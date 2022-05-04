@@ -22,9 +22,6 @@
     <Filter Include="Libs\py">
       <UniqueIdentifier>{0cf31d77-cbb3-4342-af7c-284755eb5945}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\py">
-      <UniqueIdentifier>{6f811dc8-1af0-4983-9091-453abe3772af}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
