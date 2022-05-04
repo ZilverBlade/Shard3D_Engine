@@ -1,37 +1,35 @@
-import os
-import re
+import configparser
 
-final = []
-
-
-def iniRead(data):
-    global final
-    x = re.findall("\[*[A-Z]*\]", data)
-    for i in range(len(x)):
-        data = data.replace(x[i], "")
-    data = data.replace("\n\n", "")
-    final.append(data.split(" = "))
-
-    returnSetting("Shadows")
+config = configparser.ConfigParser()
+config.read("settings.ini")
 
 
-def returnSetting(setting):
-    global final
-
-    for i in range(len(final)):
-        if setting in final[0][i]:
-            print(final[0][i])
-
-    print(final)
+def readSettingFromHeader(section, setting):
+    return config[section][setting]
 
 
-if os.path.isfile("settings.ini"):
-    text_file = open("settings.ini", "r")
-    data = text_file.read()
+def writeSettingToHeader(section, setting, value):
+    config[section][setting] = value
+    with open("settings.ini", "w") as configfile:
+        config.write(configfile)
 
-    text_file.close()
 
-    iniRead(data)
+def readAllSettingsFromHeader(section):
+    return list(config.items(section))
 
-else:
-    print("FILE NOT FOUND")
+
+def readAllHeaders():
+    return config.sections()
+
+
+def addHeader(section):
+    config.add_section(section)
+    with open("settings.ini", "w") as configfile:
+        config.write(configfile)
+
+
+def removeHeader(section):
+    config.remove_section(section)
+    with open("settings.ini", "w") as configfile:
+        config.write(configfile)
+
