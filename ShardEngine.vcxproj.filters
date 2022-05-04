@@ -16,6 +16,9 @@
     <Filter Include="shaders">
       <UniqueIdentifier>{11ecb3a1-4909-4388-85a1-e3f3819e5b59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Libs">
+      <UniqueIdentifier>{90159480-1e4b-42b9-89e7-e1bcb329dc4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -73,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="ez_render_system.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\ini.h">
+      <Filter>Header Files\Libs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

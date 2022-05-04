@@ -9,6 +9,9 @@
 #include <string>
 #include <vector>
 
+#include <fstream>
+
+
 namespace shard {
 
     class ShardSwapChain {

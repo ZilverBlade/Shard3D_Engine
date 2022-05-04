@@ -1,4 +1,5 @@
 #include "run_app.hpp"
+#include "settings_initialiser.cpp"
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>

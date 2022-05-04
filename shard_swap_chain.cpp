@@ -1,5 +1,6 @@
 #include "shard_swap_chain.hpp"
-#include "../../GameEngines/ShardEngine/shard_device.hpp"
+#include "shard_device.hpp"
+//#include "settings_initialiser.cpp"
 // std
 #include <array>
 #include <cstdlib>
@@ -8,8 +9,10 @@
 #include <limits>
 #include <set>
 #include <stdexcept>
-
-
+#include <sstream>
+#include "libs/ini.h"
+#include <typeinfo>
+using namespace inih;
 
 namespace shard {
 
@@ -387,25 +390,51 @@ VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
 }
 
 VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
-    /*
-    for (const auto &availablePresentMode : availablePresentModes) {
-    if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-      std::cout << "Present mode: Mailbox" << std::endl;
-      return availablePresentMode;
+    
+    
+    INIReader r{ "settings/graphics_settings.ini" }; //from https://github.com/SSARCandy/ini-cpp
+    //read example.cpp 
+
+    /** output
+     * v1 = "1"             type: std::string
+     * v2 = 1               type: int
+     * v3 = 1.0             type: double
+     * v4 = [1, 2, 3]       type: std::vector<float>
+     * v5 = ["1", "2", "3"] type: std::vector<std::string>
+     */
+
+
+    const auto& vsyncsetting = r.Get<std::string>("DISPLAY", "VSync");
+   
+    std::cout << "Vsync enabled? " << vsyncsetting  << std::endl;
+
+    if (vsyncsetting == "false") {
+        for (const auto& availablePresentMode : availablePresentModes) {
+            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+                std::cout << "Present mode: Mailbox" << std::endl;
+                return availablePresentMode;
+            }
+        }
     }
-  }
-    
-  for (const auto& availablePresentMode : availablePresentModes) {
-   if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-     std::cout << "Present mode: Immediate" << std::endl;
-     return availablePresentMode;
-   }
- }
- */
-  std::cout << "Present mode: V-Sync" << std::endl;
-  return VK_PRESENT_MODE_FIFO_KHR;
+    else {
+        std::cout << "Present mode: V-Sync" << std::endl;
+        return VK_PRESENT_MODE_FIFO_KHR;
+    }
+
   
-    
+ 
+
+    /*
+        for (const auto& availablePresentMode : availablePresentModes) {
+            if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+                std::cout << "Present mode: Immediate" << std::endl;
+                return availablePresentMode;
+            }
+        }
+        */
+
+        
+ 
 }
 
 VkExtent2D ShardSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) {
