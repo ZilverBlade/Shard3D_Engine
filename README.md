@@ -12,8 +12,7 @@ Also requires GLFW version 3.3.7 for the window: https://github.com/glfw/glfw/re
 
 **Read here how to set up everything:** https://vulkan-tutorial.com/Development_environment
 
-**Requires python embedding too** https://www.codeproject.com/KB/cpp/820116/EmbeddedPython3.zip
-How to embed: https://www.codeproject.com/Articles/820116/Embedding-Python-program-in-a-C-Cplusplus-code
+**Python embedding is present, and if an error occurs of "Python39.dll not found", copy the Python39.dll and Python3.dll files over to the folder where the program is being executed**
 
 ### Contributors
 

@@ -19,8 +19,11 @@
     <Filter Include="Libs">
       <UniqueIdentifier>{90159480-1e4b-42b9-89e7-e1bcb329dc4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Libs\python">
+    <Filter Include="Libs\py">
       <UniqueIdentifier>{0cf31d77-cbb3-4342-af7c-284755eb5945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\py">
+      <UniqueIdentifier>{6f811dc8-1af0-4983-9091-453abe3772af}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,7 +93,7 @@
     </None>
     <None Include="compile.bat" />
     <None Include="libs\py\main.py">
-      <Filter>Libs\python</Filter>
+      <Filter>Libs\py</Filter>
     </None>
   </ItemGroup>
 </Project>

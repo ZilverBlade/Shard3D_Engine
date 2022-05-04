@@ -1,5 +1,4 @@
 #include "run_app.hpp"
-#include "settings_initialiser.cpp"
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
@@ -13,6 +12,13 @@
 
 int main() {
 
+    PyObject* pInt;
+
+    Py_Initialize();
+
+    PyRun_SimpleString("print('Hello World from Embedded Python!!!')");
+
+    Py_Finalize();
 
     shard::RunApp app{};
     try {
