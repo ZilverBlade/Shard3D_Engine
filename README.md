@@ -1,3 +1,6 @@
+
+![](https://cdn.discordapp.com/attachments/937565381470617620/971459836652949515/Webp.net-resizeimage.png)  
+
 # Shard3D
 
 Shard3D Engine, a revolutionary engine running on Vulkan 1.3
