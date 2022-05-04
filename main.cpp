@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
+#include <Python.h>
 
 /*
     ShardEngine (2022 All rights reserved) created by ZilverBlade and Razer
@@ -11,8 +12,9 @@
 */
 
 int main() {
-    shard::RunApp app{};
 
+
+    shard::RunApp app{};
     try {
         app.run();
     }

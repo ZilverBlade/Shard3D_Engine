@@ -1,7 +1,5 @@
 #include "shard_swap_chain.hpp"
 #include "shard_device.hpp"
-//#include "settings_initialiser.cpp"
-// std
 #include <array>
 #include <cstdlib>
 #include <cstring>
@@ -10,9 +8,7 @@
 #include <set>
 #include <stdexcept>
 #include <sstream>
-#include "libs/ini.h"
 #include <typeinfo>
-using namespace inih;
 
 namespace shard {
 
@@ -391,20 +387,9 @@ VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
 
 VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     
-    
-    INIReader r{ "settings/graphics_settings.ini" }; //from https://github.com/SSARCandy/ini-cpp
-    //read example.cpp 
-
-    /** output
-     * v1 = "1"             type: std::string
-     * v2 = 1               type: int
-     * v3 = 1.0             type: double
-     * v4 = [1, 2, 3]       type: std::vector<float>
-     * v5 = ["1", "2", "3"] type: std::vector<std::string>
-     */
 
 
-    const auto& vsyncsetting = r.Get<std::string>("DISPLAY", "VSync");
+    const auto& vsyncsetting = nullptr;
    
     std::cout << "Vsync enabled? " << vsyncsetting  << std::endl;
 
