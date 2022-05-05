@@ -80,6 +80,12 @@
     <ClInclude Include="ez_render_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\ez_shader.vert">
@@ -92,5 +98,24 @@
     <None Include="libs\py\main.py">
       <Filter>Libs\py</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ShardEngine.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="shard.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="shard.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="shard_engine.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
