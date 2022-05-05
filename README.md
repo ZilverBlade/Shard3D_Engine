@@ -15,6 +15,9 @@ Make sure to install GLM and SDL2. The install of the contents of the SDK **MUST
 
 **Python embedding is present, and if an error occurs of "Python39.dll not found", copy the Python39.dll and Python3.dll files over to the folder where the program is being executed**
 
+**YOU ALSO NEED VIDUAL STUDIO 2019 OR ELSE THE BUILD WILL FAIL** 
+
+
 ### Contributors
 
 - [@ZilverBlade](https://www.github.com/ZilverBlade)
