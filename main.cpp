@@ -2,8 +2,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
-#include <Python.h>
 
+//#include "fmod_engine/play_sound.cpp"
 /*
     ShardEngine (2022 All rights reserved) created by ZilverBlade and Razer
     Huge shoutout to Brendan Galea https://www.youtube.com/channel/UC9pXmjxsQHeFH9vgCeRsHcw
@@ -12,13 +12,18 @@
 
 int main() {
 
-    PyObject* pInt;
+    /*
+    char filename[] = "libs/py/main.py"; //path the the file here
+	FILE* fp;
 
-    Py_Initialize();
+	Py_Initialize();
 
-    PyRun_SimpleString("print('Hello World from Embedded Python!')");
+	fp = _Py_fopen(filename, "r");
+	PyRun_SimpleFile(fp, filename);
 
-    Py_Finalize();
+	Py_Finalize();
+    
+  */
 
     shard::RunApp app{};
     try {
