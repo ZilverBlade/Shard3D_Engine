@@ -11,8 +11,6 @@ Shard3D Engine, a revolutionary engine running on Vulkan 1.3
 Requires version **1.3.211.0** of Vulkan SDK: https://vulkan.lunarg.com/sdk/home#windows
 Make sure to install GLM and SDL2. The install of the contents of the SDK **MUST** be "D:\GameEngines\Vulkan-1.3.211.0"
 
-**Read here how to set up everything:** https://vulkan-tutorial.com/Development_environment
-
 **Python embedding is present, and if an error occurs of "Python39.dll not found", copy the Python39.dll and Python3.dll files over to the folder where the program is being executed**
 
 **YOU ALSO NEED VIDUAL STUDIO 2019 OR ELSE THE BUILD WILL FAIL** 
