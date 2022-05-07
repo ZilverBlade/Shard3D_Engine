@@ -5,9 +5,6 @@
 
 #include "FMOD_engine/fmod_engine.hpp"
 #include <string>
-//#include <Python.h>
-
-
 
 /*
     ShardEngine (2022 All rights reserved) created by ZilverBlade and Razer
@@ -16,22 +13,11 @@
 */
 
 int main() {
-
-    /*
-    char filename[] = "libs/py/main.py"; //path the the file here
-	FILE* fp;
-
-	Py_Initialize();
-
-	fp = _Py_fopen(filename, "r");
-	int var = static_cast<uint32_t>(PyRun_SimpleFile(fp, filename));
-    std::cout << var << std::endl;
-	Py_Finalize();
-    */
+    int blob;   
 
     fmod_engine::FMOD_Engine fmodengine;
     fmodengine.PlaySound("sounddata/9kkkkkkkkkk.wav"); //zyn :)
-    
+
     shard::RunApp app{};
     try {
         app.run();
@@ -40,6 +26,6 @@ int main() {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
-    
+    std::cin >> blob;
     return EXIT_SUCCESS;
 }
