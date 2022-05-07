@@ -16,8 +16,9 @@ int main() {
     int blob;   
 
     fmod_engine::FMOD_Engine fmodengine;
-    fmodengine.PlaySound("sounddata/9kkkkkkkkkk.wav"); //zyn :)
-
+    //fmodengine.PlaySoundFile("sounddata/9kkkkkkkkkk.wav"); //zyn :)
+    fmodengine.PlayBankAction("sounddata/FMOD/Desktop/Master.bank", "sounddata/FMOD/Desktop/Master.strings.bank", "sounddata/FMOD/Desktop/engines.bank", "event:/carsounds/arrive");
+    fmodengine.PlayBankAction("sounddata/FMOD/Desktop/Master.bank", "sounddata/FMOD/Desktop/Master.strings.bank", "sounddata/FMOD/Desktop/engines.bank", "event:/carsounds/idlerace", "car_level", 2);
     shard::RunApp app{};
     try {
         app.run();
@@ -26,6 +27,6 @@ int main() {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
-    std::cin >> blob;
+
     return EXIT_SUCCESS;
 }
