@@ -23,7 +23,7 @@
       <UniqueIdentifier>{0cf31d77-cbb3-4342-af7c-284755eb5945}</UniqueIdentifier>
     </Filter>
     <Filter Include="fmod">
-      <UniqueIdentifier>{36c07e50-ed68-4442-aa3a-12de2a6aa8f9}</UniqueIdentifier>
+      <UniqueIdentifier>{1e614f4c-cefb-490a-9c9f-6a16aa54985a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +54,7 @@
     <ClCompile Include="ez_render_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fmod_engine.cpp">
+    <ClCompile Include="FMOD_engine\fmod_engine.cpp">
       <Filter>fmod</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,6 +92,9 @@
     <ClInclude Include="resource1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FMOD_engine\fmod_engine.hpp">
+      <Filter>fmod</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\ez_shader.vert">
@@ -123,5 +126,8 @@
     <Image Include="shard_engine.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="credits.txt" />
   </ItemGroup>
 </Project>

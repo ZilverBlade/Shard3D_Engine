@@ -3,9 +3,9 @@
 #include <cstdlib>
 #include <stdexcept>
 
-#include <fmod.hpp>
+#include "FMOD_engine/fmod_engine.hpp"
 #include <string>
-
+//#include <Python.h>
 
 
 
@@ -24,26 +24,14 @@ int main() {
 	Py_Initialize();
 
 	fp = _Py_fopen(filename, "r");
-	PyRun_SimpleFile(fp, filename);
-
+	int var = static_cast<uint32_t>(PyRun_SimpleFile(fp, filename));
+    std::cout << var << std::endl;
 	Py_Finalize();
+    */
+
+    fmod_engine::FMOD_Engine fmodengine;
+    fmodengine.PlaySound("sounddata/9kkkkkkkkkk.wav"); //zyn :)
     
-  */
-
-    //move this code to a different executable/dll or move it to the fmod_engine.cpp file
-    FMOD_RESULT result;
-    FMOD::System* system = NULL;
-    FMOD::Sound* sound1;
-    FMOD::Channel* channel = 0;
-    result = FMOD::System_Create(&system);
-
-    result = system->init(512, 0, 0);
-
-    result = system->createSound("sounddata/sigma.mp3", FMOD_DEFAULT, 0, &sound1);
-    result = system->playSound(sound1, 0, false, &channel);
-
-    result = system->update();
-
     shard::RunApp app{};
     try {
         app.run();
