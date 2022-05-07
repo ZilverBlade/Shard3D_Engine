@@ -40,18 +40,24 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)$(Suffix)</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\..\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\inc;D:\GameEngines\Vulkan-1.3.211.0\Include;D:\GameEngines\Vulkan-1.3.211.0\Include\glm</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\lib\$(Arch)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>fmod$(Suffix)_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib\;D:\GameEngines\Vulkan-1.3.211.0\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;fmod$(Suffix)_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>if not exist ..\bin mkdir ..\bin

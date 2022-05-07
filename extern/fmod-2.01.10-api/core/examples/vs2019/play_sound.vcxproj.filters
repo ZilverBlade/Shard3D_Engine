@@ -7,6 +7,7 @@
     <ClCompile Include="..\common_platform.cpp">
       <Filter>common</Filter>
     </ClCompile>
+    <ClCompile Include="..\play_sound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="common">

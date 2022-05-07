@@ -22,6 +22,9 @@
     <Filter Include="Libs\py">
       <UniqueIdentifier>{0cf31d77-cbb3-4342-af7c-284755eb5945}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fmod">
+      <UniqueIdentifier>{36c07e50-ed68-4442-aa3a-12de2a6aa8f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -50,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="ez_render_system.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fmod_engine.cpp">
+      <Filter>fmod</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
