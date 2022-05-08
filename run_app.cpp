@@ -6,6 +6,9 @@
 #include "run_app.hpp"
 #include <stdexcept>
 #include <array>
+#include "FMOD_engine/fmod_core_engine.hpp"
+#include "FMOD_engine/fmod_studio_engine.hpp"
+
 
 namespace shard {
 
@@ -15,6 +18,20 @@ namespace shard {
 	RunApp::~RunApp() {}
 	void RunApp::run() {
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
+
+		/*
+			just some fmod stuff bcos why not
+		*/
+
+		fmod_engine::FMOD_Core_Engine fmodcore;
+		fmod_engine::FMOD_Studio_Engine fmodstudio;
+
+		fmodcore.PlaySoundFile("sounddata/9kkkkkkkkkk.wav"); //zyn :)
+		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/arrive");
+		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/idlerace", "car_level", 0);
+
+		fmodcore.UpdateVolume(0.75);
+		fmodcore.UpdatePitch(0.9);
 
 		while (!shardWindow.shouldClose()) {
 			glfwPollEvents();

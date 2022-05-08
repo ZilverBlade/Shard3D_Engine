@@ -2,8 +2,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
-
-#include "FMOD_engine/fmod_engine.hpp"
 #include <string>
 
 /*
@@ -13,14 +11,8 @@
 */
 
 int main() {
-    int blob;   
 
-    fmod_engine::FMOD_Engine fmodengine;
-    fmodengine.PlaySoundFile("sounddata/9kkkkkkkkkk.wav"); //zyn :)
-    fmodengine.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/arrive");
-    fmodengine.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/idlerace", "car_level", 0);
-
-    fmodengine.UpdateSoundFile(1, 0.9);
+    
 
     shard::RunApp app{};
     try {

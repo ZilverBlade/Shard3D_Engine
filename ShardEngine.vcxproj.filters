@@ -19,6 +19,9 @@
     <Filter Include="fmod">
       <UniqueIdentifier>{1e614f4c-cefb-490a-9c9f-6a16aa54985a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="video">
+      <UniqueIdentifier>{0286045d-dc31-4f9b-a0ca-c19176fd378b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -48,7 +51,10 @@
     <ClCompile Include="ez_render_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FMOD_engine\fmod_engine.cpp">
+    <ClCompile Include="FMOD_engine\fmod_core_engine.cpp">
+      <Filter>fmod</Filter>
+    </ClCompile>
+    <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp">
       <Filter>fmod</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +92,10 @@
     <ClInclude Include="resource1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FMOD_engine\fmod_engine.hpp">
+    <ClInclude Include="FMOD_engine\fmod_core_engine.hpp">
+      <Filter>fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="FMOD_engine\fmod_studio_engine.hpp">
       <Filter>fmod</Filter>
     </ClInclude>
   </ItemGroup>
