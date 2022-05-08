@@ -5,12 +5,15 @@ namespace fmod_engine {
 
 class FMOD_Engine {
 public:
-	void PlayBankAction(const char* masterBankPath, const char* masterStringBankPath, const char* bankPath, const char* eventName);
-	void PlayBankAction(const char* masterBankPath, const char* masterStringBankPath, const char* bankPath, const char* eventName, const char* paramName, float paramVal);
-	//void PlayBankAction(const char* masterBankPath, const char* masterStringBankPath, const char* bankPath, const char* eventName, const char* paramLblName, const char* paramVal);
+	void PlayBankEvent(const char* desktopPath, const char* bankName, const char* eventName);
+	void PlayBankEvent(const char* desktopPath, const char* bankName, const char* eventName, const char* paramName, float paramVal);
+
 	void PlaySoundFile(const char* soundPath);
+
+	void UpdateSoundFile();
+	void UpdateSoundFile(float volume, float pitch);
+
 	void ReleaseCore();
 	void ReleaseStudio();
 };
-
 }

@@ -18,9 +18,7 @@ namespace shard {
 
 		while (!shardWindow.shouldClose()) {
 			glfwPollEvents();
-
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
-
 				/*
 					this section is great for adding multiple render passes such as :
 					- Begin offscreen shadow pass

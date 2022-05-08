@@ -11,7 +11,7 @@ namespace shard {
 	}
 
 	void ShardModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
-		vertexCount = static_cast<uint32_t>(vertices.size());
+		vertexCount = (uint32_t)(vertices.size());
 
 		assert(vertexCount >= 3 && "Vertex count must be at least 3");
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
