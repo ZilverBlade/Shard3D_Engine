@@ -34,6 +34,9 @@
     <Filter Include="Source Files\controller">
       <UniqueIdentifier>{88cde4e0-6691-42ba-b27c-a8664df01984}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{bfead136-06a5-47ca-8310-e953ba580285}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -127,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="input\mouse_movement_controller.hpp">
       <Filter>Header Files\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\shard_utils.hpp">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

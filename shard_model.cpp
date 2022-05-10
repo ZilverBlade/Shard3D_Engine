@@ -1,5 +1,29 @@
 #include "shard_model.hpp"
+#include "utils/shard_utils.hpp"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+
 #include <cassert>
+#include <cstring>
+#include <iostream>
+#include <unordered_map>>
+
+//object loaders
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
+
+namespace std {
+	template <>
+	struct hash<shard::ShardModel::Vertex> {
+		size_t operator()(shard::ShardModel::Vertex const& vertex) const {
+			size_t seed = 0;
+			shard::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+			return seed;
+		}
+	};
+}
+
 namespace shard {
 
 	ShardModel::ShardModel(ShardDevice& device, const ShardModel::Builder &builder) : shardDevice{device} {
@@ -14,6 +38,24 @@ namespace shard {
 			vkDestroyBuffer(shardDevice.device(), indexBuffer, nullptr);
 			vkFreeMemory(shardDevice.device(), indexBufferMemory, nullptr);
 		}
+	}
+
+	std::unique_ptr<ShardModel> ShardModel::createModelFromFile(ShardDevice& device, const std::string& filepath, bool indexModel) {
+		Builder builder{};
+		
+		if (indexModel) {
+			builder.loadIndexedModel(filepath);
+			std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << "\n";
+			return std::make_unique<ShardModel>(device, builder);
+		}
+		else {
+			builder.loadModel(filepath);
+			std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << " (higher vertex count due to no indexing)\n";
+			return std::make_unique<ShardModel>(device, builder);
+		}
+		
+
+		
 	}
 
 	void ShardModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
@@ -85,7 +127,6 @@ namespace shard {
 		vkFreeMemory(shardDevice.device(), stagingBufferMemory, nullptr);
 	}
 
-
 	void ShardModel::bind(VkCommandBuffer commandBuffer) {
 		VkBuffer buffers[] = { vertexBuffer };
 		VkDeviceSize offsets[] = { 0 };
@@ -95,6 +136,7 @@ namespace shard {
 			vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 		}
 	}
+
 	void ShardModel::draw(VkCommandBuffer commandBuffer) {
 		if (hasIndexBuffer) {
 			vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
@@ -115,5 +157,111 @@ namespace shard {
 		};
 	}
 
+	void ShardModel::Builder::loadIndexedModel(const std::string& filepath) {
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		std::string warn, err;
 
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
+			throw std::runtime_error(warn + err);
+		}
+
+		vertices.clear();
+		indices.clear();
+
+		std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+		for (const auto &shape : shapes) {
+			for (const auto &index : shape.mesh.indices) {
+				Vertex vertex{};
+
+				if (index.vertex_index >= 0) {
+					vertex.position = {
+						attrib.vertices[3 * index.vertex_index],
+						attrib.vertices[3 * index.vertex_index + 1],
+						attrib.vertices[3 * index.vertex_index + 2],
+					};		
+
+					auto colorIndex = 3 * index.vertex_index + 2;
+					if (colorIndex < attrib.colors.size()) {
+						vertex.color = {
+							attrib.colors[colorIndex - 2],
+							attrib.colors[colorIndex - 1],
+							attrib.colors[colorIndex],
+						};
+					}
+				}
+				if (index.normal_index >= 0) {
+					vertex.normal = {
+						attrib.normals[3 * index.normal_index],
+						attrib.normals[3 * index.normal_index + 1],
+						attrib.normals[3 * index.normal_index + 2],
+					};
+				}
+				if (index.texcoord_index >= 0) {
+					vertex.uv = {
+						attrib.texcoords[2 * index.texcoord_index],
+						attrib.texcoords[2 * index.texcoord_index + 1],
+					};
+				}
+
+				if (uniqueVertices.count(vertex) == 0) {
+					uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+					vertices.push_back(vertex);
+				}
+				indices.push_back(uniqueVertices[vertex]);
+			}
+		}
+	}
+
+	void ShardModel::Builder::loadModel(const std::string& filepath) {
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		std::string warn, err;
+
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
+			throw std::runtime_error(warn + err);
+		}
+
+		vertices.clear();
+		indices.clear();
+
+		for (const auto& shape : shapes) {
+			for (const auto& index : shape.mesh.indices) {
+				Vertex vertex{};
+
+				if (index.vertex_index >= 0) {
+					vertex.position = {
+						attrib.vertices[3 * index.vertex_index],
+						attrib.vertices[3 * index.vertex_index + 1],
+						attrib.vertices[3 * index.vertex_index + 2],
+					};
+
+					auto colorIndex = 3 * index.vertex_index + 2;
+					if (colorIndex < attrib.colors.size()) {
+						vertex.color = {
+							attrib.colors[colorIndex - 2],
+							attrib.colors[colorIndex - 1],
+							attrib.colors[colorIndex],
+						};
+					}
+				}
+				if (index.normal_index >= 0) {
+					vertex.normal = {
+						attrib.normals[3 * index.normal_index],
+						attrib.normals[3 * index.normal_index + 1],
+						attrib.normals[3 * index.normal_index + 2],
+					};
+				}
+				if (index.texcoord_index >= 0) {
+					vertex.uv = {
+						attrib.texcoords[2 * index.texcoord_index],
+						attrib.texcoords[2 * index.texcoord_index + 1],
+					};
+				}
+				vertices.push_back(vertex);
+			}
+		}
+	}
 }
