@@ -33,8 +33,6 @@ namespace shard {
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
 		ShardCamera camera{};
 
-		glfwSetInputMode(shardWindow.getGLFWwindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-
 		auto viewerObject = ShardGameObject::createGameObject();
 		controller::KeyboardMovementController cameraControllerKeyBoard{};
 		controller::MouseMovementController cameraControllerMouse{};
@@ -45,18 +43,18 @@ namespace shard {
 		std::cout << "FOV set to " << fov << " degrees" << std::endl;
 		/*
 			just some fmod stuff bcos why not
-		
+		*/
 
 		fmod_engine::FMOD_Core_Engine fmodcore;
 		fmod_engine::FMOD_Studio_Engine fmodstudio;
 
-		fmodcore.PlaySoundFile("sounddata/9kkkkkkkkkk.wav"); //zyn :)
+		fmodcore.PlaySoundFile("sounddata/9kkkkkkkkkk.mp3"); //zyn :)
 		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/arrive");
 		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/idlerace", "car_level", 0);
 
 		fmodcore.UpdateVolume(0.75);
 		fmodcore.UpdatePitch(0.9);
-		*/
+		
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!shardWindow.shouldClose()) {

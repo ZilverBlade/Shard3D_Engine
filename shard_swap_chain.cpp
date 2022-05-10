@@ -374,8 +374,8 @@ VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
   for (const auto &availableFormat : availableFormats) {
      
- 
-    if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+ //for config setting
+    if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB /*VK_FORMAT_B8G8R8A8_UNORM*/ && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
         return availableFormat;
         //hasChosen = true;
     }
@@ -390,7 +390,7 @@ VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPrese
 
 
     const auto& vsyncsetting = nullptr;
-   
+   //for config setting
     std::cout << "Vsync enabled? " << vsyncsetting  << std::endl;
 
     if (vsyncsetting == "") {
