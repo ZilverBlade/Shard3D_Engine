@@ -3,14 +3,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include "ez_render_system.hpp"
+#include "camera.hpp"
 #include "run_app.hpp"
 #include <stdexcept>
 #include <array>
 #include "FMOD_engine/fmod_core_engine.hpp"
 #include "FMOD_engine/fmod_studio_engine.hpp"
+#include <iostream>
 
 
 namespace shard {
+	float fov = 70.f;
 
 	RunApp::RunApp() {
 		loadGameObjects();
@@ -18,10 +21,12 @@ namespace shard {
 	RunApp::~RunApp() {}
 	void RunApp::run() {
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
-
+		ShardCamera camera{};
+		
+		std::cout << "FOV set to " << fov << " degrees" << std::endl;
 		/*
 			just some fmod stuff bcos why not
-		*/
+		
 
 		fmod_engine::FMOD_Core_Engine fmodcore;
 		fmod_engine::FMOD_Studio_Engine fmodstudio;
@@ -32,9 +37,15 @@ namespace shard {
 
 		fmodcore.UpdateVolume(0.75);
 		fmodcore.UpdatePitch(0.9);
-
+		*/
 		while (!shardWindow.shouldClose()) {
 			glfwPollEvents();
+
+			float aspect = shardRenderer.getAspectRatio();
+			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+			
+			camera.setPerspectiveProjection(glm::radians(fov), aspect, 0.1f, 10.f);
+
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
 				/*
 					this section is great for adding multiple render passes such as :
@@ -45,7 +56,7 @@ namespace shard {
 					Also reflections and Postfx
 				*/
 				shardRenderer.beginSwapChainRenderPass(commandBuffer); 
-				ezRenderSystem.renderGameObjects(commandBuffer, gameObjects);
+				ezRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
 				shardRenderer.endSwapChainRenderPass(commandBuffer);
 				shardRenderer.endFrame();
 			}
@@ -118,7 +129,7 @@ namespace shard {
 
 		auto cube = ShardGameObject::createGameObject();
 		cube.model = shardModel;
-		cube.transform.translation = { .0f, .0f, .5f };
+		cube.transform.translation = { .0f, .0f, 1.5f };
 		cube.transform.scale = { .5f, .5f, .5f };
 
 		gameObjects.push_back(std::move(cube));

@@ -61,7 +61,7 @@ namespace shard {
 
 
 
-	void EzRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<ShardGameObject>& gameObjects) {
+	void EzRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<ShardGameObject>& gameObjects, const ShardCamera& camera) {
 		shardPipeline->bind(commandBuffer);
 
 		for (auto& obj : gameObjects) {
@@ -70,7 +70,8 @@ namespace shard {
 
 			SimplePushConstantData push{};
 			push.color = obj.color;
-			push.transform = obj.transform.mat4();
+			push.transform = camera.getProjection() * obj.transform.mat4();
+
 			vkCmdPushConstants(
 				commandBuffer,
 				pipelineLayout,

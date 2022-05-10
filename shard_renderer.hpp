@@ -20,6 +20,7 @@ namespace shard {
 		ShardRenderer &operator=(const ShardRenderer &) = delete;
 
 		VkRenderPass getSwapChainRenderPass() const { return shardSwapChain->getRenderPass(); }
+		float getAspectRatio() const { return shardSwapChain->extentAspectRatio(); }
 		bool isFrameInProgress() const { return isFrameStarted; }
 
 		VkCommandBuffer getCurrentCommandBuffer() const { 

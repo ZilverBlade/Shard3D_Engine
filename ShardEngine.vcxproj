@@ -211,6 +211,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="ez_render_system.cpp" />
     <ClCompile Include="FMOD_engine\fmod_core_engine.cpp" />
     <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp" />
@@ -224,6 +225,7 @@
     <ClCompile Include="shard_pipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.hpp" />
     <ClInclude Include="FMOD_engine\fmod_core_engine.hpp" />
     <ClInclude Include="FMOD_engine\fmod_studio_engine.hpp" />
     <ClInclude Include="resource.h" />

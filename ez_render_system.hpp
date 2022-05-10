@@ -4,6 +4,8 @@
 #include "shard_pipeline.hpp"
 #include "shard_device.hpp"
 
+#include "camera.hpp"
+
 #include "shard_game_object.hpp"
 #include <string>
 #include "shard_renderer.hpp"
@@ -21,7 +23,7 @@ namespace shard {
 		EzRenderSystem(const EzRenderSystem&) = delete;
 		EzRenderSystem& operator=(const EzRenderSystem&) = delete;
 
-		void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<ShardGameObject> &gameObjects);
+		void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<ShardGameObject> &gameObjects, const ShardCamera &camera);
 
 	private:
 

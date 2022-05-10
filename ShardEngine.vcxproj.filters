@@ -22,6 +22,12 @@
     <Filter Include="video">
       <UniqueIdentifier>{0286045d-dc31-4f9b-a0ca-c19176fd378b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\camera">
+      <UniqueIdentifier>{54673cef-4b64-4773-afe5-0b252061d3ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\camera">
+      <UniqueIdentifier>{add15f1f-a7c7-4071-b012-3f3ecc58d786}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -56,6 +62,9 @@
     </ClCompile>
     <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp">
       <Filter>fmod</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files\camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="FMOD_engine\fmod_studio_engine.hpp">
       <Filter>fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.hpp">
+      <Filter>Header Files\camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
