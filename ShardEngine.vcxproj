@@ -216,6 +216,7 @@
     <ClCompile Include="FMOD_engine\fmod_core_engine.cpp" />
     <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp" />
     <ClCompile Include="input\keyboard_movement_controller.cpp" />
+    <ClCompile Include="input\mouse_movement_controller.cpp" />
     <ClCompile Include="shard_swap_chain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shard_device.cpp" />
@@ -230,6 +231,13 @@
     <ClInclude Include="FMOD_engine\fmod_core_engine.hpp" />
     <ClInclude Include="FMOD_engine\fmod_studio_engine.hpp" />
     <ClInclude Include="input\keyboard_movement_controller.hpp" />
+    <ClInclude Include="input\mouse_movement_controller.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DeploymentContent>false</DeploymentContent>
+    </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="shard_swap_chain.hpp" />

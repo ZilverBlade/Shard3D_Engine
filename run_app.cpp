@@ -17,6 +17,7 @@
 //engine
 #include "ez_render_system.hpp"
 #include "input/keyboard_movement_controller.hpp"
+#include "input/mouse_movement_controller.hpp"
 #include "camera.hpp"
 #include "run_app.hpp"
 
@@ -32,8 +33,14 @@ namespace shard {
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
 		ShardCamera camera{};
 
+		glfwSetInputMode(shardWindow.getGLFWwindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
 		auto viewerObject = ShardGameObject::createGameObject();
-		controller::KeyboardMovementController cameraController{};
+		controller::KeyboardMovementController cameraControllerKeyBoard{};
+		controller::MouseMovementController cameraControllerMouse{};
+
+		double mousePosX = {};
+		double mousePosY = {};
 
 		std::cout << "FOV set to " << fov << " degrees" << std::endl;
 		/*
@@ -62,11 +69,16 @@ namespace shard {
 
 			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
-			cameraController.moveInPlaneXZ(shardWindow.getGLFWwindow(), frameTime, viewerObject);
+			glfwGetCursorPos(shardWindow.getGLFWwindow(), &mousePosX, &mousePosY);
+
+			cameraControllerKeyBoard.moveInPlaneXZ(shardWindow.getGLFWwindow(), frameTime, viewerObject);
+			cameraControllerMouse.moveInPlaneXZ(shardWindow.getGLFWwindow(), frameTime, viewerObject, { mousePosX, mousePosY });
+			
 			camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
 			float aspect = shardRenderer.getAspectRatio();
-			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+
+			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);  //Ortho perspective (not needed 99.99% of the time)
 			
 			camera.setPerspectiveProjection(glm::radians(fov), aspect, 0.1f, 15.f);
 

@@ -9,7 +9,7 @@ namespace shard {
 	public:
 		ShardWindow(int w, int h, std::string name);
 		~ShardWindow();
-
+		
 		ShardWindow(const ShardWindow&) = delete;
 		ShardWindow& operator=(const ShardWindow&) = delete;
 

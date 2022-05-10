@@ -393,7 +393,7 @@ VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPrese
    
     std::cout << "Vsync enabled? " << vsyncsetting  << std::endl;
 
-    if (vsyncsetting == "false") {
+    if (vsyncsetting == "") {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                 std::cout << "Present mode: Mailbox" << std::endl;
