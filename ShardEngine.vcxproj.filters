@@ -28,6 +28,12 @@
     <Filter Include="Source Files\camera">
       <UniqueIdentifier>{add15f1f-a7c7-4071-b012-3f3ecc58d786}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\controller">
+      <UniqueIdentifier>{b1096672-e261-4aba-9deb-be3d4a3588c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\controller">
+      <UniqueIdentifier>{88cde4e0-6691-42ba-b27c-a8664df01984}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -65,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="camera.cpp">
       <Filter>Source Files\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="input\keyboard_movement_controller.cpp">
+      <Filter>Source Files\controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="camera.hpp">
       <Filter>Header Files\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="input\keyboard_movement_controller.hpp">
+      <Filter>Header Files\controller</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

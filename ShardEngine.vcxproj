@@ -215,6 +215,7 @@
     <ClCompile Include="ez_render_system.cpp" />
     <ClCompile Include="FMOD_engine\fmod_core_engine.cpp" />
     <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp" />
+    <ClCompile Include="input\keyboard_movement_controller.cpp" />
     <ClCompile Include="shard_swap_chain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shard_device.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="FMOD_engine\fmod_core_engine.hpp" />
     <ClInclude Include="FMOD_engine\fmod_studio_engine.hpp" />
+    <ClInclude Include="input\keyboard_movement_controller.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="shard_swap_chain.hpp" />

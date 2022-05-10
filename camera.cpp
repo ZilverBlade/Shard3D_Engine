@@ -48,7 +48,7 @@ namespace shard {
 	}
 
 	void ShardCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
-		assert((target - position) != 0 && "direction cannot be 0");
+		//assert((target - position) != 0 && "direction cannot be 0");
 		setViewDirection(position, target - position, up);
 	}
 

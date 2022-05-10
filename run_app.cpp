@@ -1,15 +1,24 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-#include "ez_render_system.hpp"
-#include "camera.hpp"
-#include "run_app.hpp"
+
+//lib stuff
+#include <iostream>
+#include <chrono>
 #include <stdexcept>
 #include <array>
+//glm
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
+//fmod
 #include "FMOD_engine/fmod_core_engine.hpp"
 #include "FMOD_engine/fmod_studio_engine.hpp"
-#include <iostream>
+
+//engine
+#include "ez_render_system.hpp"
+#include "input/keyboard_movement_controller.hpp"
+#include "camera.hpp"
+#include "run_app.hpp"
 
 
 namespace shard {
@@ -22,8 +31,9 @@ namespace shard {
 	void RunApp::run() {
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
 		ShardCamera camera{};
-		//camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5, 0.f, 1.f));
-		camera.setViewTarget(glm::vec3(-1.f, -2.f, -11.f), glm::vec3(0.f, 0.f, 1.5f));
+
+		auto viewerObject = ShardGameObject::createGameObject();
+		controller::KeyboardMovementController cameraController{};
 
 		std::cout << "FOV set to " << fov << " degrees" << std::endl;
 		/*
@@ -40,8 +50,20 @@ namespace shard {
 		fmodcore.UpdateVolume(0.75);
 		fmodcore.UpdatePitch(0.9);
 		*/
+
+		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!shardWindow.shouldClose()) {
 			glfwPollEvents();
+
+
+			auto newTime = std::chrono::high_resolution_clock::now();
+			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+			currentTime = newTime;
+
+			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
+
+			cameraController.moveInPlaneXZ(shardWindow.getGLFWwindow(), frameTime, viewerObject);
+			camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
 			float aspect = shardRenderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
