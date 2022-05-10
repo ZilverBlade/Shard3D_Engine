@@ -45,7 +45,7 @@ namespace shard {
 
 	std::vector<VkVertexInputAttributeDescription> ShardModel::Vertex::getAttributeDescriptions() {
 		return { 
-			{0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, position)},	//position
+			{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)},	//position
 			{1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)}		//colour
 		};
 	}
