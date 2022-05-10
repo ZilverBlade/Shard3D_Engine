@@ -22,7 +22,9 @@ namespace shard {
 	void RunApp::run() {
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
 		ShardCamera camera{};
-		
+		//camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5, 0.f, 1.f));
+		camera.setViewTarget(glm::vec3(-1.f, -2.f, -11.f), glm::vec3(0.f, 0.f, 1.5f));
+
 		std::cout << "FOV set to " << fov << " degrees" << std::endl;
 		/*
 			just some fmod stuff bcos why not
@@ -44,7 +46,7 @@ namespace shard {
 			float aspect = shardRenderer.getAspectRatio();
 			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
 			
-			camera.setPerspectiveProjection(glm::radians(fov), aspect, 0.1f, 10.f);
+			camera.setPerspectiveProjection(glm::radians(fov), aspect, 0.1f, 15.f);
 
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
 				/*
