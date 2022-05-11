@@ -20,10 +20,11 @@
 #include "input/mouse_movement_controller.hpp"
 #include "camera.hpp"
 #include "run_app.hpp"
+#include "simpleini/simple_ini.h"
 
 
 namespace shard {
-	float fov = 70.f;
+	CSimpleIniA ini;
 
 	RunApp::RunApp() {
 		loadGameObjects();
@@ -40,7 +41,13 @@ namespace shard {
 		double mousePosX = {};
 		double mousePosY = {};
 
-		std::cout << "FOV set to " << fov << " degrees" << std::endl;
+
+		ini.SetUnicode();
+		ini.LoadFile("settings/engine_settings.ini");
+
+		float fov = ini.GetDoubleValue("DISPLAY", "FOV");
+		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
+
 		/*
 			just some fmod stuff bcos why not
 		*/
@@ -50,10 +57,10 @@ namespace shard {
 
 		fmodcore.PlaySoundFile("sounddata/9kkkkkkkkkk.mp3"); //zyn :)
 		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/arrive");
-		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/idlerace", "car_level", 0);
+		//fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/idlerace", "car_level", 0);
 
-		fmodcore.UpdateVolume(0.75);
-		fmodcore.UpdatePitch(0.9);
+		fmodcore.UpdateVolume(0.55);
+		fmodcore.UpdatePitch(1);
 		
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
@@ -75,10 +82,14 @@ namespace shard {
 			camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
 			float aspect = shardRenderer.getAspectRatio();
-
-			//camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);  //Ortho perspective (not needed 99.99% of the time)
 			
-			camera.setPerspectiveProjection(glm::radians(fov), aspect, 0.1f, 15.f);
+			if ((std::string)ini.GetValue("DISPLAY", "View") == "Perspective") {
+				camera.setPerspectiveProjection(glm::radians(fov), aspect, ini.GetDoubleValue("DISPLAY", "NearClipDistance"), ini.GetDoubleValue("DISPLAY", "FarClipDistance"));
+			}
+			else if ((std::string)ini.GetValue("DISPLAY", "View") == "Orthographic"){
+				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("DISPLAY", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
+			}
+			
 
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
 				/*
@@ -118,6 +129,24 @@ namespace shard {
 		gameObject2.transform.scale = { .5f, .5f, .5f };
 		gameObject2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.push_back(std::move(gameObject2));
+
+		std::shared_ptr<ShardModel> sphere = ShardModel::createModelFromFile(shardDevice, "modeldata/sphere.obj", false);
+
+		auto gameObject3 = ShardGameObject::createGameObject();
+		gameObject3.model = sphere;
+		gameObject3.transform.translation = { 3.0f, .0f, 5.5f };
+		gameObject3.transform.scale = { 1.45f, .5f, .5f };
+		gameObject3.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.push_back(std::move(gameObject3));
+
+		std::shared_ptr<ShardModel> cyl = ShardModel::createModelFromFile(shardDevice, "modeldata/cylinder.obj");
+
+		auto gameObject4 = ShardGameObject::createGameObject();
+		gameObject4.model = cyl;
+		gameObject4.transform.translation = { 5.0f, .0f, 5.5f };
+		gameObject4.transform.scale = { .5f, .5f, .5f };
+		gameObject4.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.push_back(std::move(gameObject4));
 
 	}
 }

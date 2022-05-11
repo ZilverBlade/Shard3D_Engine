@@ -217,6 +217,7 @@
     <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp" />
     <ClCompile Include="input\keyboard_movement_controller.cpp" />
     <ClCompile Include="input\mouse_movement_controller.cpp" />
+    <ClCompile Include="shard_game_object.cpp" />
     <ClCompile Include="shard_swap_chain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shard_device.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="shard_pipeline.hpp" />
     <ClInclude Include="shard_renderer.hpp" />
     <ClInclude Include="shard_window.hpp" />
+    <ClInclude Include="simpleini\simple_ini.h" />
     <ClInclude Include="utils\shard_utils.hpp" />
   </ItemGroup>
   <ItemGroup>

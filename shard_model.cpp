@@ -41,8 +41,7 @@ namespace shard {
 	}
 
 	std::unique_ptr<ShardModel> ShardModel::createModelFromFile(ShardDevice& device, const std::string& filepath, bool indexModel) {
-		Builder builder{};
-		
+		Builder builder{};	
 		if (indexModel) {
 			builder.loadIndexedModel(filepath);
 			std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << "\n";
@@ -52,10 +51,7 @@ namespace shard {
 			builder.loadModel(filepath);
 			std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << " (higher vertex count due to no indexing)\n";
 			return std::make_unique<ShardModel>(device, builder);
-		}
-		
-
-		
+		}	
 	}
 
 	void ShardModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
@@ -151,10 +147,14 @@ namespace shard {
 	}
 
 	std::vector<VkVertexInputAttributeDescription> ShardModel::Vertex::getAttributeDescriptions() {
-		return { 
-			{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)},	//position
-			{1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)}		//colour
-		};
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
+		
+		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)});
+		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)});
+		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal) });
+		attributeDescriptions.push_back({ 3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv) });
+
+		return attributeDescriptions;
 	}
 
 	void ShardModel::Builder::loadIndexedModel(const std::string& filepath) {
@@ -174,22 +174,17 @@ namespace shard {
 		for (const auto &shape : shapes) {
 			for (const auto &index : shape.mesh.indices) {
 				Vertex vertex{};
-
 				if (index.vertex_index >= 0) {
 					vertex.position = {
 						attrib.vertices[3 * index.vertex_index],
 						attrib.vertices[3 * index.vertex_index + 1],
 						attrib.vertices[3 * index.vertex_index + 2],
+					};														
+					vertex.color = {
+						attrib.colors[3 * index.vertex_index],
+						attrib.colors[3 * index.vertex_index + 1],
+						attrib.colors[3 * index.vertex_index + 2],
 					};		
-
-					auto colorIndex = 3 * index.vertex_index + 2;
-					if (colorIndex < attrib.colors.size()) {
-						vertex.color = {
-							attrib.colors[colorIndex - 2],
-							attrib.colors[colorIndex - 1],
-							attrib.colors[colorIndex],
-						};
-					}
 				}
 				if (index.normal_index >= 0) {
 					vertex.normal = {

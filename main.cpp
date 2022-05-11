@@ -5,15 +5,10 @@
 #include <string>
 
 /*
-    ShardEngine (2022 All rights reserved) created by ZilverBlade and Razer
-    Huge shoutout to Brendan Galea https://www.youtube.com/channel/UC9pXmjxsQHeFH9vgCeRsHcw
-    And also SaschaWillems' GitHub repository with examples https://github.com/SaschaWillems/Vulkan
+    Shard3D (2022 All rights reserved) created by ZilverBlade and Razer
 */
 
 int main() {
-
-    
-
     shard::RunApp app{};
     try {
         app.run();

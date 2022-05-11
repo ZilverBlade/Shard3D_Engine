@@ -81,6 +81,9 @@
     <ClCompile Include="input\mouse_movement_controller.cpp">
       <Filter>Source Files\controller</Filter>
     </ClCompile>
+    <ClCompile Include="shard_game_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shard_window.hpp">
@@ -132,6 +135,9 @@
       <Filter>Header Files\controller</Filter>
     </ClInclude>
     <ClInclude Include="utils\shard_utils.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleini\simple_ini.h">
       <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>

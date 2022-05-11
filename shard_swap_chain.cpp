@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <typeinfo>
+#include "simpleini/simple_ini.h"
 
 namespace shard {
 
@@ -372,13 +373,36 @@ void ShardSwapChain::createSyncObjects() {
 
 VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
+
+    CSimpleIniA ini;
+
+    ini.SetUnicode();
+    ini.LoadFile("settings/game_settings.ini");
+
+    std::string colormode = ini.GetValue("DISPLAY", "ColorFormat");
   for (const auto &availableFormat : availableFormats) {
      
- //for config setting
-    if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB /*VK_FORMAT_B8G8R8A8_UNORM*/ && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-        return availableFormat;
-        //hasChosen = true;
-    }
+     
+
+      if (colormode == "8BIT_SRGB") {
+          if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+              return availableFormat;
+          }
+      }
+      else if (colormode == "8BIT_UNORM") {
+          if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+              return availableFormat;
+          }
+      }
+      else if (colormode == "10BIT_UNORM") {
+          if (availableFormat.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32 && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+              return availableFormat;
+          }
+      }
+      else {
+          std::cout << "Invalid color format chosen: " << ini.GetValue("DISPLAY", "ColorFormat") << std::endl;
+      }
+    
 
   }
 
@@ -387,38 +411,31 @@ VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
 
 VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     
+    CSimpleIniA ini;
 
+    ini.SetUnicode();
+    ini.LoadFile("settings/game_settings.ini");
 
-    const auto& vsyncsetting = nullptr;
-   //for config setting
-    std::cout << "Vsync enabled? " << vsyncsetting  << std::endl;
+    std::string vsync = ini.GetValue("DISPLAY", "V-Sync");
 
-    if (vsyncsetting == "") {
+    if (vsync == "false") {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                 std::cout << "Present mode: Mailbox" << std::endl;
                 return availablePresentMode;
             }
-        }
-    }
-    else {
-        std::cout << "Present mode: V-Sync" << std::endl;
-        return VK_PRESENT_MODE_FIFO_KHR;
-    }
-
-  
- 
-
-    /*
-        for (const auto& availablePresentMode : availablePresentModes) {
-            if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+            else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
                 std::cout << "Present mode: Immediate" << std::endl;
                 return availablePresentMode;
             }
         }
-        */
-
-        
+    }
+    else if (vsync == "true") {
+        std::cout << "Present mode: V-Sync" << std::endl;
+        return VK_PRESENT_MODE_FIFO_KHR;
+    } else {
+        std::cout << "Invalid present mode chosen: " << ini.GetValue("DISPLAY", "V-Sync") << std::endl;
+    }
  
 }
 
