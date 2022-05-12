@@ -1,6 +1,6 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
+#include "run_app.hpp"
 //lib stuff
 #include <iostream>
 #include <chrono>
@@ -15,15 +15,22 @@
 #include "FMOD_engine/fmod_studio_engine.hpp"
 
 //engine
-#include "ez_render_system.hpp"
 #include "input/keyboard_movement_controller.hpp"
 #include "input/mouse_movement_controller.hpp"
-#include "camera.hpp"
-#include "run_app.hpp"
-#include "simpleini/simple_ini.h"
 
+#include "ez_render_system.hpp"
+#include "camera.hpp"
+
+#include "simpleini/simple_ini.h"
+#include "shard_buffer.hpp"
 
 namespace shard {
+
+	struct GlobalUbo {
+		glm::mat4 projectionView{ 1.f };
+		glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
+	};
+
 	CSimpleIniA ini;
 
 	RunApp::RunApp() {
@@ -31,6 +38,16 @@ namespace shard {
 	}
 	RunApp::~RunApp() {}
 	void RunApp::run() {
+		ShardBuffer globalUboBuffer{
+			shardDevice,
+			sizeof(GlobalUbo),
+			ShardSwapChain::MAX_FRAMES_IN_FLIGHT,
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+			shardDevice.properties.limits.minUniformBufferOffsetAlignment,
+		};
+		globalUboBuffer.map();
+
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
 		ShardCamera camera{};
 
@@ -92,6 +109,21 @@ namespace shard {
 			
 
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
+				int frameIndex = shardRenderer.getFrameIndex();
+				FrameInfo frameInfo{
+					frameIndex,
+					frameTime,
+					commandBuffer,
+					camera
+				};
+
+				//	update
+				GlobalUbo ubo{};
+				ubo.projectionView = camera.getProjection() * camera.getView();
+				globalUboBuffer.writeToIndex(&ubo, frameIndex);
+				globalUboBuffer.flushIndex(frameIndex);
+
+				//	render
 				/*
 					this section is great for adding multiple render passes such as :
 					- Begin offscreen shadow pass
@@ -101,7 +133,7 @@ namespace shard {
 					Also reflections and Postfx
 				*/
 				shardRenderer.beginSwapChainRenderPass(commandBuffer); 
-				ezRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+				ezRenderSystem.renderGameObjects(frameInfo, gameObjects);
 				shardRenderer.endSwapChainRenderPass(commandBuffer);
 				shardRenderer.endFrame();
 			}
@@ -120,6 +152,15 @@ namespace shard {
 		gameObject.transform.scale = { .5f, .5f, .5f };
 		gameObject.transform.rotation = { glm::radians(90.f), 0.f, 0.f};
 		gameObjects.push_back(std::move(gameObject));
+
+
+		auto gameObject22 = ShardGameObject::createGameObject();
+		gameObject22.model = fart;
+		gameObject22.transform.translation = { 0.0f, .0f, 5.5f };
+		gameObject22.transform.scale = { .5f, .5f, .5f };
+		gameObject22.transform.rotation = { glm::radians(90.f), glm::radians(90.f), 0.f };
+		gameObjects.push_back(std::move(gameObject22));
+
 
 		std::shared_ptr<ShardModel> cube = ShardModel::createModelFromFile(shardDevice, "modeldata/colored_cube.obj");
 

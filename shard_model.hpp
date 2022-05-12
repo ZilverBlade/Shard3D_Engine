@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shard_device.hpp"
+#include "shard_buffer.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -53,13 +54,11 @@ namespace shard {
 
 		ShardDevice& shardDevice;
 
-		VkBuffer vertexBuffer;
-		VkDeviceMemory vertexBufferMemory;
+		std::unique_ptr<ShardBuffer> vertexBuffer;
 		uint32_t vertexCount;
 
 		bool hasIndexBuffer = false;
-		VkBuffer indexBuffer;
-		VkDeviceMemory indexBufferMemory;
+		std::unique_ptr<ShardBuffer> indexBuffer;
 		uint32_t indexCount;
 	};
 }

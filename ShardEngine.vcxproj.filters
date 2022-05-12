@@ -84,6 +84,9 @@
     <ClCompile Include="shard_game_object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="shard_buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shard_window.hpp">
@@ -139,6 +142,12 @@
     </ClInclude>
     <ClInclude Include="simpleini\simple_ini.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="shard_buffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shard_frame_info.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
