@@ -36,7 +36,7 @@ namespace shard {
 
 		// note: order of declaration matters
 		std::unique_ptr<ShardDescriptorPool> globalPool{};
-		std::vector<ShardGameObject> gameObjects;
+		ShardGameObject::Map gameObjects;
 };
 
 }

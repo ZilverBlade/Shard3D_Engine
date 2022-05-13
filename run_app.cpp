@@ -28,14 +28,41 @@
 namespace shard {
 
 	struct GlobalUbo {
-		alignas(16) glm::mat4 projectionView{ 1.f };
-		alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
-		alignas(16) glm::vec4 ambientColor = {0.8f, 0.9f, 1.f, 0.07f};
+		//alignment rules https://cdn.discordapp.com/attachments/763044823342776340/974725640274210926/unknown.png
+		
+		/*
+			For colour parameters use "w" for intensity
+		*/
+
+		glm::mat4 projectionView{ 1.f };
+
+		//reyleigh scattering fakery and/or indirect light
+		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.008f };
+
+		//directional light
+		alignas(16) glm::vec3 directionalLightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
+		
+		//pointlight
+		alignas(16) glm::vec3 pointlightPosition = {1.1f, -1.f, 1.f };
+		alignas(16) glm::vec4 pointlightColor = { 1.f, 1.f, 1.f, 1.0f };
+
+		glm::vec3 pointlightAttenuationMod = {0.f, 0.f, 1.f};  //	const + linear * x + quadratic * x^2
+
+		//spotlight?
 	};
 
 	CSimpleIniA ini;
 
 	RunApp::RunApp() {
+		GlobalUbo uboChecker;
+
+		ini.SetUnicode();
+		ini.LoadFile("settings/engine_settings.ini");
+
+		if (uboChecker.pointlightAttenuationMod != glm::vec3(0.f, 0.f, 1.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
+			std::cout << "warn.NotInverseSquareAttenuation: \"Point light in level that does not obey inverse square law\"\n";
+		}
+
 		globalPool = ShardDescriptorPool::Builder(shardDevice)
 			.setMaxSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ShardSwapChain::MAX_FRAMES_IN_FLIGHT)			
@@ -57,7 +84,7 @@ namespace shard {
 		}
 
 		auto globalSetLayout = ShardDescriptorSetLayout::Builder(shardDevice)
-			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 			.build();
 
 		std::vector<VkDescriptorSet> globalDescriptorSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -72,6 +99,8 @@ namespace shard {
 		ShardCamera camera{};
 
 		auto viewerObject = ShardGameObject::createGameObject();
+		viewerObject.transform.translation = glm::vec3(0.f, -1.f, 0.f);
+
 		controller::KeyboardMovementController cameraControllerKeyBoard{};
 		controller::MouseMovementController cameraControllerMouse{};
 
@@ -96,7 +125,7 @@ namespace shard {
 		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/arrive");
 		//fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/idlerace", "car_level", 0);
 
-		fmodcore.UpdateVolume(0.55);
+		fmodcore.UpdateVolume(0.15);
 		fmodcore.UpdatePitch(1);
 		
 
@@ -136,7 +165,8 @@ namespace shard {
 					frameTime,
 					commandBuffer,
 					camera,
-					globalDescriptorSets[frameIndex]
+					globalDescriptorSets[frameIndex],
+					gameObjects
 				};
 
 				//	update
@@ -157,7 +187,7 @@ namespace shard {
 					Also reflections and Postfx
 				*/
 				shardRenderer.beginSwapChainRenderPass(commandBuffer); 
-				ezRenderSystem.renderGameObjects(frameInfo, gameObjects);
+				ezRenderSystem.renderGameObjects(frameInfo);
 				shardRenderer.endSwapChainRenderPass(commandBuffer);
 				shardRenderer.endFrame();
 			}
@@ -169,50 +199,76 @@ namespace shard {
 	
 
 	void RunApp::loadGameObjects() {	
-		std::shared_ptr<ShardModel> fart = ShardModel ::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
+		std::shared_ptr<ShardModel> model = ShardModel ::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
 
-		auto gameObject = ShardGameObject::createGameObject();
-		gameObject.model = fart;
-		gameObject.transform.translation = { .0f, .0f, 1.5f };
-		gameObject.transform.scale = { .5f, .5f, .5f };
-		gameObject.transform.rotation = { glm::radians(90.f), 0.f, 0.f};
-		gameObjects.push_back(std::move(gameObject));
+		auto fart = ShardGameObject::createGameObject();
+		fart.model = model;
+		fart.transform.translation = { .0f, .0f, 1.5f };
+		fart.transform.scale = { .5f, .5f, .5f };
+		fart.transform.rotation = { glm::radians(90.f), 0.f, 0.f};
+		gameObjects.emplace(fart.getId(), std::move(fart));
 
+		model = ShardModel::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
 
-		auto gameObject22 = ShardGameObject::createGameObject();
-		gameObject22.model = fart;
-		gameObject22.transform.translation = { 0.0f, .0f, 5.5f };
-		gameObject22.transform.scale = { .5f, .5f, .5f };
-		gameObject22.transform.rotation = { glm::radians(90.f), glm::radians(90.f), 0.f };
-		gameObjects.push_back(std::move(gameObject22));
+		auto fart2 = ShardGameObject::createGameObject();
+		fart2.model = model;
+		fart2.transform.translation = { 0.0f, .0f, 5.5f };
+		fart2.transform.scale = { .5f, .5f, .5f };
+		fart2.transform.rotation = { glm::radians(90.f), glm::radians(90.f), 0.f };
+		gameObjects.emplace(fart2.getId(), std::move(fart2));
 
+		model = ShardModel::createModelFromFile(shardDevice, "modeldata/colored_cube.obj");
 
-		std::shared_ptr<ShardModel> cube = ShardModel::createModelFromFile(shardDevice, "modeldata/colored_cube.obj");
+		auto ccube = ShardGameObject::createGameObject();
+		ccube.model = model;
+		ccube.transform.translation = { 2.0f, .0f, 1.5f };
+		ccube.transform.scale = { .5f, .5f, .5f };
+		ccube.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(ccube.getId(), std::move(ccube));
 
-		auto gameObject2 = ShardGameObject::createGameObject();
-		gameObject2.model = cube;
-		gameObject2.transform.translation = { 2.0f, .0f, 1.5f };
-		gameObject2.transform.scale = { .5f, .5f, .5f };
-		gameObject2.transform.rotation = { 0.f, 0.f, 0.f };
-		gameObjects.push_back(std::move(gameObject2));
+		model = ShardModel::createModelFromFile(shardDevice, "modeldata/sphere.obj", false);
 
-		std::shared_ptr<ShardModel> sphere = ShardModel::createModelFromFile(shardDevice, "modeldata/sphere.obj", false);
+		auto sphere = ShardGameObject::createGameObject();
+		sphere.model = model;
+		sphere.transform.translation = { 3.0f, .0f, 5.5f };
+		sphere.transform.scale = { 1.f, 1.f, 1.f };
+		sphere.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(sphere.getId(), std::move(sphere));
 
-		auto gameObject3 = ShardGameObject::createGameObject();
-		gameObject3.model = sphere;
-		gameObject3.transform.translation = { 3.0f, .0f, 5.5f };
-		gameObject3.transform.scale = { 1.45f, .5f, .5f };
-		gameObject3.transform.rotation = { 0.f, 0.f, 0.f };
-		gameObjects.push_back(std::move(gameObject3));
+		model = ShardModel::createModelFromFile(shardDevice, "modeldata/cylinder.obj");
 
-		std::shared_ptr<ShardModel> cyl = ShardModel::createModelFromFile(shardDevice, "modeldata/cylinder.obj");
+		auto cylinder = ShardGameObject::createGameObject();
+		cylinder.model = model;
+		cylinder.transform.translation = { 5.0f, .0f, 5.5f };
+		cylinder.transform.scale = { .5f, .5f, .5f };
+		cylinder.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(cylinder.getId(), std::move(cylinder));
 
-		auto gameObject4 = ShardGameObject::createGameObject();
-		gameObject4.model = cyl;
-		gameObject4.transform.translation = { 5.0f, .0f, 5.5f };
-		gameObject4.transform.scale = { .5f, .5f, .5f };
-		gameObject4.transform.rotation = { 0.f, 0.f, 0.f };
-		gameObjects.push_back(std::move(gameObject4));
+		model = ShardModel::createModelFromFile(shardDevice, "modeldata/quad.obj");
 
+		auto quad = ShardGameObject::createGameObject();
+		quad.model = model;
+		quad.transform.translation = { 0.0f, 0.9f, 0.0f };
+		quad.transform.scale = { 10.f, 1.f, 10.f };
+		quad.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(quad.getId(), std::move(quad));
+
+		model = ShardModel::createModelFromFile(shardDevice, "modeldata/cone.obj");
+
+		auto cone = ShardGameObject::createGameObject();
+		cone.model = model;
+		cone.transform.translation = { 1.0f, -1.0f, 6.0f };
+		cone.transform.scale = { 0.5f, 0.5f, 0.5f };
+		cone.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(cone.getId(), std::move(cone));
+
+		model = ShardModel::createModelFromFile(shardDevice, "modeldata/cone.obj");
+
+		auto cone2 = ShardGameObject::createGameObject();
+		cone2.model = model;
+		cone2.transform.translation = { .0f, -1.0f, 6.0f };
+		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
+		cone2.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(cone2.getId(), std::move(cone2));
 	}
 }

@@ -2,7 +2,7 @@
 
 #include "shard_model.hpp"
 #include <memory>
-
+#include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace shard {
@@ -18,6 +18,7 @@ namespace shard {
 	class ShardGameObject {
 	public:
 		using id_t = unsigned int;
+		using Map = std::unordered_map<id_t, ShardGameObject>;
 
 		static ShardGameObject createGameObject() {
 			static id_t currentId = 0;
@@ -30,7 +31,7 @@ namespace shard {
 		ShardGameObject &operator=(ShardGameObject&&) = default;
 
 		id_t getId() { return id; }
-
+		
 		std::shared_ptr<ShardModel> model{};
 		glm::vec3 color{};
 		TransformComponent transform{};

@@ -22,7 +22,7 @@ namespace shard {
 		EzRenderSystem(const EzRenderSystem&) = delete;
 		EzRenderSystem& operator=(const EzRenderSystem&) = delete;
 
-		void renderGameObjects(FrameInfo &frameInfo, std::vector<ShardGameObject> &gameObjects);
+		void renderGameObjects(FrameInfo &frameInfo);
 
 	private:
 

@@ -59,7 +59,7 @@ namespace shard {
 			);
 	}
 
-	void EzRenderSystem::renderGameObjects(FrameInfo &frameInfo, std::vector<ShardGameObject>& gameObjects) {
+	void EzRenderSystem::renderGameObjects(FrameInfo &frameInfo) {
 		shardPipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
@@ -73,7 +73,9 @@ namespace shard {
 			nullptr
 		);
 
-		for (auto& obj : gameObjects) {
+		for (auto& kv : frameInfo.gameObjects) {
+			auto& obj = kv.second;
+			if (obj.model == nullptr) continue;
 			SimplePushConstantData push{};
 			push.modelMatrix = obj.transform.mat4();
 			push.normalMatrix = obj.transform.normalMatrix();
