@@ -80,16 +80,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CustomBuildBeforeTargets />
-    <OutDir>$(SolutionDir)bin\Shard3D\$(Platform)\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)export\bin\Shard3D\$(Platform)\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)export\intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntDir>
     <SourcePath>$(VC_SourcePath);$(ProjectName)fmod_engine</SourcePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildBeforeTargets />
-    <OutDir>$(SolutionDir)bin\Shard3D\$(Platform)\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)export\bin\Shard3D\$(Platform)\$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)export\intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -214,7 +214,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="shard_descriptors.cpp" />
-    <ClCompile Include="ez_render_system.cpp" />
+    <ClCompile Include="systems\ez_render_system.cpp" />
     <ClCompile Include="FMOD_engine\fmod_core_engine.cpp" />
     <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp" />
     <ClCompile Include="input\keyboard_movement_controller.cpp" />
@@ -229,6 +229,7 @@
     <ClCompile Include="shard_renderer.cpp" />
     <ClCompile Include="shard_window.cpp" />
     <ClCompile Include="shard_pipeline.cpp" />
+    <ClCompile Include="systems\pointlight_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
@@ -248,7 +249,7 @@
     <ClInclude Include="shard_descriptors.hpp" />
     <ClInclude Include="shard_frame_info.hpp" />
     <ClInclude Include="shard_swap_chain.hpp" />
-    <ClInclude Include="ez_render_system.hpp">
+    <ClInclude Include="systems\ez_render_system.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -260,6 +261,7 @@
     <ClInclude Include="shard_renderer.hpp" />
     <ClInclude Include="shard_window.hpp" />
     <ClInclude Include="simpleini\simple_ini.h" />
+    <ClInclude Include="systems\pointlight_system.hpp" />
     <ClInclude Include="utils\shard_utils.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -268,6 +270,8 @@
     <None Include="shaders\ez_shader.vert">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\pointlight.frag" />
+    <None Include="shaders\pointlight.vert" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

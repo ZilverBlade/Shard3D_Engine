@@ -37,6 +37,12 @@
     <Filter Include="utils">
       <UniqueIdentifier>{bfead136-06a5-47ca-8310-e953ba580285}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\systems">
+      <UniqueIdentifier>{a15786e3-93c2-4127-982f-a6ff38a64da7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\systems">
+      <UniqueIdentifier>{dc235f6b-25b3-4c7c-98ca-fefad5bee372}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -63,9 +69,6 @@
     <ClCompile Include="shard_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ez_render_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FMOD_engine\fmod_core_engine.cpp">
       <Filter>fmod</Filter>
     </ClCompile>
@@ -89,6 +92,12 @@
     </ClCompile>
     <ClCompile Include="shard_descriptors.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\ez_render_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\pointlight_system.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,9 +123,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shard_renderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ez_render_system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -155,6 +161,12 @@
     <ClInclude Include="shard_descriptors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="systems\ez_render_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\pointlight_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\ez_shader.vert">
@@ -164,6 +176,12 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="compile.bat" />
+    <None Include="shaders\pointlight.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\pointlight.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ShardEngine.rc">

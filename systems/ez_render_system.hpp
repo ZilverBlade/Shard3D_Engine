@@ -1,14 +1,14 @@
 #pragma once
 
-#include "shard_window.hpp"
-#include "shard_pipeline.hpp"
-#include "shard_device.hpp"
-#include "camera.hpp"
-#include "shard_frame_info.hpp"
-
-#include "shard_game_object.hpp"
+#include "../shard_window.hpp"
+#include "../shard_pipeline.hpp"
+#include "../shard_device.hpp"
+#include "../camera.hpp"
+#include "../shard_frame_info.hpp"
+		  
+#include "../shard_game_object.hpp"
 #include <string>
-#include "shard_renderer.hpp"
+#include "../shard_renderer.hpp"
 
 #include <memory>
 #include <vector>

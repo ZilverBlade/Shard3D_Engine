@@ -18,50 +18,31 @@
 //engine
 #include "input/keyboard_movement_controller.hpp"
 #include "input/mouse_movement_controller.hpp"
-
-#include "ez_render_system.hpp"
 #include "camera.hpp"
 
 #include "simpleini/simple_ini.h"
 #include "shard_buffer.hpp"
 
+//systems
+#include "systems/ez_render_system.hpp"
+#include "systems/pointlight_system.hpp"
+
+
+
 namespace shard {
 
-	struct GlobalUbo {
-		//alignment rules https://cdn.discordapp.com/attachments/763044823342776340/974725640274210926/unknown.png
-		
-		/*
-			For colour parameters use "w" for intensity
-		*/
-
-		glm::mat4 projectionView{ 1.f };
-
-		//reyleigh scattering fakery and/or indirect light
-		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.008f };
-
-		//directional light
-		alignas(16) glm::vec3 directionalLightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
-		
-		//pointlight
-		alignas(16) glm::vec3 pointlightPosition = {1.1f, -1.f, 1.f };
-		alignas(16) glm::vec4 pointlightColor = { 1.f, 1.f, 1.f, 1.0f };
-
-		glm::vec3 pointlightAttenuationMod = {0.f, 0.f, 1.f};  //	const + linear * x + quadratic * x^2
-
-		//spotlight?
-	};
-
+	
 	CSimpleIniA ini;
 
 	RunApp::RunApp() {
-		GlobalUbo uboChecker;
+		//Pointlight pointchecker;
 
 		ini.SetUnicode();
 		ini.LoadFile("settings/engine_settings.ini");
 
-		if (uboChecker.pointlightAttenuationMod != glm::vec3(0.f, 0.f, 1.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
-			std::cout << "warn.NotInverseSquareAttenuation: \"Point light in level that does not obey inverse square law\"\n";
-		}
+		//if (pointchecker.attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
+		//	std::cout << "warn.NotInverseSquareAttenuation: \"Point light in level that does not obey inverse square law\"\n";
+		//}
 
 		globalPool = ShardDescriptorPool::Builder(shardDevice)
 			.setMaxSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -96,6 +77,8 @@ namespace shard {
 		}
 
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		PointlightSystem pointlightSystem { shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+
 		ShardCamera camera{};
 
 		auto viewerObject = ShardGameObject::createGameObject();
@@ -171,7 +154,9 @@ namespace shard {
 
 				//	update
 				GlobalUbo ubo{};
-				ubo.projectionView = camera.getProjection() * camera.getView();
+				ubo.projection = camera.getProjection();
+				ubo.view = camera.getView();
+				pointlightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 				
@@ -188,6 +173,7 @@ namespace shard {
 				*/
 				shardRenderer.beginSwapChainRenderPass(commandBuffer); 
 				ezRenderSystem.renderGameObjects(frameInfo);
+				pointlightSystem.render(frameInfo);
 				shardRenderer.endSwapChainRenderPass(commandBuffer);
 				shardRenderer.endFrame();
 			}
@@ -270,5 +256,24 @@ namespace shard {
 		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
+
+		{
+			auto pointlight = ShardGameObject::makePointlight(1.f);
+			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
+			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
+		}
+		
+
+		{
+			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, {1.f, 0.f, 1.f});
+			pointlight.transform.translation = { 0.0f, -0.2f, 0.2f };
+			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
+		}
+
+		{
+			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f });
+			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
+			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
+		}
 	}
 }
