@@ -24,6 +24,7 @@
     <ProjectGuid>{14c833a5-6f7a-4d48-abc8-8885b60d0cdc}</ProjectGuid>
     <RootNamespace>ShardEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Shard3D</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -212,6 +213,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="shard_descriptors.cpp" />
     <ClCompile Include="ez_render_system.cpp" />
     <ClCompile Include="FMOD_engine\fmod_core_engine.cpp" />
     <ClCompile Include="FMOD_engine\fmod_studio_engine.cpp" />
@@ -243,6 +245,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="shard_buffer.hpp" />
+    <ClInclude Include="shard_descriptors.hpp" />
     <ClInclude Include="shard_frame_info.hpp" />
     <ClInclude Include="shard_swap_chain.hpp" />
     <ClInclude Include="ez_render_system.hpp">

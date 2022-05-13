@@ -37,6 +37,12 @@
     <Filter Include="utils">
       <UniqueIdentifier>{bfead136-06a5-47ca-8310-e953ba580285}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\AA">
+      <UniqueIdentifier>{5df837bf-a3a7-4761-b1ff-ca73331de905}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AA">
+      <UniqueIdentifier>{b4856a1e-ff02-48cf-b53e-bf60fff4f682}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -85,6 +91,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shard_buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shard_descriptors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -147,6 +156,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shard_frame_info.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shard_descriptors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

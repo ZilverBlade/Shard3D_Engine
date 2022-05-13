@@ -6,6 +6,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <array>
+
 //glm
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -27,28 +28,47 @@
 namespace shard {
 
 	struct GlobalUbo {
-		glm::mat4 projectionView{ 1.f };
-		glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
+		alignas(16) glm::mat4 projectionView{ 1.f };
+		alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
+		alignas(16) glm::vec4 ambientColor = {0.8f, 0.9f, 1.f, 0.07f};
 	};
 
 	CSimpleIniA ini;
 
 	RunApp::RunApp() {
+		globalPool = ShardDescriptorPool::Builder(shardDevice)
+			.setMaxSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ShardSwapChain::MAX_FRAMES_IN_FLIGHT)			
+			.build();
 		loadGameObjects();
 	}
 	RunApp::~RunApp() {}
 	void RunApp::run() {
-		ShardBuffer globalUboBuffer{
-			shardDevice,
-			sizeof(GlobalUbo),
-			ShardSwapChain::MAX_FRAMES_IN_FLIGHT,
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-			shardDevice.properties.limits.minUniformBufferOffsetAlignment,
-		};
-		globalUboBuffer.map();
+		std::vector<std::unique_ptr<ShardBuffer>> uboBuffers(ShardSwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < uboBuffers.size(); i++) {
+			uboBuffers[i] = std::make_unique<ShardBuffer>(
+				shardDevice,
+				sizeof(GlobalUbo),
+				1,
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+			uboBuffers[i]->map();
+		}
 
-		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass() };
+		auto globalSetLayout = ShardDescriptorSetLayout::Builder(shardDevice)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+			.build();
+
+		std::vector<VkDescriptorSet> globalDescriptorSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < globalDescriptorSets.size(); i++) {
+			auto bufferInfo = uboBuffers[i]->descriptorInfo();
+			ShardDescriptorWriter(*globalSetLayout, *globalPool)
+				.writeBuffer(0, &bufferInfo)
+				.build(globalDescriptorSets[i]);
+		}
+
+		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		ShardCamera camera{};
 
 		auto viewerObject = ShardGameObject::createGameObject();
@@ -82,6 +102,7 @@ namespace shard {
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!shardWindow.shouldClose()) {
+
 			glfwPollEvents();
 
 
@@ -107,21 +128,22 @@ namespace shard {
 				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("DISPLAY", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
 			}
 			
-
+		
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
 				int frameIndex = shardRenderer.getFrameIndex();
 				FrameInfo frameInfo{
 					frameIndex,
 					frameTime,
 					commandBuffer,
-					camera
+					camera,
+					globalDescriptorSets[frameIndex]
 				};
 
 				//	update
 				GlobalUbo ubo{};
 				ubo.projectionView = camera.getProjection() * camera.getView();
-				globalUboBuffer.writeToIndex(&ubo, frameIndex);
-				globalUboBuffer.flushIndex(frameIndex);
+				uboBuffers[frameIndex]->writeToBuffer(&ubo);
+				uboBuffers[frameIndex]->flush();
 
 				//	render
 				/*
@@ -139,6 +161,7 @@ namespace shard {
 			}
 		}
 		vkDeviceWaitIdle(shardDevice.device());
+		
 	}
 
 	

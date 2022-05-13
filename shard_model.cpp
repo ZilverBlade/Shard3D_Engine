@@ -63,7 +63,6 @@ namespace shard {
 		stagingBuffer.map();
 		stagingBuffer.writeToBuffer((void *)vertices.data());
 
-
 		vertexBuffer = std::make_unique<ShardBuffer>(
 			shardDevice,
 			vertexSize,

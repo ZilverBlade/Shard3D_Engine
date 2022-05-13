@@ -16,7 +16,7 @@
 namespace shard {
 	class EzRenderSystem {
 	public:
-		EzRenderSystem(ShardDevice &device, VkRenderPass renderPass);
+		EzRenderSystem(ShardDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		~EzRenderSystem();
 
 		EzRenderSystem(const EzRenderSystem&) = delete;
@@ -26,7 +26,7 @@ namespace shard {
 
 	private:
 
-		void createPipelineLayout();
+		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
 
 		ShardDevice& shardDevice;

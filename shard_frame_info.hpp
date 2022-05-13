@@ -10,5 +10,6 @@ namespace shard {
 		float frameTime;
 		VkCommandBuffer commandBuffer;
 		ShardCamera& camera;
+		VkDescriptorSet globalDescriptorSet;
 	};
 }

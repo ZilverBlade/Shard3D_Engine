@@ -3,6 +3,7 @@
 #include "shard_window.hpp"
 #include "shard_pipeline.hpp"
 #include "shard_device.hpp"
+#include "shard_descriptors.hpp"
 
 #include "shard_game_object.hpp"
 #include <string>
@@ -33,6 +34,8 @@ namespace shard {
 		ShardDevice shardDevice{ shardWindow };
 		ShardRenderer shardRenderer{ shardWindow, shardDevice };
 
+		// note: order of declaration matters
+		std::unique_ptr<ShardDescriptorPool> globalPool{};
 		std::vector<ShardGameObject> gameObjects;
 };
 
