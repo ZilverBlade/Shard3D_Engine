@@ -75,9 +75,6 @@ namespace shard {
 		shaderStages[1].pNext = nullptr;
 		shaderStages[1].pSpecializationInfo = nullptr;
 
-		VkPipelineMultisampleStateCreateInfo multisampling{};
-		multisampling.rasterizationSamples = shardDevice.msaaSamples;
-
 		auto bindingDescriptions = ShardModel::Vertex::getBindingDescriptions();
 		auto attributeDescriptions = ShardModel::Vertex::getAttributeDescriptions();
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -159,7 +156,7 @@ namespace shard {
 
 		configInfo.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 		configInfo.multisampleInfo.sampleShadingEnable = VK_FALSE;
-		configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+		configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT; //causing issues for the msaa sample count
 		configInfo.multisampleInfo.minSampleShading = 1.0f;           // Optional
 		configInfo.multisampleInfo.pSampleMask = nullptr;             // Optional
 		configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;  // Optional

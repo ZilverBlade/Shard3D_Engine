@@ -30,6 +30,7 @@ void ShardSwapChain::init() {
        createSwapChain();
         createImageViews();
         createRenderPass();
+        createColorResources();
         createDepthResources();
         createFramebuffers();
         createSyncObjects();
@@ -52,6 +53,11 @@ ShardSwapChain::~ShardSwapChain() {
     vkFreeMemory(device.device(), depthImageMemorys[i], nullptr);
   }
 
+
+      vkDestroyImageView(device.device(), colorImageView, nullptr);
+      vkDestroyImage(device.device(), colorImage, nullptr);
+      vkFreeMemory(device.device(), colorImageMemory, nullptr);
+  
   for (auto framebuffer : swapChainFramebuffers) {
     vkDestroyFramebuffer(device.device(), framebuffer, nullptr);
   }
@@ -311,6 +317,35 @@ void ShardSwapChain::createFramebuffers() {
       throw std::runtime_error("failed to create framebuffer!");
     }
   }
+}
+
+
+void ShardSwapChain::createColorResources() {
+    VkFormat colorFormat = swapChainImageFormat;
+
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = swapChainExtent.width;
+    imageInfo.extent.height = swapChainExtent.height;
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = 1;
+    imageInfo.format = colorFormat;
+    imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    imageInfo.samples = device.msaaSamples;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageInfo.flags = 0;
+
+    device.createImageWithInfo(
+        imageInfo,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        device.msaaSamples,
+        colorImage,
+        colorImageMemory);
+    //colorImageView = createImageViews();
 }
 
 void ShardSwapChain::createDepthResources() {
