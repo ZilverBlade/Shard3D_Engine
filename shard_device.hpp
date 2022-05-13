@@ -5,6 +5,7 @@
 // std lib headers
 #include <string>
 #include <vector>
+#include "simpleini/simple_ini.h"
 
 namespace shard {
 
@@ -39,7 +40,10 @@ class ShardDevice {
   ShardDevice(ShardDevice &&) = delete;
   ShardDevice &operator=(ShardDevice &&) = delete;
 
+  CSimpleIniA ini;
+  VkSampleCountFlagBits msaaSamples = (VkSampleCountFlagBits)1;
 
+  int getMaxUsableSampleCount();
 
   VkCommandPool getCommandPool() { return commandPool; }
   VkDevice device() { return device_; }
@@ -67,8 +71,9 @@ class ShardDevice {
       VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
 
   void createImageWithInfo(
-      const VkImageCreateInfo &imageInfo,
+      VkImageCreateInfo &imageInfo,
       VkMemoryPropertyFlags properties,
+      VkSampleCountFlagBits numSamples,
       VkImage &image,
       VkDeviceMemory &imageMemory);
 

@@ -1,5 +1,5 @@
 #include "shard_device.hpp"
-
+#include "simpleini/simple_ini.h"
 // std headers
 #include <cstring>
 #include <iostream>
@@ -46,6 +46,21 @@ void DestroyDebugUtilsMessengerEXT(
   }
 }
 
+int ShardDevice::getMaxUsableSampleCount() {
+    VkPhysicalDeviceProperties physicalDeviceProperties;
+    vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
+
+    VkSampleCountFlags counts = std::min(physicalDeviceProperties.limits.framebufferColorSampleCounts, physicalDeviceProperties.limits.framebufferDepthSampleCounts);
+    if (counts & VK_SAMPLE_COUNT_64_BIT) { return VK_SAMPLE_COUNT_64_BIT; }
+    if (counts & VK_SAMPLE_COUNT_32_BIT) { return VK_SAMPLE_COUNT_32_BIT; }
+    if (counts & VK_SAMPLE_COUNT_16_BIT) { return VK_SAMPLE_COUNT_16_BIT; }
+    if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
+    if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
+    if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
+    return VK_SAMPLE_COUNT_1_BIT;
+}
+
+
 // class member functions
 ShardDevice::ShardDevice(ShardWindow& window) : window{ window } {
   createInstance();
@@ -75,10 +90,10 @@ void ShardDevice::createInstance() {
 
   VkApplicationInfo appInfo = {};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  appInfo.pApplicationName = "ShardEngine (Vulkan)";
+  appInfo.pApplicationName = "Shard3D (Vulkan)";
   appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-  appInfo.pEngineName = "No Engine";
-  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+  appInfo.pEngineName = "Shard3D";
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 3);
   appInfo.apiVersion = VK_API_VERSION_1_0;
 
   VkInstanceCreateInfo createInfo = {};
@@ -118,9 +133,19 @@ void ShardDevice::pickPhysicalDevice() {
   std::vector<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
+  ini.SetUnicode();
+  ini.LoadFile("settings/game_settings.ini");
+
   for (const auto &device : devices) {
     if (isDeviceSuitable(device)) {
       physicalDevice = device;
+
+      //MSAA setup
+      assert(msaaSamples >= 1 && "MSAA samples cannot be inferior to 1!");
+      if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { std::cout << "MSAA Sample count exceeds device capability, dropping down to device limit\n"; }
+      msaaSamples = (VkSampleCountFlagBits)std::min((int)ini.GetLongValue("GRAPHICS", "MSAASamples"), getMaxUsableSampleCount());
+   
+      std::cout << "Using " << msaaSamples << "x MSAA\n";
       break;
     }
   }
@@ -506,13 +531,16 @@ void ShardDevice::copyBufferToImage(
 }
 
 void ShardDevice::createImageWithInfo(
-    const VkImageCreateInfo &imageInfo,
+    VkImageCreateInfo &imageInfo,
     VkMemoryPropertyFlags properties,
+    VkSampleCountFlagBits numSamples,
     VkImage &image,
     VkDeviceMemory &imageMemory) {
   if (vkCreateImage(device_, &imageInfo, nullptr, &image) != VK_SUCCESS) {
     throw std::runtime_error("failed to create image!");
   }
+
+  imageInfo.samples = numSamples;
 
   VkMemoryRequirements memRequirements;
   vkGetImageMemoryRequirements(device_, image, &memRequirements);

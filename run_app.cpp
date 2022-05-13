@@ -144,6 +144,8 @@ namespace shard {
 				ubo.projectionView = camera.getProjection() * camera.getView();
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
+				
+
 
 				//	render
 				/*

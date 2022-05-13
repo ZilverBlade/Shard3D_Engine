@@ -75,6 +75,9 @@ namespace shard {
 		shaderStages[1].pNext = nullptr;
 		shaderStages[1].pSpecializationInfo = nullptr;
 
+		VkPipelineMultisampleStateCreateInfo multisampling{};
+		multisampling.rasterizationSamples = shardDevice.msaaSamples;
+
 		auto bindingDescriptions = ShardModel::Vertex::getBindingDescriptions();
 		auto attributeDescriptions = ShardModel::Vertex::getAttributeDescriptions();
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
@@ -103,6 +106,8 @@ namespace shard {
 
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+
+
 
 		if (vkCreateGraphicsPipelines(shardDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
