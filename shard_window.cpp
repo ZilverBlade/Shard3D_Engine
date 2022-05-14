@@ -1,6 +1,7 @@
 #include "shard_window.hpp"
 #include <stdexcept>
 #include "simpleini/simple_ini.h"
+#include "utils/definitions.hpp"
 namespace shard {
 
 	ShardWindow::ShardWindow(int w, int h, std::string name) : width{ w }, height{ h }, windowName{ name } {
@@ -19,7 +20,7 @@ namespace shard {
 		CSimpleIniA ini;
 
 		ini.SetUnicode();
-		ini.LoadFile("settings/engine_settings.ini");
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
 		bool windowresizable = ini.GetBoolValue("WINDOW", "Resizable");
 

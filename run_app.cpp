@@ -19,6 +19,7 @@
 #include "input/keyboard_movement_controller.hpp"
 #include "input/mouse_movement_controller.hpp"
 #include "camera.hpp"
+#include "utils/definitions.hpp"
 
 #include "simpleini/simple_ini.h"
 #include "shard_buffer.hpp"
@@ -38,7 +39,7 @@ namespace shard {
 		Pointlight pointchecker;
 
 		ini.SetUnicode();
-		ini.LoadFile("settings/engine_settings.ini");
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
 		if (pointchecker.attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
 			std::cout << "warn.NotInverseSquareAttenuation: \"Point light in level that does not obey inverse square law\"\n";
@@ -92,7 +93,7 @@ namespace shard {
 
 
 		ini.SetUnicode();
-		ini.LoadFile("settings/engine_settings.ini");
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
 		float fov = ini.GetDoubleValue("DISPLAY", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
@@ -270,7 +271,7 @@ namespace shard {
 		}
 
 		{
-			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f }, { 0.f, 1.f, 0.3f, 0.f});
+			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f }, { 2.f, 0.8f, 3.0f, 0.f});
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}

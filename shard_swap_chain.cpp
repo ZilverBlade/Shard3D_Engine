@@ -10,6 +10,7 @@
 #include <sstream>
 #include <typeinfo>
 #include "simpleini/simple_ini.h"
+#include "utils/definitions.hpp"
 
 namespace shard {
 
@@ -30,7 +31,7 @@ void ShardSwapChain::init() {
        createSwapChain();
         createImageViews();
         createRenderPass();
-        createColorResources();
+       // createColorResources();
         createDepthResources();
         createFramebuffers();
         createSyncObjects();
@@ -53,11 +54,14 @@ ShardSwapChain::~ShardSwapChain() {
     vkFreeMemory(device.device(), depthImageMemorys[i], nullptr);
   }
 
+  /*
+  for (int i = 0; i < colorImageViews.size(); i++) {
+      vkDestroyImageView(device.device(), colorImageViews[i], nullptr);
+      vkDestroyImage(device.device(), colorImages[i], nullptr);
+      vkFreeMemory(device.device(), colorImageMemorys[i], nullptr);
+  }
+  */
 
-      vkDestroyImageView(device.device(), colorImageView, nullptr);
-      vkDestroyImage(device.device(), colorImage, nullptr);
-      vkFreeMemory(device.device(), colorImageMemory, nullptr);
-  
   for (auto framebuffer : swapChainFramebuffers) {
     vkDestroyFramebuffer(device.device(), framebuffer, nullptr);
   }
@@ -244,12 +248,12 @@ void ShardSwapChain::createRenderPass() {
   colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
   colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
   colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
   VkAttachmentReference colorAttachmentRef = {};
   colorAttachmentRef.attachment = 0;
   colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
+  /*
   VkAttachmentDescription colorAttachmentResolve{};
   colorAttachmentResolve.format = getSwapChainImageFormat();
   colorAttachmentResolve.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -261,15 +265,15 @@ void ShardSwapChain::createRenderPass() {
   colorAttachmentResolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
   VkAttachmentReference colorAttachmentResolveRef{};
-  colorAttachmentResolveRef.attachment = VK_ATTACHMENT_UNUSED;
+  colorAttachmentResolveRef.attachment = 2;
   colorAttachmentResolveRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
+  */
   VkSubpassDescription subpass = {};
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = 1;
   subpass.pColorAttachments = &colorAttachmentRef;
   subpass.pDepthStencilAttachment = &depthAttachmentRef;
-  subpass.pResolveAttachments = &colorAttachmentResolveRef;
+  // subpass.pResolveAttachments = &colorAttachmentResolveRef;
 
   VkSubpassDependency dependency = {};
   dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -279,7 +283,7 @@ void ShardSwapChain::createRenderPass() {
   dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
   dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-  std::array<VkAttachmentDescription, 3> attachments = {colorAttachment, depthAttachment, colorAttachmentResolve};
+  std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment/*, colorAttachmentResolve*/ };
   VkRenderPassCreateInfo renderPassInfo = {};
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
   renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -297,7 +301,7 @@ void ShardSwapChain::createRenderPass() {
 void ShardSwapChain::createFramebuffers() {
   swapChainFramebuffers.resize(imageCount());
   for (size_t i = 0; i < imageCount(); i++) {
-    std::array<VkImageView, 3> attachments = {swapChainImageViews[i], depthImageViews[i], swapChainImageViews[i]};
+    std::array<VkImageView, 2> attachments = { swapChainImageViews[i], /*colorImageViews[i], */depthImageViews[i]};
 
     VkExtent2D swapChainExtent = getSwapChainExtent();
     VkFramebufferCreateInfo framebufferInfo = {};
@@ -319,35 +323,39 @@ void ShardSwapChain::createFramebuffers() {
   }
 }
 
-
+/*
 void ShardSwapChain::createColorResources() {
-    VkFormat colorFormat = swapChainImageFormat;
+    VkFormat colorFormat = getSwapChainImageFormat();
+    swapChainImageFormat = colorFormat;
+    VkExtent2D swapChainExtent = getSwapChainExtent();
 
-    VkImageCreateInfo imageInfo{};
-    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = swapChainExtent.width;
-    imageInfo.extent.height = swapChainExtent.height;
-    imageInfo.extent.depth = 1;
-    imageInfo.mipLevels = 1;
-    imageInfo.arrayLayers = 1;
-    imageInfo.format = colorFormat;
-    imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    imageInfo.samples = device.msaaSamples;
-    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    imageInfo.flags = 0;
+    for (int i = 0; i < colorImages.size(); i++) {
+        VkImageCreateInfo imageInfo{};
+        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageInfo.extent.width = swapChainExtent.width;
+        imageInfo.extent.height = swapChainExtent.height;
+        imageInfo.extent.depth = 1;
+        imageInfo.mipLevels = 1;
+        imageInfo.arrayLayers = 1;
+        imageInfo.format = colorFormat;
+        imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        imageInfo.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        imageInfo.samples = device.msaaSamples;
+        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageInfo.flags = 0;
 
-    device.createImageWithInfo(
-        imageInfo,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        device.msaaSamples,
-        colorImage,
-        colorImageMemory);
-    //colorImageView = createImageViews();
+        device.createImageWithInfo(
+            imageInfo,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            device.msaaSamples,
+            colorImages[i],
+            colorImageMemorys[i]);
+        
+    }
 }
-
+*/
 void ShardSwapChain::createDepthResources() {
   VkFormat depthFormat = findDepthFormat();
   swapChainDepthFormat = depthFormat;
@@ -357,7 +365,7 @@ void ShardSwapChain::createDepthResources() {
   depthImageMemorys.resize(imageCount());
   depthImageViews.resize(imageCount());
 
-  for (int i = 0; i < depthImages.size(); i++) {
+for (int i = 0; i < depthImages.size(); i++) {
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -377,7 +385,7 @@ void ShardSwapChain::createDepthResources() {
     device.createImageWithInfo(
         imageInfo,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        device.msaaSamples,
+       // device.msaaSamples,
         depthImages[i],
         depthImageMemorys[i]);
 
@@ -428,12 +436,10 @@ VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
     CSimpleIniA ini;
 
     ini.SetUnicode();
-    ini.LoadFile("settings/game_settings.ini");
+    ini.LoadFile(GAME_SETTINGS_PATH);
 
     std::string colormode = ini.GetValue("DISPLAY", "ColorFormat");
   for (const auto &availableFormat : availableFormats) {
-     
-     
 
       if (colormode == "8BIT_SRGB") {
           if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -465,7 +471,7 @@ VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPrese
     CSimpleIniA ini;
 
     ini.SetUnicode();
-    ini.LoadFile("settings/game_settings.ini");
+    ini.LoadFile(GAME_SETTINGS_PATH);
 
     std::string vsync = ini.GetValue("DISPLAY", "V-Sync");
 
@@ -513,4 +519,4 @@ VkFormat ShardSwapChain::findDepthFormat() {
       VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 }
 
-}  // namespace shard
+}

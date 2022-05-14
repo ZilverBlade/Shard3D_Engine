@@ -71,9 +71,9 @@ class ShardDevice {
       VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
 
   void createImageWithInfo(
-      VkImageCreateInfo &imageInfo,
+      const VkImageCreateInfo &imageInfo,
       VkMemoryPropertyFlags properties,
-      VkSampleCountFlagBits numSamples,
+     // VkSampleCountFlagBits numSamples,
       VkImage &image,
       VkDeviceMemory &imageMemory);
 

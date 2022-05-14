@@ -233,6 +233,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
+    <ClInclude Include="utils\definitions.hpp" />
     <ClInclude Include="FMOD_engine\fmod_core_engine.hpp" />
     <ClInclude Include="FMOD_engine\fmod_studio_engine.hpp" />
     <ClInclude Include="input\keyboard_movement_controller.hpp" />

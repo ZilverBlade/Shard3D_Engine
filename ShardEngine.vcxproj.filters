@@ -167,6 +167,9 @@
     <ClInclude Include="systems\pointlight_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>
+    <ClInclude Include="utils\definitions.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\ez_shader.vert">

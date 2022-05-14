@@ -6,6 +6,7 @@
 #include <set>
 #include <unordered_set>
 #include <cassert>
+#include "utils/definitions.hpp"
 
 namespace shard {
 
@@ -135,7 +136,7 @@ void ShardDevice::pickPhysicalDevice() {
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
   ini.SetUnicode();
-  ini.LoadFile("settings/game_settings.ini");
+  ini.LoadFile(GAME_SETTINGS_PATH);
 
   for (const auto &device : devices) {
     if (isDeviceSuitable(device)) {
@@ -532,16 +533,16 @@ void ShardDevice::copyBufferToImage(
 }
 
 void ShardDevice::createImageWithInfo(
-    VkImageCreateInfo &imageInfo,
+    const VkImageCreateInfo &imageInfo,
     VkMemoryPropertyFlags properties,
-    VkSampleCountFlagBits numSamples,
+    //VkSampleCountFlagBits numSamples,
     VkImage &image,
     VkDeviceMemory &imageMemory) {
   if (vkCreateImage(device_, &imageInfo, nullptr, &image) != VK_SUCCESS) {
     throw std::runtime_error("failed to create image!");
   }
 
-  imageInfo.samples = numSamples;
+  //imageInfo.samples = numSamples;
 
   VkMemoryRequirements memRequirements;
   vkGetImageMemoryRequirements(device_, image, &memRequirements);

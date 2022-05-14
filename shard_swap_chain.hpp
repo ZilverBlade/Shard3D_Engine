@@ -51,7 +51,7 @@ namespace shard {
      void init();
      void createSwapChain();
   void createImageViews();
-  void createColorResources();
+  //void createColorResources();
   void createDepthResources();
   void createRenderPass();
   void createFramebuffers();
@@ -67,11 +67,11 @@ namespace shard {
   VkFormat swapChainImageFormat;
   VkFormat swapChainDepthFormat;
   VkExtent2D swapChainExtent;
-
-  VkImage colorImage;
-  VkDeviceMemory colorImageMemory;
-  VkImageView colorImageView;
-
+  /*
+  std::vector <VkImage> colorImages;
+  std::vector <VkDeviceMemory> colorImageMemorys;
+  std::vector <VkImageView> colorImageViews;
+  */
   std::vector<VkFramebuffer> swapChainFramebuffers;
   VkRenderPass renderPass;
 
