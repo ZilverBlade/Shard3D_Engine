@@ -6,6 +6,7 @@
 #include "pointlight_system.hpp"
 #include <stdexcept>
 #include <array>
+#include <map>
 
 namespace shard {
 
@@ -51,6 +52,7 @@ namespace shard {
 
 		PipelineConfigInfo pipelineConfig{};
 		ShardPipeline::defaultPipelineConfigInfo(pipelineConfig);
+		ShardPipeline::enableAlphaBlending(pipelineConfig);
 		pipelineConfig.attributeDescriptions.clear();
 		pipelineConfig.bindingDescriptions.clear();
 		pipelineConfig.renderPass = renderPass;
@@ -79,6 +81,18 @@ namespace shard {
 	}
 
 	void PointlightSystem::render(FrameInfo &frameInfo) {
+		//sort lights
+		std::map<float, ShardGameObject::id_t> sorted;
+		for (auto& kv : frameInfo.gameObjects) {
+			auto& obj = kv.second;
+			if (obj.pointlight == nullptr) continue;
+
+			// calc distance
+			auto offset = frameInfo.camera.getPosition() - obj.transform.translation;
+			float disSquared = glm::dot(offset, offset);
+			sorted[disSquared] = obj.getId();
+		}
+
 		shardPipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
@@ -91,10 +105,10 @@ namespace shard {
 			0,
 			nullptr
 		);
-
-		for (auto& kv : frameInfo.gameObjects) {
-			auto& obj = kv.second;
-			if (obj.pointlight == nullptr) continue;
+		//iterate through sorted lights in reverse order
+		for (auto it = sorted.rbegin(); it != sorted.rend(); it++) {
+			//use game obj id to find light obj
+			auto& obj = frameInfo.gameObjects.at(it->second);
 
 			PointlightPushConstants push{};
 			push.position = glm::vec4(obj.transform.translation, 1.f);

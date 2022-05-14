@@ -91,7 +91,6 @@ namespace shard {
 		double mousePosX = {};
 		double mousePosY = {};
 
-
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
@@ -111,13 +110,11 @@ namespace shard {
 
 		fmodcore.UpdateVolume(0.15);
 		fmodcore.UpdatePitch(1);
-		
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!shardWindow.shouldClose()) {
 
 			glfwPollEvents();
-
 
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
@@ -140,8 +137,7 @@ namespace shard {
 			else if ((std::string)ini.GetValue("DISPLAY", "View") == "Orthographic"){
 				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("DISPLAY", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
 			}
-			
-		
+				
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
 				int frameIndex = shardRenderer.getFrameIndex();
 				FrameInfo frameInfo{
@@ -173,8 +169,12 @@ namespace shard {
 					Also reflections and Postfx
 				*/
 				shardRenderer.beginSwapChainRenderPass(commandBuffer); 
+
 				ezRenderSystem.renderGameObjects(frameInfo);
 				pointlightSystem.render(frameInfo);
+
+
+
 				shardRenderer.endSwapChainRenderPass(commandBuffer);
 				shardRenderer.endFrame();
 			}
