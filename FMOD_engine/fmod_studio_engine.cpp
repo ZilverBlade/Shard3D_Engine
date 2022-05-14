@@ -5,6 +5,8 @@
 #include <fmod_studio.hpp>
 #include <iostream>
 
+#include "../utils/definitions.hpp"
+
 #pragma warning(disable : 4996)
 
 namespace fmod_engine {
@@ -22,9 +24,9 @@ namespace fmod_engine {
         FMOD::Studio::Bank* masterBank = NULL;
 
         //combine the master bank path with the desktop path
-        char* mbank = (char*)(calloc(strlen(desktopPath) + strlen("/Master.bank") - 1, 1));
+        char* mbank = (char*)(calloc(strlen(desktopPath) + strlen(FMOD_MASTER_BANK) - 1, 1));
         strncpy(mbank, desktopPath, strlen(desktopPath));
-        strncat(mbank, "/Master.bank", strlen("/Master.bank"));
+        strncat(mbank, FMOD_MASTER_BANK, strlen(FMOD_MASTER_BANK));
 
         system->loadBankFile((const char*)(mbank), FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank);
 
@@ -33,9 +35,9 @@ namespace fmod_engine {
         FMOD::Studio::Bank* stringsBank = NULL;
 
         //combine the master string bank path with the desktop path
-        char* mstrbank = (char*)(calloc(strlen(desktopPath) + strlen("/Master.strings.bank") - 1, 1));
+        char* mstrbank = (char*)(calloc(strlen(desktopPath) + strlen(FMOD_MASTER_STRINGS_BANK) - 1, 1));
         strncpy(mstrbank, desktopPath, strlen(desktopPath));
-        strncat(mstrbank, "/Master.strings.bank", strlen("/Master.strings.bank"));
+        strncat(mstrbank, FMOD_MASTER_STRINGS_BANK, strlen(FMOD_MASTER_STRINGS_BANK));
 
         system->loadBankFile((const char*)(mstrbank), FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank);
 
@@ -73,9 +75,9 @@ namespace fmod_engine {
         FMOD::Studio::Bank* masterBank = NULL;
 
         //combine the master bank path with the desktop path
-        char* mbank = (char*)(calloc(strlen(desktopPath) + strlen("/Master.bank") - 1, 1));
+        char* mbank = (char*)(calloc(strlen(desktopPath) + strlen(FMOD_MASTER_BANK) - 1, 1));
         strncpy(mbank, desktopPath, strlen(desktopPath));
-        strncat(mbank, "/Master.bank", strlen("/Master.bank"));
+        strncat(mbank, FMOD_MASTER_BANK, strlen(FMOD_MASTER_BANK));
 
         system->loadBankFile((const char*)(mbank), FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank);
 
@@ -84,9 +86,9 @@ namespace fmod_engine {
         FMOD::Studio::Bank* stringsBank = NULL;
 
         //combine the master string bank path with the desktop path
-        char* mstrbank = (char*)(calloc(strlen(desktopPath) + strlen("/Master.strings.bank") - 1, 1));
+        char* mstrbank = (char*)(calloc(strlen(desktopPath) + strlen(FMOD_MASTER_STRINGS_BANK) - 1, 1));
         strncpy(mstrbank, desktopPath, strlen(desktopPath));
-        strncat(mstrbank, "/Master.strings.bank", strlen("/Master.strings.bank"));
+        strncat(mstrbank, FMOD_MASTER_STRINGS_BANK, strlen(FMOD_MASTER_STRINGS_BANK));
 
         system->loadBankFile((const char*)(mstrbank), FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank);
 

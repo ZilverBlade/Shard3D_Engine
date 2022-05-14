@@ -173,8 +173,6 @@ namespace shard {
 				ezRenderSystem.renderGameObjects(frameInfo);
 				pointlightSystem.render(frameInfo);
 
-
-
 				shardRenderer.endSwapChainRenderPass(commandBuffer);
 				shardRenderer.endFrame();
 			}
@@ -186,7 +184,7 @@ namespace shard {
 	
 
 	void RunApp::loadGameObjects() {	
-		std::shared_ptr<ShardModel> model = ShardModel ::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
+		std::shared_ptr<ShardModel> model = ShardModel::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
 
 		auto fart = ShardGameObject::createGameObject();
 		fart.model = model;
@@ -290,7 +288,7 @@ namespace shard {
 		}
 
 		{
-			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f }, { 2.f, 0.8f, 3.0f, 0.f});
+			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f });
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
