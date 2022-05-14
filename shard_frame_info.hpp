@@ -3,10 +3,10 @@
 #include "camera.hpp"
 #include "shard_game_object.hpp"
 #include <vulkan/vulkan.h>
+#include "utils/definitions.hpp"
 
 namespace shard {
 
-	#define MAX_LIGHTS 20 //engine setting
 
 	struct Pointlight {
 		glm::vec4 position{}; //ignore w
@@ -23,6 +23,7 @@ namespace shard {
 
 		glm::mat4 projection{ 1.f };
 		glm::mat4 view{ 1.f };
+		glm::mat4 inverseView{ 1.f };
 
 		//reyleigh scattering fakery and/or indirect light
 		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.008f };
