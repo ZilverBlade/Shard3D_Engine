@@ -14,7 +14,7 @@ layout(location = 2) out vec3 fragNormalWorld;
 struct Pointlight {
 	vec4 position;
 	vec4 color;
-	//vec4 attenuationMod; //	const + linear * x + quadratic * x^2
+	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
 };
 
 layout(set = 0, binding = 0) uniform GlobalUbo{

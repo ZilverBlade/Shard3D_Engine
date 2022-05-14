@@ -35,14 +35,14 @@ namespace shard {
 	CSimpleIniA ini;
 
 	RunApp::RunApp() {
-		//Pointlight pointchecker;
+		Pointlight pointchecker;
 
 		ini.SetUnicode();
 		ini.LoadFile("settings/engine_settings.ini");
 
-		//if (pointchecker.attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
-		//	std::cout << "warn.NotInverseSquareAttenuation: \"Point light in level that does not obey inverse square law\"\n";
-		//}
+		if (pointchecker.attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
+			std::cout << "warn.NotInverseSquareAttenuation: \"Point light in level that does not obey inverse square law\"\n";
+		}
 
 		globalPool = ShardDescriptorPool::Builder(shardDevice)
 			.setMaxSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -262,8 +262,7 @@ namespace shard {
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
-		
-
+	
 		{
 			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, {1.f, 0.f, 1.f});
 			pointlight.transform.translation = { 0.0f, -0.2f, 0.2f };
@@ -271,7 +270,7 @@ namespace shard {
 		}
 
 		{
-			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f });
+			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f }, { 0.f, 1.f, 0.3f, 0.f});
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}

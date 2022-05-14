@@ -12,7 +12,7 @@ namespace shard {
 	struct PointlightPushConstants {
 		glm::vec4 position{};
 		glm::vec4 color{};
-		//glm::vec4 attenuationMod{};
+		glm::vec4 attenuationMod{};
 		float radius;
 	};
 
@@ -72,6 +72,7 @@ namespace shard {
 			// copy light to ubo
 			ubo.pointlights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
 			ubo.pointlights[lightIndex].color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
+			ubo.pointlights[lightIndex].attenuationMod = obj.pointlight->attenuationMod;
 			lightIndex += 1;
 		}
 		ubo.numLights = lightIndex;
@@ -99,6 +100,7 @@ namespace shard {
 			push.position = glm::vec4(obj.transform.translation, 1.f);
 			push.color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
 			push.radius = obj.transform.scale.x;
+			push.attenuationMod = obj.pointlight->attenuationMod;
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,

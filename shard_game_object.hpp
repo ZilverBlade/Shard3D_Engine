@@ -18,7 +18,7 @@ namespace shard {
 
 	struct PointlightComponent {
 		float lightIntensity = 1.0f;
-		//glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f);
+		glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f);
 	};
 
 	class ShardGameObject {
@@ -31,7 +31,7 @@ namespace shard {
 			return ShardGameObject{ currentId++ };
 		}
 
-		static ShardGameObject makePointlight(float intensity = 5.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f)/*, glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f)*/);
+		static ShardGameObject makePointlight(float intensity = 5.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f), glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f));
 
 		ShardGameObject(const ShardGameObject&) = delete;
 		ShardGameObject &operator=(const ShardGameObject&) = delete;

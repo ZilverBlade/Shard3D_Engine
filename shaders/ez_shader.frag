@@ -10,7 +10,7 @@ layout (location = 0) out vec4 outColor;
 struct Pointlight {
 	vec4 position;
 	vec4 color;
-	//vec4 attenuationMod; //	const + linear * x + quadratic * x^2
+	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
 };
 
 layout(set = 0, binding = 0) uniform GlobalUbo{
@@ -39,10 +39,10 @@ void main(){
 		Pointlight pointlight = ubo.pointlights[i];
 
 		vec3 lightDistance = pointlight.position.xyz - fragPosWorld;
-		float attenuation = pointlight.color.w / dot(lightDistance, lightDistance) /* 
-	/*				c				(pointlight.attenuationMod.x +																
-	/*				bx				pointlight.attenuationMod.y * sqrt(lightDistance.x*lightDistance.x + lightDistance.y*lightDistance.y + lightDistance.z*lightDistance.z) +  
-	/*				ax^2			pointlight.attenuationMod.z * dot(lightDistance, lightDistance))*/ ;							
+		float attenuation = pointlight.color.w / 
+	/*				c		*/		(pointlight.attenuationMod.x +																
+	/*				bx		*/		pointlight.attenuationMod.y * sqrt(lightDistance.x*lightDistance.x + lightDistance.y*lightDistance.y + lightDistance.z*lightDistance.z) +  
+	/*				ax^2	*/		pointlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
 		float cosAngIndicence = max(dot(surfaceNormal, normalize(lightDistance)), 0);
 		vec3 color_intensity = pointlight.color.xyz * pointlight.color.w * attenuation;
 
