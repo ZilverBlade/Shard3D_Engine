@@ -263,6 +263,25 @@ namespace shard {
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
+
+		{
+			auto pointlight = ShardGameObject::makePointlight(1.f);
+			pointlight.transform.translation = { -2.0f, -1.0f, 2.0f };
+			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
+		}
+
+		{
+			auto pointlight = ShardGameObject::makePointlight(1.f);
+			pointlight.transform.translation = { 0.0f, -1.0f, 0.0f };
+			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
+		}
+
+
+		{
+			auto pointlight = ShardGameObject::makePointlight(1.f);
+			pointlight.transform.translation = { 0.0f, -1.0f, 3.0f };
+			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
+		}
 	
 		{
 			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, {1.f, 0.f, 1.f});
