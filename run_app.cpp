@@ -11,10 +11,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-//fmod
-#include "FMOD_engine/fmod_core_engine.hpp"
-#include "FMOD_engine/fmod_studio_engine.hpp"
-
 //engine
 #include "input/keyboard_movement_controller.hpp"
 #include "input/mouse_movement_controller.hpp"
@@ -96,20 +92,6 @@ namespace shard {
 
 		float fov = ini.GetDoubleValue("DISPLAY", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
-
-		/*
-			just some fmod stuff bcos why not
-		*/
-
-		fmod_engine::FMOD_Core_Engine fmodcore;
-		fmod_engine::FMOD_Studio_Engine fmodstudio;
-
-		fmodcore.PlaySoundFile("sounddata/9kkkkkkkkkk.mp3"); //zyn :)
-		fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/arrive");
-		//fmodstudio.PlayBankEvent("sounddata/FMOD/Desktop", "engines.bank", "event:/carsounds/idlerace", "car_level", 0);
-
-		fmodcore.UpdateVolume(0.15);
-		fmodcore.UpdatePitch(1);
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!shardWindow.shouldClose()) {
