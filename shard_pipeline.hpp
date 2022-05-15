@@ -39,7 +39,7 @@ namespace shard {
 
 		ShardPipeline(const ShardPipeline&) = delete;
 		ShardPipeline& operator=(const ShardPipeline&) = delete;
-		//ShardPipeline() = default;
+		ShardPipeline() = default;
 
 		void bind(VkCommandBuffer commandBuffer);
 

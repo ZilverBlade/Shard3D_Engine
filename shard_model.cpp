@@ -13,6 +13,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
+#include "simpleini/simple_ini.h"
+#include "utils/definitions.hpp"
+
 namespace std {
 	template <>
 	struct hash<shard::ShardModel::Vertex> {
@@ -34,14 +37,23 @@ namespace shard {
 
 	std::unique_ptr<ShardModel> ShardModel::createModelFromFile(ShardDevice& device, const std::string& filepath, bool indexModel) {
 		Builder builder{};	
+		CSimpleIniA ini;
+
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+
 		if (indexModel) {
 			builder.loadIndexedModel(filepath);
-			std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << "\n";
+			if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
+				std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << "\n";
+			}
 			return std::make_unique<ShardModel>(device, builder);
 		}
 		else {
 			builder.loadModel(filepath);
-			std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << " (higher vertex count due to no indexing)\n";
+			if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
+				std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << " (higher vertex count due to no indexing)\n";
+			}
 			return std::make_unique<ShardModel>(device, builder);
 		}	
 	}

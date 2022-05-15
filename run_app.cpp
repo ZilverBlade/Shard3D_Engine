@@ -28,12 +28,10 @@
 
 namespace shard {
 
-	
-	CSimpleIniA ini;
-
 	RunApp::RunApp() {
 		Pointlight pointchecker;
 
+		CSimpleIniA ini;
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
@@ -87,6 +85,7 @@ namespace shard {
 		double mousePosX = {};
 		double mousePosY = {};
 
+		CSimpleIniA ini;
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
@@ -163,8 +162,6 @@ namespace shard {
 		
 	}
 
-	
-
 	void RunApp::loadGameObjects() {	
 		std::shared_ptr<ShardModel> model = ShardModel::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
 
@@ -174,8 +171,6 @@ namespace shard {
 		fart.transform.scale = { .5f, .5f, .5f };
 		fart.transform.rotation = { glm::radians(90.f), 0.f, 0.f};
 		gameObjects.emplace(fart.getId(), std::move(fart));
-
-		model = ShardModel::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
 
 		auto fart2 = ShardGameObject::createGameObject();
 		fart2.model = model;
@@ -228,8 +223,6 @@ namespace shard {
 		cone.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone.getId(), std::move(cone));
-
-		model = ShardModel::createModelFromFile(shardDevice, "modeldata/cone.obj");
 
 		auto cone2 = ShardGameObject::createGameObject();
 		cone2.model = model;

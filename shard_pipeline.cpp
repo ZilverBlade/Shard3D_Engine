@@ -41,8 +41,8 @@ namespace shard {
 
 
 	void ShardPipeline::createGraphicsPipeline(
-		const std::string& vertFilePath, 
-		const std::string& fragFilePath, 
+		const std::string& vertFilePath,
+		const std::string& fragFilePath,
 		const PipelineConfigInfo& configInfo
 	) {
 		assert(
@@ -103,8 +103,6 @@ namespace shard {
 
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-
-
 
 		if (vkCreateGraphicsPipelines(shardDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
