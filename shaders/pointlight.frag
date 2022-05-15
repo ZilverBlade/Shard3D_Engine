@@ -34,9 +34,9 @@ const float M_PI = 3.1415926538;
 
 void main()	{
 	float dis = sqrt(dot(fragOffset, fragOffset));
-	if (dis >= 1.0){
+	if (dis >= 1.0 || dis <= 0.33){
 		discard;
 	}
-	float cosDist =  0.5 * (cos(dis * M_PI) + 1.0);
+	float cosDist =  0.5 * (cos(dis * 3 * M_PI) + 1.0);
 	outColor = vec4(push.color.xyz + cosDist, cosDist);
 }

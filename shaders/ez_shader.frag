@@ -45,8 +45,8 @@ void main(){
 		Pointlight pointlight = ubo.pointlights[i];
 
 		vec3 lightDistance = pointlight.position.xyz - fragPosWorld;
-		float attenuation = 1.0 / 
-	/*				c		*/		(pointlight.attenuationMod.x +																
+		float attenuation = 1.0 / (
+	/*				c		*/		pointlight.attenuationMod.x +																
 	/*				bx		*/		pointlight.attenuationMod.y * sqrt(lightDistance.x*lightDistance.x + lightDistance.y*lightDistance.y + lightDistance.z*lightDistance.z) +  
 	/*				ax^2	*/		pointlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
 		lightDistance = normalize(lightDistance);

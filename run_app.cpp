@@ -270,7 +270,7 @@ namespace shard {
 		}
 
 		{
-			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f });
+			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, { 1.f, 1.f, 0.f }, { 1.0f, -0.2f, 0.2f });
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}

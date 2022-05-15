@@ -61,13 +61,13 @@ namespace shard {
 				invScale.z * (c1 * c2),
 			},};
 	}
-	ShardGameObject ShardGameObject::makePointlight(float intensity, float radius, glm::vec3 color, glm::vec4 attenuationMod) {
+	ShardGameObject ShardGameObject::makePointlight(float intensity, float radius, glm::vec3 color, glm::vec3 attenuationMod) {
 		ShardGameObject gameObj = ShardGameObject::createGameObject(); 
 		gameObj.color = color;
 		gameObj.transform.scale.x = radius;
 		gameObj.pointlight = std::make_unique<PointlightComponent>();
 		gameObj.pointlight->lightIntensity = intensity;
-		gameObj.pointlight->attenuationMod = attenuationMod;
+		gameObj.pointlight->attenuationMod = glm::vec4(attenuationMod, 0.f);
 		return gameObj;
 	}
 }
