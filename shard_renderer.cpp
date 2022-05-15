@@ -1,4 +1,7 @@
 #include "shard_renderer.hpp"
+#include "run_app.hpp"
+#include "utils/definitions.hpp"
+#include "simpleini/simple_ini.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -122,8 +125,18 @@ namespace shard {
 		renderPassInfo.renderArea.offset = { 0,0 };
 		renderPassInfo.renderArea.extent = shardSwapChain->getSwapChainExtent();
 
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+
 		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f };
+		clearValues[0].color = { 
+			(float)ini.GetDoubleValue("RENDERING", "DefaultBGColorR"), 
+			(float)ini.GetDoubleValue("RENDERING", "DefaultBGColorG"),
+			(float)ini.GetDoubleValue("RENDERING", "DefaultBGColorB"),
+			1.0f
+		};
+
 		clearValues[1].depthStencil = { 1.0f, 0 };
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfo.pClearValues = clearValues.data();

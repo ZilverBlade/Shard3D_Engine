@@ -40,6 +40,12 @@
     <Filter Include="Header Files\systems">
       <UniqueIdentifier>{dc235f6b-25b3-4c7c-98ca-fefad5bee372}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\fragment">
+      <UniqueIdentifier>{9ae8ef2b-52e5-4ad5-b467-a4581ce74553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\vertex">
+      <UniqueIdentifier>{025747d3-7fbb-4a1f-97db-4e1357ada593}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -88,6 +94,9 @@
       <Filter>Source Files\systems</Filter>
     </ClCompile>
     <ClCompile Include="systems\pointlight_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\directional_light_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
@@ -155,20 +164,29 @@
     <ClInclude Include="utils\definitions.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="systems\directional_light_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\ez_shader.vert">
-      <Filter>shaders</Filter>
+    <None Include="compile.bat" />
+    <None Include="shaders\directional_light.frag">
+      <Filter>shaders\fragment</Filter>
     </None>
     <None Include="shaders\ez_shader.frag">
-      <Filter>shaders</Filter>
+      <Filter>shaders\fragment</Filter>
     </None>
-    <None Include="compile.bat" />
     <None Include="shaders\pointlight.frag">
-      <Filter>shaders</Filter>
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\directional_light.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\ez_shader.vert">
+      <Filter>shaders\vertex</Filter>
     </None>
     <None Include="shaders\pointlight.vert">
-      <Filter>shaders</Filter>
+      <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

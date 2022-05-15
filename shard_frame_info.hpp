@@ -7,11 +7,16 @@
 
 namespace shard {
 
-
 	struct Pointlight {
 		glm::vec4 position{}; //ignore w
 		glm::vec4 color{}; 
 		glm::vec4 attenuationMod{};
+	};
+
+	struct DirectionalLight {
+		glm::vec4 position{}; //ignore w
+		glm::vec4 color{};
+		glm::vec4 direction{};
 	};
 
 	struct GlobalUbo {
@@ -28,11 +33,10 @@ namespace shard {
 		//reyleigh scattering fakery and/or indirect light
 		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.008f };
 
-		//directional light
-		//alignas(16) glm::vec3 directionalLightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
-		
 		Pointlight pointlights[MAX_LIGHTS];
-		int numLights;
+		DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
+		int numPointlights;
+		int numDirectionalLights;
 		//spotlight?
 	};
 

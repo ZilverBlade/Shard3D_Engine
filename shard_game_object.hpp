@@ -21,6 +21,10 @@ namespace shard {
 		glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f);
 	};
 
+	struct DirectionalLightComponent {
+		float lightIntensity = 1.0f;
+	};
+
 	class ShardGameObject {
 	public:
 		using id_t = unsigned int;
@@ -32,6 +36,7 @@ namespace shard {
 		}
 
 		static ShardGameObject makePointlight(float intensity = 5.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f), glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f));
+		static ShardGameObject makeDirectionalLight(float intensity = 5.f, glm::vec3 color = glm::vec3(1.f), glm::vec3 direction = glm::vec3(1.f, -3.f, -1.f));
 
 		ShardGameObject(const ShardGameObject&) = delete;
 		ShardGameObject &operator=(const ShardGameObject&) = delete;
@@ -47,6 +52,7 @@ namespace shard {
 		// Optional pointer components
 		std::shared_ptr<ShardModel> model{};
 		std::unique_ptr<PointlightComponent> pointlight = nullptr;
+		std::unique_ptr<DirectionalLightComponent> directionalLight = nullptr;
 
 	private:
 		ShardGameObject(id_t objId) : id{ objId } {}

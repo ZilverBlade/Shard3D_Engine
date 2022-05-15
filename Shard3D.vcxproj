@@ -214,6 +214,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="shard_descriptors.cpp" />
+    <ClCompile Include="systems\directional_light_system.cpp" />
     <ClCompile Include="systems\ez_render_system.cpp" />
     <ClCompile Include="input\keyboard_movement_controller.cpp" />
     <ClCompile Include="input\mouse_movement_controller.cpp" />
@@ -231,6 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
+    <ClInclude Include="systems\directional_light_system.hpp" />
     <ClInclude Include="utils\definitions.hpp" />
     <ClInclude Include="input\keyboard_movement_controller.hpp" />
     <ClInclude Include="input\mouse_movement_controller.hpp">
@@ -263,6 +265,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
+    <None Include="shaders\directional_light.frag" />
+    <None Include="shaders\directional_light.vert" />
     <None Include="shaders\ez_shader.frag" />
     <None Include="shaders\ez_shader.vert">
       <FileType>Document</FileType>

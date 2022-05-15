@@ -1,24 +1,17 @@
 #version 450
-#extension GL_KHR_vulkan_glsl : enable
 
-const vec2 OFFSETS[6] = vec2[](
-  vec2(-1.0, -1.0),
-  vec2(-1.0, 1.0),
-  vec2(1.0, -1.0),
-  vec2(1.0, -1.0),
-  vec2(-1.0, 1.0),
-  vec2(1.0, 1.0)
-);
+layout (location = 0) in vec2 fragOffset;
+layout (location = 0) out vec4 outColor;
 
-layout (location = 0) out vec2 fragOffset;
 
 struct Pointlight {
 	vec4 position;
 	vec4 color;
 	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
 };
+
 struct DirectionalLight {
-	vec4 position;
+vec4 position;
 	vec4 color;
 	vec4 direction; //	directional (ignore w)
 };
@@ -40,15 +33,16 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 layout(push_constant) uniform Push {
 vec4 position;
 vec4 color;
-vec4 attenuationMod;
-float radius;
+vec4 direction;
 } push;
 
-void main(){
-	fragOffset = OFFSETS[gl_VertexIndex];
-	
-	vec4 lightInCameraSpace = ubo.view * push.position;
-	vec4 positionInCameraSpace = lightInCameraSpace + push.radius * vec4(fragOffset, 0.0, 0.0);
+const float M_PI = 3.1415926538;
 
-	gl_Position = ubo.projection * positionInCameraSpace;
+void main()	{
+	float dis = sqrt(dot(fragOffset, fragOffset));
+	if (dis >= 1.0 || dis <= 0.33){
+		discard;
+	}
+	float cosDist =  0.5 * (cos(dis * 3 * M_PI) + 1.0);
+	outColor = vec4(push.color.xyz + cosDist, cosDist);
 }

@@ -40,15 +40,14 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 layout(push_constant) uniform Push {
 vec4 position;
 vec4 color;
-vec4 attenuationMod;
-float radius;
+vec4 direction;
 } push;
 
 void main(){
 	fragOffset = OFFSETS[gl_VertexIndex];
 	
 	vec4 lightInCameraSpace = ubo.view * push.position;
-	vec4 positionInCameraSpace = lightInCameraSpace + push.radius * vec4(fragOffset, 0.0, 0.0);
+	vec4 positionInCameraSpace = lightInCameraSpace + 0.1 * vec4(fragOffset, 0.0, 0.0);
 
 	gl_Position = ubo.projection * positionInCameraSpace;
 }

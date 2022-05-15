@@ -13,17 +13,23 @@ struct Pointlight {
 	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
 };
 
+struct DirectionalLight {
+vec4 position;
+	vec4 color;
+	vec4 direction; //	directional (ignore w)
+};
+
 layout(set = 0, binding = 0) uniform GlobalUbo{
 	mat4 projection;
 	mat4 view;
 	mat4 invView;
 
 	vec4 ambientLightColor;			//	sky/ambient
-	//vec3 directionalLightDirection;	//	directional
 	
 	Pointlight pointlights[20];
-	int numLights;
-
+	DirectionalLight directionalLights[6];
+	int numPointlights;
+	int numDirectionalLights;
 } ubo;
 
 
@@ -41,10 +47,12 @@ void main(){
 	vec3 cameraPosWorld = ubo.invView[3].xyz;
 	vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
 
-	for (int i = 0; i < ubo.numLights; i++) {
+	//Pointlight
+	for (int i = 0; i < ubo.numPointlights; i++) {
 		Pointlight pointlight = ubo.pointlights[i];
 
 		vec3 lightDistance = pointlight.position.xyz - fragPosWorld;
+
 		float attenuation = 1.0 / (
 	/*				c		*/		pointlight.attenuationMod.x +																
 	/*				bx		*/		pointlight.attenuationMod.y * sqrt(lightDistance.x*lightDistance.x + lightDistance.y*lightDistance.y + lightDistance.z*lightDistance.z) +  
@@ -64,7 +72,15 @@ void main(){
 		specularLight += color_intensity * blinnTerm; 
 	}
 
-//	float lightIntensity = ubo.ambientLightColor.w + max(dot(normalize(fragNormalWorld), ubo.directionalLightDirection), 0);w
+	//Directional light
+	for (int i = 0; i < ubo.numDirectionalLights; i++) {
+		DirectionalLight directionalLight = ubo.directionalLights[i];
+
+		float lightIntensity = max(dot(surfaceNormal, normalize(vec3(directionalLight.direction))), 0);
+		vec3 color_intensity = directionalLight.color.xyz * directionalLight.color.w;
+
+		diffuseLight += color_intensity * lightIntensity;
+	}
 
 		// multiply fragColor by specular only if material is metallic
 	outColor = vec4(diffuseLight * fragColor + specularLight, 1.0); //RGBA

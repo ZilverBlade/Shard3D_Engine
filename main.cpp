@@ -2,13 +2,12 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
-#include <string>
 
 /*
     Shard3D (2022 All rights reserved) created by ZilverBlade and Razer
 */
-
 int main() {
+
     shard::RunApp app{};
     try {
         app.run();

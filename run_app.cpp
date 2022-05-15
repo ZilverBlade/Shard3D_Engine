@@ -15,6 +15,7 @@
 #include "input/keyboard_movement_controller.hpp"
 #include "input/mouse_movement_controller.hpp"
 #include "camera.hpp"
+#include "utils/shard_utils.hpp"
 #include "utils/definitions.hpp"
 
 #include "simpleini/simple_ini.h"
@@ -23,18 +24,23 @@
 //systems
 #include "systems/ez_render_system.hpp"
 #include "systems/pointlight_system.hpp"
+#include "systems/directional_light_system.hpp"
 
 
 
 namespace shard {
 
 	RunApp::RunApp() {
-		Pointlight pointchecker;
+		std::ifstream infile(ENGINE_SETTINGS_PATH);
+		assert(infile.good() != false && "Critical error! Engine settings config file not found!");
+		std::ifstream infile2(GAME_SETTINGS_PATH);
+		assert(infile2.good() != false && "Critical error! Game settings config file not found!");
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
+		Pointlight pointchecker;
 		if (pointchecker.attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
 			std::cout << "warn.NotInverseSquareAttenuation: \"Point light in level that does not obey inverse square law\"\n";
 		}
@@ -73,11 +79,12 @@ namespace shard {
 
 		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		PointlightSystem pointlightSystem { shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		DirectionalLightSystem directionalLightSystem{ shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		ShardCamera camera{};
 
 		auto viewerObject = ShardGameObject::createGameObject();
-		viewerObject.transform.translation = glm::vec3(0.f, -1.f, 0.f);
+		viewerObject.transform.translation = glm::vec3(0.f, -1.f, -1.f);
 
 		controller::KeyboardMovementController cameraControllerKeyBoard{};
 		controller::MouseMovementController cameraControllerMouse{};
@@ -89,7 +96,7 @@ namespace shard {
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
-		float fov = ini.GetDoubleValue("DISPLAY", "FOV");
+		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
@@ -112,11 +119,11 @@ namespace shard {
 
 			float aspect = shardRenderer.getAspectRatio();
 			
-			if ((std::string)ini.GetValue("DISPLAY", "View") == "Perspective") {
-				camera.setPerspectiveProjection(glm::radians(fov), aspect, ini.GetDoubleValue("DISPLAY", "NearClipDistance"), ini.GetDoubleValue("DISPLAY", "FarClipDistance"));
+			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
+				camera.setPerspectiveProjection(glm::radians(fov), aspect, ini.GetDoubleValue("RENDERING", "NearClipDistance"), ini.GetDoubleValue("RENDERING", "FarClipDistance"));
 			}
-			else if ((std::string)ini.GetValue("DISPLAY", "View") == "Orthographic"){
-				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("DISPLAY", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
+			else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic"){
+				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("RENDERING", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
 			}
 				
 			if (auto commandBuffer = shardRenderer.beginFrame()) {
@@ -140,6 +147,10 @@ namespace shard {
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
+				directionalLightSystem.update(frameInfo, ubo);
+				uboBuffers[frameIndex]->writeToBuffer(&ubo);
+				uboBuffers[frameIndex]->flush();
+
 				//	render
 				/*
 					this section is great for adding multiple render passes such as :
@@ -153,6 +164,7 @@ namespace shard {
 
 				ezRenderSystem.renderGameObjects(frameInfo);
 				pointlightSystem.render(frameInfo);
+				directionalLightSystem.render(frameInfo);
 
 				shardRenderer.endSwapChainRenderPass(commandBuffer);
 				shardRenderer.endFrame();
@@ -267,5 +279,13 @@ namespace shard {
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
+
+
+		{
+			auto directionalLight = ShardGameObject::makeDirectionalLight(0.01f, glm::vec3(1.f, 0.9f, 0.f));
+			directionalLight.transform.translation = { 2.0f, -0.5f, 0.2f };
+			gameObjects.emplace(directionalLight.getId(), std::move(directionalLight));
+		}
+
 	}
 }

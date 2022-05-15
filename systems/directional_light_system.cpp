@@ -3,34 +3,33 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include "pointlight_system.hpp"
+#include "directional_light_system.hpp"
 #include <stdexcept>
 #include <array>
 #include <map>
 
 namespace shard {
 
-	struct PointlightPushConstants {
+	struct DirectionalLightPushConstants {
 		glm::vec4 position{};
 		glm::vec4 color{};
-		glm::vec4 attenuationMod{};
-		float radius;
+		glm::vec4 direction{}; 
 	};
 
-	PointlightSystem::PointlightSystem(ShardDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : shardDevice{ device } {
+	DirectionalLightSystem::DirectionalLightSystem(ShardDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : shardDevice{ device } {
 		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
-	PointlightSystem::~PointlightSystem() {
+	DirectionalLightSystem::~DirectionalLightSystem() {
 		vkDestroyPipelineLayout(shardDevice.device(), pipelineLayout, nullptr);
 	}
 	
-	void PointlightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+	void DirectionalLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
 		
 		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
-		pushConstantRange.size = sizeof(PointlightPushConstants);
+		pushConstantRange.size = sizeof(DirectionalLightPushConstants);
 		
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
 
@@ -47,7 +46,7 @@ namespace shard {
 
 
 
-	void PointlightSystem::createPipeline(VkRenderPass renderPass) {
+	void DirectionalLightSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
@@ -59,33 +58,33 @@ namespace shard {
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		shardPipeline = std::make_unique<ShardPipeline>(
 			shardDevice,
-			"shaders/pointlight.vert.spv",
-			"shaders/pointlight.frag.spv",
+			"shaders/directional_light.vert.spv",
+			"shaders/directional_light.frag.spv",
 			pipelineConfig
 			);
 	}
 
-	void PointlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {
+	void DirectionalLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {
 		int lightIndex = 0;
 		for (auto& kv : frameInfo.gameObjects) {
 			auto& obj = kv.second;
-			if (obj.pointlight == nullptr) continue;
+			if (obj.directionalLight == nullptr) continue;
 
 			// copy light to ubo
-			ubo.pointlights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
-			ubo.pointlights[lightIndex].color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
-			ubo.pointlights[lightIndex].attenuationMod = obj.pointlight->attenuationMod;
+			ubo.directionalLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
+			ubo.directionalLights[lightIndex].color = glm::vec4(obj.color, obj.directionalLight->lightIntensity);
+			ubo.directionalLights[lightIndex].direction = glm::vec4(obj.transform.rotation, 1.f);
 			lightIndex += 1;
 		}
-		ubo.numPointlights = lightIndex;
+		ubo.numDirectionalLights = lightIndex;
 	}
 
-	void PointlightSystem::render(FrameInfo &frameInfo) {
+	void DirectionalLightSystem::render(FrameInfo &frameInfo) {
 		//sort lights
 		std::map<float, ShardGameObject::id_t> sorted;
 		for (auto& kv : frameInfo.gameObjects) {
 			auto& obj = kv.second;
-			if (obj.pointlight == nullptr) continue;
+			if (obj.directionalLight == nullptr) continue;
 
 			// calc distance
 			auto offset = frameInfo.camera.getPosition() - obj.transform.translation;
@@ -110,18 +109,17 @@ namespace shard {
 			//use game obj id to find light obj
 			auto& obj = frameInfo.gameObjects.at(it->second);
 
-			PointlightPushConstants push{};
+			DirectionalLightPushConstants push{};
 			push.position = glm::vec4(obj.transform.translation, 1.f);
-			push.color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
-			push.radius = obj.transform.scale.x;
-			push.attenuationMod = obj.pointlight->attenuationMod;
+			push.color = glm::vec4(obj.color, obj.directionalLight->lightIntensity);
+			push.direction = glm::vec4(obj.transform.rotation, 1.f);
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
 				pipelineLayout,
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 				0,
-				sizeof(PointlightPushConstants),
+				sizeof(DirectionalLightPushConstants),
 				&push
 			);
 			vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
