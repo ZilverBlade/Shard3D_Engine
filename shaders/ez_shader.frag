@@ -103,7 +103,7 @@ void main(){
 		float epsilon  = spotlight.angle.x - spotlight.angle.y;
 		float intensity = clamp((theta - spotlight.angle.x) / epsilon, 0.0, 1.0); 
 
-		if(theta > cos(spotlight.angle.x)) { diffuseLight += color_intensity * cosAngIndicence * intensity;}	
+		if(theta > sin(spotlight.angle.x)) { diffuseLight += color_intensity * cosAngIndicence * intensity;}	
 
 		//specular AlightDistance
 		vec3 halfAngle = normalize(lightDistance + viewDirection);

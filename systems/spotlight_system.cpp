@@ -6,7 +6,7 @@
 #include "spotlight_system.hpp"
 #include <stdexcept>
 #include <array>
-
+#include <iostream>
 namespace shard {
 
 	struct SpotlightPushConstants {
@@ -69,13 +69,15 @@ namespace shard {
 		for (auto& kv : frameInfo.gameObjects) {
 			auto& obj = kv.second;
 			if (obj.spotlight == nullptr) continue;
-
+			
 			// copy light to ubo
 			ubo.spotlights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
-			ubo.spotlights[lightIndex].color = glm::vec4(obj.color, 0.2f);
+			ubo.spotlights[lightIndex].color = glm::vec4(obj.color, obj.spotlight->lightIntensity);
 			ubo.spotlights[lightIndex].direction = glm::vec4(obj.transform.rotation, 1.f);
 			ubo.spotlights[lightIndex].angle = glm::vec2(obj.spotlight->outerAngle, obj.spotlight->innerAngle);
 			ubo.spotlights[lightIndex].attenuationMod = obj.spotlight->attenuationMod;
+
+
 			lightIndex += 1;
 		}
 		ubo.numSpotlights = lightIndex;

@@ -1,5 +1,6 @@
 #include "shard_game_object.hpp"
-
+#include <iostream>
+#include "utils/definitions.hpp"
 namespace shard {
 	glm::mat4 TransformComponent::mat4() {
 
@@ -63,23 +64,47 @@ namespace shard {
 	}
 	ShardGameObject ShardGameObject::makePointlight(float intensity, float radius, glm::vec3 color, glm::vec3 attenuationMod) {
 		ShardGameObject gameObj = ShardGameObject::createGameObject(); 
+
 		gameObj.color = color;
 		gameObj.transform.scale.x = radius;
 		gameObj.pointlight = std::make_unique<PointlightComponent>();
 		gameObj.pointlight->lightIntensity = intensity;
 		gameObj.pointlight->attenuationMod = glm::vec4(attenuationMod, 0.f);
+
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+
+		if (gameObj.pointlight->attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
+			std::cout << "warn.NotInverseSquareAttenuation: \"Pointlight in level does not obey inverse square law\"\n";
+		}
+
 		return gameObj;
 	}
 	ShardGameObject ShardGameObject::makeSpotlight(float intensity, float radius, glm::vec3 color, glm::vec3 direction, float outerAngle, float innerAngle, glm::vec3 attenuationMod) {
 		ShardGameObject gameObj = ShardGameObject::createGameObject();
+		
 		gameObj.color = color;
 		gameObj.transform.scale.x = radius;
 		gameObj.spotlight = std::make_unique<SpotlightComponent>();
 		gameObj.spotlight->lightIntensity = intensity;
 		gameObj.transform.rotation = direction;
-		gameObj.spotlight->outerAngle = outerAngle;
-		gameObj.spotlight->innerAngle = innerAngle;
+
+		gameObj.spotlight->outerAngle = outerAngle; //(-1 * outerAngle) + glm::radians(55.f); //how the fuck does the angle work/???
+		gameObj.spotlight->innerAngle = innerAngle; //(-1 * innerAngle) + glm::radians(90.f); //how the fuck does the angle work/???
 		gameObj.spotlight->attenuationMod = glm::vec4(attenuationMod, 0.f);
+
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+
+		if (gameObj.spotlight->attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
+			std::cout << "warn.NotInverseSquareAttenuation: \"Spotlight in level does not obey inverse square law\"\n";
+		}
+		if (gameObj.spotlight->outerAngle < gameObj.spotlight->innerAngle && ini.GetBoolValue("WARNINGS", "warn.InvertedSpotlightAngle")) {
+			std::cout << "warn.InvertedSpotlightAngle: \"Spotlight in level that has inner angle greater than outer angle, spotlight won't render correctly\"\n";
+		}
+
 		return gameObj;
 	}
 	ShardGameObject ShardGameObject::makeDirectionalLight(float intensity, glm::vec3 color, glm::vec3 direction)

@@ -36,16 +36,6 @@ namespace shard {
 		assert(infile.good() != false && "Critical error! Engine settings config file not found!");
 		std::ifstream infile2(GAME_SETTINGS_PATH);
 		assert(infile2.good() != false && "Critical error! Game settings config file not found!");
-
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		ini.LoadFile(ENGINE_SETTINGS_PATH);
-
-		Pointlight pointchecker;
-		if (pointchecker.attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && (std::string)ini.GetValue("WARNINGS", "warn.NotInverseSquareAttenuation") == "true") {
-			std::cout << "warn.NotInverseSquareAttenuation: \"Pointlight in level that does not obey inverse square law\"\n";
-		}
-
 	
 		globalPool = ShardDescriptorPool::Builder(shardDevice)
 			.setMaxSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -250,7 +240,7 @@ namespace shard {
 		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
-		/*
+		
 		{
 			auto pointlight = ShardGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
@@ -281,15 +271,20 @@ namespace shard {
 			pointlight.transform.translation = { 0.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
-		*/
+		
 		{
-			auto pointlight = ShardGameObject::makePointlight(0.5f, 0.1, { 1.f, 1.f, 0.f }, { 0.0f, -0.2f, 1.2f });
+			auto pointlight = ShardGameObject::makePointlight(0.5f, 0.1, { 1.f, 1.f, 0.f }, { 0.0f, -0.2f, 1.3f });
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
 		{
-			auto spotlight = ShardGameObject::makeSpotlight(1.3f, 0.1, { 1.f, 1.f, 1.f }, {0.f, glm::radians(60.f), 0.7f}, glm::radians(50.f), glm::radians(00.f));
-			spotlight.transform.translation = { 2.0f, -0.1f, 0.2f };
+			auto spotlight = ShardGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(90.f), 0.f }, glm::radians(30.f), glm::radians(10.f), {1.f, 0.f, 1.f});
+			spotlight.transform.translation = { 4.0f, -0.1f, 0.2f };
+			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
+		}
+		{
+			auto spotlight = ShardGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(60.f), 1.f }, glm::radians(30.f), glm::radians(0.f), { 1.f, 0.f, 1.f });
+			spotlight.transform.translation = { 6.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
 		{
