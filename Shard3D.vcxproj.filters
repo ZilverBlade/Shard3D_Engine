@@ -99,6 +99,9 @@
     <ClCompile Include="systems\directional_light_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
+    <ClCompile Include="systems\spotlight_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shard_window.hpp">
@@ -167,6 +170,9 @@
     <ClInclude Include="systems\directional_light_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>
+    <ClInclude Include="systems\spotlight_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
@@ -186,6 +192,12 @@
       <Filter>shaders\vertex</Filter>
     </None>
     <None Include="shaders\pointlight.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\spotlight.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\spotlight.vert">
       <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>

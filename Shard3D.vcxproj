@@ -229,10 +229,12 @@
     <ClCompile Include="shard_window.cpp" />
     <ClCompile Include="shard_pipeline.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
+    <ClCompile Include="systems\spotlight_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
+    <ClInclude Include="systems\spotlight_system.hpp" />
     <ClInclude Include="utils\definitions.hpp" />
     <ClInclude Include="input\keyboard_movement_controller.hpp" />
     <ClInclude Include="input\mouse_movement_controller.hpp">
@@ -273,6 +275,8 @@
     </None>
     <None Include="shaders\pointlight.frag" />
     <None Include="shaders\pointlight.vert" />
+    <None Include="shaders\spotlight.frag" />
+    <None Include="shaders\spotlight.vert" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -13,8 +13,7 @@ namespace shard {
 		glm::vec4 position{};
 		glm::vec4 color{};
 		glm::vec4 direction{};
-		float outerAngle;
-		float innerAngle;
+		alignas(16) glm::vec2 angle{}; //x = outer, y = inner
 		glm::vec4 attenuationMod{};
 	};
 
@@ -69,12 +68,14 @@ namespace shard {
 		int lightIndex = 0;
 		for (auto& kv : frameInfo.gameObjects) {
 			auto& obj = kv.second;
-			if (obj.pointlight == nullptr) continue;
+			if (obj.spotlight == nullptr) continue;
 
 			// copy light to ubo
-			ubo.pointlights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
-			ubo.pointlights[lightIndex].color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
-			ubo.pointlights[lightIndex].attenuationMod = obj.pointlight->attenuationMod;
+			ubo.spotlights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
+			ubo.spotlights[lightIndex].color = glm::vec4(obj.color, 0.2f);
+			ubo.spotlights[lightIndex].direction = glm::vec4(obj.transform.rotation, 1.f);
+			ubo.spotlights[lightIndex].angle = glm::vec2(obj.spotlight->outerAngle, obj.spotlight->innerAngle);
+			ubo.spotlights[lightIndex].attenuationMod = obj.spotlight->attenuationMod;
 			lightIndex += 1;
 		}
 		ubo.numSpotlights = lightIndex;
@@ -101,6 +102,8 @@ namespace shard {
 			SpotlightPushConstants push{};
 			push.position = glm::vec4(obj.transform.translation, 1.f);
 			push.color = glm::vec4(obj.color, obj.spotlight->lightIntensity);
+			push.direction = glm::vec4(obj.transform.rotation, 1.f);
+			push.angle = glm::vec2(obj.spotlight->outerAngle, obj.spotlight->innerAngle);
 			push.attenuationMod = obj.spotlight->attenuationMod;
 
 			vkCmdPushConstants(

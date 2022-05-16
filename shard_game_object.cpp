@@ -70,6 +70,18 @@ namespace shard {
 		gameObj.pointlight->attenuationMod = glm::vec4(attenuationMod, 0.f);
 		return gameObj;
 	}
+	ShardGameObject ShardGameObject::makeSpotlight(float intensity, float radius, glm::vec3 color, glm::vec3 direction, float outerAngle, float innerAngle, glm::vec3 attenuationMod) {
+		ShardGameObject gameObj = ShardGameObject::createGameObject();
+		gameObj.color = color;
+		gameObj.transform.scale.x = radius;
+		gameObj.spotlight = std::make_unique<SpotlightComponent>();
+		gameObj.spotlight->lightIntensity = intensity;
+		gameObj.transform.rotation = direction;
+		gameObj.spotlight->outerAngle = outerAngle;
+		gameObj.spotlight->innerAngle = innerAngle;
+		gameObj.spotlight->attenuationMod = glm::vec4(attenuationMod, 0.f);
+		return gameObj;
+	}
 	ShardGameObject ShardGameObject::makeDirectionalLight(float intensity, glm::vec3 color, glm::vec3 direction)
 	{
 		ShardGameObject gameObj = ShardGameObject::createGameObject();
