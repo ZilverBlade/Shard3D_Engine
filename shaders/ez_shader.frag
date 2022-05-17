@@ -100,12 +100,12 @@ void main(){
 		vec3 color_intensity = spotlight.color.xyz * spotlight.color.w * attenuation;
 
 		float theta = dot(lightDistance, normalize(-spotlight.direction.xyz));
-		float epsilon  = spotlight.angle.x - spotlight.angle.y;
+		float epsilon  = spotlight.angle.y - spotlight.angle.x;
 		float intensity = clamp((theta - spotlight.angle.x) / epsilon, 0.0, 1.0); 
 
 		if(theta > sin(spotlight.angle.x)) { diffuseLight += color_intensity * cosAngIndicence * intensity;}	
 
-		//specular AlightDistance
+		//specular lightDistance
 		vec3 halfAngle = normalize(lightDistance + viewDirection);
 		float blinnTerm = dot(surfaceNormal, halfAngle);
 		blinnTerm = clamp(blinnTerm, 0, 1);

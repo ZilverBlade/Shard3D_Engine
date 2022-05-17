@@ -55,8 +55,8 @@ namespace shard {
 			float radius = 0.1f,
 			glm::vec3 color = glm::vec3(1.f),
 			glm::vec3 direction = glm::vec3(1.f, -3.f, -1.f),
-			float outerAngle = glm::radians(45.f), 
-			float innerAngle = glm::radians(15.f), 
+			float outerAngle = glm::radians(25.f), 
+			float innerAngle = glm::radians(45.f), 
 			glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f)
 		);
 		

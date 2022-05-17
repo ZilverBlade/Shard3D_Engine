@@ -240,7 +240,7 @@ namespace shard {
 		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
-		
+		/*
 		{
 			auto pointlight = ShardGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
@@ -271,24 +271,26 @@ namespace shard {
 			pointlight.transform.translation = { 0.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
-		
+		*/
 		{
 			auto pointlight = ShardGameObject::makePointlight(0.5f, 0.1, { 1.f, 1.f, 0.f }, { 0.0f, -0.2f, 1.3f });
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
+		
 		{
-			auto spotlight = ShardGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(90.f), 0.f }, glm::radians(30.f), glm::radians(10.f), {1.f, 0.f, 1.f});
+			auto spotlight = ShardGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(90.f), 0.f }, glm::radians(30.f), glm::radians(40.f), {0.f, 0.f, 1.f});
 			spotlight.transform.translation = { 4.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
 		{
-			auto spotlight = ShardGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(60.f), 1.f }, glm::radians(30.f), glm::radians(0.f), { 1.f, 0.f, 1.f });
+			auto spotlight = ShardGameObject::makeSpotlight(0.2f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(60.f), 1.f }, glm::radians(20.f), glm::radians(50.f), { 0.f, 0.f, 1.f });
 			spotlight.transform.translation = { 6.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
+		
 		{
-			auto directionalLight = ShardGameObject::makeDirectionalLight(0.01f, glm::vec3(1.f, 0.0f, 1.f));
+			auto directionalLight = ShardGameObject::makeDirectionalLight(0.01f, glm::vec3(1.f, 1.0f, 1.f));
 			directionalLight.transform.translation = { 2.0f, -0.5f, 0.2f };
 			gameObjects.emplace(directionalLight.getId(), std::move(directionalLight));
 		}

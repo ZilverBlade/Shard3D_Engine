@@ -101,7 +101,7 @@ namespace shard {
 		if (gameObj.spotlight->attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
 			std::cout << "warn.NotInverseSquareAttenuation: \"Spotlight in level does not obey inverse square law\"\n";
 		}
-		if (gameObj.spotlight->outerAngle < gameObj.spotlight->innerAngle && ini.GetBoolValue("WARNINGS", "warn.InvertedSpotlightAngle")) {
+		if (gameObj.spotlight->outerAngle > gameObj.spotlight->innerAngle && ini.GetBoolValue("WARNINGS", "warn.InvertedSpotlightAngle")) {
 			std::cout << "warn.InvertedSpotlightAngle: \"Spotlight in level that has inner angle greater than outer angle, spotlight won't render correctly\"\n";
 		}
 
