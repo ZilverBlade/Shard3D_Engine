@@ -26,9 +26,6 @@ namespace Shard3D {
 			if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
 				gameObject.transform.rotation += sensitivity * dt * glm::normalize(rotate);
 			}
-
-			//gameObject.transform.rotation.x = glm::clamp(gameObject.transform.rotation.x, -1.5f, 1.5f);
-			gameObject.transform.rotation.y = glm::mod(gameObject.transform.rotation.y, glm::two_pi<float>());
 		}
 		/**/
 		void MouseMovementController::adjustFOV(GLFWwindow* window, glm::vec2 scrollPosition) {

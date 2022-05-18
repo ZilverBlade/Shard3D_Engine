@@ -6,7 +6,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <array>
-
+#include <thread>
 //glm
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -93,13 +93,12 @@ namespace Shard3D {
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!engineWindow.shouldClose()) {
-
 			glfwPollEvents();
 
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
-
+			
 			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
 			glfwGetCursorPos(engineWindow.getGLFWwindow(), &mousePosX, &mousePosY);
@@ -276,7 +275,7 @@ namespace Shard3D {
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
-		
+		/*
 		{
 			auto spotlight = EngineGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(90.f), 0.f }, glm::radians(30.f), glm::radians(40.f), {0.f, 0.f, 1.f});
 			spotlight.transform.translation = { 4.0f, -0.1f, 0.2f };
@@ -293,6 +292,6 @@ namespace Shard3D {
 			directionalLight.transform.translation = { 2.0f, -0.5f, 0.2f };
 			gameObjects.emplace(directionalLight.getId(), std::move(directionalLight));
 		}
-
+		*/
 	}
 }

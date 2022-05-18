@@ -62,7 +62,6 @@ int EngineDevice::getMaxUsableSampleCount() {
     return VK_SAMPLE_COUNT_1_BIT;
 }
 
-
 // class member functions
 EngineDevice::EngineDevice(EngineWindow& window) : window{ window } {
   createInstance();
