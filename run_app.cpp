@@ -221,7 +221,7 @@ namespace shard {
 		auto quad = ShardGameObject::createGameObject();
 		quad.model = model;
 		quad.transform.translation = { 0.0f, 0.9f, 0.0f };
-		quad.transform.scale = { 10.f, 1.f, 10.f };
+		quad.transform.scale = { 100.f, 1.f, 100.f };
 		quad.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(quad.getId(), std::move(quad));
 
@@ -284,7 +284,7 @@ namespace shard {
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
 		{
-			auto spotlight = ShardGameObject::makeSpotlight(0.2f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(60.f), 1.f }, glm::radians(20.f), glm::radians(50.f), { 0.f, 0.f, 1.f });
+			auto spotlight = ShardGameObject::makeSpotlight(2.2f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(60.f), 1.f }, glm::radians(20.f), glm::radians(30.f), { 0.f, 0.f, 1.f });
 			spotlight.transform.translation = { 6.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}

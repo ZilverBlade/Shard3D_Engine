@@ -6,7 +6,6 @@ layout(location = 2) in vec3 fragNormalWorld;
 
 layout (location = 0) out vec4 outColor;
 
-
 struct Pointlight {
 	vec4 position;
 	vec4 color;
@@ -24,8 +23,6 @@ struct DirectionalLight {
 	vec4 color;
 	vec4 direction; //	directional (ignore w)
 };
-
-
 
 layout(set = 0, binding = 0) uniform GlobalUbo{
 	mat4 projection;
@@ -58,8 +55,6 @@ void main(){
 
 	vec3 cameraPosWorld = ubo.invView[3].xyz;
 	vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
-
-
 
 	//Pointlight
 	for (int i = 0; i < ubo.numPointlights; i++) {

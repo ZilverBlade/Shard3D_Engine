@@ -15,18 +15,19 @@ namespace shard {
 		glm::vec4 direction{};
 		alignas(16) glm::vec2 angle{}; //x = outer, y = inner
 		glm::vec4 attenuationMod{};
+		float radius;
 	};
 
 	SpotlightSystem::SpotlightSystem(ShardDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : shardDevice{ device } {
 		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
+
 	SpotlightSystem::~SpotlightSystem() {
 		vkDestroyPipelineLayout(shardDevice.device(), pipelineLayout, nullptr);
 	}
 	
-	void SpotlightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
-		
+	void SpotlightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {		
 		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
@@ -45,8 +46,6 @@ namespace shard {
 		}
 	}
 
-
-
 	void SpotlightSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
@@ -61,7 +60,7 @@ namespace shard {
 			"shaders/spotlight.vert.spv",
 			"shaders/spotlight.frag.spv",
 			pipelineConfig
-			);
+		);
 	}
 
 	void SpotlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {
@@ -76,7 +75,6 @@ namespace shard {
 			ubo.spotlights[lightIndex].direction = glm::vec4(obj.transform.rotation, 1.f);
 			ubo.spotlights[lightIndex].angle = glm::vec2(obj.spotlight->outerAngle, obj.spotlight->innerAngle);
 			ubo.spotlights[lightIndex].attenuationMod = obj.spotlight->attenuationMod;
-
 
 			lightIndex += 1;
 		}
@@ -107,6 +105,7 @@ namespace shard {
 			push.direction = glm::vec4(obj.transform.rotation, 1.f);
 			push.angle = glm::vec2(obj.spotlight->outerAngle, obj.spotlight->innerAngle);
 			push.attenuationMod = obj.spotlight->attenuationMod;
+			push.radius = obj.transform.scale.x;
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
