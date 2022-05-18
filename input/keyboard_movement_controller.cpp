@@ -18,11 +18,13 @@ namespace Shard3D {
 			gameObject.transform.rotation.y = glm::mod(gameObject.transform.rotation.y, glm::two_pi<float>());
 
 			float yaw = gameObject.transform.rotation.y;
-			const glm::vec3 forwardDir{ sin(yaw), 0.f, cos(yaw) };
+			float pitch = gameObject.transform.rotation.x;
+			const glm::vec3 forwardDir{ sin(yaw), -sin(pitch), cos(yaw) };
 			const glm::vec3 rightDir{ forwardDir.z, 0.f, -forwardDir.x };
 			const glm::vec3 upDir{ 0.f, -1.f, 0.f };
 
 			glm::vec3 moveDir{ 0.f };
+			
 			if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS) moveDir += forwardDir;
 			if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS) moveDir -= forwardDir;
 			if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) moveDir += rightDir;
@@ -30,8 +32,11 @@ namespace Shard3D {
 			if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir += upDir;
 			if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir -= upDir;
 
+			float slowDownModifier = 1.f;
+			if (glfwGetKey(window, keys.slowDown) == GLFW_PRESS) slowDownModifier = 0.5f;
+
 			if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
-				gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
+				gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir) * slowDownModifier;
 			}
 		}
 	}

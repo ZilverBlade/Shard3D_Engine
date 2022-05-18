@@ -233,6 +233,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
+    <ClInclude Include="engine_logger.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
     <ClInclude Include="systems\spotlight_system.hpp" />
     <ClInclude Include="utils\definitions.hpp" />

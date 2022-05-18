@@ -63,9 +63,6 @@
     <ClCompile Include="run_app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="camera.cpp">
       <Filter>Source Files\camera</Filter>
     </ClCompile>
@@ -108,15 +105,15 @@
     <ClCompile Include="buffer.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="run_app.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game_object.hpp">
@@ -177,6 +174,12 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="swap_chain.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="model.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="engine_logger.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,12 +13,13 @@ namespace Shard3D {
             int moveRight = GLFW_KEY_D;
             int moveForward = GLFW_KEY_W;
             int moveBackward = GLFW_KEY_S;
-            int moveUp = GLFW_KEY_LEFT_SHIFT;
-            int moveDown = GLFW_KEY_LEFT_CONTROL;
+            int moveUp = GLFW_KEY_SPACE;
+            int moveDown = GLFW_KEY_LEFT_SHIFT;
             int lookLeft = GLFW_KEY_LEFT;
             int lookRight = GLFW_KEY_RIGHT;
             int lookUp = GLFW_KEY_UP;
             int lookDown = GLFW_KEY_DOWN;
+            int slowDown = GLFW_KEY_LEFT_CONTROL;
         };
 
         void moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject);

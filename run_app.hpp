@@ -4,6 +4,7 @@
 #include "pipeline.hpp"
 #include "device.hpp"
 #include "descriptors.hpp"
+#include "utils/engine_utils.hpp"
 
 #include "game_object.hpp"
 #include <string>
@@ -30,7 +31,7 @@ namespace Shard3D {
 	private:
 		void loadGameObjects();
 
-		EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
+		EngineWindow engineWindow { WIDTH, HEIGHT, WINDOW_NAME };//{ (int)getValFromGameConfig("WINDOW", "WIDTH"), (int)getValFromGameConfig("WINDOW", "HEIGHT"), WINDOW_NAME};
 		EngineDevice engineDevice{ engineWindow };
 		EngineRenderer engineRenderer{ engineWindow, engineDevice };
 

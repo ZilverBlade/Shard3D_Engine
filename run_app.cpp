@@ -15,7 +15,6 @@
 #include "input/keyboard_movement_controller.hpp"
 #include "input/mouse_movement_controller.hpp"
 #include "camera.hpp"
-#include "utils/engine_utils.hpp"
 #include "utils/definitions.hpp"
 
 #include "simpleini/simple_ini.h"
