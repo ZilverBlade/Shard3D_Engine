@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../shard_game_object.hpp"
-#include "../shard_window.hpp"
+#include "../game_object.hpp"
+#include "../engine_window.hpp"
 
-namespace shard {
+namespace Shard3D {
     namespace controller {
 	class KeyboardMovementController {
 
@@ -21,7 +21,7 @@ namespace shard {
             int lookDown = GLFW_KEY_DOWN;
         };
 
-        void moveInPlaneXZ(GLFWwindow* window, float dt, ShardGameObject& gameObject);
+        void moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject);
 
         KeyMappings keys{};
         float moveSpeed{ 3.f };

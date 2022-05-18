@@ -1,22 +1,22 @@
 #pragma once
 
-#include "shard_device.hpp"
+#include "device.hpp"
 
-namespace shard {
+namespace Shard3D {
 
-    class ShardBuffer {
+    class EngineBuffer {
     public:
-        ShardBuffer(
-            ShardDevice& device,
+        EngineBuffer(
+            EngineDevice& device,
             VkDeviceSize instanceSize,
             uint32_t instanceCount,
             VkBufferUsageFlags usageFlags,
             VkMemoryPropertyFlags memoryPropertyFlags,
             VkDeviceSize minOffsetAlignment = 1);
-        ~ShardBuffer();
+        ~EngineBuffer();
 
-        ShardBuffer(const ShardBuffer&) = delete;
-        ShardBuffer& operator=(const ShardBuffer&) = delete;
+        EngineBuffer(const EngineBuffer&) = delete;
+        EngineBuffer& operator=(const EngineBuffer&) = delete;
 
         VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
         void unmap();
@@ -43,7 +43,7 @@ namespace shard {
     private:
         static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
-        ShardDevice& shardDevice;
+        EngineDevice& engineDevice;
         void* mapped = nullptr;
         VkBuffer buffer = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;

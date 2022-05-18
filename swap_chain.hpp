@@ -1,5 +1,5 @@
 #pragma once
-#include "shard_device.hpp"
+#include "device.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.h>
@@ -12,19 +12,19 @@
 #include <fstream>
 
 
-namespace shard {
+namespace Shard3D {
 
-    class ShardSwapChain {
+    class EngineSwapChain {
          public:
               static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
     
-              ShardSwapChain(ShardDevice &deviceRef, VkExtent2D windowExtent);
-              ShardSwapChain(ShardDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<ShardSwapChain> previous);
-              ~ShardSwapChain();
+              EngineSwapChain(EngineDevice &deviceRef, VkExtent2D windowExtent);
+              EngineSwapChain(EngineDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<EngineSwapChain> previous);
+              ~EngineSwapChain();
     
-              ShardSwapChain(const ShardSwapChain &) = delete;
-              ShardSwapChain& operator=(const ShardSwapChain &) = delete;
-              ShardSwapChain() = default;
+              EngineSwapChain(const EngineSwapChain &) = delete;
+              EngineSwapChain& operator=(const EngineSwapChain &) = delete;
+              EngineSwapChain() = default;
     
               VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
               VkRenderPass getRenderPass() { return renderPass; }
@@ -43,7 +43,7 @@ namespace shard {
  VkResult acquireNextImage(uint32_t *imageIndex);
  VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
- bool compareSwapFormats(const ShardSwapChain& swapChain) const {
+ bool compareSwapFormats(const EngineSwapChain& swapChain) const {
      return swapChain.swapChainDepthFormat == swapChainDepthFormat  &&
             swapChain.swapChainImageFormat == swapChainImageFormat  ;
  }
@@ -81,11 +81,11 @@ namespace shard {
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;
 
-  ShardDevice &device;
+  EngineDevice &device;
   VkExtent2D windowExtent;
 
   VkSwapchainKHR swapChain;
-  std::shared_ptr<ShardSwapChain> oldSwapChain;
+  std::shared_ptr<EngineSwapChain> oldSwapChain;
 
   std::vector<VkSemaphore> imageAvailableSemaphores;
   std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -94,4 +94,4 @@ namespace shard {
   size_t currentFrame = 0;
 };
 
-}  // namespace shard
+}  // namespace Shard3D

@@ -1,18 +1,18 @@
 #pragma once
 
-#include "shard_window.hpp"
-#include "shard_pipeline.hpp"
-#include "shard_device.hpp"
-#include "shard_descriptors.hpp"
+#include "engine_window.hpp"
+#include "pipeline.hpp"
+#include "device.hpp"
+#include "descriptors.hpp"
 
-#include "shard_game_object.hpp"
+#include "game_object.hpp"
 #include <string>
-#include "shard_renderer.hpp"
+#include "renderer.hpp"
 
 #include <memory>
 #include <vector>
 
-namespace shard {
+namespace Shard3D {
 	class RunApp {
 	public:
 		static constexpr int WIDTH = 1280; //800
@@ -30,13 +30,13 @@ namespace shard {
 	private:
 		void loadGameObjects();
 
-		ShardWindow shardWindow{ WIDTH, HEIGHT, WINDOW_NAME };
-		ShardDevice shardDevice{ shardWindow };
-		ShardRenderer shardRenderer{ shardWindow, shardDevice };
+		EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
+		EngineDevice engineDevice{ engineWindow };
+		EngineRenderer engineRenderer{ engineWindow, engineDevice };
 
 		// note: order of declaration matters
-		std::unique_ptr<ShardDescriptorPool> globalPool{};
-		ShardGameObject::Map gameObjects;
+		std::unique_ptr<EngineDescriptorPool> globalPool{};
+		EngineGameObject::Map gameObjects;
 };
 
 }

@@ -1,26 +1,26 @@
 #pragma once
 
-#include "shard_window.hpp"
-#include "shard_device.hpp"
+#include "engine_window.hpp"
+#include "device.hpp"
 #include <cassert>
 #include <string>
-#include "shard_swap_chain.hpp"
+#include "swap_chain.hpp"
 
 #include <memory>
 #include <vector>
 
-namespace shard {
-	class ShardRenderer {
+namespace Shard3D {
+	class EngineRenderer {
 	public:
 
-		ShardRenderer(ShardWindow &window, ShardDevice &device);
-		~ShardRenderer();
+		EngineRenderer(EngineWindow &window, EngineDevice &device);
+		~EngineRenderer();
 
-		ShardRenderer(const ShardRenderer &) = delete;
-		ShardRenderer &operator=(const ShardRenderer &) = delete;
+		EngineRenderer(const EngineRenderer &) = delete;
+		EngineRenderer &operator=(const EngineRenderer &) = delete;
 
-		VkRenderPass getSwapChainRenderPass() const { return shardSwapChain->getRenderPass(); }
-		float getAspectRatio() const { return shardSwapChain->extentAspectRatio(); }
+		VkRenderPass getSwapChainRenderPass() const { return engineSwapChain->getRenderPass(); }
+		float getAspectRatio() const { return engineSwapChain->extentAspectRatio(); }
 		bool isFrameInProgress() const { return isFrameStarted; }
 
 		VkCommandBuffer getCurrentCommandBuffer() const { 
@@ -43,9 +43,9 @@ namespace shard {
 		void freeCommandBuffers();
 		void recreateSwapchain();
 		
-		ShardWindow &shardWindow;
-		ShardDevice &shardDevice;
-		std::unique_ptr<ShardSwapChain> shardSwapChain;
+		EngineWindow &engineWindow;
+		EngineDevice &engineDevice;
+		std::unique_ptr<EngineSwapChain> engineSwapChain;
 		std::vector<VkCommandBuffer> commandBuffers;	
 
 		uint32_t currentImageIndex;

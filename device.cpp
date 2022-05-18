@@ -1,4 +1,4 @@
-#include "shard_device.hpp"
+#include "device.hpp"
 #include "simpleini/simple_ini.h"
 // std headers
 #include <cstring>
@@ -8,7 +8,7 @@
 #include <cassert>
 #include "utils/definitions.hpp"
 
-namespace shard {
+namespace Shard3D {
 
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
@@ -48,7 +48,7 @@ void DestroyDebugUtilsMessengerEXT(
   }
 }
 
-int ShardDevice::getMaxUsableSampleCount() {
+int EngineDevice::getMaxUsableSampleCount() {
     VkPhysicalDeviceProperties physicalDeviceProperties;
     vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
 
@@ -64,7 +64,7 @@ int ShardDevice::getMaxUsableSampleCount() {
 
 
 // class member functions
-ShardDevice::ShardDevice(ShardWindow& window) : window{ window } {
+EngineDevice::EngineDevice(EngineWindow& window) : window{ window } {
   createInstance();
   setupDebugMessenger();
   createSurface();
@@ -73,7 +73,7 @@ ShardDevice::ShardDevice(ShardWindow& window) : window{ window } {
   createCommandPool();
 }
 
-ShardDevice::~ShardDevice() {
+EngineDevice::~EngineDevice() {
   vkDestroyCommandPool(device_, commandPool, nullptr);
   vkDestroyDevice(device_, nullptr);
 
@@ -85,7 +85,7 @@ ShardDevice::~ShardDevice() {
   vkDestroyInstance(instance, nullptr);
 }
 
-void ShardDevice::createInstance() {
+void EngineDevice::createInstance() {
   if (enableValidationLayers && !checkValidationLayerSupport()) {
     throw std::runtime_error("validation layers requested, but not available!");
   }
@@ -125,7 +125,7 @@ void ShardDevice::createInstance() {
   hasGflwRequiredInstanceExtensions();
 }
 
-void ShardDevice::pickPhysicalDevice() {
+void EngineDevice::pickPhysicalDevice() {
   uint32_t deviceCount = 0;
   vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
   if (deviceCount == 0) {
@@ -160,7 +160,7 @@ void ShardDevice::pickPhysicalDevice() {
   std::cout << "physical device: " << properties.deviceName << std::endl;
 }
 
-void ShardDevice::createLogicalDevice() {
+void EngineDevice::createLogicalDevice() {
   QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -206,7 +206,7 @@ void ShardDevice::createLogicalDevice() {
   vkGetDeviceQueue(device_, indices.presentFamily, 0, &presentQueue_);
 }
 
-void ShardDevice::createCommandPool() {
+void EngineDevice::createCommandPool() {
   QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
 
   VkCommandPoolCreateInfo poolInfo = {};
@@ -220,9 +220,9 @@ void ShardDevice::createCommandPool() {
   }
 }
 
-void ShardDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
+void EngineDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
 
-bool ShardDevice::isDeviceSuitable(VkPhysicalDevice device) {
+bool EngineDevice::isDeviceSuitable(VkPhysicalDevice device) {
   QueueFamilyIndices indices = findQueueFamilies(device);
 
   bool extensionsSupported = checkDeviceExtensionSupport(device);
@@ -240,7 +240,7 @@ bool ShardDevice::isDeviceSuitable(VkPhysicalDevice device) {
          supportedFeatures.samplerAnisotropy;
 }
 
-void ShardDevice::populateDebugMessengerCreateInfo(
+void EngineDevice::populateDebugMessengerCreateInfo(
     VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
   createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -253,7 +253,7 @@ void ShardDevice::populateDebugMessengerCreateInfo(
   createInfo.pUserData = nullptr;  // Optional
 }
 
-void ShardDevice::setupDebugMessenger() {
+void EngineDevice::setupDebugMessenger() {
   if (!enableValidationLayers) return;
   VkDebugUtilsMessengerCreateInfoEXT createInfo;
   populateDebugMessengerCreateInfo(createInfo);
@@ -262,7 +262,7 @@ void ShardDevice::setupDebugMessenger() {
   }
 }
 
-bool ShardDevice::checkValidationLayerSupport() {
+bool EngineDevice::checkValidationLayerSupport() {
   uint32_t layerCount;
   vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -287,7 +287,7 @@ bool ShardDevice::checkValidationLayerSupport() {
   return true;
 }
 
-std::vector<const char *> ShardDevice::getRequiredExtensions() {
+std::vector<const char *> EngineDevice::getRequiredExtensions() {
   uint32_t glfwExtensionCount = 0;
   const char **glfwExtensions;
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -301,7 +301,7 @@ std::vector<const char *> ShardDevice::getRequiredExtensions() {
   return extensions;
 }
 
-void ShardDevice::hasGflwRequiredInstanceExtensions() {
+void EngineDevice::hasGflwRequiredInstanceExtensions() {
   uint32_t extensionCount = 0;
   vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
   std::vector<VkExtensionProperties> extensions(extensionCount);
@@ -324,7 +324,7 @@ void ShardDevice::hasGflwRequiredInstanceExtensions() {
   }
 }
 
-bool ShardDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+bool EngineDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
   uint32_t extensionCount;
   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
@@ -344,7 +344,7 @@ bool ShardDevice::checkDeviceExtensionSupport(VkPhysicalDevice device) {
   return requiredExtensions.empty();
 }
 
-QueueFamilyIndices ShardDevice::findQueueFamilies(VkPhysicalDevice device) {
+QueueFamilyIndices EngineDevice::findQueueFamilies(VkPhysicalDevice device) {
   QueueFamilyIndices indices;
 
   uint32_t queueFamilyCount = 0;
@@ -375,7 +375,7 @@ QueueFamilyIndices ShardDevice::findQueueFamilies(VkPhysicalDevice device) {
   return indices;
 }
 
-SwapChainSupportDetails ShardDevice::querySwapChainSupport(VkPhysicalDevice device) {
+SwapChainSupportDetails EngineDevice::querySwapChainSupport(VkPhysicalDevice device) {
   SwapChainSupportDetails details;
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface_, &details.capabilities);
 
@@ -401,7 +401,7 @@ SwapChainSupportDetails ShardDevice::querySwapChainSupport(VkPhysicalDevice devi
   return details;
 }
 
-VkFormat ShardDevice::findSupportedFormat(
+VkFormat EngineDevice::findSupportedFormat(
     const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
   for (VkFormat format : candidates) {
     VkFormatProperties props;
@@ -417,7 +417,7 @@ VkFormat ShardDevice::findSupportedFormat(
   throw std::runtime_error("failed to find supported format!");
 }
 
-uint32_t ShardDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+uint32_t EngineDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
   for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
@@ -430,7 +430,7 @@ uint32_t ShardDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags 
   throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void ShardDevice::createBuffer(
+void EngineDevice::createBuffer(
     VkDeviceSize size,
     VkBufferUsageFlags usage,
     VkMemoryPropertyFlags properties,
@@ -461,7 +461,7 @@ void ShardDevice::createBuffer(
   vkBindBufferMemory(device_, buffer, bufferMemory, 0);
 }
 
-VkCommandBuffer ShardDevice::beginSingleTimeCommands() {
+VkCommandBuffer EngineDevice::beginSingleTimeCommands() {
   VkCommandBufferAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -479,7 +479,7 @@ VkCommandBuffer ShardDevice::beginSingleTimeCommands() {
   return commandBuffer;
 }
 
-void ShardDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+void EngineDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
   vkEndCommandBuffer(commandBuffer);
 
   VkSubmitInfo submitInfo{};
@@ -493,7 +493,7 @@ void ShardDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
   vkFreeCommandBuffers(device_, commandPool, 1, &commandBuffer);
 }
 
-void ShardDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void EngineDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
   VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
   VkBufferCopy copyRegion{};
@@ -505,7 +505,7 @@ void ShardDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSiz
   endSingleTimeCommands(commandBuffer);
 }
 
-void ShardDevice::copyBufferToImage(
+void EngineDevice::copyBufferToImage(
     VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount) {
   VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
@@ -532,7 +532,7 @@ void ShardDevice::copyBufferToImage(
   endSingleTimeCommands(commandBuffer);
 }
 
-void ShardDevice::createImageWithInfo(
+void EngineDevice::createImageWithInfo(
     const VkImageCreateInfo &imageInfo,
     VkMemoryPropertyFlags properties,
     //VkSampleCountFlagBits numSamples,

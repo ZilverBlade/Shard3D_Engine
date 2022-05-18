@@ -1,7 +1,7 @@
-#include "shard_game_object.hpp"
+#include "game_object.hpp"
 #include <iostream>
 #include "utils/definitions.hpp"
-namespace shard {
+namespace Shard3D {
 	glm::mat4 TransformComponent::mat4() {
 
 		// Matrix corresponds to translate * Ry * Rx * Rz * scale transformation
@@ -62,8 +62,8 @@ namespace shard {
 				invScale.z * (c1 * c2),
 			},};
 	}
-	ShardGameObject ShardGameObject::makePointlight(float intensity, float radius, glm::vec3 color, glm::vec3 attenuationMod) {
-		ShardGameObject gameObj = ShardGameObject::createGameObject(); 
+	EngineGameObject EngineGameObject::makePointlight(float intensity, float radius, glm::vec3 color, glm::vec3 attenuationMod) {
+		EngineGameObject gameObj = EngineGameObject::createGameObject(); 
 
 		gameObj.color = color;
 		gameObj.transform.scale.x = radius;
@@ -81,8 +81,8 @@ namespace shard {
 
 		return gameObj;
 	}
-	ShardGameObject ShardGameObject::makeSpotlight(float intensity, float radius, glm::vec3 color, glm::vec3 direction, float outerAngle, float innerAngle, glm::vec3 attenuationMod) {
-		ShardGameObject gameObj = ShardGameObject::createGameObject();
+	EngineGameObject EngineGameObject::makeSpotlight(float intensity, float radius, glm::vec3 color, glm::vec3 direction, float outerAngle, float innerAngle, glm::vec3 attenuationMod) {
+		EngineGameObject gameObj = EngineGameObject::createGameObject();
 		
 		gameObj.color = color;
 		gameObj.transform.scale.x = radius;
@@ -107,9 +107,9 @@ namespace shard {
 
 		return gameObj;
 	}
-	ShardGameObject ShardGameObject::makeDirectionalLight(float intensity, glm::vec3 color, glm::vec3 direction)
+	EngineGameObject EngineGameObject::makeDirectionalLight(float intensity, glm::vec3 color, glm::vec3 direction)
 	{
-		ShardGameObject gameObj = ShardGameObject::createGameObject();
+		EngineGameObject gameObj = EngineGameObject::createGameObject();
 		gameObj.color = color;
 		gameObj.directionalLight = std::make_unique<DirectionalLightComponent>();
 		gameObj.directionalLight->lightIntensity = intensity;

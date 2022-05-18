@@ -5,13 +5,13 @@
  * https://github.com/SaschaWillems/Vulkan/blob/master/base/VulkanBuffer.h
  */
 
-#include "shard_buffer.hpp"
+#include "buffer.hpp"
 
  // std
 #include <cassert>
 #include <cstring>
 
-namespace shard {
+namespace Shard3D {
 
     /**
      * Returns the minimum instance size required to be compatible with devices minOffsetAlignment
@@ -22,21 +22,21 @@ namespace shard {
      *
      * @return VkResult of the buffer mapping call
      */
-    VkDeviceSize ShardBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
+    VkDeviceSize EngineBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
         if (minOffsetAlignment > 0) {
             return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
         }
         return instanceSize;
     }
 
-    ShardBuffer::ShardBuffer(
-        ShardDevice& device,
+    EngineBuffer::EngineBuffer(
+        EngineDevice& device,
         VkDeviceSize instanceSize,
         uint32_t instanceCount,
         VkBufferUsageFlags usageFlags,
         VkMemoryPropertyFlags memoryPropertyFlags,
         VkDeviceSize minOffsetAlignment)
-        : shardDevice{ device },
+        : engineDevice{ device },
         instanceSize{ instanceSize },
         instanceCount{ instanceCount },
         usageFlags{ usageFlags },
@@ -46,10 +46,10 @@ namespace shard {
         device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);
     }
 
-    ShardBuffer::~ShardBuffer() {
+    EngineBuffer::~EngineBuffer() {
         unmap();
-        vkDestroyBuffer(shardDevice.device(), buffer, nullptr);
-        vkFreeMemory(shardDevice.device(), memory, nullptr);
+        vkDestroyBuffer(engineDevice.device(), buffer, nullptr);
+        vkFreeMemory(engineDevice.device(), memory, nullptr);
     }
 
     /**
@@ -61,9 +61,9 @@ namespace shard {
      *
      * @return VkResult of the buffer mapping call
      */
-    VkResult ShardBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult EngineBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
         assert(buffer && memory && "Called map on buffer before create");
-        return vkMapMemory(shardDevice.device(), memory, offset, size, 0, &mapped);
+        return vkMapMemory(engineDevice.device(), memory, offset, size, 0, &mapped);
     }
 
     /**
@@ -71,9 +71,9 @@ namespace shard {
      *
      * @note Does not return a result as vkUnmapMemory can't fail
      */
-    void ShardBuffer::unmap() {
+    void EngineBuffer::unmap() {
         if (mapped) {
-            vkUnmapMemory(shardDevice.device(), memory);
+            vkUnmapMemory(engineDevice.device(), memory);
             mapped = nullptr;
         }
     }
@@ -87,7 +87,7 @@ namespace shard {
      * @param offset (Optional) Byte offset from beginning of mapped region
      *
      */
-    void ShardBuffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset) {
+    void EngineBuffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset) {
         assert(mapped && "Cannot copy to unmapped buffer");
 
         if (size == VK_WHOLE_SIZE) {
@@ -111,13 +111,13 @@ namespace shard {
      *
      * @return VkResult of the flush call
      */
-    VkResult ShardBuffer::flush(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult EngineBuffer::flush(VkDeviceSize size, VkDeviceSize offset) {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory;
         mappedRange.offset = offset;
         mappedRange.size = size;
-        return vkFlushMappedMemoryRanges(shardDevice.device(), 1, &mappedRange);
+        return vkFlushMappedMemoryRanges(engineDevice.device(), 1, &mappedRange);
     }
 
     /**
@@ -131,13 +131,13 @@ namespace shard {
      *
      * @return VkResult of the invalidate call
      */
-    VkResult ShardBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult EngineBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory;
         mappedRange.offset = offset;
         mappedRange.size = size;
-        return vkInvalidateMappedMemoryRanges(shardDevice.device(), 1, &mappedRange);
+        return vkInvalidateMappedMemoryRanges(engineDevice.device(), 1, &mappedRange);
     }
 
     /**
@@ -148,7 +148,7 @@ namespace shard {
      *
      * @return VkDescriptorBufferInfo of specified offset and range
      */
-    VkDescriptorBufferInfo ShardBuffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
+    VkDescriptorBufferInfo EngineBuffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
         return VkDescriptorBufferInfo{
             buffer,
             offset,
@@ -163,7 +163,7 @@ namespace shard {
      * @param index Used in offset calculation
      *
      */
-    void ShardBuffer::writeToIndex(void* data, int index) {
+    void EngineBuffer::writeToIndex(void* data, int index) {
         writeToBuffer(data, instanceSize, index * alignmentSize);
     }
 
@@ -173,7 +173,7 @@ namespace shard {
      * @param index Used in offset calculation
      *
      */
-    VkResult ShardBuffer::flushIndex(int index) { return flush(alignmentSize, index * alignmentSize); }
+    VkResult EngineBuffer::flushIndex(int index) { return flush(alignmentSize, index * alignmentSize); }
 
     /**
      * Create a buffer info descriptor
@@ -182,7 +182,7 @@ namespace shard {
      *
      * @return VkDescriptorBufferInfo for instance at index
      */
-    VkDescriptorBufferInfo ShardBuffer::descriptorInfoForIndex(int index) {
+    VkDescriptorBufferInfo EngineBuffer::descriptorInfoForIndex(int index) {
         return descriptorInfo(alignmentSize, index * alignmentSize);
     }
 
@@ -195,7 +195,7 @@ namespace shard {
      *
      * @return VkResult of the invalidate call
      */
-    VkResult ShardBuffer::invalidateIndex(int index) {
+    VkResult EngineBuffer::invalidateIndex(int index) {
         return invalidate(alignmentSize, index * alignmentSize);
     }
 

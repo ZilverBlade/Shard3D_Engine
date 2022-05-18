@@ -1,6 +1,6 @@
 #pragma once
 
-namespace shard{
+namespace Shard3D{
 
 #define ENGINE_SETTINGS_PATH		"settings/engine_settings.ini"
 #define GAME_SETTINGS_PATH			"settings/game_settings.ini"

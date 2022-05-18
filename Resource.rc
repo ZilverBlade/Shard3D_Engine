@@ -52,7 +52,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "shard.ico"
+IDI_ICON1               ICON                    "shard3d.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -80,9 +80,9 @@ BEGIN
             VALUE "CompanyName", "TODO: <Company name>"
             VALUE "FileDescription", "TODO: <File description>"
             VALUE "FileVersion", "1.0.4.508"
-            VALUE "InternalName", "ShardEng.exe"
+            VALUE "InternalName", "EngineEng.exe"
             VALUE "LegalCopyright", "Copyright (C) 2022"
-            VALUE "OriginalFilename", "ShardEng.exe"
+            VALUE "OriginalFilename", "EngineEng.exe"
             VALUE "ProductName", "TODO: <Product name>"
             VALUE "ProductVersion", "1.0.4.508"
         END

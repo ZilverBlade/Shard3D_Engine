@@ -213,21 +213,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="shard_descriptors.cpp" />
+    <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="systems\directional_light_system.cpp" />
-    <ClCompile Include="systems\ez_render_system.cpp" />
+    <ClCompile Include="systems\basic_render_system.cpp" />
     <ClCompile Include="input\keyboard_movement_controller.cpp" />
     <ClCompile Include="input\mouse_movement_controller.cpp" />
-    <ClCompile Include="shard_buffer.cpp" />
-    <ClCompile Include="shard_game_object.cpp" />
-    <ClCompile Include="shard_swap_chain.cpp" />
+    <ClCompile Include="buffer.cpp" />
+    <ClCompile Include="game_object.cpp" />
+    <ClCompile Include="swap_chain.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="shard_device.cpp" />
+    <ClCompile Include="device.cpp" />
     <ClCompile Include="run_app.cpp" />
-    <ClCompile Include="shard_model.cpp" />
-    <ClCompile Include="shard_renderer.cpp" />
-    <ClCompile Include="shard_window.cpp" />
-    <ClCompile Include="shard_pipeline.cpp" />
+    <ClCompile Include="model.cpp" />
+    <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="window.cpp" />
+    <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
   </ItemGroup>
@@ -246,31 +246,31 @@
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
-    <ClInclude Include="shard_buffer.hpp" />
-    <ClInclude Include="shard_descriptors.hpp" />
-    <ClInclude Include="shard_frame_info.hpp" />
-    <ClInclude Include="shard_swap_chain.hpp" />
-    <ClInclude Include="systems\ez_render_system.hpp">
+    <ClInclude Include="buffer.hpp" />
+    <ClInclude Include="descriptors.hpp" />
+    <ClInclude Include="frame_info.hpp" />
+    <ClInclude Include="swap_chain.hpp" />
+    <ClInclude Include="systems\basic_render_system.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="shard_device.hpp" />
+    <ClInclude Include="device.hpp" />
     <ClInclude Include="run_app.hpp" />
-    <ClInclude Include="shard_game_object.hpp" />
-    <ClInclude Include="shard_model.hpp" />
-    <ClInclude Include="shard_pipeline.hpp" />
-    <ClInclude Include="shard_renderer.hpp" />
-    <ClInclude Include="shard_window.hpp" />
+    <ClInclude Include="game_object.hpp" />
+    <ClInclude Include="model.hpp" />
+    <ClInclude Include="pipeline.hpp" />
+    <ClInclude Include="renderer.hpp" />
+    <ClInclude Include="engine_window.hpp" />
     <ClInclude Include="simpleini\simple_ini.h" />
     <ClInclude Include="systems\pointlight_system.hpp" />
-    <ClInclude Include="utils\shard_utils.hpp" />
+    <ClInclude Include="utils\engine_utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
     <None Include="shaders\directional_light.frag" />
     <None Include="shaders\directional_light.vert" />
-    <None Include="shaders\ez_shader.frag" />
-    <None Include="shaders\ez_shader.vert">
+    <None Include="shaders\basic_shader.frag" />
+    <None Include="shaders\basic_shader.vert">
       <FileType>Document</FileType>
     </None>
     <None Include="shaders\pointlight.frag" />

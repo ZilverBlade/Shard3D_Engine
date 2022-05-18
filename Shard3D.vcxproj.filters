@@ -46,30 +46,24 @@
     <Filter Include="shaders\vertex">
       <UniqueIdentifier>{025747d3-7fbb-4a1f-97db-4e1357ada593}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\core">
+      <UniqueIdentifier>{5c072065-5f99-49bd-84d0-b7cc333d43aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{2fc22722-ac3f-489e-a775-583cdf859c6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shard_window.cpp">
+    <ClCompile Include="window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="run_app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shard_pipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shard_device.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shard_swap_chain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shard_model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shard_renderer.cpp">
+    <ClCompile Include="model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
@@ -81,16 +75,10 @@
     <ClCompile Include="input\mouse_movement_controller.cpp">
       <Filter>Source Files\controller</Filter>
     </ClCompile>
-    <ClCompile Include="shard_game_object.cpp">
+    <ClCompile Include="game_object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shard_buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shard_descriptors.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="systems\ez_render_system.cpp">
+    <ClCompile Include="systems\basic_render_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
     <ClCompile Include="systems\pointlight_system.cpp">
@@ -102,30 +90,36 @@
     <ClCompile Include="systems\spotlight_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
+    <ClCompile Include="swap_chain.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="pipeline.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="device.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="descriptors.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shard_window.hpp">
+    <ClInclude Include="engine_window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="run_app.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shard_pipeline.hpp">
+    <ClInclude Include="model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shard_device.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shard_swap_chain.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shard_model.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shard_game_object.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shard_renderer.hpp">
+    <ClInclude Include="game_object.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -143,22 +137,16 @@
     <ClInclude Include="input\mouse_movement_controller.hpp">
       <Filter>Header Files\controller</Filter>
     </ClInclude>
-    <ClInclude Include="utils\shard_utils.hpp">
+    <ClInclude Include="utils\engine_utils.hpp">
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="simpleini\simple_ini.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="shard_buffer.hpp">
+    <ClInclude Include="frame_info.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shard_frame_info.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shard_descriptors.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="systems\ez_render_system.hpp">
+    <ClInclude Include="systems\basic_render_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>
     <ClInclude Include="systems\pointlight_system.hpp">
@@ -173,13 +161,31 @@
     <ClInclude Include="systems\spotlight_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>
+    <ClInclude Include="buffer.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="descriptors.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="device.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="pipeline.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="swap_chain.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
     <None Include="shaders\directional_light.frag">
       <Filter>shaders\fragment</Filter>
     </None>
-    <None Include="shaders\ez_shader.frag">
+    <None Include="shaders\basic_shader.frag">
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="shaders\pointlight.frag">
@@ -188,7 +194,7 @@
     <None Include="shaders\directional_light.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="shaders\ez_shader.vert">
+    <None Include="shaders\basic_shader.vert">
       <Filter>shaders\vertex</Filter>
     </None>
     <None Include="shaders\pointlight.vert">

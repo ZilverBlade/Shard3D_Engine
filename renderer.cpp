@@ -1,4 +1,4 @@
-#include "shard_renderer.hpp"
+#include "renderer.hpp"
 #include "run_app.hpp"
 #include "utils/definitions.hpp"
 #include "simpleini/simple_ini.h"
@@ -7,59 +7,59 @@
 #include <stdexcept>
 #include <array>
 
-namespace shard {
+namespace Shard3D {
 
-	ShardRenderer::ShardRenderer(ShardWindow &window, ShardDevice &device) 
-		: shardWindow{window}, shardDevice{device} {
+	EngineRenderer::EngineRenderer(EngineWindow &window, EngineDevice &device) 
+		: engineWindow{window}, engineDevice{device} {
 		recreateSwapchain();
 		createCommandBuffers();
 	}
-	ShardRenderer::~ShardRenderer() {
+	EngineRenderer::~EngineRenderer() {
 		freeCommandBuffers();
 	}
 	
 
-	void ShardRenderer::recreateSwapchain() {
-		auto extent = shardWindow.getExtent();
+	void EngineRenderer::recreateSwapchain() {
+		auto extent = engineWindow.getExtent();
 		while (extent.width == 0 || extent.height == 0) {
-			extent = shardWindow.getExtent();
+			extent = engineWindow.getExtent();
 			glfwWaitEvents();
 		}
 
-		vkDeviceWaitIdle(shardDevice.device());
-		shardSwapChain = nullptr; //for some reason validation fails when new swap chain is created
-		if (shardSwapChain == nullptr) {
-			shardSwapChain = std::make_unique<ShardSwapChain>(shardDevice, extent);
+		vkDeviceWaitIdle(engineDevice.device());
+		engineSwapChain = nullptr; //for some reason validation fails when new swap chain is created
+		if (engineSwapChain == nullptr) {
+			engineSwapChain = std::make_unique<EngineSwapChain>(engineDevice, extent);
 		}
 		else {
-			std::shared_ptr<ShardSwapChain> oldSwapChain = std::move(shardSwapChain);
-			shardSwapChain = std::make_unique<ShardSwapChain>(shardDevice, extent, std::move(shardSwapChain));
+			std::shared_ptr<EngineSwapChain> oldSwapChain = std::move(engineSwapChain);
+			engineSwapChain = std::make_unique<EngineSwapChain>(engineDevice, extent, std::move(engineSwapChain));
 
-			if (!oldSwapChain->compareSwapFormats(*shardSwapChain.get())) {
+			if (!oldSwapChain->compareSwapFormats(*engineSwapChain.get())) {
 				throw std::runtime_error("Swap chain image (or depth) format has changed!");
 			}
 		}
 		//come back later
 	}
 
-	void ShardRenderer::createCommandBuffers() {
-		commandBuffers.resize(ShardSwapChain::MAX_FRAMES_IN_FLIGHT);
+	void EngineRenderer::createCommandBuffers() {
+		commandBuffers.resize(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = shardDevice.getCommandPool();
+		allocInfo.commandPool = engineDevice.getCommandPool();
 		allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-		if (vkAllocateCommandBuffers(shardDevice.device(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+		if (vkAllocateCommandBuffers(engineDevice.device(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate command buffers!");
 		}
 	}
 
-	void ShardRenderer::freeCommandBuffers() {
+	void EngineRenderer::freeCommandBuffers() {
 		vkFreeCommandBuffers(
-			shardDevice.device(),
-			shardDevice.getCommandPool(),
+			engineDevice.device(),
+			engineDevice.getCommandPool(),
 			static_cast<uint32_t>(commandBuffers.size()),
 			commandBuffers.data()
 		);
@@ -67,10 +67,10 @@ namespace shard {
 	}
 
 	
-	VkCommandBuffer ShardRenderer::beginFrame() {
+	VkCommandBuffer EngineRenderer::beginFrame() {
 		assert(!isFrameStarted && "Can't call beginFrame while already in progress");
 
-		auto result = shardSwapChain->acquireNextImage(&currentImageIndex);
+		auto result = engineSwapChain->acquireNextImage(&currentImageIndex);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 			recreateSwapchain();
@@ -94,7 +94,7 @@ namespace shard {
 
 		return commandBuffer;
 	}
-	void ShardRenderer::endFrame() {
+	void EngineRenderer::endFrame() {
 		assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
 		auto commandBuffer = getCurrentCommandBuffer();
 
@@ -102,28 +102,28 @@ namespace shard {
 			throw std::runtime_error("failed to record command buffer!");
 		}
 
-		auto result = shardSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || shardWindow.wasWindowResized()) {
-			shardWindow.resetWindowResizedFlag();
+		auto result = engineSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || engineWindow.wasWindowResized()) {
+			engineWindow.resetWindowResizedFlag();
 			recreateSwapchain();
 		} else if (result != VK_SUCCESS) {
 			throw std::runtime_error("failed to present swap chain image!");
 		}
 
 		isFrameStarted = false;
-		currentFrameIndex = (currentFrameIndex + 1) % ShardSwapChain::MAX_FRAMES_IN_FLIGHT;
+		currentFrameIndex = (currentFrameIndex + 1) % EngineSwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
-	void ShardRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+	void EngineRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 		assert(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
 		assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
 
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = shardSwapChain->getRenderPass();
-		renderPassInfo.framebuffer = shardSwapChain->getFrameBuffer(currentImageIndex);
+		renderPassInfo.renderPass = engineSwapChain->getRenderPass();
+		renderPassInfo.framebuffer = engineSwapChain->getFrameBuffer(currentImageIndex);
 
 		renderPassInfo.renderArea.offset = { 0,0 };
-		renderPassInfo.renderArea.extent = shardSwapChain->getSwapChainExtent();
+		renderPassInfo.renderArea.extent = engineSwapChain->getSwapChainExtent();
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
@@ -146,16 +146,16 @@ namespace shard {
 		VkViewport viewport{};
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(shardSwapChain->getSwapChainExtent().width);
-		viewport.height = static_cast<float>(shardSwapChain->getSwapChainExtent().height);
+		viewport.width = static_cast<float>(engineSwapChain->getSwapChainExtent().width);
+		viewport.height = static_cast<float>(engineSwapChain->getSwapChainExtent().height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
-		VkRect2D scissor{ {0, 0}, shardSwapChain->getSwapChainExtent() };
+		VkRect2D scissor{ {0, 0}, engineSwapChain->getSwapChainExtent() };
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 	}
-	void ShardRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+	void EngineRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 		assert(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
 		assert(commandBuffer == getCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame");
 

@@ -8,7 +8,7 @@
 */
 int main() {
 
-    shard::RunApp app{};
+    Shard3D::RunApp app{};
     try {
         app.run();
     }

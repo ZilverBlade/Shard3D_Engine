@@ -1,10 +1,10 @@
 #pragma once
 
-#include "shard_device.hpp"
+#include "device.hpp"
 
 #include <string>
 #include <vector>
-namespace shard {
+namespace Shard3D {
 
 	struct PipelineConfigInfo {
 		PipelineConfigInfo() = default;
@@ -27,19 +27,19 @@ namespace shard {
 		uint32_t subpass = 0;
 	};
 
-	class ShardPipeline {
+	class EnginePipeline {
 	public:
-		ShardPipeline(
-			ShardDevice &device, 
+		EnginePipeline(
+			EngineDevice &device, 
 			const std::string& vertFilePath, 
 			const std::string& fragFilePath, 
 			const PipelineConfigInfo& configInfo
 		);
-		~ShardPipeline();
+		~EnginePipeline();
 
-		ShardPipeline(const ShardPipeline&) = delete;
-		ShardPipeline& operator=(const ShardPipeline&) = delete;
-		ShardPipeline() = default;
+		EnginePipeline(const EnginePipeline&) = delete;
+		EnginePipeline& operator=(const EnginePipeline&) = delete;
+		EnginePipeline() = default;
 
 		void bind(VkCommandBuffer commandBuffer);
 
@@ -57,7 +57,7 @@ namespace shard {
 
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
-		ShardDevice& shardDevice;
+		EngineDevice& engineDevice;
 		VkPipeline graphicsPipeline;
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;

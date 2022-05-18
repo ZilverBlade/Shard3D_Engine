@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by ShardEngine.rc
+// Used by EngineEngine.rc
 //
 #define IDB_PNG1                        102
 

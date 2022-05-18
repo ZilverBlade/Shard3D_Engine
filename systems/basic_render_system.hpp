@@ -14,16 +14,15 @@
 #include <vector>
 
 namespace Shard3D {
-	class DirectionalLightSystem {
+	class BasicRenderSystem {
 	public:
-		DirectionalLightSystem(EngineDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-		~DirectionalLightSystem();
+		BasicRenderSystem(EngineDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		~BasicRenderSystem();
 
-		DirectionalLightSystem(const DirectionalLightSystem&) = delete;
-		DirectionalLightSystem& operator=(const DirectionalLightSystem&) = delete;
+		BasicRenderSystem(const BasicRenderSystem&) = delete;
+		BasicRenderSystem& operator=(const BasicRenderSystem&) = delete;
 
-		void update(FrameInfo& frameInfo, GlobalUbo &ubo);
-		void render(FrameInfo &frameInfo);
+		void renderGameObjects(FrameInfo &frameInfo);
 
 	private:
 

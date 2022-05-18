@@ -1,11 +1,11 @@
 #pragma once
 
-#include "shard_model.hpp"
+#include "model.hpp"
 #include <memory>
 #include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace shard {
+namespace Shard3D {
 
 	struct TransformComponent {
 		glm::vec3 translation{};
@@ -32,25 +32,25 @@ namespace shard {
 		float lightIntensity = 1.0f;
 	};
 
-	class ShardGameObject {
+	class EngineGameObject {
 	public:
 		using id_t = unsigned int;
-		using Map = std::unordered_map<id_t, ShardGameObject>;
+		using Map = std::unordered_map<id_t, EngineGameObject>;
 
-		static ShardGameObject createGameObject() {
+		static EngineGameObject createGameObject() {
 			static id_t currentId = 0;
-			return ShardGameObject{ currentId++ };
+			return EngineGameObject{ currentId++ };
 		}
 
 		//LIGHT TYPES!
-		static ShardGameObject makePointlight(
+		static EngineGameObject makePointlight(
 			float intensity = 5.f,
 			float radius = 0.1f,
 			glm::vec3 color = glm::vec3(1.f),
 			glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f)
 		);
 
-		static ShardGameObject makeSpotlight(
+		static EngineGameObject makeSpotlight(
 			float intensity = 5.f,
 			float radius = 0.1f,
 			glm::vec3 color = glm::vec3(1.f),
@@ -60,16 +60,16 @@ namespace shard {
 			glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f)
 		);
 		
-		static ShardGameObject makeDirectionalLight(
+		static EngineGameObject makeDirectionalLight(
 			float intensity = 5.f, 
 			glm::vec3 color = glm::vec3(1.f), 
 			glm::vec3 direction = glm::vec3(1.f, -3.f, -1.f)
 		);
 
-		ShardGameObject(const ShardGameObject&) = delete;
-		ShardGameObject &operator=(const ShardGameObject&) = delete;
-		ShardGameObject(ShardGameObject&&) = default;
-		ShardGameObject &operator=(ShardGameObject&&) = default;
+		EngineGameObject(const EngineGameObject&) = delete;
+		EngineGameObject &operator=(const EngineGameObject&) = delete;
+		EngineGameObject(EngineGameObject&&) = default;
+		EngineGameObject &operator=(EngineGameObject&&) = default;
 
 		id_t getId() { return id; }
 		
@@ -78,13 +78,13 @@ namespace shard {
 		TransformComponent transform{};
 
 		// Optional pointer components
-		std::shared_ptr<ShardModel> model{};
+		std::shared_ptr<EngineModel> model{};
 		std::unique_ptr<PointlightComponent> pointlight = nullptr;
 		std::unique_ptr<SpotlightComponent> spotlight = nullptr;
 		std::unique_ptr<DirectionalLightComponent> directionalLight = nullptr;
 
 	private:
-		ShardGameObject(id_t objId) : id{ objId } {}
+		EngineGameObject(id_t objId) : id{ objId } {}
 
 		id_t id;
 	};

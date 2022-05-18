@@ -3,9 +3,9 @@
 #include <cassert>
 #include <limits>
 
-namespace shard {
+namespace Shard3D {
 
-	void ShardCamera::setOrthographicProjection(
+	void EngineCamera::setOrthographicProjection(
 		float left, float right, float top, float bottom, float near, float far) {
 		projectionMatrix = glm::mat4{ 1.0f };
 		projectionMatrix[0][0] = 2.f / (right - left);
@@ -16,7 +16,7 @@ namespace shard {
 		projectionMatrix[3][2] = -near / (far - near);
 	}
 
-	void ShardCamera::setPerspectiveProjection(float fovy, float aspect, float near /*Near clipping plane*/, float far /*Far clipping plane*/) {
+	void EngineCamera::setPerspectiveProjection(float fovy, float aspect, float near /*Near clipping plane*/, float far /*Far clipping plane*/) {
 		assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
 		const float tanHalfFovy = tan(fovy / 2.f);
 		projectionMatrix = glm::mat4{ 0.0f };
@@ -27,7 +27,7 @@ namespace shard {
 		projectionMatrix[3][2] = -(far * near) / (far - near);
 	}
 
-	void ShardCamera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
+	void EngineCamera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
 		const glm::vec3 w{ glm::normalize(direction) };
 		const glm::vec3 u{ glm::normalize(glm::cross(w, up)) };
 		const glm::vec3 v{ glm::cross(w, u) };
@@ -61,12 +61,12 @@ namespace shard {
 		inverseViewMatrix[3][2] = position.z;
 	}
 
-	void ShardCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
+	void EngineCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
 		assert((target - position) == glm::vec3(0) && "direction cannot be 0");
 		setViewDirection(position, target - position, up);
 	}
 
-	void ShardCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
+	void EngineCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);
 		const float c2 = glm::cos(rotation.x);

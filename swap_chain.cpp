@@ -1,5 +1,5 @@
-#include "shard_swap_chain.hpp"
-#include "shard_device.hpp"
+#include "swap_chain.hpp"
+#include "device.hpp"
 #include <array>
 #include <cstdlib>
 #include <cstring>
@@ -12,13 +12,13 @@
 #include "simpleini/simple_ini.h"
 #include "utils/definitions.hpp"
 
-namespace shard {
+namespace Shard3D {
 
-ShardSwapChain::ShardSwapChain(ShardDevice &deviceRef, VkExtent2D extent)
+EngineSwapChain::EngineSwapChain(EngineDevice &deviceRef, VkExtent2D extent)
     : device{deviceRef}, windowExtent{extent} {
     init();
 }
-ShardSwapChain::ShardSwapChain(ShardDevice& deviceRef, VkExtent2D extent, std::shared_ptr<ShardSwapChain> previous)
+EngineSwapChain::EngineSwapChain(EngineDevice& deviceRef, VkExtent2D extent, std::shared_ptr<EngineSwapChain> previous)
     : device{ deviceRef }, windowExtent{ extent } {
     init();
 
@@ -27,7 +27,7 @@ ShardSwapChain::ShardSwapChain(ShardDevice& deviceRef, VkExtent2D extent, std::s
     oldSwapChain = nullptr;
 }
 
-void ShardSwapChain::init() {
+void EngineSwapChain::init() {
        createSwapChain();
         createImageViews();
         createRenderPass();
@@ -37,7 +37,7 @@ void ShardSwapChain::init() {
         createSyncObjects();
 }
 
-ShardSwapChain::~ShardSwapChain() {
+EngineSwapChain::~EngineSwapChain() {
   for (auto imageView : swapChainImageViews) {
     vkDestroyImageView(device.device(), imageView, nullptr);
   }
@@ -76,7 +76,7 @@ ShardSwapChain::~ShardSwapChain() {
   }
 }
 
-VkResult ShardSwapChain::acquireNextImage(uint32_t *imageIndex) {
+VkResult EngineSwapChain::acquireNextImage(uint32_t *imageIndex) {
   vkWaitForFences(
       device.device(),
       1,
@@ -95,7 +95,7 @@ VkResult ShardSwapChain::acquireNextImage(uint32_t *imageIndex) {
   return result;
 }
 
-VkResult ShardSwapChain::submitCommandBuffers(
+VkResult EngineSwapChain::submitCommandBuffers(
     const VkCommandBuffer *buffers, uint32_t *imageIndex) {
   if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
     vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
@@ -143,7 +143,7 @@ VkResult ShardSwapChain::submitCommandBuffers(
   return result;
 }
 
-void ShardSwapChain::createSwapChain() {
+void EngineSwapChain::createSwapChain() {
   SwapChainSupportDetails swapChainSupport = device.getSwapChainSupport();
 
   VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -204,7 +204,7 @@ void ShardSwapChain::createSwapChain() {
   swapChainExtent = extent;
 }
 
-void ShardSwapChain::createImageViews() {
+void EngineSwapChain::createImageViews() {
   swapChainImageViews.resize(swapChainImages.size());
   for (size_t i = 0; i < swapChainImages.size(); i++) {
     VkImageViewCreateInfo viewInfo{};
@@ -225,7 +225,7 @@ void ShardSwapChain::createImageViews() {
   }
 }
 
-void ShardSwapChain::createRenderPass() {
+void EngineSwapChain::createRenderPass() {
   VkAttachmentDescription depthAttachment{};
   depthAttachment.format = findDepthFormat();
   depthAttachment.samples = device.msaaSamples;
@@ -298,7 +298,7 @@ void ShardSwapChain::createRenderPass() {
   }
 }
 
-void ShardSwapChain::createFramebuffers() {
+void EngineSwapChain::createFramebuffers() {
   swapChainFramebuffers.resize(imageCount());
   for (size_t i = 0; i < imageCount(); i++) {
     std::array<VkImageView, 2> attachments = { swapChainImageViews[i], /*colorImageViews[i], */depthImageViews[i]};
@@ -324,7 +324,7 @@ void ShardSwapChain::createFramebuffers() {
 }
 
 /*
-void ShardSwapChain::createColorResources() {
+void EngineSwapChain::createColorResources() {
     VkFormat colorFormat = getSwapChainImageFormat();
     swapChainImageFormat = colorFormat;
     VkExtent2D swapChainExtent = getSwapChainExtent();
@@ -356,7 +356,7 @@ void ShardSwapChain::createColorResources() {
     }
 }
 */
-void ShardSwapChain::createDepthResources() {
+void EngineSwapChain::createDepthResources() {
   VkFormat depthFormat = findDepthFormat();
   swapChainDepthFormat = depthFormat;
   VkExtent2D swapChainExtent = getSwapChainExtent();
@@ -406,7 +406,7 @@ for (int i = 0; i < depthImages.size(); i++) {
   }
 }
 
-void ShardSwapChain::createSyncObjects() {
+void EngineSwapChain::createSyncObjects() {
   imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
   renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
   inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -430,7 +430,7 @@ void ShardSwapChain::createSyncObjects() {
   }
 }
 
-VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
+VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
 
     CSimpleIniA ini;
@@ -466,7 +466,7 @@ VkSurfaceFormatKHR ShardSwapChain::chooseSwapSurfaceFormat(
   return availableFormats[0];
 }
 
-VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
+VkPresentModeKHR EngineSwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     
     CSimpleIniA ini;
 
@@ -496,7 +496,7 @@ VkPresentModeKHR ShardSwapChain::chooseSwapPresentMode(const std::vector<VkPrese
  
 }
 
-VkExtent2D ShardSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) {
+VkExtent2D EngineSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) {
   if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
     return capabilities.currentExtent;
   } else {
@@ -512,7 +512,7 @@ VkExtent2D ShardSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capa
   }
 }
 
-VkFormat ShardSwapChain::findDepthFormat() {
+VkFormat EngineSwapChain::findDepthFormat() {
   return device.findSupportedFormat(
       {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
       VK_IMAGE_TILING_OPTIMAL,

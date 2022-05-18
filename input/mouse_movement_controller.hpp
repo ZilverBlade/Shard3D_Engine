@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../shard_game_object.hpp"
-#include "../shard_window.hpp"
+#include "../game_object.hpp"
+#include "../engine_window.hpp"
 
-namespace shard {
+namespace Shard3D {
 	namespace controller {
 		class MouseMovementController {
 		public:
@@ -11,7 +11,7 @@ namespace shard {
 				int canRotate = GLFW_MOUSE_BUTTON_RIGHT;
 			};
 
-			void moveInPlaneXZ(GLFWwindow* window, float dt, ShardGameObject& gameObject, glm::vec2 mousePosition);
+			void moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject, glm::vec2 mousePosition);
 			void adjustFOV(GLFWwindow* window, glm::vec2 scrollPosition);
 
 			ButtonMappings buttons{};

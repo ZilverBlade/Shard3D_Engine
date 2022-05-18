@@ -1,14 +1,14 @@
 #include "mouse_movement_controller.hpp"
 #include <limits>
 #include <iostream>
-namespace shard {
+namespace Shard3D {
 	namespace controller {
 
 		bool firstMouse = true;
 
 		float lastX, lastY;
 
-		void MouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, ShardGameObject& gameObject, glm::vec2 mousePosition) {
+		void MouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject, glm::vec2 mousePosition) {
 			glm::vec3 rotate{ 0 };
 			if (glfwGetMouseButton(window, buttons.canRotate) == GLFW_PRESS) {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);		

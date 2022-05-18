@@ -1,14 +1,14 @@
-#include "shard_descriptors.hpp"
+#include "descriptors.hpp"
 
 // std
 #include <cassert>
 #include <stdexcept>
 
-namespace shard {
+namespace Shard3D {
 
     // *************** Descriptor Set Layout Builder *********************
 
-    ShardDescriptorSetLayout::Builder& ShardDescriptorSetLayout::Builder::addBinding(
+    EngineDescriptorSetLayout::Builder& EngineDescriptorSetLayout::Builder::addBinding(
         uint32_t binding,
         VkDescriptorType descriptorType,
         VkShaderStageFlags stageFlags,
@@ -23,15 +23,15 @@ namespace shard {
         return *this;
     }
 
-    std::unique_ptr<ShardDescriptorSetLayout> ShardDescriptorSetLayout::Builder::build() const {
-        return std::make_unique<ShardDescriptorSetLayout>(shardDevice, bindings);
+    std::unique_ptr<EngineDescriptorSetLayout> EngineDescriptorSetLayout::Builder::build() const {
+        return std::make_unique<EngineDescriptorSetLayout>(engineDevice, bindings);
     }
 
     // *************** Descriptor Set Layout *********************
 
-    ShardDescriptorSetLayout::ShardDescriptorSetLayout(
-        ShardDevice& shardDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
-        : shardDevice{ shardDevice }, bindings{ bindings } {
+    EngineDescriptorSetLayout::EngineDescriptorSetLayout(
+        EngineDevice& engineDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+        : engineDevice{ engineDevice }, bindings{ bindings } {
         std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
         for (auto kv : bindings) {
             setLayoutBindings.push_back(kv.second);
@@ -43,7 +43,7 @@ namespace shard {
         descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
         if (vkCreateDescriptorSetLayout(
-            shardDevice.device(),
+            engineDevice.device(),
             &descriptorSetLayoutInfo,
             nullptr,
             &descriptorSetLayout) != VK_SUCCESS) {
@@ -51,40 +51,40 @@ namespace shard {
         }
     }
 
-    ShardDescriptorSetLayout::~ShardDescriptorSetLayout() {
-        vkDestroyDescriptorSetLayout(shardDevice.device(), descriptorSetLayout, nullptr);
+    EngineDescriptorSetLayout::~EngineDescriptorSetLayout() {
+        vkDestroyDescriptorSetLayout(engineDevice.device(), descriptorSetLayout, nullptr);
     }
 
     // *************** Descriptor Pool Builder *********************
 
-    ShardDescriptorPool::Builder& ShardDescriptorPool::Builder::addPoolSize(
+    EngineDescriptorPool::Builder& EngineDescriptorPool::Builder::addPoolSize(
         VkDescriptorType descriptorType, uint32_t count) {
         poolSizes.push_back({ descriptorType, count });
         return *this;
     }
 
-    ShardDescriptorPool::Builder& ShardDescriptorPool::Builder::setPoolFlags(
+    EngineDescriptorPool::Builder& EngineDescriptorPool::Builder::setPoolFlags(
         VkDescriptorPoolCreateFlags flags) {
         poolFlags = flags;
         return *this;
     }
-    ShardDescriptorPool::Builder& ShardDescriptorPool::Builder::setMaxSets(uint32_t count) {
+    EngineDescriptorPool::Builder& EngineDescriptorPool::Builder::setMaxSets(uint32_t count) {
         maxSets = count;
         return *this;
     }
 
-    std::unique_ptr<ShardDescriptorPool> ShardDescriptorPool::Builder::build() const {
-        return std::make_unique<ShardDescriptorPool>(shardDevice, maxSets, poolFlags, poolSizes);
+    std::unique_ptr<EngineDescriptorPool> EngineDescriptorPool::Builder::build() const {
+        return std::make_unique<EngineDescriptorPool>(engineDevice, maxSets, poolFlags, poolSizes);
     }
 
     // *************** Descriptor Pool *********************
 
-    ShardDescriptorPool::ShardDescriptorPool(
-        ShardDevice& shardDevice,
+    EngineDescriptorPool::EngineDescriptorPool(
+        EngineDevice& engineDevice,
         uint32_t maxSets,
         VkDescriptorPoolCreateFlags poolFlags,
         const std::vector<VkDescriptorPoolSize>& poolSizes)
-        : shardDevice{ shardDevice } {
+        : engineDevice{ engineDevice } {
         VkDescriptorPoolCreateInfo descriptorPoolInfo{};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
@@ -92,17 +92,17 @@ namespace shard {
         descriptorPoolInfo.maxSets = maxSets;
         descriptorPoolInfo.flags = poolFlags;
 
-        if (vkCreateDescriptorPool(shardDevice.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
+        if (vkCreateDescriptorPool(engineDevice.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
         }
     }
 
-    ShardDescriptorPool::~ShardDescriptorPool() {
-        vkDestroyDescriptorPool(shardDevice.device(), descriptorPool, nullptr);
+    EngineDescriptorPool::~EngineDescriptorPool() {
+        vkDestroyDescriptorPool(engineDevice.device(), descriptorPool, nullptr);
     }
 
-    bool ShardDescriptorPool::allocateDescriptor(
+    bool EngineDescriptorPool::allocateDescriptor(
         const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const {
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -112,30 +112,30 @@ namespace shard {
 
         // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
         // a new pool whenever an old pool fills up. But this is beyond our current scope
-        if (vkAllocateDescriptorSets(shardDevice.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
+        if (vkAllocateDescriptorSets(engineDevice.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
             return false;
         }
         return true;
     }
 
-    void ShardDescriptorPool::freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const {
+    void EngineDescriptorPool::freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const {
         vkFreeDescriptorSets(
-            shardDevice.device(),
+            engineDevice.device(),
             descriptorPool,
             static_cast<uint32_t>(descriptors.size()),
             descriptors.data());
     }
 
-    void ShardDescriptorPool::resetPool() {
-        vkResetDescriptorPool(shardDevice.device(), descriptorPool, 0);
+    void EngineDescriptorPool::resetPool() {
+        vkResetDescriptorPool(engineDevice.device(), descriptorPool, 0);
     }
 
     // *************** Descriptor Writer *********************
 
-    ShardDescriptorWriter::ShardDescriptorWriter(ShardDescriptorSetLayout& setLayout, ShardDescriptorPool& pool)
+    EngineDescriptorWriter::EngineDescriptorWriter(EngineDescriptorSetLayout& setLayout, EngineDescriptorPool& pool)
         : setLayout{ setLayout }, pool{ pool } {}
 
-    ShardDescriptorWriter& ShardDescriptorWriter::writeBuffer(
+    EngineDescriptorWriter& EngineDescriptorWriter::writeBuffer(
         uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
         assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
@@ -156,7 +156,7 @@ namespace shard {
         return *this;
     }
 
-    ShardDescriptorWriter& ShardDescriptorWriter::writeImage(
+    EngineDescriptorWriter& EngineDescriptorWriter::writeImage(
         uint32_t binding, VkDescriptorImageInfo* imageInfo) {
         assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
@@ -177,7 +177,7 @@ namespace shard {
         return *this;
     }
 
-    bool ShardDescriptorWriter::build(VkDescriptorSet& set) {
+    bool EngineDescriptorWriter::build(VkDescriptorSet& set) {
         bool success = pool.allocateDescriptor(setLayout.getDescriptorSetLayout(), set);
         if (!success) {
             return false;
@@ -186,11 +186,11 @@ namespace shard {
         return true;
     }
 
-    void ShardDescriptorWriter::overwrite(VkDescriptorSet& set) {
+    void EngineDescriptorWriter::overwrite(VkDescriptorSet& set) {
         for (auto& write : writes) {
             write.dstSet = set;
         }
-        vkUpdateDescriptorSets(pool.shardDevice.device(), writes.size(), writes.data(), 0, nullptr);
+        vkUpdateDescriptorSets(pool.engineDevice.device(), writes.size(), writes.data(), 0, nullptr);
     }
 
-}  // namespace shard
+}  // namespace Shard3D

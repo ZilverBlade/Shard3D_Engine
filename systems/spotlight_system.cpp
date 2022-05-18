@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <array>
 #include <iostream>
-namespace shard {
+namespace Shard3D {
 
 	struct SpotlightPushConstants {
 		glm::vec4 position{};
@@ -18,13 +18,13 @@ namespace shard {
 		float radius;
 	};
 
-	SpotlightSystem::SpotlightSystem(ShardDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : shardDevice{ device } {
+	SpotlightSystem::SpotlightSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
 		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
 
 	SpotlightSystem::~SpotlightSystem() {
-		vkDestroyPipelineLayout(shardDevice.device(), pipelineLayout, nullptr);
+		vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
 	}
 	
 	void SpotlightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {		
@@ -41,7 +41,7 @@ namespace shard {
 		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-		if (vkCreatePipelineLayout(shardDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+		if (vkCreatePipelineLayout(engineDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
 	}
@@ -50,13 +50,13 @@ namespace shard {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
-		ShardPipeline::defaultPipelineConfigInfo(pipelineConfig);
+		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.attributeDescriptions.clear();
 		pipelineConfig.bindingDescriptions.clear();
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		shardPipeline = std::make_unique<ShardPipeline>(
-			shardDevice,
+		enginePipeline = std::make_unique<EnginePipeline>(
+			engineDevice,
 			"shaders/spotlight.vert.spv",
 			"shaders/spotlight.frag.spv",
 			pipelineConfig
@@ -82,7 +82,7 @@ namespace shard {
 	}
 
 	void SpotlightSystem::render(FrameInfo &frameInfo) {
-		shardPipeline->bind(frameInfo.commandBuffer);
+		enginePipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
 			frameInfo.commandBuffer,

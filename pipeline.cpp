@@ -1,28 +1,28 @@
-#include "shard_pipeline.hpp"
-#include "shard_model.hpp"
+#include "pipeline.hpp"
+#include "model.hpp"
 //std
 #include <fstream>
 #include <stdexcept>
 #include <iostream>
 #include <cassert>
-namespace shard {
+namespace Shard3D {
 
-	ShardPipeline::ShardPipeline(
-		ShardDevice& device,
+	EnginePipeline::EnginePipeline(
+		EngineDevice& device,
 		const std::string& vertFilePath,
 		const std::string& fragFilePath,
 		const PipelineConfigInfo& configInfo)
-		: shardDevice{device} {
+		: engineDevice{device} {
 		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
 	}
 
-	ShardPipeline::~ShardPipeline() {
-		vkDestroyShaderModule(shardDevice.device(), vertShaderModule, nullptr);
-		vkDestroyShaderModule(shardDevice.device(), fragShaderModule, nullptr);
-		vkDestroyPipeline(shardDevice.device(), graphicsPipeline, nullptr);
+	EnginePipeline::~EnginePipeline() {
+		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
+		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
+		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
 	}
 
-	std::vector<char> ShardPipeline::readFile(const std::string& filePath) {
+	std::vector<char> EnginePipeline::readFile(const std::string& filePath) {
 		std::ifstream file{ filePath, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
@@ -40,7 +40,7 @@ namespace shard {
 	}
 
 
-	void ShardPipeline::createGraphicsPipeline(
+	void EnginePipeline::createGraphicsPipeline(
 		const std::string& vertFilePath,
 		const std::string& fragFilePath,
 		const PipelineConfigInfo& configInfo
@@ -104,27 +104,27 @@ namespace shard {
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-		if (vkCreateGraphicsPipelines(shardDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+		if (vkCreateGraphicsPipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
 	}
 
-	void ShardPipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
+	void EnginePipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		createInfo.codeSize = code.size();
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-		if (vkCreateShaderModule(shardDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
+		if (vkCreateShaderModule(engineDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create shader module!");
 		}
 	}
 
-	void ShardPipeline::bind(VkCommandBuffer commandBuffer) {
+	void EnginePipeline::bind(VkCommandBuffer commandBuffer) {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 
-	void ShardPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
+	void EnginePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
 
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -198,11 +198,11 @@ namespace shard {
 		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
 		configInfo.dynamicStateInfo.flags = 0;	
 
-		configInfo.bindingDescriptions = ShardModel::Vertex::getBindingDescriptions();
-		configInfo.attributeDescriptions = ShardModel::Vertex::getAttributeDescriptions();
+		configInfo.bindingDescriptions = EngineModel::Vertex::getBindingDescriptions();
+		configInfo.attributeDescriptions = EngineModel::Vertex::getAttributeDescriptions();
 	 }
 
-	void ShardPipeline::enableAlphaBlending(PipelineConfigInfo& configInfo) {
+	void EnginePipeline::enableAlphaBlending(PipelineConfigInfo& configInfo) {
 		configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 		configInfo.colorBlendAttachment.colorWriteMask =
 			VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |

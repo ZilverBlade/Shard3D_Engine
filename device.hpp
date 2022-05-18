@@ -1,13 +1,13 @@
 #pragma once
 
-#include "shard_window.hpp"
+#include "engine_window.hpp"
 
 // std lib headers
 #include <string>
 #include <vector>
 #include "simpleini/simple_ini.h"
 
-namespace shard {
+namespace Shard3D {
 
 struct SwapChainSupportDetails {
   VkSurfaceCapabilitiesKHR capabilities;
@@ -23,7 +23,7 @@ struct QueueFamilyIndices {
   bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 };
 
-class ShardDevice {
+class EngineDevice {
  public:
 #ifdef NDEBUG
   const bool enableValidationLayers = false;
@@ -31,14 +31,14 @@ class ShardDevice {
   const bool enableValidationLayers = true;
 #endif
 
-  ShardDevice(ShardWindow &window);
-  ~ShardDevice();
+  EngineDevice(EngineWindow &window);
+  ~EngineDevice();
 
   // Not copyable or movable
-  ShardDevice(const ShardDevice &) = delete;
-  ShardDevice &operator=(const ShardDevice &) = delete;
-  ShardDevice(ShardDevice &&) = delete;
-  ShardDevice &operator=(ShardDevice &&) = delete;
+  EngineDevice(const EngineDevice &) = delete;
+  EngineDevice &operator=(const EngineDevice &) = delete;
+  EngineDevice(EngineDevice &&) = delete;
+  EngineDevice &operator=(EngineDevice &&) = delete;
 
   CSimpleIniA ini;
   VkSampleCountFlagBits msaaSamples = (VkSampleCountFlagBits)1;
@@ -100,7 +100,7 @@ class ShardDevice {
   VkInstance instance;
   VkDebugUtilsMessengerEXT debugMessenger;
   VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-  ShardWindow &window;
+  EngineWindow &window;
   VkCommandPool commandPool;
 
   VkDevice device_;

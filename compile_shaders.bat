@@ -1,5 +1,5 @@
-glslc.exe shaders/ez_shader.vert -o shaders/ez_shader.vert.spv
-glslc.exe shaders/ez_shader.frag -o shaders/ez_shader.frag.spv
+glslc.exe shaders/basic_shader.vert -o shaders/basic_shader.vert.spv
+glslc.exe shaders/basic_shader.frag -o shaders/basic_shader.frag.spv
 glslc.exe shaders/pointlight.vert -o shaders/pointlight.vert.spv
 glslc.exe shaders/pointlight.frag -o shaders/pointlight.frag.spv
 glslc.exe shaders/spotlight.vert -o shaders/spotlight.vert.spv

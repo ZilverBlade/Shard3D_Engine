@@ -1,22 +1,22 @@
 #pragma once
 
-#include "../shard_window.hpp"
-#include "../shard_pipeline.hpp"
-#include "../shard_device.hpp"
+#include "../engine_window.hpp"
+#include "../pipeline.hpp"
+#include "../device.hpp"
 #include "../camera.hpp"
-#include "../shard_frame_info.hpp"
+#include "../frame_info.hpp"
 		  
-#include "../shard_game_object.hpp"
+#include "../game_object.hpp"
 #include <string>
-#include "../shard_renderer.hpp"
+#include "../renderer.hpp"
 
 #include <memory>
 #include <vector>
 
-namespace shard {
+namespace Shard3D {
 	class PointlightSystem {
 	public:
-		PointlightSystem(ShardDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		PointlightSystem(EngineDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		~PointlightSystem();
 
 		PointlightSystem(const PointlightSystem&) = delete;
@@ -30,9 +30,9 @@ namespace shard {
 		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
 
-		ShardDevice& shardDevice;
+		EngineDevice& engineDevice;
 
-		std::unique_ptr<ShardPipeline> shardPipeline;
+		std::unique_ptr<EnginePipeline> enginePipeline;
 		VkPipelineLayout pipelineLayout;
 	};
 

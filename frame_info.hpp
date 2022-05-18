@@ -1,11 +1,11 @@
 #pragma once
 
 #include "camera.hpp"
-#include "shard_game_object.hpp"
+#include "game_object.hpp"
 #include <vulkan/vulkan.h>
 #include "utils/definitions.hpp"
 
-namespace shard {
+namespace Shard3D {
 
 	struct Pointlight {
 		glm::vec4 position{};
@@ -52,8 +52,8 @@ namespace shard {
 		int frameIndex;
 		float frameTime;
 		VkCommandBuffer commandBuffer;
-		ShardCamera& camera;
+		EngineCamera& camera;
 		VkDescriptorSet globalDescriptorSet;
-		ShardGameObject::Map& gameObjects;
+		EngineGameObject::Map& gameObjects;
 	};
 }

@@ -2,16 +2,16 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
-namespace shard {
+namespace Shard3D {
 
-	class ShardWindow {
+	class EngineWindow {
 
 	public:
-		ShardWindow(int w, int h, std::string name);
-		~ShardWindow();
+		EngineWindow(int w, int h, std::string name);
+		~EngineWindow();
 		
-		ShardWindow(const ShardWindow&) = delete;
-		ShardWindow& operator=(const ShardWindow&) = delete;
+		EngineWindow(const EngineWindow&) = delete;
+		EngineWindow& operator=(const EngineWindow&) = delete;
 
 		bool shouldClose() { return glfwWindowShouldClose(window); }
 		VkExtent2D getExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }

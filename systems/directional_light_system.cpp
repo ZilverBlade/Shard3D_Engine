@@ -8,7 +8,7 @@
 #include <array>
 #include <map>
 
-namespace shard {
+namespace Shard3D {
 
 	struct DirectionalLightPushConstants {
 		glm::vec4 position{};
@@ -16,12 +16,12 @@ namespace shard {
 		glm::vec4 direction{}; 
 	};
 
-	DirectionalLightSystem::DirectionalLightSystem(ShardDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : shardDevice{ device } {
+	DirectionalLightSystem::DirectionalLightSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
 		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
 	DirectionalLightSystem::~DirectionalLightSystem() {
-		vkDestroyPipelineLayout(shardDevice.device(), pipelineLayout, nullptr);
+		vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
 	}
 	
 	void DirectionalLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
@@ -39,7 +39,7 @@ namespace shard {
 		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-		if (vkCreatePipelineLayout(shardDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+		if (vkCreatePipelineLayout(engineDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
 	}
@@ -50,14 +50,14 @@ namespace shard {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
-		ShardPipeline::defaultPipelineConfigInfo(pipelineConfig);
-		ShardPipeline::enableAlphaBlending(pipelineConfig);
+		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
+		EnginePipeline::enableAlphaBlending(pipelineConfig);
 		pipelineConfig.attributeDescriptions.clear();
 		pipelineConfig.bindingDescriptions.clear();
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		shardPipeline = std::make_unique<ShardPipeline>(
-			shardDevice,
+		enginePipeline = std::make_unique<EnginePipeline>(
+			engineDevice,
 			"shaders/directional_light.vert.spv",
 			"shaders/directional_light.frag.spv",
 			pipelineConfig
@@ -81,7 +81,7 @@ namespace shard {
 
 	void DirectionalLightSystem::render(FrameInfo &frameInfo) {
 		//sort lights
-		std::map<float, ShardGameObject::id_t> sorted;
+		std::map<float, EngineGameObject::id_t> sorted;
 		for (auto& kv : frameInfo.gameObjects) {
 			auto& obj = kv.second;
 			if (obj.directionalLight == nullptr) continue;
@@ -92,7 +92,7 @@ namespace shard {
 			sorted[disSquared] = obj.getId();
 		}
 
-		shardPipeline->bind(frameInfo.commandBuffer);
+		enginePipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
 			frameInfo.commandBuffer,

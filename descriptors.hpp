@@ -1,74 +1,74 @@
 #pragma once
 
-#include "shard_device.hpp"
+#include "device.hpp"
 
 // std
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
-namespace shard {
+namespace Shard3D {
 
-    class ShardDescriptorSetLayout {
+    class EngineDescriptorSetLayout {
     public:
         class Builder {
         public:
-            Builder(ShardDevice& shardDevice) : shardDevice{ shardDevice } {}
+            Builder(EngineDevice& engineDevice) : engineDevice{ engineDevice } {}
 
             Builder& addBinding(
                 uint32_t binding,
                 VkDescriptorType descriptorType,
                 VkShaderStageFlags stageFlags,
                 uint32_t count = 1);
-            std::unique_ptr<ShardDescriptorSetLayout> build() const;
+            std::unique_ptr<EngineDescriptorSetLayout> build() const;
 
         private:
-            ShardDevice& shardDevice;
+            EngineDevice& engineDevice;
             std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
         };
 
-        ShardDescriptorSetLayout(
-            ShardDevice& shardDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
-        ~ShardDescriptorSetLayout();
-        ShardDescriptorSetLayout(const ShardDescriptorSetLayout&) = delete;
-        ShardDescriptorSetLayout& operator=(const ShardDescriptorSetLayout&) = delete;
+        EngineDescriptorSetLayout(
+            EngineDevice& engineDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+        ~EngineDescriptorSetLayout();
+        EngineDescriptorSetLayout(const EngineDescriptorSetLayout&) = delete;
+        EngineDescriptorSetLayout& operator=(const EngineDescriptorSetLayout&) = delete;
 
         VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
 
     private:
-        ShardDevice& shardDevice;
+        EngineDevice& engineDevice;
         VkDescriptorSetLayout descriptorSetLayout;
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
 
-        friend class ShardDescriptorWriter;
+        friend class EngineDescriptorWriter;
     };
 
-    class ShardDescriptorPool {
+    class EngineDescriptorPool {
     public:
         class Builder {
         public:
-            Builder(ShardDevice& shardDevice) : shardDevice{ shardDevice } {}
+            Builder(EngineDevice& engineDevice) : engineDevice{ engineDevice } {}
 
             Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
             Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
             Builder& setMaxSets(uint32_t count);
-            std::unique_ptr<ShardDescriptorPool> build() const;
+            std::unique_ptr<EngineDescriptorPool> build() const;
 
         private:
-            ShardDevice& shardDevice;
+            EngineDevice& engineDevice;
             std::vector<VkDescriptorPoolSize> poolSizes{};
             uint32_t maxSets = 1000;
             VkDescriptorPoolCreateFlags poolFlags = 0;
         };
 
-        ShardDescriptorPool(
-            ShardDevice& shardDevice,
+        EngineDescriptorPool(
+            EngineDevice& engineDevice,
             uint32_t maxSets,
             VkDescriptorPoolCreateFlags poolFlags,
             const std::vector<VkDescriptorPoolSize>& poolSizes);
-        ~ShardDescriptorPool();
-        ShardDescriptorPool(const ShardDescriptorPool&) = delete;
-        ShardDescriptorPool& operator=(const ShardDescriptorPool&) = delete;
+        ~EngineDescriptorPool();
+        EngineDescriptorPool(const EngineDescriptorPool&) = delete;
+        EngineDescriptorPool& operator=(const EngineDescriptorPool&) = delete;
 
         bool allocateDescriptor(
             const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
@@ -78,26 +78,26 @@ namespace shard {
         void resetPool();
 
     private:
-        ShardDevice& shardDevice;
+        EngineDevice& engineDevice;
         VkDescriptorPool descriptorPool;
 
-        friend class ShardDescriptorWriter;
+        friend class EngineDescriptorWriter;
     };
 
-    class ShardDescriptorWriter {
+    class EngineDescriptorWriter {
     public:
-        ShardDescriptorWriter(ShardDescriptorSetLayout& setLayout, ShardDescriptorPool& pool);
+        EngineDescriptorWriter(EngineDescriptorSetLayout& setLayout, EngineDescriptorPool& pool);
 
-        ShardDescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
-        ShardDescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
+        EngineDescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
+        EngineDescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
 
         bool build(VkDescriptorSet& set);
         void overwrite(VkDescriptorSet& set);
 
     private:
-        ShardDescriptorSetLayout& setLayout;
-        ShardDescriptorPool& pool;
+        EngineDescriptorSetLayout& setLayout;
+        EngineDescriptorPool& pool;
         std::vector<VkWriteDescriptorSet> writes;
     };
 
-}  // namespace shard
+}  // namespace Shard3D

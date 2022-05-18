@@ -1,7 +1,7 @@
 #pragma once
 
-#include "shard_device.hpp"
-#include "shard_buffer.hpp"
+#include "device.hpp"
+#include "buffer.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -9,9 +9,9 @@
 #include <memory>
 #include <vector>
 
-namespace shard {
+namespace Shard3D {
 
-	class ShardModel {
+	class EngineModel {
 
 	public:
 
@@ -37,13 +37,13 @@ namespace shard {
 			void loadModel(const std::string& filepath);
 		};
 
-		ShardModel(ShardDevice &device, const ShardModel::Builder &builder);
-		~ShardModel();
+		EngineModel(EngineDevice &device, const EngineModel::Builder &builder);
+		~EngineModel();
 
-		ShardModel(const ShardModel&) = delete;
-		ShardModel& operator=(const ShardModel&) = delete;
+		EngineModel(const EngineModel&) = delete;
+		EngineModel& operator=(const EngineModel&) = delete;
 		
-		static std::unique_ptr<ShardModel> createModelFromFile(ShardDevice& device, const std::string& filepath, bool indexModel = true);
+		static std::unique_ptr<EngineModel> createModelFromFile(EngineDevice& device, const std::string& filepath, bool indexModel = true);
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
@@ -52,13 +52,13 @@ namespace shard {
 		void createVertexBuffers(const std::vector<Vertex> &vertices);
 		void createIndexBuffers(const std::vector<uint32_t> &indices);
 
-		ShardDevice& shardDevice;
+		EngineDevice& engineDevice;
 
-		std::unique_ptr<ShardBuffer> vertexBuffer;
+		std::unique_ptr<EngineBuffer> vertexBuffer;
 		uint32_t vertexCount;
 
 		bool hasIndexBuffer = false;
-		std::unique_ptr<ShardBuffer> indexBuffer;
+		std::unique_ptr<EngineBuffer> indexBuffer;
 		uint32_t indexCount;
 	};
 }

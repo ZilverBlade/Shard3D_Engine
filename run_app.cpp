@@ -15,21 +15,21 @@
 #include "input/keyboard_movement_controller.hpp"
 #include "input/mouse_movement_controller.hpp"
 #include "camera.hpp"
-#include "utils/shard_utils.hpp"
+#include "utils/engine_utils.hpp"
 #include "utils/definitions.hpp"
 
 #include "simpleini/simple_ini.h"
-#include "shard_buffer.hpp"
+#include "buffer.hpp"
 
 //systems
-#include "systems/ez_render_system.hpp"
+#include "systems/basic_render_system.hpp"
 
 #include "systems/pointlight_system.hpp"
 #include "systems/spotlight_system.hpp"
 #include "systems/directional_light_system.hpp"
 
 
-namespace shard {
+namespace Shard3D {
 
 	RunApp::RunApp() {
 		std::ifstream infile(ENGINE_SETTINGS_PATH);
@@ -37,18 +37,18 @@ namespace shard {
 		std::ifstream infile2(GAME_SETTINGS_PATH);
 		assert(infile2.good() != false && "Critical error! Game settings config file not found!");
 	
-		globalPool = ShardDescriptorPool::Builder(shardDevice)
-			.setMaxSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, ShardSwapChain::MAX_FRAMES_IN_FLIGHT)			
+		globalPool = EngineDescriptorPool::Builder(engineDevice)
+			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)			
 			.build();
 		loadGameObjects();
 	}
 	RunApp::~RunApp() {}
 	void RunApp::run() {
-		std::vector<std::unique_ptr<ShardBuffer>> uboBuffers(ShardSwapChain::MAX_FRAMES_IN_FLIGHT);
+		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
-			uboBuffers[i] = std::make_unique<ShardBuffer>(
-				shardDevice,
+			uboBuffers[i] = std::make_unique<EngineBuffer>(
+				engineDevice,
 				sizeof(GlobalUbo),
 				1,
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -57,26 +57,26 @@ namespace shard {
 			uboBuffers[i]->map();
 		}
 
-		auto globalSetLayout = ShardDescriptorSetLayout::Builder(shardDevice)
+		auto globalSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 			.build();
 
-		std::vector<VkDescriptorSet> globalDescriptorSets(ShardSwapChain::MAX_FRAMES_IN_FLIGHT);
+		std::vector<VkDescriptorSet> globalDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < globalDescriptorSets.size(); i++) {
 			auto bufferInfo = uboBuffers[i]->descriptorInfo();
-			ShardDescriptorWriter(*globalSetLayout, *globalPool)
+			EngineDescriptorWriter(*globalSetLayout, *globalPool)
 				.writeBuffer(0, &bufferInfo)
 				.build(globalDescriptorSets[i]);
 		}
 
-		EzRenderSystem ezRenderSystem{ shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PointlightSystem pointlightSystem { shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		SpotlightSystem spotlightSystem{ shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		DirectionalLightSystem directionalLightSystem{ shardDevice, shardRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		PointlightSystem pointlightSystem { engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		SpotlightSystem spotlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		DirectionalLightSystem directionalLightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		ShardCamera camera{};
+		EngineCamera camera{};
 
-		auto viewerObject = ShardGameObject::createGameObject();
+		auto viewerObject = EngineGameObject::createGameObject();
 		viewerObject.transform.translation = glm::vec3(0.f, -1.f, -1.f);
 
 		controller::KeyboardMovementController cameraControllerKeyBoard{};
@@ -93,7 +93,7 @@ namespace shard {
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
-		while (!shardWindow.shouldClose()) {
+		while (!engineWindow.shouldClose()) {
 
 			glfwPollEvents();
 
@@ -103,14 +103,14 @@ namespace shard {
 
 			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
-			glfwGetCursorPos(shardWindow.getGLFWwindow(), &mousePosX, &mousePosY);
+			glfwGetCursorPos(engineWindow.getGLFWwindow(), &mousePosX, &mousePosY);
 
-			cameraControllerKeyBoard.moveInPlaneXZ(shardWindow.getGLFWwindow(), frameTime, viewerObject);
-			cameraControllerMouse.moveInPlaneXZ(shardWindow.getGLFWwindow(), frameTime, viewerObject, { mousePosX, mousePosY });
+			cameraControllerKeyBoard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, viewerObject);
+			cameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, viewerObject, { mousePosX, mousePosY });
 			
 			camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
-			float aspect = shardRenderer.getAspectRatio();
+			float aspect = engineRenderer.getAspectRatio();
 			
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
 				camera.setPerspectiveProjection(glm::radians(fov), aspect, ini.GetDoubleValue("RENDERING", "NearClipDistance"), ini.GetDoubleValue("RENDERING", "FarClipDistance"));
@@ -119,8 +119,8 @@ namespace shard {
 				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("RENDERING", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
 			}
 				
-			if (auto commandBuffer = shardRenderer.beginFrame()) {
-				int frameIndex = shardRenderer.getFrameIndex();
+			if (auto commandBuffer = engineRenderer.beginFrame()) {
+				int frameIndex = engineRenderer.getFrameIndex();
 				FrameInfo frameInfo{
 					frameIndex,
 					frameTime,
@@ -157,84 +157,84 @@ namespace shard {
 
 					Also reflections and Postfx
 				*/
-				shardRenderer.beginSwapChainRenderPass(commandBuffer); 
+				engineRenderer.beginSwapChainRenderPass(commandBuffer); 
 
-				ezRenderSystem.renderGameObjects(frameInfo);
+				basicRenderSystem.renderGameObjects(frameInfo);
 				pointlightSystem.render(frameInfo);
 				spotlightSystem.render(frameInfo);
 				directionalLightSystem.render(frameInfo);
 
-				shardRenderer.endSwapChainRenderPass(commandBuffer);
-				shardRenderer.endFrame();
+				engineRenderer.endSwapChainRenderPass(commandBuffer);
+				engineRenderer.endFrame();
 			}
 		}
-		vkDeviceWaitIdle(shardDevice.device());
+		vkDeviceWaitIdle(engineDevice.device());
 		
 	}
 
 	void RunApp::loadGameObjects() {	
-		std::shared_ptr<ShardModel> model = ShardModel::createModelFromFile(shardDevice, "modeldata/FART.obj", false); //dont index because model breaks
+		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", false); //dont index because model breaks
 
-		auto fart = ShardGameObject::createGameObject();
+		auto fart = EngineGameObject::createGameObject();
 		fart.model = model;
 		fart.transform.translation = { .0f, .0f, 1.5f };
 		fart.transform.scale = { .5f, .5f, .5f };
 		fart.transform.rotation = { glm::radians(90.f), 0.f, 0.f};
 		gameObjects.emplace(fart.getId(), std::move(fart));
 
-		auto fart2 = ShardGameObject::createGameObject();
+		auto fart2 = EngineGameObject::createGameObject();
 		fart2.model = model;
 		fart2.transform.translation = { 0.0f, .0f, 5.5f };
 		fart2.transform.scale = { .5f, .5f, .5f };
 		fart2.transform.rotation = { glm::radians(90.f), glm::radians(90.f), 0.f };
 		gameObjects.emplace(fart2.getId(), std::move(fart2));
 
-		model = ShardModel::createModelFromFile(shardDevice, "modeldata/colored_cube.obj");
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/colored_cube.obj");
 
-		auto ccube = ShardGameObject::createGameObject();
+		auto ccube = EngineGameObject::createGameObject();
 		ccube.model = model;
 		ccube.transform.translation = { 2.0f, .0f, 1.5f };
 		ccube.transform.scale = { .5f, .5f, .5f };
 		ccube.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(ccube.getId(), std::move(ccube));
 
-		model = ShardModel::createModelFromFile(shardDevice, "modeldata/sphere.obj", false);
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/sphere.obj", false);
 
-		auto sphere = ShardGameObject::createGameObject();
+		auto sphere = EngineGameObject::createGameObject();
 		sphere.model = model;
 		sphere.transform.translation = { 3.0f, .0f, 5.5f };
 		sphere.transform.scale = { 1.f, 1.f, 1.f };
 		sphere.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(sphere.getId(), std::move(sphere));
 
-		model = ShardModel::createModelFromFile(shardDevice, "modeldata/cylinder.obj");
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cylinder.obj");
 
-		auto cylinder = ShardGameObject::createGameObject();
+		auto cylinder = EngineGameObject::createGameObject();
 		cylinder.model = model;
 		cylinder.transform.translation = { 5.0f, .0f, 5.5f };
 		cylinder.transform.scale = { .5f, .5f, .5f };
 		cylinder.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cylinder.getId(), std::move(cylinder));
 
-		model = ShardModel::createModelFromFile(shardDevice, "modeldata/quad.obj");
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj");
 
-		auto quad = ShardGameObject::createGameObject();
+		auto quad = EngineGameObject::createGameObject();
 		quad.model = model;
 		quad.transform.translation = { 0.0f, 0.9f, 0.0f };
 		quad.transform.scale = { 100.f, 1.f, 100.f };
 		quad.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(quad.getId(), std::move(quad));
 
-		model = ShardModel::createModelFromFile(shardDevice, "modeldata/cone.obj");
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj");
 
-		auto cone = ShardGameObject::createGameObject();
+		auto cone = EngineGameObject::createGameObject();
 		cone.model = model;
 		cone.transform.translation = { 1.0f, -1.0f, 6.0f };
 		cone.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone.getId(), std::move(cone));
 
-		auto cone2 = ShardGameObject::createGameObject();
+		auto cone2 = EngineGameObject::createGameObject();
 		cone2.model = model;
 		cone2.transform.translation = { .0f, -1.0f, 6.0f };
 		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
@@ -242,55 +242,55 @@ namespace shard {
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
 		/*
 		{
-			auto pointlight = ShardGameObject::makePointlight(1.f);
+			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
 
 		{
-			auto pointlight = ShardGameObject::makePointlight(1.f);
+			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { -2.0f, -1.0f, 2.0f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
 
 		{
-			auto pointlight = ShardGameObject::makePointlight(1.f);
+			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 0.0f, -1.0f, 0.0f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
 
 
 		{
-			auto pointlight = ShardGameObject::makePointlight(1.f);
+			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 0.0f, -1.0f, 3.0f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
 	
 		{
-			auto pointlight = ShardGameObject::makePointlight(0.3f, 0.1, {1.f, 0.f, 1.f});
+			auto pointlight = EngineGameObject::makePointlight(0.3f, 0.1, {1.f, 0.f, 1.f});
 			pointlight.transform.translation = { 0.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
 		*/
 		{
-			auto pointlight = ShardGameObject::makePointlight(0.5f, 0.1, { 1.f, 1.f, 0.f }, { 0.0f, -0.2f, 1.3f });
+			auto pointlight = EngineGameObject::makePointlight(0.5f, 0.1, { 1.f, 1.f, 0.f }, { 0.0f, -0.2f, 1.3f });
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
 		
 		{
-			auto spotlight = ShardGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(90.f), 0.f }, glm::radians(30.f), glm::radians(40.f), {0.f, 0.f, 1.f});
+			auto spotlight = EngineGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(90.f), 0.f }, glm::radians(30.f), glm::radians(40.f), {0.f, 0.f, 1.f});
 			spotlight.transform.translation = { 4.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
 		{
-			auto spotlight = ShardGameObject::makeSpotlight(2.2f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(60.f), 1.f }, glm::radians(20.f), glm::radians(30.f), { 0.f, 0.f, 1.f });
+			auto spotlight = EngineGameObject::makeSpotlight(2.2f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(60.f), 1.f }, glm::radians(20.f), glm::radians(30.f), { 0.f, 0.f, 1.f });
 			spotlight.transform.translation = { 6.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
 		
 		{
-			auto directionalLight = ShardGameObject::makeDirectionalLight(0.01f, glm::vec3(1.f, 1.0f, 1.f));
+			auto directionalLight = EngineGameObject::makeDirectionalLight(0.01f, glm::vec3(1.f, 1.0f, 1.f));
 			directionalLight.transform.translation = { 2.0f, -0.5f, 0.2f };
 			gameObjects.emplace(directionalLight.getId(), std::move(directionalLight));
 		}

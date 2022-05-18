@@ -1,5 +1,5 @@
-#include "shard_model.hpp"
-#include "utils/shard_utils.hpp"
+#include "model.hpp"
+#include "utils/engine_utils.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -18,24 +18,24 @@
 
 namespace std {
 	template <>
-	struct hash<shard::ShardModel::Vertex> {
-		size_t operator()(shard::ShardModel::Vertex const& vertex) const {
+	struct hash<Shard3D::EngineModel::Vertex> {
+		size_t operator()(Shard3D::EngineModel::Vertex const& vertex) const {
 			size_t seed = 0;
-			shard::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+			Shard3D::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
 			return seed;
 		}
 	};
 }
 
-namespace shard {
+namespace Shard3D {
 
-	ShardModel::ShardModel(ShardDevice& device, const ShardModel::Builder &builder) : shardDevice{device} {
+	EngineModel::EngineModel(EngineDevice& device, const EngineModel::Builder &builder) : engineDevice{device} {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
 	}
-	ShardModel::~ShardModel() {}
+	EngineModel::~EngineModel() {}
 
-	std::unique_ptr<ShardModel> ShardModel::createModelFromFile(ShardDevice& device, const std::string& filepath, bool indexModel) {
+	std::unique_ptr<EngineModel> EngineModel::createModelFromFile(EngineDevice& device, const std::string& filepath, bool indexModel) {
 		Builder builder{};	
 		CSimpleIniA ini;
 
@@ -47,25 +47,25 @@ namespace shard {
 			if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
 				std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << "\n";
 			}
-			return std::make_unique<ShardModel>(device, builder);
+			return std::make_unique<EngineModel>(device, builder);
 		}
 		else {
 			builder.loadModel(filepath);
 			if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
 				std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << " (higher vertex count due to no indexing)\n";
 			}
-			return std::make_unique<ShardModel>(device, builder);
+			return std::make_unique<EngineModel>(device, builder);
 		}	
 	}
 
-	void ShardModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
+	void EngineModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
 		vertexCount = (uint32_t)(vertices.size());
 		assert(vertexCount >= 3 && "Vertex count must be at least 3");
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
 		uint32_t vertexSize = sizeof(vertices[0]);
 
-		ShardBuffer stagingBuffer{
-			shardDevice,
+		EngineBuffer stagingBuffer{
+			engineDevice,
 			vertexSize,
 			vertexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -75,17 +75,17 @@ namespace shard {
 		stagingBuffer.map();
 		stagingBuffer.writeToBuffer((void *)vertices.data());
 
-		vertexBuffer = std::make_unique<ShardBuffer>(
-			shardDevice,
+		vertexBuffer = std::make_unique<EngineBuffer>(
+			engineDevice,
 			vertexSize,
 			vertexCount,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
-		shardDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
+		engineDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
 	}
 
-	void ShardModel::createIndexBuffers(const std::vector<uint32_t> &indices) {
+	void EngineModel::createIndexBuffers(const std::vector<uint32_t> &indices) {
 		indexCount = (uint32_t)(indices.size());
 		hasIndexBuffer = indexCount > 0;
 
@@ -93,8 +93,8 @@ namespace shard {
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
 		uint32_t indexSize = sizeof(indices[0]);
 
-		ShardBuffer stagingBuffer{
-			shardDevice,
+		EngineBuffer stagingBuffer{
+			engineDevice,
 			indexSize,
 			indexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -104,18 +104,18 @@ namespace shard {
 		stagingBuffer.map();
 		stagingBuffer.writeToBuffer((void*)indices.data());
 	
-		indexBuffer = std::make_unique<ShardBuffer>(
-			shardDevice,
+		indexBuffer = std::make_unique<EngineBuffer>(
+			engineDevice,
 			indexSize,
 			indexCount,
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 			);
 
-		shardDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
+		engineDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 	}
 
-	void ShardModel::bind(VkCommandBuffer commandBuffer) {
+	void EngineModel::bind(VkCommandBuffer commandBuffer) {
 		VkBuffer buffers[] = { vertexBuffer->getBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
@@ -125,7 +125,7 @@ namespace shard {
 		}
 	}
 
-	void ShardModel::draw(VkCommandBuffer commandBuffer) {
+	void EngineModel::draw(VkCommandBuffer commandBuffer) {
 		if (hasIndexBuffer) {
 			vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 		} else {
@@ -134,11 +134,11 @@ namespace shard {
 		vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
 	}
 
-	std::vector<VkVertexInputBindingDescription> ShardModel::Vertex::getBindingDescriptions() {
+	std::vector<VkVertexInputBindingDescription> EngineModel::Vertex::getBindingDescriptions() {
 		return { {0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX} };
 	}
 
-	std::vector<VkVertexInputAttributeDescription> ShardModel::Vertex::getAttributeDescriptions() {
+	std::vector<VkVertexInputAttributeDescription> EngineModel::Vertex::getAttributeDescriptions() {
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 		
 		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)});
@@ -149,7 +149,7 @@ namespace shard {
 		return attributeDescriptions;
 	}
 
-	void ShardModel::Builder::loadIndexedModel(const std::string& filepath) {
+	void EngineModel::Builder::loadIndexedModel(const std::string& filepath) {
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
 		std::vector<tinyobj::material_t> materials;
@@ -201,7 +201,7 @@ namespace shard {
 		}
 	}
 
-	void ShardModel::Builder::loadModel(const std::string& filepath) {
+	void EngineModel::Builder::loadModel(const std::string& filepath) {
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
 		std::vector<tinyobj::material_t> materials;
