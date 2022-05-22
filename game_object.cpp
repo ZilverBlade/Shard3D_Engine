@@ -62,7 +62,7 @@ namespace Shard3D {
 				invScale.z * (c1 * c2),
 			},};
 	}
-	EngineGameObject EngineGameObject::makePointlight(float intensity, float radius, glm::vec3 color, glm::vec3 attenuationMod) {
+	EngineGameObject EngineGameObject::makePointlight(float intensity, float radius, glm::vec3 color, glm::vec3 attenuationMod, float specularMod) {
 		EngineGameObject gameObj = EngineGameObject::createGameObject(); 
 
 		gameObj.color = color;
@@ -70,6 +70,7 @@ namespace Shard3D {
 		gameObj.pointlight = std::make_unique<PointlightComponent>();
 		gameObj.pointlight->lightIntensity = intensity;
 		gameObj.pointlight->attenuationMod = glm::vec4(attenuationMod, 0.f);
+		gameObj.pointlight->specularMod = specularMod;
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
@@ -81,7 +82,7 @@ namespace Shard3D {
 
 		return gameObj;
 	}
-	EngineGameObject EngineGameObject::makeSpotlight(float intensity, float radius, glm::vec3 color, glm::vec3 direction, float outerAngle, float innerAngle, glm::vec3 attenuationMod) {
+	EngineGameObject EngineGameObject::makeSpotlight(float intensity, float radius, glm::vec3 color, glm::vec3 direction, float outerAngle, float innerAngle, glm::vec3 attenuationMod, float specularMod) {
 		EngineGameObject gameObj = EngineGameObject::createGameObject();
 		
 		gameObj.color = color;
@@ -93,6 +94,7 @@ namespace Shard3D {
 		gameObj.spotlight->outerAngle = outerAngle; //(-1 * outerAngle) + glm::radians(55.f); //how the fuck does the angle work/???
 		gameObj.spotlight->innerAngle = innerAngle; //(-1 * innerAngle) + glm::radians(90.f); //how the fuck does the angle work/???
 		gameObj.spotlight->attenuationMod = glm::vec4(attenuationMod, 0.f);
+		gameObj.spotlight->specularMod = specularMod;
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
@@ -107,13 +109,15 @@ namespace Shard3D {
 
 		return gameObj;
 	}
-	EngineGameObject EngineGameObject::makeDirectionalLight(float intensity, glm::vec3 color, glm::vec3 direction)
+	EngineGameObject EngineGameObject::makeDirectionalLight(float intensity, glm::vec3 color, glm::vec3 direction, float specularMod)
 	{
 		EngineGameObject gameObj = EngineGameObject::createGameObject();
 		gameObj.color = color;
 		gameObj.directionalLight = std::make_unique<DirectionalLightComponent>();
 		gameObj.directionalLight->lightIntensity = intensity;
 		gameObj.transform.rotation = direction;
+		gameObj.directionalLight->specularMod = specularMod;
+
 		return gameObj;
 	}
 }

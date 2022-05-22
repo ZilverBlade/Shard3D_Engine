@@ -14,6 +14,7 @@ namespace Shard3D {
 		glm::vec4 position{};
 		glm::vec4 color{};
 		glm::vec4 direction{}; 
+		alignas(16) float specularMod{};
 	};
 
 	DirectionalLightSystem::DirectionalLightSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
@@ -74,6 +75,7 @@ namespace Shard3D {
 			ubo.directionalLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
 			ubo.directionalLights[lightIndex].color = glm::vec4(obj.color, obj.directionalLight->lightIntensity);
 			ubo.directionalLights[lightIndex].direction = glm::vec4(obj.transform.rotation, 1.f);
+			ubo.directionalLights[lightIndex].specularMod = obj.directionalLight->specularMod;
 			lightIndex += 1;
 		}
 		ubo.numDirectionalLights = lightIndex;
@@ -113,6 +115,7 @@ namespace Shard3D {
 			push.position = glm::vec4(obj.transform.translation, 1.f);
 			push.color = glm::vec4(obj.color, obj.directionalLight->lightIntensity);
 			push.direction = glm::vec4(obj.transform.rotation, 1.f);
+			push.specularMod = obj.directionalLight->specularMod;
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,

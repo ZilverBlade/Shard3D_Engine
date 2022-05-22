@@ -238,7 +238,7 @@ namespace Shard3D {
 		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
-		/*
+		/**/
 		{
 			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
@@ -286,9 +286,9 @@ namespace Shard3D {
 			spotlight.transform.translation = { 6.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
-		*/
+		
 		{
-			auto directionalLight = EngineGameObject::makeDirectionalLight(0.5f, glm::vec3(1.f, 1.0f, 1.f));
+			auto directionalLight = EngineGameObject::makeDirectionalLight(0.2f, glm::vec3(1.f, 1.0f, 1.f), {1.f, -3.f, -1.f}, 0.5f);
 			directionalLight.transform.translation = { 2.0f, -0.5f, 0.2f };
 			gameObjects.emplace(directionalLight.getId(), std::move(directionalLight));
 		}

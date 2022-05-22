@@ -15,7 +15,8 @@ namespace Shard3D {
 		glm::vec4 direction{};
 		alignas(16) glm::vec2 angle{}; //x = outer, y = inner
 		glm::vec4 attenuationMod{};
-		float radius;
+		alignas(16) float radius;
+		alignas(16) float specularMod{};
 	};
 
 	SpotlightSystem::SpotlightSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
@@ -75,6 +76,7 @@ namespace Shard3D {
 			ubo.spotlights[lightIndex].direction = glm::vec4(obj.transform.rotation, 1.f);
 			ubo.spotlights[lightIndex].angle = glm::vec2(obj.spotlight->outerAngle, obj.spotlight->innerAngle);
 			ubo.spotlights[lightIndex].attenuationMod = obj.spotlight->attenuationMod;
+			ubo.spotlights[lightIndex].specularMod = obj.spotlight->specularMod;
 
 			lightIndex += 1;
 		}
@@ -105,7 +107,9 @@ namespace Shard3D {
 			push.direction = glm::vec4(obj.transform.rotation, 1.f);
 			push.angle = glm::vec2(obj.spotlight->outerAngle, obj.spotlight->innerAngle);
 			push.attenuationMod = obj.spotlight->attenuationMod;
+
 			push.radius = obj.transform.scale.x;
+			push.specularMod = obj.spotlight->specularMod;
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,

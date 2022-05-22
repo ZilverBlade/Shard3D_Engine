@@ -119,12 +119,6 @@
     <ClInclude Include="game_object.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="camera.hpp">
       <Filter>Header Files\camera</Filter>
     </ClInclude>
@@ -180,6 +174,12 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="engine_logger.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

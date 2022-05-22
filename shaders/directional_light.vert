@@ -16,20 +16,22 @@ struct Pointlight {
 	vec4 position;
 	vec4 color;
 	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
+	float specularMod;
 };
 struct Spotlight {
 	vec4 position;
 	vec4 color;
 	vec4 direction; // (ignore w)
+	vec2 angle; //outer, inner
 	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
+	float specularMod;
 };
 struct DirectionalLight {
 	vec4 position;
 	vec4 color;
 	vec4 direction; //	directional (ignore w)
+	float specularMod;	
 };
-
-
 
 layout(set = 0, binding = 0) uniform GlobalUbo{
 	mat4 projection;
@@ -46,12 +48,11 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 	int numDirectionalLights;
 } ubo;
 
-
-
 layout(push_constant) uniform Push {
-vec4 position;
-vec4 color;
-vec4 direction;
+	vec4 position;
+	vec4 color;
+	vec4 direction;
+	float specularMod;
 } push;
 
 void main(){

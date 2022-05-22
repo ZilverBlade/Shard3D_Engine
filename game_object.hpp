@@ -19,6 +19,7 @@ namespace Shard3D {
 	struct PointlightComponent {
 		float lightIntensity = 1.0f;
 		glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f);
+		float specularMod = 1.0f;
 	};
 
 	struct SpotlightComponent {
@@ -26,10 +27,12 @@ namespace Shard3D {
 		float outerAngle = glm::radians(45.0f);
 		float innerAngle = glm::radians(15.0f);
 		glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f);
+		float specularMod = 1.0f;
 	};
 
 	struct DirectionalLightComponent {
 		float lightIntensity = 1.0f;
+		float specularMod = 1.0f;
 	};
 
 	class EngineGameObject {
@@ -47,7 +50,8 @@ namespace Shard3D {
 			float intensity = 5.f,
 			float radius = 0.1f,
 			glm::vec3 color = glm::vec3(1.f),
-			glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f)
+			glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f),
+			float specularMod = 1.0f
 		);
 
 		static EngineGameObject makeSpotlight(
@@ -57,13 +61,15 @@ namespace Shard3D {
 			glm::vec3 direction = glm::vec3(1.f, -3.f, -1.f),
 			float outerAngle = glm::radians(25.f), 
 			float innerAngle = glm::radians(45.f), 
-			glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f)
+			glm::vec3 attenuationMod = glm::vec3(0.f, 0.f, 1.f),
+			float specularMod = 1.0f
 		);
 		
 		static EngineGameObject makeDirectionalLight(
 			float intensity = 5.f, 
 			glm::vec3 color = glm::vec3(1.f), 
-			glm::vec3 direction = glm::vec3(1.f, -3.f, -1.f)
+			glm::vec3 direction = glm::vec3(1.f, -3.f, -1.f),
+			float specularMod = 1.0f
 		);
 
 		EngineGameObject(const EngineGameObject&) = delete;

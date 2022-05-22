@@ -14,7 +14,8 @@ namespace Shard3D {
 		glm::vec4 position{};
 		glm::vec4 color{};
 		glm::vec4 attenuationMod{};
-		float radius;
+		alignas(16) float radius;
+		alignas(16) float specularMod{};
 	};
 
 	PointlightSystem::PointlightSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
@@ -75,6 +76,8 @@ namespace Shard3D {
 			ubo.pointlights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
 			ubo.pointlights[lightIndex].color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
 			ubo.pointlights[lightIndex].attenuationMod = obj.pointlight->attenuationMod;
+			ubo.pointlights[lightIndex].specularMod = obj.pointlight->specularMod;
+
 			lightIndex += 1;
 		}
 		ubo.numPointlights = lightIndex;
@@ -115,6 +118,7 @@ namespace Shard3D {
 			push.color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
 			push.radius = obj.transform.scale.x;
 			push.attenuationMod = obj.pointlight->attenuationMod;
+			push.specularMod = obj.pointlight->specularMod;
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,

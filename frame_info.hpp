@@ -11,6 +11,7 @@ namespace Shard3D {
 		glm::vec4 position{};
 		glm::vec4 color{}; 
 		glm::vec4 attenuationMod{};
+		alignas(16)float specularMod{};
 	};
 	struct Spotlight {
 		glm::vec4 position{};
@@ -18,11 +19,13 @@ namespace Shard3D {
 		glm::vec4 direction{};
 		alignas(16) glm::vec2 angle{}; //x = outer, y = inner
 		glm::vec4 attenuationMod{};
+		alignas(16)float specularMod{};
 	};
 	struct DirectionalLight {
 		glm::vec4 position{};
 		glm::vec4 color{};
 		glm::vec4 direction{};
+		alignas(16)float specularMod{};
 	};
 
 	struct GlobalUbo {

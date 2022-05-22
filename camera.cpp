@@ -62,7 +62,7 @@ namespace Shard3D {
 	}
 
 	void EngineCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
-		assert((target - position) == glm::vec3(0) && "direction cannot be 0");
+		assert((target - position) != glm::vec3(0) && "direction cannot be 0");
 		setViewDirection(position, target - position, up);
 	}
 
