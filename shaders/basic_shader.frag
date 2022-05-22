@@ -64,7 +64,7 @@ void main(){
 
 		float attenuation = 1.0 / (
 	/*				c		*/		pointlight.attenuationMod.x +																
-	/*				bx		*/		pointlight.attenuationMod.y * sqrt(lightDistance.x*lightDistance.x + lightDistance.y*lightDistance.y + lightDistance.z*lightDistance.z) +  
+	/*				bx		*/		pointlight.attenuationMod.y * length(lightDistance) +  
 	/*				ax^2	*/		pointlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
 		lightDistance = normalize(lightDistance);
 		
@@ -88,24 +88,25 @@ void main(){
 		vec3 lightDistance = spotlight.position.xyz - fragPosWorld;
 		float attenuation = 1.0 / (
 	/*				c		*/		spotlight.attenuationMod.x +																
-	/*				bx		*/		spotlight.attenuationMod.y * sqrt(lightDistance.x*lightDistance.x + lightDistance.y*lightDistance.y + lightDistance.z*lightDistance.z) +  
+	/*				bx		*/		spotlight.attenuationMod.y * length(lightDistance) +  
 	/*				ax^2	*/		spotlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
 		lightDistance = normalize(lightDistance);
 		float cosAngIndicence = max(dot(surfaceNormal, normalize(lightDistance)), 0);
-		vec3 color_intensity = spotlight.color.xyz * spotlight.color.w * attenuation;
+		vec3 color_intensity = spotlight.color.xyz * spotlight.color.w;
 
 		float theta = dot(lightDistance, normalize(-spotlight.direction.xyz));
 		float epsilon  = spotlight.angle.y - spotlight.angle.x;
 		float intensity = clamp((theta - spotlight.angle.x) / epsilon, 0.0, 1.0); 
 
-		if(theta > sin(spotlight.angle.x)) { diffuseLight += color_intensity * cosAngIndicence * intensity;}	
-
-		//specular lightDistance
-		vec3 halfAngle = normalize(lightDistance + viewDirection);
-		float blinnTerm = dot(surfaceNormal, halfAngle);
-		blinnTerm = clamp(blinnTerm, 0, 1);
-		blinnTerm = pow(blinnTerm, blinnPow); //higher val -> sharper light (16 - 1024)
-		specularLight += color_intensity * blinnTerm; 
+		if(theta > sin(spotlight.angle.x)) { 
+			diffuseLight += color_intensity * cosAngIndicence * intensity ;
+			//specular lightDistance
+			vec3 halfAngle = normalize(lightDistance + viewDirection);
+			float blinnTerm = dot(surfaceNormal, halfAngle);
+			blinnTerm = clamp(blinnTerm, 0, 1);
+			blinnTerm = pow(blinnTerm, blinnPow); //higher val -> sharper light (16 - 1024)
+			specularLight += color_intensity * blinnTerm * intensity; 
+		}		
 	}
 
 	//Directional light
@@ -116,6 +117,14 @@ void main(){
 		vec3 color_intensity = directionalLight.color.xyz * directionalLight.color.w;
 
 		diffuseLight += color_intensity * lightIntensity;
+
+				//specular lightDistance
+		vec3 halfAngle = normalize(directionalLight.position.xyz + vec3(0, -1000.f, 0) - fragPosWorld + viewDirection) * 0.999f;
+		float blinnTerm = dot(surfaceNormal, halfAngle);
+		blinnTerm = clamp(blinnTerm, 0, 1);
+		blinnTerm = pow(blinnTerm, blinnPow * 2.f); //higher val -> sharper light (16 - 1024)
+		specularLight += color_intensity * blinnTerm; 
+
 	}
 
 		// multiply fragColor by specular only if material is metallic

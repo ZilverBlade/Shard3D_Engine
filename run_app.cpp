@@ -116,7 +116,7 @@ namespace Shard3D {
 			else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic"){
 				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("RENDERING", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
 			}
-				
+			
 			if (auto commandBuffer = engineRenderer.beginFrame()) {
 				int frameIndex = engineRenderer.getFrameIndex();
 				FrameInfo frameInfo{
@@ -269,13 +269,13 @@ namespace Shard3D {
 			pointlight.transform.translation = { 0.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
-		*/
+		
 		{
 			auto pointlight = EngineGameObject::makePointlight(0.5f, 0.1, { 1.f, 1.f, 0.f }, { 0.0f, -0.2f, 1.3f });
 			pointlight.transform.translation = { 1.0f, -0.2f, 0.2f };
 			gameObjects.emplace(pointlight.getId(), std::move(pointlight));
 		}
-		/*
+		
 		{
 			auto spotlight = EngineGameObject::makeSpotlight(1.3f, 3.1, { 1.f, 1.f, 1.f }, { 0.f, glm::radians(90.f), 0.f }, glm::radians(30.f), glm::radians(40.f), {0.f, 0.f, 1.f});
 			spotlight.transform.translation = { 4.0f, -0.1f, 0.2f };
@@ -286,12 +286,12 @@ namespace Shard3D {
 			spotlight.transform.translation = { 6.0f, -0.1f, 0.2f };
 			gameObjects.emplace(spotlight.getId(), std::move(spotlight));
 		}
-		
+		*/
 		{
-			auto directionalLight = EngineGameObject::makeDirectionalLight(0.01f, glm::vec3(1.f, 1.0f, 1.f));
+			auto directionalLight = EngineGameObject::makeDirectionalLight(0.5f, glm::vec3(1.f, 1.0f, 1.f));
 			directionalLight.transform.translation = { 2.0f, -0.5f, 0.2f };
 			gameObjects.emplace(directionalLight.getId(), std::move(directionalLight));
 		}
-		*/
+		
 	}
 }

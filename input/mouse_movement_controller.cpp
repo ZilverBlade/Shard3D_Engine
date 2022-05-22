@@ -4,11 +4,12 @@
 namespace Shard3D {
 	namespace controller {
 
-		bool firstMouse = true;
+		//bool firstMouse = true;
 
 		float lastX, lastY;
 
 		void MouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject, glm::vec2 mousePosition) {
+			
 			glm::vec3 rotate{ 0 };
 			if (glfwGetMouseButton(window, buttons.canRotate) == GLFW_PRESS) {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);		
@@ -19,15 +20,12 @@ namespace Shard3D {
 				lastX = mousePosition.x;
 				lastY = mousePosition.y;
 			}
-			else {
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			}
+			else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-			if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
-				gameObject.transform.rotation += sensitivity * dt * glm::normalize(rotate);
-			}
+			if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) 
+				gameObject.transform.rotation += sensitivity * dt * glm::normalize(rotate);	
 		}
-		/**/
+
 		void MouseMovementController::adjustFOV(GLFWwindow* window, glm::vec2 scrollPosition) {
 			//glfwSetScrollCallback(window, scroll_callback);
 

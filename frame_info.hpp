@@ -37,7 +37,7 @@ namespace Shard3D {
 		glm::mat4 inverseView{ 1.f };
 
 		//reyleigh scattering fakery and/or indirect light
-		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.004f };
+		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.014f };
 
 		Pointlight pointlights[MAX_POINTLIGHTS];
 		Spotlight spotlights[MAX_SPOTLIGHTS];
