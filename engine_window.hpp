@@ -2,11 +2,18 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <string>
+
 namespace Shard3D {
 
 	class EngineWindow {
 
 	public:
+		int windowType = 0; // 0 = windowed; 1 = borderless windowed; 2 = fullscreen
+		int borderlessFullscreen = false;
+
+		int windowWidth;
+		int windowHeight;
+
 		EngineWindow(int w, int h, std::string name);
 		~EngineWindow();
 		
@@ -20,15 +27,22 @@ namespace Shard3D {
 		GLFWwindow* getGLFWwindow() const { return window; }
 
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+		void toggleFullscreen();
 	private:
 		static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 		void initWindow();
 
 		int width;
 		int height;
+
+		int windowPosX;
+		int windowPosY;
+
+
 		bool framebufferResized = false;
 
 		std::string windowName;
 		GLFWwindow* window;
+		GLFWmonitor* monitor = nullptr;
 	};
 }

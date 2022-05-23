@@ -88,6 +88,10 @@ namespace Shard3D {
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
+		CSimpleIniA gini;
+		gini.SetUnicode();
+		gini.LoadFile(GAME_SETTINGS_PATH);
+
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
 
@@ -112,9 +116,13 @@ namespace Shard3D {
 			
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
 				camera.setPerspectiveProjection(glm::radians(fov), aspect, ini.GetDoubleValue("RENDERING", "NearClipDistance"), ini.GetDoubleValue("RENDERING", "FarClipDistance"));
-			}
-			else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic"){
+			} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
 				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("RENDERING", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
+			}
+
+			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
+				glfwGetWindowSize(engineWindow.getGLFWwindow(), &engineWindow.windowWidth, &engineWindow.windowHeight);
+				engineWindow.toggleFullscreen();
 			}
 			
 			if (auto commandBuffer = engineRenderer.beginFrame()) {
@@ -167,7 +175,6 @@ namespace Shard3D {
 			}
 		}
 		vkDeviceWaitIdle(engineDevice.device());
-		
 	}
 
 	void RunApp::loadGameObjects() {	
@@ -238,7 +245,7 @@ namespace Shard3D {
 		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
-		/**/
+		
 		{
 			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };

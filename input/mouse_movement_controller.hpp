@@ -12,13 +12,13 @@ namespace Shard3D {
 			};
 
 			void moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject, glm::vec2 mousePosition);
-			void adjustFOV(GLFWwindow* window, glm::vec2 scrollPosition);
+			//void adjustFOV(GLFWwindow* window, glm::vec2 scrollPosition);
 
 			ButtonMappings buttons{};
 			float sensitivity{ 2.f };
 
 		private:
-			void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+			//GLFWscrollfun scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 		};
 	}
 }

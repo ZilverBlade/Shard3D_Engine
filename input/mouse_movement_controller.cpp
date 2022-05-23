@@ -34,9 +34,15 @@ namespace Shard3D {
 			if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) 
 				gameObject.transform.rotation += sensitivity * dt * rotate;
 		}
-
+		/*
 		void MouseMovementController::adjustFOV(GLFWwindow* window, glm::vec2 scrollPosition) {
-			//glfwSetScrollCallback(window, scroll_callback);
+			double xOffset{};
+			double yOffset{};
+			glfwSetScrollCallback(window, scroll_callback(window, xOffset, yOffset));
+
+		}
+
+		GLFWscrollfun scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 			float fov = {};
 			if (fov < 30.0f)
@@ -44,13 +50,10 @@ namespace Shard3D {
 			if (fov > 120.0f)
 				fov = 120.0f;
 
-			fov -= scrollPosition.y;
-
-			//return fov;
+			fov -= yoffset;
+			std::cout << fov << "\n";
+			;
 		}
-
-		void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-		{
-		}
+		*/
 	}
 }

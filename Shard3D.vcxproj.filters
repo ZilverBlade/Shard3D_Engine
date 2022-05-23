@@ -57,7 +57,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="window.cpp">
+    <ClCompile Include="engine_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="run_app.cpp">

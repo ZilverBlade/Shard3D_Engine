@@ -226,7 +226,7 @@
     <ClCompile Include="run_app.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="window.cpp" />
+    <ClCompile Include="engine_window.cpp" />
     <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
