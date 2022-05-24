@@ -180,14 +180,14 @@ namespace Shard3D {
 
 		auto fart = EngineGameObject::createGameObject();
 		fart.model = model;
-		fart.transform.translation = { .0f, 4.0f, 1.5f };
+		fart.transform.translation = { .0f, 0.0f, 1.5f };
 		fart.transform.scale = { .5f, .5f, .5f };
 		fart.transform.rotation = { glm::radians(90.f), 0.f, 0.f};
 		gameObjects.emplace(fart.getId(), std::move(fart));
 
 		auto fart2 = EngineGameObject::createGameObject();
 		fart2.model = model;
-		fart2.transform.translation = { 0.0f, 4.0f, 5.5f };
+		fart2.transform.translation = { 0.0f, 0.0f, 5.5f };
 		fart2.transform.scale = { .5f, .5f, .5f };
 		fart2.transform.rotation = { glm::radians(90.f), glm::radians(90.f), 0.f };
 		gameObjects.emplace(fart2.getId(), std::move(fart2));

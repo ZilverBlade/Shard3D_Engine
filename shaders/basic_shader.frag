@@ -51,6 +51,16 @@ float wrapDiffuse(vec3 normal, vec3 lightVector, float wrap) {
     return max(0.f, (dot(lightVector, normal) + wrap) / (1.f + wrap));
 }
 
+float getFogFactor(float d) {
+		const float FogMax = 20.0;
+		const float FogMin = 10.0;
+
+		if (d>=FogMax) return 1;
+		if (d<=FogMin) return 0;
+
+	 return 1 - (FogMax - d) / (FogMax - FogMin);
+}
+
 void main(){
 	vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
 
@@ -135,6 +145,9 @@ void main(){
 		}
 	}
 
+	float d = distance(cameraPosWorld, fragPosWorld);
+	float alpha = getFogFactor(d);
+
 		// multiply fragColor by specular only if material is metallic
-	outColor = vec4(diffuseLight * fragColor + specularLight, 1.0); //RGBA
+	outColor = vec4(mix(diffuseLight * fragColor + specularLight, vec3(0.3f, 0.3f, 0.8f), alpha), 1.0); //RGBA
 }

@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 /*
-    Shard3D (2022 All rights reserved) created by ZilverBlade and Razer
+    Shard3D 1.0 (2022) created by ZilverBlade and Razer
 */
 int main() {
 

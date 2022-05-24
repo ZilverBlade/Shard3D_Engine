@@ -38,7 +38,6 @@ namespace Shard3D {
 		int windowPosX;
 		int windowPosY;
 
-
 		bool framebufferResized = false;
 
 		std::string windowName;
