@@ -66,32 +66,32 @@ namespace Shard3D {
 	}
 
 	void EngineWindow::toggleFullscreen() {
-		if (borderlessFullscreen == false) {
-			if (windowType == 2) {		
-				const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
+		if (borderlessFullscreen == false && windowType == 2) {
+		
+			const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
 
-				// restore last window size and position
-				glfwSetWindowMonitor(window, nullptr, windowPosX, windowPosY, windowWidth, windowHeight, videoMode->refreshRate);
+			// restore last window size and position
+			glfwSetWindowMonitor(window, nullptr, windowPosX, windowPosY, windowWidth, windowHeight, videoMode->refreshRate);
 
-				windowType = 0;
-			}
-			else {
-				CSimpleIniA ini;
-				ini.SetUnicode();
-				ini.LoadFile(GAME_SETTINGS_PATH);
+			windowType = 0;
+		}
+		else {
+			CSimpleIniA ini;
+			ini.SetUnicode();
+			ini.LoadFile(GAME_SETTINGS_PATH);
 
-				// backup window position and window size
-				glfwGetWindowPos(window, &windowPosX, &windowPosY);
-				glfwGetWindowSize(window, &windowWidth, &windowHeight);
-				ini.SetLongValue("WINDOW", "WIDTH", (long)windowWidth);
-				ini.SetLongValue("WINDOW", "HEIGHT", (long)windowHeight);
-				// get resolution of monitor
-				const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
-				// switch to full screen
-				glfwSetWindowMonitor(window, monitor, 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
-				std::cout << "Set Fullscreen\n";
-				windowType = 2;
-			}
+			// backup window position and window size
+			glfwGetWindowPos(window, &windowPosX, &windowPosY);
+			glfwGetWindowSize(window, &windowWidth, &windowHeight);
+			ini.SetLongValue("WINDOW", "WIDTH", (long)windowWidth);
+			ini.SetLongValue("WINDOW", "HEIGHT", (long)windowHeight);
+			// get resolution of monitor
+			const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
+			// switch to full screen
+			glfwSetWindowMonitor(window, monitor, 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
+			std::cout << "Set Fullscreen\n";
+			windowType = 2;
+		
 		}
 	}
 

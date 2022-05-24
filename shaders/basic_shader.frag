@@ -79,7 +79,7 @@ void main(){
 
 		diffuseLight += color_intensity * cosAngIndicence;
 
-		//specular lightDistance
+			// specular
 		vec3 halfAngle = normalize(lightDistance + viewDirection);
 		float blinnTerm = dot(surfaceNormal, halfAngle);
 		blinnTerm = clamp(blinnTerm, 0, 1);
@@ -87,11 +87,12 @@ void main(){
 		specularLight += color_intensity * blinnTerm * pointlight.specularMod; 
 	}
 
-		//Spotlight
+	// Spotlight
 	for (int i = 0; i < ubo.numSpotlights; i++) {
 		Spotlight spotlight = ubo.spotlights[i];
 
 		vec3 lightDistance = spotlight.position.xyz - fragPosWorld;
+
 		float attenuation = 1.0 / (
 	/*				c		*/		spotlight.attenuationMod.x +																
 	/*				bx		*/		spotlight.attenuationMod.y * length(lightDistance) +  
@@ -106,16 +107,16 @@ void main(){
 
 		if(theta > sin(spotlight.angle.x)) { 
 			diffuseLight += color_intensity * cosAngIndicence * intensity ;
-			//specular lightDistance
+				//specular 
 			vec3 halfAngle = normalize(lightDistance + viewDirection);
 			float blinnTerm = dot(surfaceNormal, halfAngle);
 			blinnTerm = clamp(blinnTerm, 0, 1);
-			blinnTerm = pow(blinnTerm, blinnPow); //higher val -> sharper light (16 - 1024)
+			blinnTerm = pow(blinnTerm, blinnPow); 
 			specularLight += color_intensity * blinnTerm * intensity * spotlight.specularMod; 
 		}		
 	}
 
-	//Directional light
+	// Directional light
 	for (int i = 0; i < ubo.numDirectionalLights; i++) {
 		DirectionalLight directionalLight = ubo.directionalLights[i];
 
@@ -125,11 +126,11 @@ void main(){
 		diffuseLight +=  lightIntensity * color_intensity;
 
 		if (directionalLight.specularMod != 0.f){
-				//specular lightDistance
+				// specular 
 		vec3 halfAngle = normalize(directionalLight.position.xyz + vec3(0, -1000.f, 0) - fragPosWorld + viewDirection) * 0.999f;
 		float blinnTerm = dot(surfaceNormal, halfAngle);
 		blinnTerm = clamp(blinnTerm, 0, 1);
-		blinnTerm = pow(blinnTerm, blinnPow); //higher val -> sharper light (16 - 1024)
+		blinnTerm = pow(blinnTerm, blinnPow); 
 		specularLight += color_intensity * blinnTerm * directionalLight.specularMod; 
 		}
 	}
