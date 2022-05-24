@@ -3,8 +3,8 @@
 
 # Shard3D
 
-Shard3D Engine, a revolutionary engine running on Vulkan 1.3
-
+Shard3D Engine, a 2000s styled engine running on Vulkan 1.3
+The goal is to get an partial editor based engine with 2000s styled graphics with modern technology, with tons of customisation.
 
 ### Requirements
 
