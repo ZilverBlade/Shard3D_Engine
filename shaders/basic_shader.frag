@@ -150,4 +150,5 @@ void main(){
 
 		// multiply fragColor by specular only if material is metallic
 	outColor = vec4(mix(diffuseLight * fragColor + specularLight, vec3(0.3f, 0.3f, 0.8f), alpha), 1.0); //RGBA
+	//outColor = vec4(diffuseLight * fragColor + specularLight, 1.0); //RGBA
 }

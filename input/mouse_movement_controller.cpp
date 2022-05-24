@@ -44,7 +44,7 @@ namespace Shard3D {
 				// Rotates the Orientation left and right
 				orientation = glm::rotate(orientation, glm::radians(-rotX), glm::vec3(0.f, 1.f, 0.f));
 
-				std::cout << orientation.x << orientation.y << orientation.z << "\n";
+				//std::cout << orientation.x << orientation.y << orientation.z << "\n";
 				glfwSetCursorPos(window, (width / 2), (height / 2));
 			}
 			else { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); firstClick = true; }

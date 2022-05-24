@@ -228,6 +228,7 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="engine_window.cpp" />
     <ClCompile Include="pipeline.cpp" />
+    <ClCompile Include="systems\grid_system.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
   </ItemGroup>
@@ -235,6 +236,7 @@
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="engine_logger.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
+    <ClInclude Include="systems\grid_system.hpp" />
     <ClInclude Include="systems\spotlight_system.hpp" />
     <ClInclude Include="utils\definitions.hpp" />
     <ClInclude Include="input\keyboard_movement_controller.hpp" />
@@ -274,6 +276,8 @@
     <None Include="shaders\basic_shader.vert">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\grid.frag" />
+    <None Include="shaders\grid.vert" />
     <None Include="shaders\pointlight.frag" />
     <None Include="shaders\pointlight.vert" />
     <None Include="shaders\spotlight.frag" />

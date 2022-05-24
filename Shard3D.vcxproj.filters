@@ -108,6 +108,9 @@
     <ClCompile Include="model.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="systems\grid_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -182,6 +185,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="systems\grid_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
@@ -207,6 +213,12 @@
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="shaders\spotlight.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\grid.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\grid.vert">
       <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>
