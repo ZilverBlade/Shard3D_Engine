@@ -10,6 +10,8 @@
 #include <string>
 #include "renderer.hpp"
 
+#include "UI/LayerStack.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -28,8 +30,12 @@ namespace Shard3D {
 		RunApp& operator=(const RunApp&) = delete;
 
 		void run();
+
+		void pushLayer(Layer* layer);
+		void pushOverlay(Layer* overlay);
 	private:
 		void loadGameObjects();
+		LayerStack layerStack;
 
 		EngineWindow engineWindow { WIDTH, HEIGHT, WINDOW_NAME };//{ (int)getValFromGameConfig("WINDOW", "WIDTH"), (int)getValFromGameConfig("WINDOW", "HEIGHT"), WINDOW_NAME};
 		EngineDevice engineDevice{ engineWindow };

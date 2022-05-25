@@ -15,7 +15,7 @@ vec4 grid(vec3 fragPos3D, float scale, bool drawAxis) {
     float line = min(grid.x, grid.y);
     float minimumz = min(derivative.y, 1);
     float minimumx = min(derivative.x, 1);
-    vec4 color = vec4(0.2, 0.2, 0.2, 1.0 - min(line, 1.0));
+    vec4 color = vec4(0.1, 0.1, 0.1, 1.0 - min(line, 1.0));
     // z axis
     if(fragPos3D.x > -0.1 * minimumx && fragPos3D.x < 0.1 * minimumx)
         color.z = 1.0;
@@ -34,6 +34,7 @@ float computeLinearDepth(vec3 pos) {
     float linearDepth = (2.0 * near * far) / (far + near - clip_space_depth * (far - near)); // get linear value between 0.01 and 100
     return linearDepth / far; // normalize
 }
+
 void main() {
     float t = -nearPoint.y / (farPoint.y - nearPoint.y);
     vec3 fragPos3D = nearPoint + t * (farPoint - nearPoint);

@@ -52,6 +52,24 @@
     <Filter Include="Source Files\core">
       <UniqueIdentifier>{2fc22722-ac3f-489e-a775-583cdf859c6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{b9ed0249-bbd1-4d85-994c-7cc31fa2c5ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\ImGui">
+      <UniqueIdentifier>{76434d82-927e-45da-a8ca-2a3694369cf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{1e840a49-c365-4689-857c-2867a20d2d3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\ImGui">
+      <UniqueIdentifier>{a37ab8bb-6c24-4470-9120-82fc94a00727}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\Layers">
+      <UniqueIdentifier>{41771886-af11-4995-b305-93fcd4e1aa2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\Layers">
+      <UniqueIdentifier>{a630aec4-df96-45b2-9226-30392c09303a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -110,6 +128,18 @@
     </ClCompile>
     <ClCompile Include="systems\grid_system.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\ImGuiLayer.cpp">
+      <Filter>Source Files\UI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Layer.cpp">
+      <Filter>Source Files\UI\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\LayerStack.cpp">
+      <Filter>Source Files\UI\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\TestLayer.cpp">
+      <Filter>Source Files\UI\Layers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +217,18 @@
     </ClInclude>
     <ClInclude Include="systems\grid_system.hpp">
       <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\ImGuiLayer.hpp">
+      <Filter>Header Files\UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Layer.hpp">
+      <Filter>Header Files\UI\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\LayerStack.hpp">
+      <Filter>Header Files\UI\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\TestLayer.hpp">
+      <Filter>Header Files\UI\Layers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

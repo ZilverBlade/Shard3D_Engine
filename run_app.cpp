@@ -28,6 +28,9 @@
 #include "systems/directional_light_system.hpp"
 #include "systems/grid_system.hpp"
 
+//UI stuff
+#include "UI/TestLayer.hpp"
+
 namespace Shard3D {
 
 	RunApp::RunApp() {
@@ -43,6 +46,15 @@ namespace Shard3D {
 		loadGameObjects();
 	}
 	RunApp::~RunApp() {}
+
+	void RunApp::pushLayer(Layer* layer) {
+		layerStack.pushLayer(layer);
+	}
+
+	void RunApp::pushOverlay(Layer* overlay) {
+		layerStack.pushOverlay(overlay);
+	}
+
 	void RunApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
@@ -67,6 +79,8 @@ namespace Shard3D {
 				.writeBuffer(0, &bufferInfo)
 				.build(globalDescriptorSets[i]);
 		}
+
+		pushLayer(new TestLayer());
 
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -105,6 +119,10 @@ namespace Shard3D {
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
 			
+			for (Layer* layer : layerStack) {
+				layer->update();
+			}
+
 			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
 			cameraControllerKeyBoard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, viewerObject);
