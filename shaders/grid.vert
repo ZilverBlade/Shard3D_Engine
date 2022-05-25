@@ -70,7 +70,7 @@ void main() {
 	fragProj = ubo.projection;
 
 	near = 0.01;
-	far = 100;
+	far = 8;
 
     gl_Position = vec4(p, 1.0); // using directly the clipped coordinates
 }

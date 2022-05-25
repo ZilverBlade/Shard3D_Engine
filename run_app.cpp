@@ -30,6 +30,7 @@
 
 //UI stuff
 #include "UI/TestLayer.hpp"
+#include "UI/ImGuiLayer.hpp"
 
 namespace Shard3D {
 
@@ -46,14 +47,6 @@ namespace Shard3D {
 		loadGameObjects();
 	}
 	RunApp::~RunApp() {}
-
-	void RunApp::pushLayer(Layer* layer) {
-		layerStack.pushLayer(layer);
-	}
-
-	void RunApp::pushOverlay(Layer* overlay) {
-		layerStack.pushOverlay(overlay);
-	}
 
 	void RunApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -80,7 +73,8 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 
-		pushLayer(new TestLayer());
+		layerStack.pushLayer(new TestLayer(), engineRenderer.getSwapChainRenderPass(), nullptr);
+		//layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), nullptr);
 
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -118,10 +112,6 @@ namespace Shard3D {
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
-			
-			for (Layer* layer : layerStack) {
-				layer->update();
-			}
 
 			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
@@ -173,14 +163,22 @@ namespace Shard3D {
 				uboBuffers[frameIndex]->flush();
 
 				//	render
+
 				/*
 					this section is great for adding multiple render passes such as :
 					- Begin offscreen shadow pass
 					- render shadow casting objects
 					- end offscreen shadow pass
+					- UI
 
 					Also reflections and Postfx
 				*/
+
+				// Layer overlays
+				for (Layer* layer : layerStack) {
+					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime);
+				}
+
 				engineRenderer.beginSwapChainRenderPass(commandBuffer); 
 
 

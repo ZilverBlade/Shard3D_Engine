@@ -7,7 +7,7 @@ namespace Shard3D {
 	public:
 		TestLayer();
 
-		void update() override;
+		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt) override;
 
 	};
 }

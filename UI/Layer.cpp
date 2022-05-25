@@ -2,24 +2,16 @@
 
 namespace Shard3D {
 
-	Layer::Layer(const char* name) {
+	Layer::Layer(const char* name) {}
 
-	}
+	Layer::~Layer() {}
 
-	Layer::~Layer() {
+	void Layer::attach(){}
 
-	}
+	void Layer::attach(VkRenderPass renderPass, GLFWwindow* window) {}
 
-	void Layer::attach()
-	{
-	}
+	void Layer::detach(){}
 
-	void Layer::detach()
-	{
-	}
-
-	void Layer::update()
-	{
-	}
+	void Layer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt) {}
 
 }

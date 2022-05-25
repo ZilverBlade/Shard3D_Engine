@@ -7,11 +7,12 @@ namespace Shard3D {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void attach() override;
+		void attach(VkRenderPass renderPass, GLFWwindow* window) override;
 		void detach() override;
-		void update() override;
+		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt) override;
 	private:
-
+		int width;
+		int height;
 	};
 
 }

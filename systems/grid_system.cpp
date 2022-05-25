@@ -38,21 +38,22 @@ namespace Shard3D {
     void GridSystem::createPipeline(VkRenderPass renderPass) {
         assert(pipelineLayout != VK_NULL_HANDLE && "Cannot create pipeline before pipeline layout");
 
-        PipelineConfigInfo configInfo{};
-        EnginePipeline::defaultPipelineConfigInfo(configInfo);
-        configInfo.renderPass = renderPass;
-        configInfo.pipelineLayout = pipelineLayout;
-        configInfo.bindingDescriptions.clear();
-        configInfo.attributeDescriptions.clear();
-        configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
-        configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-        configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        PipelineConfigInfo pipelineConfig{};
+        EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
+        EnginePipeline::enableAlphaBlending(pipelineConfig);
+        pipelineConfig.renderPass = renderPass;
+        pipelineConfig.pipelineLayout = pipelineLayout;
+        pipelineConfig.bindingDescriptions.clear();
+        pipelineConfig.attributeDescriptions.clear();
+        pipelineConfig.colorBlendAttachment.blendEnable = VK_TRUE;
+        pipelineConfig.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        pipelineConfig.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 
         enginePipeline = std::make_unique<EnginePipeline>(
             engineDevice,
             "shaders/grid.vert.spv",
             "shaders/grid.frag.spv",
-            configInfo
+            pipelineConfig
            );
     }
 
