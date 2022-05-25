@@ -141,6 +141,9 @@
     <ClCompile Include="UI\TestLayer.cpp">
       <Filter>Source Files\UI\Layers</Filter>
     </ClCompile>
+    <ClCompile Include="UI\imgui_implementation.cpp">
+      <Filter>Source Files\UI\ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -229,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="UI\TestLayer.hpp">
       <Filter>Header Files\UI\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\imgui_implementation.hpp">
+      <Filter>Header Files\UI\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

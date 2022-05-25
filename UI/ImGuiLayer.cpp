@@ -2,11 +2,21 @@
 
 namespace Shard3D {
 
-	ImGuiLayer::ImGuiLayer() {
+	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
+
+	ImGuiLayer::~ImGuiLayer() {
 
 	}
 
-	ImGuiLayer::~ImGuiLayer() {
+	void ImGuiLayer::attach() {
+
+	}
+
+	void ImGuiLayer::detach() {
+
+	}
+
+	void ImGuiLayer::update() {
 
 	}
 

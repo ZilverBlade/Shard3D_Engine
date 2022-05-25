@@ -80,16 +80,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CustomBuildBeforeTargets />
-    <OutDir>$(SolutionDir)export\bin\Shard3D\$(Platform)\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)export\intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)export\bin\Shard3D\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)export\intermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <SourcePath>$(VC_SourcePath);$(ProjectName)fmod_engine</SourcePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CustomBuildBeforeTargets />
-    <OutDir>$(SolutionDir)export\bin\Shard3D\$(Platform)\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)export\intermediate\$(Platform)\$(Configuration)\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)export\bin\Shard3D\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)export\intermediate\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,17 +134,18 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
       <ForceSymbolReferences>
@@ -180,20 +181,21 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -232,6 +234,7 @@
     <ClCompile Include="systems\grid_system.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
+    <ClCompile Include="UI\imgui_implementation.cpp" />
     <ClCompile Include="UI\Layer.cpp" />
     <ClCompile Include="UI\LayerStack.cpp" />
     <ClCompile Include="UI\TestLayer.cpp" />
@@ -239,6 +242,7 @@
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="engine_logger.hpp" />
+    <ClInclude Include="UI\imgui_implementation.hpp" />
     <ClInclude Include="UI\TestLayer.hpp" />
     <ClInclude Include="UI\ImGuiLayer.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
