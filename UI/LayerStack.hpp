@@ -9,8 +9,8 @@ namespace Shard3D {
 		LayerStack();
 		~LayerStack();
 
-		void pushLayer(Layer* layer, VkRenderPass renderPass, GLFWwindow* window);
-		void pushOverlay(Layer* overlay, VkRenderPass renderPass, GLFWwindow* window);
+		void pushLayer(Layer* layer, VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window);
+		void pushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window);
 		void popLayer(Layer* layer);
 		void popOverlay(Layer* overlay);
 

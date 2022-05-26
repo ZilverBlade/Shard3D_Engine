@@ -12,14 +12,14 @@ namespace Shard3D {
 		}
 	}
 
-	void LayerStack::pushLayer(Layer* layer, VkRenderPass renderPass, GLFWwindow* window) {
+	void LayerStack::pushLayer(Layer* layer, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window) {
 		layerInsert = layers.emplace(layerInsert, layer);
-		layer->attach(renderPass, window);
+		layer->attach(renderPass, device, window);
 	}
 
-	void LayerStack::pushOverlay(Layer* overlay, VkRenderPass renderPass, GLFWwindow* window) {
+	void LayerStack::pushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window) {
 		layers.emplace_back(overlay);
-		overlay->attach(renderPass, window);
+		overlay->attach(renderPass, device, window);
 	}
 
 	void LayerStack::popLayer(Layer* layer) {

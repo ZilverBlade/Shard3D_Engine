@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "simpleini/simple_ini.h"
+#include "UI/imgui_implementation.hpp"
 
 namespace Shard3D {
 
@@ -79,6 +80,7 @@ class EngineDevice {
 
   VkPhysicalDeviceProperties properties;
 
+  ImGui_ImplVulkan_InitInfo init_info{};
  private:
   void createInstance();
   void setupDebugMessenger();

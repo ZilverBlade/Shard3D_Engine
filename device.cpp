@@ -117,10 +117,12 @@ void EngineDevice::createInstance() {
     createInfo.pNext = nullptr;
   }
 
+
+
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
     throw std::runtime_error("failed to create instance!");
   }
-
+  init_info.Instance = instance;
   hasGflwRequiredInstanceExtensions();
 }
 
@@ -154,6 +156,8 @@ void EngineDevice::pickPhysicalDevice() {
   if (physicalDevice == VK_NULL_HANDLE) {
     throw std::runtime_error("failed to find a suitable GPU!");
   }
+
+  init_info.PhysicalDevice = physicalDevice;
 
   vkGetPhysicalDeviceProperties(physicalDevice, &properties);
   std::cout << "physical device: " << properties.deviceName << std::endl;

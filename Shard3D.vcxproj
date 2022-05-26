@@ -139,7 +139,7 @@
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26812;4244</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -187,7 +187,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26812;4244</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -234,6 +234,7 @@
     <ClCompile Include="systems\grid_system.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
+    <ClCompile Include="UI\imgui_glfw_implementation.cpp" />
     <ClCompile Include="UI\imgui_implementation.cpp" />
     <ClCompile Include="UI\Layer.cpp" />
     <ClCompile Include="UI\LayerStack.cpp" />
@@ -242,6 +243,7 @@
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="engine_logger.hpp" />
+    <ClInclude Include="UI\imgui_glfw_implementation.hpp" />
     <ClInclude Include="UI\imgui_implementation.hpp" />
     <ClInclude Include="UI\TestLayer.hpp" />
     <ClInclude Include="UI\ImGuiLayer.hpp" />

@@ -1,6 +1,7 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
+#include "../device.hpp"
 
 namespace Shard3D {
 	class Layer {
@@ -9,7 +10,7 @@ namespace Shard3D {
 		virtual ~Layer();
 
 		virtual void attach();
-		virtual void attach(VkRenderPass renderPass, GLFWwindow* window);
+		virtual void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window);
 
 		virtual void detach();
 

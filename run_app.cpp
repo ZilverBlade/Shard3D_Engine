@@ -73,8 +73,8 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 
-		layerStack.pushLayer(new TestLayer(), engineRenderer.getSwapChainRenderPass(), nullptr);
-		//layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), nullptr);
+		layerStack.pushLayer(new TestLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, nullptr);
+		layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, nullptr);
 
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -176,7 +176,7 @@ namespace Shard3D {
 
 				// Layer overlays
 				for (Layer* layer : layerStack) {
-					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime);
+					layer->update(frameInfo.commandBuffer, engineWindow.getGLFWwindow(), frameTime);
 				}
 
 				engineRenderer.beginSwapChainRenderPass(commandBuffer); 

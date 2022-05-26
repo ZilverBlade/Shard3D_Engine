@@ -1,6 +1,8 @@
 #include "ImGuiLayer.hpp"
 #include "imgui_implementation.hpp"
 #include <imgui.h>
+#include "../swap_chain.hpp"
+#include "imgui_glfw_implementation.hpp"
 
 namespace Shard3D {
 
@@ -10,7 +12,7 @@ namespace Shard3D {
 
 	}
 
-	void ImGuiLayer::attach(VkRenderPass renderPass, GLFWwindow* window) {
+	void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
         
 
 		ImGui::CreateContext();
@@ -47,23 +49,19 @@ namespace Shard3D {
 
         io.Fonts->AddFontDefault();
         io.Fonts->Build();
-        /*
-        ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = VkInstanceCreateFlagBits;
-        init_info.PhysicalDevice = g_PhysicalDevice;
-        init_info.Device = g_Device;
-        init_info.QueueFamily = g_QueueFamily;
-        init_info.Queue = g_Queue;
-        init_info.PipelineCache = g_PipelineCache;
-        init_info.DescriptorPool = g_DescriptorPool;
 
-        init_info.MinImageCount = g_MinImageCount;
-        init_info.ImageCount = wd->ImageCount;
-        init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-        
+        device->init_info.Device = device->device();
+        device->init_info.Queue = device->graphicsQueue();
+        device->init_info.PipelineCache = VK_NULL_HANDLE;
+              
+       // device->init_info.ImageCount = 0;
+        device->init_info.MSAASamples = device->msaaSamples;
+      
+        ImGui_ImplGlfw_InitForVulkan(window, false);
 
-        ImGui_ImplVulkan_Init(&init_info, renderPass);
-        */
+        ImGui_ImplVulkan_Init(&device->init_info, renderPass);
+
+
 	}
 
 	void ImGuiLayer::detach() {
@@ -79,13 +77,15 @@ namespace Shard3D {
         io.DisplaySize = ImVec2(width, height);
 
         ImGui_ImplVulkan_NewFrame();
+       // ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         static bool visible = true;
         ImGui::ShowDemoWindow(&visible);
 
         ImGui::Render();
-        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), buffer);
+
+        //ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), buffer);
 	}
 
 }

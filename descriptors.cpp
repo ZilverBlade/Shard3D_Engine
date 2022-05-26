@@ -3,6 +3,7 @@
 // std
 #include <cassert>
 #include <stdexcept>
+#include "device.hpp"
 
 namespace Shard3D {
 
@@ -96,6 +97,8 @@ namespace Shard3D {
             VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
         }
+        engineDevice.init_info.DescriptorPool = descriptorPool;
+
     }
 
     EngineDescriptorPool::~EngineDescriptorPool() {

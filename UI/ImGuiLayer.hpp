@@ -7,7 +7,7 @@ namespace Shard3D {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void attach(VkRenderPass renderPass, GLFWwindow* window) override;
+		void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) override;
 		void detach() override;
 		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt) override;
 	private:
