@@ -9,9 +9,7 @@ namespace Shard3D {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
 	ImGuiLayer::~ImGuiLayer() {
-        ImGui_ImplVulkan_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+
 	}
 
 	void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
@@ -72,20 +70,26 @@ namespace Shard3D {
         pool_info.pPoolSizes = pool_sizes;
         vkCreateDescriptorPool(device->device(), &pool_info, nullptr, &descriptorPool);
 
-        ImGui_ImplGlfw_InitForVulkan(window, true);
+
         device->init_info.DescriptorPool = descriptorPool;
         device->init_info.Device = device->device();
         device->init_info.Queue = device->graphicsQueue();
         device->init_info.QueueFamily = device->findPhysicalQueueFamilies().graphicsFamily;
 
         device->init_info.MSAASamples = device->msaaSamples;
-
+        ImGui_ImplGlfw_InitForVulkan(window, true);
         ImGui_ImplVulkan_Init(&device->init_info, renderPass);
-       
+
+        auto commandBuffer = device->beginSingleTimeCommands();
+        ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+        device->endSingleTimeCommands(commandBuffer);
+        ImGui_ImplVulkan_DestroyFontUploadObjects();
 	}
 
 	void ImGuiLayer::detach() {
-
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
 	}
 
 	void ImGuiLayer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt) {
@@ -112,6 +116,7 @@ namespace Shard3D {
         glfwMakeContextCurrent(backup_current_context);
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
+        
        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), buffer); 
 	}
 

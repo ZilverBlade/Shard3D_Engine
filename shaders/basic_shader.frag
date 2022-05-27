@@ -133,8 +133,8 @@ void main(){
 		float lightIntensity = max(dot(surfaceNormal, normalize(directionalLight.direction.xyz)), 0) * wrapDiffuse(surfaceNormal, normalize(directionalLight.direction.xyz), 1.f) ;
 		vec3 color_intensity = directionalLight.color.xyz * directionalLight.color.w ;
 
-		diffuseLight +=  lightIntensity * color_intensity;
-
+		diffuseLight += lightIntensity * color_intensity;
+		
 		if (directionalLight.specularMod != 0.f){
 				// specular 
 		vec3 halfAngle = normalize(directionalLight.position.xyz + vec3(0, -1000.f, 0) - fragPosWorld + viewDirection) * 0.999f;
@@ -145,8 +145,7 @@ void main(){
 		}
 	}
 
-	float d = distance(cameraPosWorld, fragPosWorld);
-	float alpha = getFogFactor(d);
+	float alpha = getFogFactor(distance(cameraPosWorld, fragPosWorld));
 
 		// multiply fragColor by specular only if material is metallic
 	outColor = vec4(mix(diffuseLight * fragColor + specularLight, vec3(0.3f, 0.3f, 0.8f), alpha), 1.0); //RGBA

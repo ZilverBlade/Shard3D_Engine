@@ -154,7 +154,6 @@ namespace Shard3D {
 
 		std::ostringstream sstr;
 
-
 		std::ifstream file{ filepath, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
@@ -440,7 +439,6 @@ namespace Shard3D {
 		}
 		else if (modelType == ModelType::MODEL_TYPE_GLTF) {
 			//assert(indMesh != NULL && "Mesh index may not be 0 (GLTF loader)");
-			
 		}
 	}
 }

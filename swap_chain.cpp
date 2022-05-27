@@ -302,6 +302,7 @@ void EngineSwapChain::createRenderPass() {
   if (vkCreateRenderPass(device.device(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
     throw std::runtime_error("failed to create render pass!");
   }
+
 }
 
 void EngineSwapChain::createFramebuffers() {
@@ -485,20 +486,17 @@ VkPresentModeKHR EngineSwapChain::chooseSwapPresentMode(const std::vector<VkPres
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                 std::cout << "Present mode: Mailbox" << std::endl;
-                return availablePresentMode;
-                //device.init_info.MinImageCount = ImGui_ImplVulkanH_GetMinImageCountFromPresentMode(VK_PRESENT_MODE_MAILBOX_KHR);
+                return availablePresentMode;               
             }
             else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
                 std::cout << "Present mode: Immediate" << std::endl;
                 return availablePresentMode;
-                //device.init_info.MinImageCount = ImGui_ImplVulkanH_GetMinImageCountFromPresentMode(VK_PRESENT_MODE_IMMEDIATE_KHR);
             }
         }
     }
     else if (vsync == "true") {
         std::cout << "Present mode: V-Sync" << std::endl;
         return VK_PRESENT_MODE_FIFO_KHR;
-        //device.init_info.MinImageCount = ImGui_ImplVulkanH_GetMinImageCountFromPresentMode(VK_PRESENT_MODE_FIFO_KHR);
     } else {
         std::cout << "Invalid present mode chosen: " << ini.GetValue("DISPLAY", "V-Sync") << std::endl;
     }

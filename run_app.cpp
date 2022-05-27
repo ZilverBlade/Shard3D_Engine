@@ -74,7 +74,7 @@ namespace Shard3D {
 		}
 
 		layerStack.pushLayer(new TestLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow());
-		//layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow());
+		layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow());
 
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -172,25 +172,32 @@ namespace Shard3D {
 					- UI
 
 					Also reflections and Postfx
+
+					LAYERS MUST BE LOADED LAST!
 				*/
 
-				// Layer overlays
-				for (Layer* layer : layerStack) {
-					layer->update(frameInfo.commandBuffer, engineWindow.getGLFWwindow(), frameTime);
-				}
-
+				
 				engineRenderer.beginSwapChainRenderPass(commandBuffer); 
 
-
 				basicRenderSystem.renderGameObjects(frameInfo);
+
+				
 				gridSystem.render(frameInfo);
 				pointlightSystem.render(frameInfo);
 				spotlightSystem.render(frameInfo);
 				directionalLightSystem.render(frameInfo);
 
+
+				// Layer overlays
+				for (Layer* layer : layerStack) {
+					layer->update(frameInfo.commandBuffer, engineWindow.getGLFWwindow(), frameTime);
+				}
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 				engineRenderer.endFrame();
 			}
+		}
+		for (Layer* layer : layerStack) {
+			layer->detach();
 		}
 		vkDeviceWaitIdle(engineDevice.device());
 	}
@@ -239,8 +246,8 @@ namespace Shard3D {
 		cylinder.transform.scale = { .5f, .5f, .5f };
 		cylinder.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cylinder.getId(), std::move(cylinder));
-		/*
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj");
+		
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
 
 		auto quad = EngineGameObject::createGameObject();
 		quad.model = model;
@@ -248,7 +255,7 @@ namespace Shard3D {
 		quad.transform.scale = { 100.f, 1.f, 100.f };
 		quad.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(quad.getId(), std::move(quad));
-		*/
+		
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ);
 
 		auto cone = EngineGameObject::createGameObject();
