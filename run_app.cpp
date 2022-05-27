@@ -105,7 +105,6 @@ namespace Shard3D {
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
 	
-
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!engineWindow.shouldClose()) {
 			glfwPollEvents();
@@ -132,8 +131,8 @@ namespace Shard3D {
 			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
 				glfwGetWindowSize(engineWindow.getGLFWwindow(), &engineWindow.windowWidth, &engineWindow.windowHeight);
 				engineWindow.toggleFullscreen();
-			}
-			
+			}	
+
 			if (auto commandBuffer = engineRenderer.beginFrame()) {
 				int frameIndex = engineRenderer.getFrameIndex();
 				FrameInfo frameInfo{
@@ -191,7 +190,6 @@ namespace Shard3D {
 
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 				engineRenderer.endFrame();
-
 			}
 		}
 		vkDeviceWaitIdle(engineDevice.device());
@@ -199,7 +197,7 @@ namespace Shard3D {
 
 	void RunApp::loadGameObjects() {	
 
-		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", false); //dont index because model breaks
+		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
 		auto fart = EngineGameObject::createGameObject();
 		fart.model = model;
@@ -215,7 +213,7 @@ namespace Shard3D {
 		fart2.transform.rotation = { glm::radians(90.f), glm::radians(90.f), 0.f };
 		gameObjects.emplace(fart2.getId(), std::move(fart2));
 
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/colored_cube.obj");
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/colored_cube.obj", ModelType::MODEL_TYPE_OBJ);
 
 		auto ccube = EngineGameObject::createGameObject();
 		ccube.model = model;
@@ -224,7 +222,7 @@ namespace Shard3D {
 		ccube.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(ccube.getId(), std::move(ccube));
 
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/sphere.obj", false);
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/sphere.obj", ModelType::MODEL_TYPE_OBJ, false);
 
 		auto sphere = EngineGameObject::createGameObject();
 		sphere.model = model;
@@ -233,7 +231,7 @@ namespace Shard3D {
 		sphere.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(sphere.getId(), std::move(sphere));
 
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cylinder.obj");
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cylinder.obj", ModelType::MODEL_TYPE_OBJ);
 
 		auto cylinder = EngineGameObject::createGameObject();
 		cylinder.model = model;
@@ -251,7 +249,7 @@ namespace Shard3D {
 		quad.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(quad.getId(), std::move(quad));
 		*/
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj");
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ);
 
 		auto cone = EngineGameObject::createGameObject();
 		cone.model = model;

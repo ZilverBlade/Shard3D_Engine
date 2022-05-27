@@ -19,7 +19,6 @@ namespace Shard3D {
         vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
     }
 
-
     void GridSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
         std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
 
@@ -36,25 +35,48 @@ namespace Shard3D {
     }
 
     void GridSystem::createPipeline(VkRenderPass renderPass) {
-        assert(pipelineLayout != VK_NULL_HANDLE && "Cannot create pipeline before pipeline layout");
+        assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
         PipelineConfigInfo pipelineConfig{};
         EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
-        EnginePipeline::enableAlphaBlending(pipelineConfig);
+        EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
+
+        pipelineConfig.attributeDescriptions.clear();
+        pipelineConfig.bindingDescriptions.clear();
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-        pipelineConfig.bindingDescriptions.clear();
-        pipelineConfig.attributeDescriptions.clear();
-        pipelineConfig.colorBlendAttachment.blendEnable = VK_TRUE;
-        pipelineConfig.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-        pipelineConfig.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 
         enginePipeline = std::make_unique<EnginePipeline>(
             engineDevice,
             "shaders/grid.vert.spv",
             "shaders/grid.frag.spv",
             pipelineConfig
-           );
+        );
+    }
+
+    void GridSystem::recreatePipeline(VkRenderPass renderPass) {
+        enginePipeline->destroyGraphicsPipeline();
+       vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
+
+
+//assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+        PipelineConfigInfo pipelineConfig{};
+        EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
+        EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
+
+        pipelineConfig.attributeDescriptions.clear();
+        pipelineConfig.bindingDescriptions.clear();
+        pipelineConfig.renderPass = renderPass;
+        pipelineConfig.pipelineLayout = pipelineLayout;
+
+        enginePipeline = std::make_unique<EnginePipeline>(
+            engineDevice,
+            "shaders/grid.vert.spv",
+            "shaders/grid.frag.spv",
+            pipelineConfig,
+            true
+       );
     }
 
     void GridSystem::render(FrameInfo& frameInfo) {

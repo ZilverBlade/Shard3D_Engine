@@ -53,7 +53,7 @@ namespace Shard3D {
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
-		EnginePipeline::enableAlphaBlending(pipelineConfig);
+		EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
 		pipelineConfig.attributeDescriptions.clear();
 		pipelineConfig.bindingDescriptions.clear();
 		pipelineConfig.renderPass = renderPass;
@@ -63,7 +63,7 @@ namespace Shard3D {
 			"shaders/pointlight.vert.spv",
 			"shaders/pointlight.frag.spv",
 			pipelineConfig
-			);
+		);
 	}
 
 	void PointlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {

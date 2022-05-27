@@ -8,8 +8,18 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+#include <json.hpp>
+
+using json = nlohmann::json;
 
 namespace Shard3D {
+
+	enum class ModelType {
+		MODEL_TYPE_OBJ,
+		MODEL_TYPE_GLTF,
+		MODEL_TYPE_FBX,
+		MODEL_TYPE_COLLADA
+	};
 
 	class EngineModel {
 
@@ -33,8 +43,8 @@ namespace Shard3D {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
 
-			void loadIndexedModel(const std::string& filepath);
-			void loadModel(const std::string& filepath);
+			void loadIndexedModel(const std::string& filepath, ModelType modelType);
+			void loadModel(const std::string& filepath, ModelType modelType);
 		};
 
 		EngineModel(EngineDevice &device, const EngineModel::Builder &builder);
@@ -43,10 +53,11 @@ namespace Shard3D {
 		EngineModel(const EngineModel&) = delete;
 		EngineModel& operator=(const EngineModel&) = delete;
 		
-		static std::unique_ptr<EngineModel> createModelFromFile(EngineDevice& device, const std::string& filepath, bool indexModel = true);
+		static std::unique_ptr<EngineModel> createModelFromFile(EngineDevice& device, const std::string& filepath, ModelType modelType, bool indexModel = true);
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
+
 		
 	private:
 		void createVertexBuffers(const std::vector<Vertex> &vertices);
@@ -60,5 +71,26 @@ namespace Shard3D {
 		bool hasIndexBuffer = false;
 		std::unique_ptr<EngineBuffer> indexBuffer;
 		uint32_t indexCount;
+
+#pragma region GLTF
+		json JSON;
+		std::vector<UCHAR> data;
+		void gltfInitialiseShit(const std::string& filepath);
+		std::vector<UCHAR> gltfGetData(const std::string& filepath);
+		std::vector<float> gltfGetFloats(json accessor);
+		std::vector<GLuint> gltfGetIndices(json accessor);
+		
+		std::vector<Vertex> assembleVertices(
+			std::vector<glm::vec3> positions,
+			std::vector<glm::vec3> normals,
+			//std::vector<glm::vec3> colors,
+			std::vector<glm::vec2> texCoords
+		);
+
+		std::vector<glm::vec2> gltfGroupFloatsVec2(std::vector<float> floatVec);
+		std::vector<glm::vec3> gltfGroupFloatsVec3(std::vector<float> floatVec);
+		std::vector<glm::vec4> gltfGroupFloatsVec4(std::vector<float> floatVec);
+		void loadGLTFMesh(uint32_t indMesh);
+#pragma endregion	
 	};
 }

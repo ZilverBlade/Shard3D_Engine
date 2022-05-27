@@ -23,11 +23,13 @@ namespace Shard3D {
 		GridSystem& operator=(const GridSystem&) = delete;
 
 		void render(FrameInfo& frameInfo);
-
+		void recreatePipeline(VkRenderPass renderPass);
 	private:
 
 		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
+
+
 
 		EngineDevice& engineDevice;
 

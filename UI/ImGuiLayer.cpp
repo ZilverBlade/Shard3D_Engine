@@ -12,7 +12,6 @@ namespace Shard3D {
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-
 	}
 
 	void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
@@ -102,13 +101,15 @@ namespace Shard3D {
         ImGui::NewFrame();
         ImGui::Begin("Hello, world!");
         ImGui::Text("This is some useful text.");
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", dt, 1/dt);
 
         static bool visible = true;
         ImGui::ShowDemoWindow(&visible);
         ImGui::End();
     
         ImGui::Render();
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        glfwMakeContextCurrent(backup_current_context);
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), buffer); 

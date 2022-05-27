@@ -11,8 +11,15 @@ namespace Shard3D {
 		EngineDevice& device,
 		const std::string& vertFilePath,
 		const std::string& fragFilePath,
-		const PipelineConfigInfo& configInfo)
+		const PipelineConfigInfo& configInfo, 
+		bool recreate
+	)
 		: engineDevice{device} {
+		if (!recreate) { createGraphicsPipeline(vertFilePath, fragFilePath, configInfo); return; }
+
+		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
+		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
+		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
 		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
 	}
 
@@ -108,6 +115,15 @@ namespace Shard3D {
 		}
 	}
 
+	void EnginePipeline::destroyGraphicsPipeline( 
+	) {
+		/*
+		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
+		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
+		*/
+		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
+	}
+
 	void EnginePipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -198,7 +214,7 @@ namespace Shard3D {
 		configInfo.attributeDescriptions = EngineModel::Vertex::getAttributeDescriptions();
 	 }
 
-	void EnginePipeline::enableAlphaBlending(PipelineConfigInfo& configInfo) {
+	void EnginePipeline::enableAlphaBlending(PipelineConfigInfo& configInfo, VkBlendOp blendOp) {
 		configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 		configInfo.colorBlendAttachment.colorWriteMask =
 			VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
@@ -208,6 +224,6 @@ namespace Shard3D {
 		configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;             
 		configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; 
 		configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-		configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;            
+		configInfo.colorBlendAttachment.alphaBlendOp = blendOp;
 	}
 }

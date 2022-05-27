@@ -33,7 +33,8 @@ namespace Shard3D {
 			EngineDevice &device, 
 			const std::string& vertFilePath, 
 			const std::string& fragFilePath, 
-			const PipelineConfigInfo& configInfo
+			const PipelineConfigInfo& configInfo,
+			bool recreate = false
 		);
 		~EnginePipeline();
 
@@ -44,7 +45,9 @@ namespace Shard3D {
 		void bind(VkCommandBuffer commandBuffer);
 
 		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
-		static void enableAlphaBlending(PipelineConfigInfo& configInfo);
+		static void enableAlphaBlending(PipelineConfigInfo& configInfo, VkBlendOp blendOp);
+
+		void destroyGraphicsPipeline();
 
 	private:
 		static std::vector<char> readFile(const std::string& filePath);
@@ -54,6 +57,7 @@ namespace Shard3D {
 			const std::string& fragFilePath,
 			const PipelineConfigInfo& configInfo
 		);
+
 
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
