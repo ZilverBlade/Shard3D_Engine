@@ -2,7 +2,8 @@
 
 #include "../game_object.hpp"
 #include "../engine_window.hpp"
-
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 namespace Shard3D {
 	namespace controller {
 		class MouseMovementController {
@@ -19,7 +20,8 @@ namespace Shard3D {
 
 		private:
 
-			glm::vec3 orientation{ 0.f, 0.f, glm::radians(360.f) };;
+			glm::vec3 orientation{ .0f, .0f, glm::radians(360.0f )};
+			glm::vec3 upVec{ 0.f, 1.f, 0.f };
 			bool firstClick = true;
 			//GLFWscrollfun scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 		};

@@ -28,29 +28,27 @@ namespace Shard3D {
 				double mouseY;
 				glfwGetCursorPos(window, &mouseX, &mouseY);
 
-				// Normalizes and shifts the coordinates of the cursor such that they begin in the middle of the screen
-				// and then "transforms" them into degrees
 				float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
 				float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
 
-				// Calculates upcoming vertical change in the Orientation
-				glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(rotY), glm::normalize(glm::cross(orientation, glm::vec3(0.f, 1.f, 0.f))));
-
-				// Decides whether or not the next vertical Orientation is legal or not
-				//if (abs(glm::angle(newOrientation, glm::vec3(0.f, -1.f, 0.f)) - glm::radians(90.0f)) <= glm::radians(85.0f)) {
+				// up down rotation
+				glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), upVec);
+				// check if can rotate up down
+				if (abs(glm::angle(newOrientation, glm::vec3(1.f, 0.f, 0.f)) - glm::radians(90.0f)) < glm::radians(90.0f)) {
 					orientation = newOrientation;
-				//}
-
-				// Rotates the Orientation left and right
-				orientation = glm::rotate(orientation, glm::radians(-rotX), glm::vec3(0.f, 1.f, 0.f));
-
-				//std::cout << orientation.x << orientation.y << orientation.z << "\n";
+				}
+				// left right rotation
+				orientation = glm::rotate(orientation, glm::radians(rotY), glm::normalize(glm::cross(orientation, upVec)));
+	
+				// force the roll to be pi*2 radians
+				orientation.z = glm::radians(360.f);
+				
 				glfwSetCursorPos(window, (width / 2), (height / 2));
 			}
 			else { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); firstClick = true; }
 
 			if (glm::dot(orientation, orientation) > std::numeric_limits<float>::epsilon()) {
-				gameObject.transform.rotation = { orientation.x, orientation.y, glm::radians(360.f) };
+				gameObject.transform.rotation = orientation;
 			}
 		}
 		/*
