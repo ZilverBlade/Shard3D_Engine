@@ -280,8 +280,8 @@ namespace Shard3D {
         // Submit the DockSpace
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
             ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-           // ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
-            ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoDockingInCentralNode);
+            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
+         //   ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoDockingInCentralNode);
         }
 
         if (ImGui::BeginMenuBar()) {

@@ -4,6 +4,9 @@
 #include "utils/definitions.hpp"
 #include <iostream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 namespace Shard3D {
 
 	EngineWindow::EngineWindow(int w, int h, std::string name) : width{ w }, height{ h }, windowName{ name } {
@@ -34,6 +37,10 @@ namespace Shard3D {
 		window = glfwCreateWindow(ini.GetLongValue("WINDOW", "DEFAULT_WIDTH"), ini.GetLongValue("WINDOW", "DEFAULT_HEIGHT"), ini.GetValue("WINDOW", "WindowName"), nullptr, nullptr);
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+		GLFWimage images[1];
+		images[0].pixels = stbi_load(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		glfwSetWindowIcon(window, 1, images);
+		stbi_image_free(images[0].pixels);
 
 		monitor = glfwGetPrimaryMonitor();
 

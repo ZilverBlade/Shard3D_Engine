@@ -30,9 +30,6 @@ namespace Shard3D {
 		RunApp& operator=(const RunApp&) = delete;
 
 		void run();
-
-		void pushLayer(Layer* layer);
-		void pushOverlay(Layer* overlay);
 	private:
 		void loadGameObjects();
 		LayerStack layerStack;
