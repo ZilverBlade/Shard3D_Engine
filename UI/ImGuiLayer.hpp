@@ -3,7 +3,6 @@
 
 namespace Shard3D {
 
-	static ImGui_ImplVulkanH_Window mainWindowData;
 	class ImGuiLayer : public Shard3D::Layer {
 	public:
 		ImGuiLayer();
@@ -17,7 +16,34 @@ namespace Shard3D {
 		int width;
 		int height;
 		VkDescriptorPool descriptorPool;
-		
+		bool hasBeenDetached = false;
+
+		bool showStatsWindow = false;
+		bool showEngineSettingsWindow = false;
+
+		struct EngineSettings {	
+			// WINDOW
+			int DEFAULT_WIDTH{};
+			int DEFAULT_HEIGHT{};
+			bool Resizable{};
+			char WindowName[64]{};
+
+			// RENDERING
+			int ViewCombo{};
+			float NearClipDistance{};
+			float FarClipDistance{};
+			float FOV{};
+			float defaultBGColor[3] = {0.f, 0.f, 0.f};
+		};
+
+		struct EditorPreferences {
+			// WINDOW
+			bool antiAliasedUI = true;
+			ImGuiColorEditFlags displayFloatOr255 = ImGuiColorEditFlags_Float;
+		};
+
+		EngineSettings enset;
+		EditorPreferences edpref;
 	};
 
 }

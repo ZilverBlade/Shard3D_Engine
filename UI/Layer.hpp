@@ -2,7 +2,7 @@
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 #include "../device.hpp"
-
+#include "../utils/definitions.hpp"
 namespace Shard3D {
 	class Layer {
 	public:

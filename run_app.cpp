@@ -174,6 +174,8 @@ namespace Shard3D {
 					Also reflections and Postfx
 
 					LAYERS MUST BE LOADED LAST!
+
+					Also order absolutely matters, post processing for example must go last
 				*/
 
 				
@@ -181,17 +183,17 @@ namespace Shard3D {
 
 				basicRenderSystem.renderGameObjects(frameInfo);
 
-				
-				gridSystem.render(frameInfo);
 				pointlightSystem.render(frameInfo);
 				spotlightSystem.render(frameInfo);
 				directionalLightSystem.render(frameInfo);
 
+				gridSystem.render(frameInfo);
 
 				// Layer overlays
 				for (Layer* layer : layerStack) {
 					layer->update(frameInfo.commandBuffer, engineWindow.getGLFWwindow(), frameTime);
 				}
+
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 				engineRenderer.endFrame();
 			}

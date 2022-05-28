@@ -22,6 +22,11 @@ namespace Shard3D {
 		overlay->attach(renderPass, device, window);
 	}
 
+	void LayerStack::repushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
+		//layers.emplace_back(overlay);
+		overlay->attach(renderPass, device, window);
+	}
+
 	void LayerStack::popLayer(Layer* layer) {
 		auto iter = std::find(layers.begin(), layers.end(), layer);
 		if (iter != layers.end()) {
