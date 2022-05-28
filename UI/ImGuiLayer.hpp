@@ -1,5 +1,9 @@
 #pragma once
 #include "Layer.hpp"
+#include "../pipeline.hpp"
+
+#include <memory>
+#include <vector>
 
 namespace Shard3D {
 
@@ -11,11 +15,11 @@ namespace Shard3D {
 		void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) override;
 		void detach() override;
 		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt) override;
-
 	private:
 		int width;
 		int height;
 		VkDescriptorPool descriptorPool;
+
 		bool hasBeenDetached = false;
 
 		bool showStatsWindow = false;

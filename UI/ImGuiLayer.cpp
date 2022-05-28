@@ -1,11 +1,13 @@
 #include "ImGuiLayer.hpp"
 #include "imgui_implementation.hpp"
+
 #include <imgui.h>
 #include "imgui_glfw_implementation.hpp"
 #include <stdexcept>
 #include <iostream>
 #include "..\engine_logger.hpp"
 #define GLFW_INCLUDE_VULKAN
+
 namespace Shard3D {
 
 
@@ -19,12 +21,12 @@ namespace Shard3D {
         hasBeenDetached = false;
         ImGui::CreateContext();
 
-
         ImGuiIO& io = ImGui::GetIO();
         io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
         io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
         io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
         io.ConfigDockingWithShift = true;
         // temp
         io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
@@ -90,13 +92,12 @@ namespace Shard3D {
         ImGui_ImplVulkan_DestroyFontUploadObjects();
 
         ImGuiStyle& style = ImGui::GetStyle();
-        ImVec4* colors = style.Colors;
-
+        ImVec4* colors = ImGui::GetStyle().Colors;
         colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         colors[ImGuiCol_TextDisabled] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
-        colors[ImGuiCol_ChildBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
         colors[ImGuiCol_WindowBg] = ImVec4(0.07f, 0.07f, 0.07f, 1.00f);
-        colors[ImGuiCol_PopupBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
+        colors[ImGuiCol_ChildBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+        colors[ImGuiCol_PopupBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
         colors[ImGuiCol_Border] = ImVec4(0.12f, 0.12f, 0.12f, 0.71f);
         colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
         colors[ImGuiCol_FrameBg] = ImVec4(0.42f, 0.42f, 0.42f, 0.54f);
@@ -105,36 +106,51 @@ namespace Shard3D {
         colors[ImGuiCol_TitleBg] = ImVec4(0.01f, 0.01f, 0.04f, 1.00f);
         colors[ImGuiCol_TitleBgActive] = ImVec4(0.01f, 0.01f, 0.04f, 1.00f);
         colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.17f, 0.17f, 0.17f, 0.90f);
-        colors[ImGuiCol_MenuBarBg] = ImVec4(0.035f, 0.035f, 0.035f, 0.900f);
+        colors[ImGuiCol_MenuBarBg] = ImVec4(0.04f, 0.04f, 0.04f, 0.90f);
         colors[ImGuiCol_ScrollbarBg] = ImVec4(0.24f, 0.24f, 0.24f, 0.53f);
         colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
         colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.52f, 0.52f, 0.52f, 1.00f);
         colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.76f, 0.76f, 0.76f, 1.00f);
-        colors[ImGuiCol_CheckMark] = ImVec4(0.65f, 0.65f, 0.65f, 1.00f);
-        colors[ImGuiCol_SliderGrab] = ImVec4(0.52f, 0.52f, 0.52f, 1.00f);
-        colors[ImGuiCol_SliderGrabActive] = ImVec4(0.64f, 0.64f, 0.64f, 1.00f);
-        colors[ImGuiCol_Button] = ImVec4(0.24f, 0.24f, 0.24f, 0.35f);
+        colors[ImGuiCol_CheckMark] = ImVec4(1.00f, 0.42f, 1.00f, 1.00f);
+        colors[ImGuiCol_SliderGrab] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+        colors[ImGuiCol_SliderGrabActive] = ImVec4(0.44f, 0.44f, 0.44f, 1.00f);
+        colors[ImGuiCol_Button] = ImVec4(0.17f, 0.17f, 0.17f, 0.35f);
         colors[ImGuiCol_ButtonHovered] = ImVec4(0.32f, 0.32f, 0.32f, 0.59f);
         colors[ImGuiCol_ButtonActive] = ImVec4(0.36f, 0.16f, 0.96f, 1.00f);
         colors[ImGuiCol_Header] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
         colors[ImGuiCol_HeaderHovered] = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
         colors[ImGuiCol_HeaderActive] = ImVec4(0.36f, 0.36f, 0.36f, 0.77f);
-        colors[ImGuiCol_Separator] = ImVec4(0.000f, 0.000f, 0.000f, 0.537f);
-        colors[ImGuiCol_SeparatorHovered] = ImVec4(0.700f, 0.671f, 0.600f, 0.290f);
+        colors[ImGuiCol_Separator] = ImVec4(0.00f, 0.00f, 0.00f, 0.54f);
+        colors[ImGuiCol_SeparatorHovered] = ImVec4(0.70f, 0.67f, 0.60f, 0.29f);
         colors[ImGuiCol_SeparatorActive] = ImVec4(0.36f, 0.16f, 0.96f, 1.00f);
-        colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.25f);
-        colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-        colors[ImGuiCol_ResizeGripActive] = ImVec4(0.36f, 0.16f, 0.96f, 1.00f);
+        colors[ImGuiCol_ResizeGrip] = ImVec4(0.46f, 0.24f, 1.00f, 0.25f);
+        colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.69f, 0.30f, 1.00f, 0.67f);
+        colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 0.00f, 0.96f, 1.00f);
+        colors[ImGuiCol_Tab] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+        colors[ImGuiCol_TabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+        colors[ImGuiCol_TabActive] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
+        colors[ImGuiCol_TabUnfocused] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+        colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
+        colors[ImGuiCol_DockingPreview] = ImVec4(0.85f, 0.85f, 0.85f, 0.28f);
+        colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
         colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
         colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
         colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
         colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+        colors[ImGuiCol_TableHeaderBg] = ImVec4(0.19f, 0.19f, 0.20f, 1.00f);
+        colors[ImGuiCol_TableBorderStrong] = ImVec4(0.31f, 0.31f, 0.35f, 1.00f);
+        colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
+        colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
         colors[ImGuiCol_TextSelectedBg] = ImVec4(0.73f, 0.73f, 0.73f, 0.35f);
-        colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
         colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
         colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+        colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+
+
+
 
         style.PopupRounding = 3;
 
@@ -214,7 +230,6 @@ namespace Shard3D {
         ini.SetUnicode();
         ini.LoadFile(ENGINE_SETTINGS_PATH);
 
-
         ImGuiIO& io = ImGui::GetIO();
         io.DeltaTime = dt;
 
@@ -224,10 +239,11 @@ namespace Shard3D {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
        
         static bool visible = true;
-       // ImGui::ShowDemoWindow(&visible);
+
+        ImGui::ShowDemoWindow(&visible);
+
 #pragma region DOCKSPACE    
         static bool opt_fullscreen = true;
         static bool opt_padding = false;
@@ -264,14 +280,16 @@ namespace Shard3D {
         // Submit the DockSpace
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
             ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+           // ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
+            ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoDockingInCentralNode);
         }
 
         if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("Shard3D")) {
+            if (ImGui::BeginMenu("File")) {
                 // Disabling fullscreen would allow the window to be moved to the front of other windows,
                 // which we can't undo at the moment without finer window depth/z control.
-                ImGui::MenuItem("World Builder (Shard3D Version 1.0.5)");
+
+                ImGui::TextDisabled("World Builder3D 0.1");
                 ImGui::Separator();
                 if (ImGui::MenuItem("Engine Settings", NULL /*make sure to add some sort of shardcut */)) { showEngineSettingsWindow = true; }
                 if (ImGui::MenuItem("World Builder Settings", NULL /*make sure to add some sort of shardcut */)) { /*show editor win*/ }
@@ -279,33 +297,39 @@ namespace Shard3D {
                 ImGui::Checkbox("Stats", &showStatsWindow);
                 ImGui::Separator();
 
-                if (ImGui::MenuItem("Close World Builder", "")) { detach(); return; }
+                if (ImGui::MenuItem("Close World Builder3D", "")) { detach(); return; }
                 ImGui::Separator();
+
 
                 ImGui::EndMenu();
             }          
+            ImTextureID texID; 
+
             ImGui::EndMenuBar();
         }
 
         if (showStatsWindow) {
             ImGui::Begin("Stats");
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", dt*1000, 1 / dt);
+            if (ImGui::CollapsingHeader("ImGui Metrics")) {
+                ImGui::ShowStyleEditor();
+            }
             ImGui::End();
         }
 
         if (showEngineSettingsWindow) {
-            ImGui::Begin("Engine Settings");
+            ImGui::Begin("Engine Settings", &showEngineSettingsWindow);
              if (ImGui::CollapsingHeader("Window", ImGuiTreeNodeFlags_None)) {
-                 ImGui::InputInt("DEFAULT_WIDTH", &enset.DEFAULT_WIDTH, 5, 50);
-                 ImGui::InputInt("DEFAULT_HEIGHT", &enset.DEFAULT_HEIGHT, 5, 50);
+                 ImGui::InputInt("Default width", &enset.DEFAULT_WIDTH, 5, 50);
+                 ImGui::InputInt("Default height", &enset.DEFAULT_HEIGHT, 5, 50);
                  ImGui::Checkbox("Resizable", &enset.Resizable);
-                 ImGui::InputText("WindowName", enset.WindowName, IM_ARRAYSIZE(enset.WindowName));
+                 ImGui::InputText("Window name", enset.WindowName, IM_ARRAYSIZE(enset.WindowName));
              }        
              if (ImGui::CollapsingHeader("Rendering", ImGuiTreeNodeFlags_None)) {
                  ImGui::Combo("View", &enset.ViewCombo, "Perspective\0Orthographic");
 
-                 ImGui::SliderFloat("NearClipDistance", &enset.NearClipDistance, 0.000000001, 2);
-                 ImGui::SliderFloat("FarClipDistance", &enset.FarClipDistance, 16, 32767);
+                 ImGui::SliderFloat("Near clip distance", &enset.NearClipDistance, 0.000000001, 2);
+                 ImGui::SliderFloat("Far clip distance", &enset.FarClipDistance, 16, 32767);
                  ImGui::SliderFloat("FOV", &enset.FOV, 10, 180);
                  ImGui::ColorPicker3("Default world background colour", enset.defaultBGColor, edpref.displayFloatOr255);
              }
@@ -357,12 +381,13 @@ namespace Shard3D {
         ImGui::End();
 #pragma endregion
         ImGui::Render();
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        glfwMakeContextCurrent(backup_current_context);
+
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), buffer);
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        
-       ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), buffer); 
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        glfwMakeContextCurrent(backup_current_context);
+
 
 
 	}

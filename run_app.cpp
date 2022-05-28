@@ -191,9 +191,8 @@ namespace Shard3D {
 
 				// Layer overlays
 				for (Layer* layer : layerStack) {
-					layer->update(frameInfo.commandBuffer, engineWindow.getGLFWwindow(), frameTime);
+					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime);
 				}
-
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 				engineRenderer.endFrame();
 			}

@@ -30,7 +30,6 @@ namespace Shard3D {
 		void createPipeline(VkRenderPass renderPass);
 
 
-
 		EngineDevice& engineDevice;
 
 		std::unique_ptr<EnginePipeline> enginePipeline;
