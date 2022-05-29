@@ -2,6 +2,7 @@
 #include "imgui_implementation.hpp"
 
 #include <imgui.h>
+
 #include "imgui_glfw_implementation.hpp"
 #include <stdexcept>
 #include <iostream>
@@ -18,7 +19,12 @@ namespace Shard3D {
 	}
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
+
+        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (EDITOR) (PHYSICS: null)");
         hasBeenDetached = false;
+
+        nodeEditorContext = ax::NodeEditor::CreateEditor();
+
         ImGui::CreateContext();
 
         ImGuiIO& io = ImGui::GetIO();
@@ -219,11 +225,11 @@ namespace Shard3D {
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
+        ax::NodeEditor::DestroyEditor(nodeEditorContext);
         hasBeenDetached = true;
 	}
 
-	void ImGuiLayer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt) {
-
+    void ImGuiLayer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt) {
         if (hasBeenDetached) return;
 
         CSimpleIniA ini;
@@ -239,10 +245,12 @@ namespace Shard3D {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-       
+
+        ax::NodeEditor::SetCurrentEditor(nodeEditorContext);
+
         static bool visible = true;
 
-        ImGui::ShowDemoWindow(&visible);
+        //ImGui::ShowDemoWindow(&visible);
 
 #pragma region DOCKSPACE    
         static bool opt_fullscreen = true;
@@ -280,8 +288,8 @@ namespace Shard3D {
         // Submit the DockSpace
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
             ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
-         //   ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoDockingInCentralNode);
+            //   ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
+            ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         }
 
         if (ImGui::BeginMenuBar()) {
@@ -289,29 +297,67 @@ namespace Shard3D {
                 // Disabling fullscreen would allow the window to be moved to the front of other windows,
                 // which we can't undo at the moment without finer window depth/z control.
 
-                ImGui::TextDisabled("World Builder3D 0.1");
+                ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
                 if (ImGui::MenuItem("Engine Settings", NULL /*make sure to add some sort of shardcut */)) { showEngineSettingsWindow = true; }
-                if (ImGui::MenuItem("World Builder Settings", NULL /*make sure to add some sort of shardcut */)) { /*show editor win*/ }
+                if (ImGui::MenuItem("WorldBuilder3D Settings", NULL /*make sure to add some sort of shardcut */)) { /*show editor win*/ }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Material Builder", NULL /*make sure to add some sort of shardcut */)) {
+                    showTest = true;
+                }
                 ImGui::Separator();
                 ImGui::Checkbox("Stats", &showStatsWindow);
                 ImGui::Separator();
 
-                if (ImGui::MenuItem("Close World Builder3D", "")) { detach(); return; }
+                if (ImGui::MenuItem("Close WorldBuilder3D", "")) { detach(); return; }
                 ImGui::Separator();
 
 
                 ImGui::EndMenu();
-            }          
-            ImTextureID texID; 
+            }
+            ImTextureID texID;
 
             ImGui::EndMenuBar();
         }
 
+        if (showTest) {
+            ImGui::Begin("Material editor");
+            ax::NodeEditor::Begin("Matedit BP");
+            int uniqueId = 1;
+
+            // Start drawing nodes.
+            ax::NodeEditor::BeginNode(uniqueId++);
+            ImGui::Text("Material");
+            ax::NodeEditor::PinPivotSize(ImVec2(8, 8));
+            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            ImGui::Text("Diffuse");
+            ax::NodeEditor::EndPin();
+
+            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            ImGui::Text("Specular");
+            ax::NodeEditor::EndPin();
+            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            ImGui::Text("Roughness");
+            ax::NodeEditor::EndPin();
+            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            ImGui::Text("Metalcy");
+            ax::NodeEditor::EndPin();
+            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            ImGui::Text("Reflectiveness");
+            ax::NodeEditor::EndPin();
+
+            ImGui::SameLine();
+            ax::NodeEditor::EndNode();
+            ax::NodeEditor::End();
+            ImGui::End();
+        }
+
         if (showStatsWindow) {
             ImGui::Begin("Stats");
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", dt*1000, 1 / dt);
-            if (ImGui::CollapsingHeader("ImGui Metrics")) {
+            timeSinceLastSecond += dt;
+            if (timeSinceLastSecond > 1.f) { deltaTimeFromLastSecond = dt; timeSinceLastSecond = 0; }
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", deltaTimeFromLastSecond * 1000, 1 / deltaTimeFromLastSecond);
+            if (ImGui::CollapsingHeader("style editor")) {
                 ImGui::ShowStyleEditor();
             }
             ImGui::End();
@@ -319,64 +365,66 @@ namespace Shard3D {
 
         if (showEngineSettingsWindow) {
             ImGui::Begin("Engine Settings", &showEngineSettingsWindow);
-             if (ImGui::CollapsingHeader("Window", ImGuiTreeNodeFlags_None)) {
-                 ImGui::InputInt("Default width", &enset.DEFAULT_WIDTH, 5, 50);
-                 ImGui::InputInt("Default height", &enset.DEFAULT_HEIGHT, 5, 50);
-                 ImGui::Checkbox("Resizable", &enset.Resizable);
-                 ImGui::InputText("Window name", enset.WindowName, IM_ARRAYSIZE(enset.WindowName));
-             }        
-             if (ImGui::CollapsingHeader("Rendering", ImGuiTreeNodeFlags_None)) {
-                 ImGui::Combo("View", &enset.ViewCombo, "Perspective\0Orthographic");
+            if (ImGui::CollapsingHeader("Window", ImGuiTreeNodeFlags_None)) {
+                ImGui::InputInt("Default width", &enset.DEFAULT_WIDTH, 5, 50);
+                ImGui::InputInt("Default height", &enset.DEFAULT_HEIGHT, 5, 50);
+                ImGui::Checkbox("Resizable", &enset.Resizable);
+                ImGui::InputText("Window name", enset.WindowName, IM_ARRAYSIZE(enset.WindowName));
+            }
+            if (ImGui::CollapsingHeader("Rendering", ImGuiTreeNodeFlags_None)) {
+                ImGui::Combo("View", &enset.ViewCombo, "Perspective\0Orthographic");
 
-                 ImGui::SliderFloat("Near clip distance", &enset.NearClipDistance, 0.000000001, 2);
-                 ImGui::SliderFloat("Far clip distance", &enset.FarClipDistance, 16, 32767);
-                 ImGui::SliderFloat("FOV", &enset.FOV, 10, 180);
-                 ImGui::ColorPicker3("Default world background colour", enset.defaultBGColor, edpref.displayFloatOr255);
-             }
-             /*
-             if (ImGui::CollapsingHeader("Engine Limits", ImGuiTreeNodeFlags_None)) {
-                 ImGui::SliderInt("MaxPointlights", nullptr, 1, 50);
-                 ImGui::SliderInt("MaxSpotlights", nullptr, 1, 50);
-                 ImGui::SliderInt("MaxDirectionalLights", nullptr, 1, 10);
-                 ImGui::SliderInt("MaxFramesInFlight", nullptr, 1, 16);
-             }
-             */
-             if (ImGui::CollapsingHeader("Misc", ImGuiTreeNodeFlags_None)) {
-                 if (ImGui::CollapsingHeader("Logging", ImGuiTreeNodeFlags_None)) {
+                ImGui::SliderFloat("Near clip distance", &enset.NearClipDistance, 0.000000001, 2);
+                ImGui::SliderFloat("Far clip distance", &enset.FarClipDistance, 16, 32767);
+                ImGui::SliderFloat("FOV", &enset.FOV, 10, 180);
+                ImGui::ColorPicker3("Default world background colour", enset.defaultBGColor, edpref.displayFloatOr255);
+            }
+            /*
+            if (ImGui::CollapsingHeader("Engine Limits", ImGuiTreeNodeFlags_None)) {
+                ImGui::SliderInt("MaxPointlights", nullptr, 1, 50);
+                ImGui::SliderInt("MaxSpotlights", nullptr, 1, 50);
+                ImGui::SliderInt("MaxDirectionalLights", nullptr, 1, 10);
+                ImGui::SliderInt("MaxFramesInFlight", nullptr, 1, 16);
+            }
+            */
+            if (ImGui::CollapsingHeader("Misc", ImGuiTreeNodeFlags_None)) {
+                if (ImGui::CollapsingHeader("Logging", ImGuiTreeNodeFlags_None)) {
                     ImGui::Checkbox("log.ModelLoadInfo", nullptr);
-                 }
-                 if (ImGui::CollapsingHeader("Warnings", ImGuiTreeNodeFlags_None)) {
+                }
+                if (ImGui::CollapsingHeader("Warnings", ImGuiTreeNodeFlags_None)) {
                     ImGui::Checkbox("warn.NotInverseSquareAttenuation", nullptr);
                     ImGui::Checkbox("warn.InvertedSpotlightAngle ", nullptr);
-                 }
-             }
+                }
+            }
 
-             if (ImGui::Button("Save Changes")) {
-                 if (ini.GetSection("DEFAULT") != nullptr) {
-                     ini.SetLongValue("WINDOW", "DEFAULT_WIDTH", enset.DEFAULT_WIDTH);
-                     ini.SetLongValue("WINDOW", "DEFAULT_HEIGHT", enset.DEFAULT_HEIGHT);
-                     ini.SetBoolValue("WINDOW", "Resizable", enset.defaultBGColor[2]);
-                     ini.SetValue("WINDOW", "WindowName", enset.WindowName);
+            if (ImGui::Button("Save Changes")) {
+                if (ini.GetSection("DEFAULT") != nullptr) {
+                    ini.SetLongValue("WINDOW", "DEFAULT_WIDTH", enset.DEFAULT_WIDTH);
+                    ini.SetLongValue("WINDOW", "DEFAULT_HEIGHT", enset.DEFAULT_HEIGHT);
+                    ini.SetBoolValue("WINDOW", "Resizable", enset.defaultBGColor[2]);
+                    ini.SetValue("WINDOW", "WindowName", enset.WindowName);
 
-                     if (enset.ViewCombo == 0) ini.SetValue("RENDERING", "View", "Perspective");
-                     else if (enset.ViewCombo == 1) ini.SetValue("RENDERING", "View", "Orthographic");
-                     ini.SetDoubleValue("RENDERING", "NearClipDistance", enset.NearClipDistance);
-                     ini.SetDoubleValue("RENDERING", "FarClipDistance", enset.FarClipDistance);
-                     ini.SetDoubleValue("RENDERING", "FOV", enset.FOV);
-                     ini.SetDoubleValue("RENDERING", "DefaultBGColorR", enset.defaultBGColor[0]);
-                     ini.SetDoubleValue("RENDERING", "DefaultBGColorG", enset.defaultBGColor[1]);
-                     ini.SetDoubleValue("RENDERING", "DefaultBGColorB", enset.defaultBGColor[2]);
+                    if (enset.ViewCombo == 0) ini.SetValue("RENDERING", "View", "Perspective");
+                    else if (enset.ViewCombo == 1) ini.SetValue("RENDERING", "View", "Orthographic");
+                    ini.SetDoubleValue("RENDERING", "NearClipDistance", enset.NearClipDistance);
+                    ini.SetDoubleValue("RENDERING", "FarClipDistance", enset.FarClipDistance);
+                    ini.SetDoubleValue("RENDERING", "FOV", enset.FOV);
+                    ini.SetDoubleValue("RENDERING", "DefaultBGColorR", enset.defaultBGColor[0]);
+                    ini.SetDoubleValue("RENDERING", "DefaultBGColorG", enset.defaultBGColor[1]);
+                    ini.SetDoubleValue("RENDERING", "DefaultBGColorB", enset.defaultBGColor[2]);
 
-                     ini.SaveFile(ENGINE_SETTINGS_PATH);
-                     Log log;
-                     log.logString("Saved engine settings succesfully");
-                 }
-                 else {
-                     std::cout << "Failed to write to ini file\n";
-                 }
-             }
+                    ini.SaveFile(ENGINE_SETTINGS_PATH);
+                    Log log;
+                    log.logString("Saved engine settings succesfully");
+                }
+                else {
+                    std::cout << "Failed to write to ini file\n";
+                }
+            }
             ImGui::End();
         }
+
+        console.Draw("cool: Console", &visible);
 
         ImGui::End();
 #pragma endregion
@@ -387,9 +435,10 @@ namespace Shard3D {
         ImGui::RenderPlatformWindowsDefault();
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         glfwMakeContextCurrent(backup_current_context);
+    }
 
-
-
-	}
+    void ImGuiLayer::pushError(const char* message) {
+         console.AddLog(message);
+    }
 
 }

@@ -70,6 +70,12 @@
     <Filter Include="Header Files\UI\Layers">
       <UniqueIdentifier>{a630aec4-df96-45b2-9226-30392c09303a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\core\worldbuilder3d">
+      <UniqueIdentifier>{599cfd87-b152-4b15-bb46-7336019e3d6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\worldbuilder3d">
+      <UniqueIdentifier>{d3f983ea-c893-4619-95e5-37987e72a4b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -146,6 +152,12 @@
     </ClCompile>
     <ClCompile Include="UI\imgui_glfw_implementation.cpp">
       <Filter>Source Files\UI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="worldbuilder3d_imgui_frame.hpp">
+      <Filter>Header Files\core\worldbuilder3d</Filter>
+    </ClCompile>
+    <ClCompile Include="worldbuilder3d_imgui_frame.cpp">
+      <Filter>Source Files\core\worldbuilder3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

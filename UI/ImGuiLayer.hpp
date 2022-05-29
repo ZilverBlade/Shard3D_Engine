@@ -2,9 +2,10 @@
 #include "Layer.hpp"
 #include "../pipeline.hpp"
 
+#include <imgui_node_editor.h>
 #include <memory>
 #include <vector>
-
+#include "../worldbuilder3d_imgui_frame.hpp"
 namespace Shard3D {
 
 	class ImGuiLayer : public Shard3D::Layer {
@@ -15,13 +16,20 @@ namespace Shard3D {
 		void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) override;
 		void detach() override;
 		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt) override;
+
+        void pushError(const char* message);
 	private:
 		int width;
 		int height;
 		VkDescriptorPool descriptorPool;
 
-		bool hasBeenDetached = false;
+		ax::NodeEditor::EditorContext* nodeEditorContext;
 
+		bool hasBeenDetached = false;
+		float timeSinceLastSecond;
+		float deltaTimeFromLastSecond;
+
+		bool showTest = false;
 		bool showStatsWindow = false;
 		bool showEngineSettingsWindow = false;
 
@@ -39,15 +47,16 @@ namespace Shard3D {
 			float FOV{};
 			float defaultBGColor[3] = {0.f, 0.f, 0.f};
 		};
-
 		struct EditorPreferences {
 			// WINDOW
 			bool antiAliasedUI = true;
 			ImGuiColorEditFlags displayFloatOr255 = ImGuiColorEditFlags_Float;
 		};
 
-		EngineSettings enset;
 		EditorPreferences edpref;
+		EngineSettings enset;
+
+		WorldBuilder3D::WorldBuilder3DConsole console;
 	};
 
 }

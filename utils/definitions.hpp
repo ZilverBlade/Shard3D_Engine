@@ -2,7 +2,8 @@
 
 namespace Shard3D{
 
-#define ENGINE_VERSION				"1.0.5"//{1, 0, 5, nullptr} // major, minor, revision, build
+#define ENGINE_VERSION				"1.0.5"	// Shard3D {major, minor, revision, build}
+#define EDITOR_VERSION				"0.1"	// WorldEditor3D{major, minor}
 
 #define ENGINE_SETTINGS_PATH		"settings/engine_settings.ini"
 #define EDITOR_SETTINGS_PATH		"settings/editor_settings.ini"	//unused
