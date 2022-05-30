@@ -5,7 +5,7 @@
 #include <imgui_node_editor.h>
 #include <memory>
 #include <vector>
-#include "../worldbuilder3d_imgui_frame.hpp"
+#include "../wb3d/wb3d_imgui_frame.hpp"
 namespace Shard3D {
 
 	class ImGuiLayer : public Shard3D::Layer {
@@ -25,6 +25,8 @@ namespace Shard3D {
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 
+		VkDevice currentDevice{};
+
 		bool hasBeenDetached = false;
 		float timeSinceLastSecond;
 		float deltaTimeFromLastSecond;
@@ -32,6 +34,7 @@ namespace Shard3D {
 		bool showTest = false;
 		bool showStatsWindow = false;
 		bool showEngineSettingsWindow = false;
+		bool showGraphicsSettingsWindow = false;
 
 		struct EngineSettings {	
 			// WINDOW
@@ -56,7 +59,7 @@ namespace Shard3D {
 		EditorPreferences edpref;
 		EngineSettings enset;
 
-		WorldBuilder3D::WorldBuilder3DConsole console;
+		wb3d::Console console;
 	};
 
 }

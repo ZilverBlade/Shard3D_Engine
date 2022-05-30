@@ -5,6 +5,7 @@
 #include "device.hpp"
 #include "descriptors.hpp"
 #include "utils/engine_utils.hpp"
+#include "wb3d/actor.hpp"
 
 #include "game_object.hpp"
 #include <string>
@@ -41,6 +42,8 @@ namespace Shard3D {
 		// note: order of declaration matters
 		std::unique_ptr<EngineDescriptorPool> globalPool{};
 		EngineGameObject::Map gameObjects;
+
+		//Ref<wb3d::Scene> activeScene;
 };
 
 }

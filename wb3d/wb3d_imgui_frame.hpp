@@ -1,12 +1,12 @@
 #include <imgui.h>
 #include <memory>
 #include <vector>
-#include "utils/definitions.hpp"
+#include "../utils/definitions.hpp"
 #include <string>
 
 namespace Shard3D {
-	namespace WorldBuilder3D {
-        struct WorldBuilder3DConsole
+	namespace wb3d {
+        struct Console
         {
             char                  InputBuf[256];
             ImVector<char*>       Items;
@@ -17,7 +17,7 @@ namespace Shard3D {
             bool                  AutoScroll;
             bool                  ScrollToBottom;
 
-            WorldBuilder3DConsole()
+            Console()
             {
                 //IMGUI_DEMO_MARKER("Examples/Console");
                 ClearLog();
@@ -33,7 +33,7 @@ namespace Shard3D {
                 ScrollToBottom = false;
                 AddLog("Welcome to Dear ImGui!");
             }
-            ~WorldBuilder3DConsole()
+            ~Console()
             {
                 ClearLog();
                 for (int i = 0; i < History.Size; i++)
@@ -247,7 +247,7 @@ namespace Shard3D {
             // In C++11 you'd be better off using lambdas for this sort of forwarding callbacks
             static int TextEditCallbackStub(ImGuiInputTextCallbackData* data)
             {
-                WorldBuilder3DConsole* console = (WorldBuilder3DConsole*)data->UserData;
+                Console* console = (Console*)data->UserData;
                 return console->TextEditCallback(data);
             }
 

@@ -17,6 +17,7 @@
 #include "camera.hpp"
 #include "utils/definitions.hpp"
 
+
 #include "simpleini/simple_ini.h"
 #include "buffer.hpp"
 
@@ -74,8 +75,9 @@ namespace Shard3D {
 		}
 
 		layerStack.pushLayer(new TestLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow());
+#if ENABLE_WORLDBUILDER3D
 		layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow());
-
+#endif
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		
@@ -273,6 +275,10 @@ namespace Shard3D {
 		cone2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
 		
+		
+		//auto activeScene
+		//auto fartThing = 
+		//wb3d::Entity fartObj = {}
 		{
 			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };

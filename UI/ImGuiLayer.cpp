@@ -19,7 +19,7 @@ namespace Shard3D {
 	}
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
-
+        currentDevice = device->device();
         glfwSetWindowTitle(window, "Shard3D Engine 1.0 (EDITOR) (PHYSICS: null)");
         hasBeenDetached = false;
 
@@ -81,10 +81,10 @@ namespace Shard3D {
         pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
         pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
         pool_info.pPoolSizes = pool_sizes;
-        vkCreateDescriptorPool(device->device(), &pool_info, nullptr, &descriptorPool);
+        vkCreateDescriptorPool(currentDevice, &pool_info, nullptr, &descriptorPool);
 
         device->init_info.DescriptorPool = descriptorPool;
-        device->init_info.Device = device->device();
+        device->init_info.Device = currentDevice;
         device->init_info.Queue = device->graphicsQueue();
         device->init_info.QueueFamily = device->findPhysicalQueueFamilies().graphicsFamily;
 
@@ -154,8 +154,6 @@ namespace Shard3D {
         colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
-
-
 
 
         style.PopupRounding = 3;
@@ -292,8 +290,34 @@ namespace Shard3D {
             ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         }
 
-        if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenuBar()) {\
             if (ImGui::BeginMenu("File")) {
+                ImGui::TextDisabled("WorldBuilder3D 0.1");
+                ImGui::Separator();
+                if (ImGui::MenuItem("New Level", NULL /*make sure to add some sort of shardcut */)) { }
+                if (ImGui::MenuItem("Open Level", NULL /*make sure to add some sort of shardcut */)) { }
+                if (ImGui::MenuItem("Delete Level", NULL /*make sure to add some sort of shardcut */)) { }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Close WorldBuilder3D", "")) { detach(); return; }
+                ImGui::Separator();
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Edit")) {
+                ImGui::TextDisabled("WorldBuilder3D 0.1");
+                ImGui::Separator();
+                if (ImGui::MenuItem("Add Component", NULL /*make sure to add some sort of shardcut */)) {}
+                //if (ImGui::MenuItem("", NULL /*make sure to add some sort of shardcut */)) {}
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Actions")) {
+                if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {}
+                if (ImGui::MenuItem("Compile Shaders & Reupload Pipeline", NULL /*make sure to add some sort of shardcut */)) {}
+
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Window")) {
                 // Disabling fullscreen would allow the window to be moved to the front of other windows,
                 // which we can't undo at the moment without finer window depth/z control.
 
@@ -302,20 +326,24 @@ namespace Shard3D {
                 if (ImGui::MenuItem("Engine Settings", NULL /*make sure to add some sort of shardcut */)) { showEngineSettingsWindow = true; }
                 if (ImGui::MenuItem("WorldBuilder3D Settings", NULL /*make sure to add some sort of shardcut */)) { /*show editor win*/ }
                 ImGui::Separator();
+                if (ImGui::MenuItem("Game Graphics Settings", NULL /*make sure to add some sort of shardcut */)) { showGraphicsSettingsWindow = true; }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Console", NULL /*make sure to add some sort of shardcut */)) {
+                    //showTest = true;
+                }
                 if (ImGui::MenuItem("Material Builder", NULL /*make sure to add some sort of shardcut */)) {
                     showTest = true;
                 }
                 ImGui::Separator();
                 ImGui::Checkbox("Stats", &showStatsWindow);
-                ImGui::Separator();
-
-                if (ImGui::MenuItem("Close WorldBuilder3D", "")) { detach(); return; }
-                ImGui::Separator();
-
-
                 ImGui::EndMenu();
             }
-            ImTextureID texID;
+            if (ImGui::BeginMenu("Help")) {
+                if (ImGui::MenuItem("Main Website", NULL /*make sure to add some sort of shardcut */)) { ShellExecuteA(nullptr, "open", "https://www.shard3d.com", nullptr, nullptr, false);}
+                if (ImGui::MenuItem("Documentation", NULL /*make sure to add some sort of shardcut */)) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com", nullptr, nullptr, false);}
+                if (ImGui::MenuItem("WorldBuilder3D", NULL /*make sure to add some sort of shardcut */)) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com/worldbuilder3d.html", nullptr, nullptr, false); }
+                ImGui::EndMenu();
+            }
 
             ImGui::EndMenuBar();
         }
@@ -421,6 +449,7 @@ namespace Shard3D {
                     std::cout << "Failed to write to ini file\n";
                 }
             }
+            if (ImGui::Button("Revert Changes")) {}
             ImGui::End();
         }
 

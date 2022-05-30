@@ -2,6 +2,8 @@
 
 namespace Shard3D{
 
+#define ENABLE_WORLDBUILDER3D		false;
+
 #define ENGINE_VERSION				"1.0.5"	// Shard3D {major, minor, revision, build}
 #define EDITOR_VERSION				"0.1"	// WorldEditor3D{major, minor}
 

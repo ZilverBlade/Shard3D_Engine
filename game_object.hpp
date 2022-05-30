@@ -7,6 +7,11 @@
 
 namespace Shard3D {
 
+	struct TagComponent {
+		std::string tag;
+		
+	};
+
 	struct TransformComponent {
 		glm::vec3 translation{};
 		glm::vec3 scale{ 1.f, 1.f, 1.f};
