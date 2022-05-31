@@ -256,6 +256,15 @@ namespace Shard3D {
 		axis.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(axis.getId(), std::move(axis));
 
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/blank_fart.obj", ModelType::MODEL_TYPE_OBJ, false);
+
+		auto refcar = EngineGameObject::createGameObject();
+		refcar.model = model;
+		refcar.transform.translation = { 0.f, 0.f, 0.f };
+		refcar.transform.scale = { .25f, .25f, .25f };
+		refcar.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(refcar.getId(), std::move(refcar));
+
 
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cylinder.obj", ModelType::MODEL_TYPE_OBJ);
 
