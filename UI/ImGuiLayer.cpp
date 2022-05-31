@@ -311,7 +311,9 @@ namespace Shard3D {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Actions")) {
-                if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {}
+                if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {
+                    ShellExecuteA(nullptr, "open", "shadercompmgr.exe", "-o shaders/ shaders/", "/", false);
+                }
                 if (ImGui::MenuItem("Compile Shaders & Reupload Pipeline", NULL /*make sure to add some sort of shardcut */)) {}
 
 

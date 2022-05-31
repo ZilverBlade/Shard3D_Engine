@@ -207,20 +207,26 @@ namespace Shard3D {
 
 	void RunApp::loadGameObjects() {	
 
-		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
+		/*
+			NOTE:
+			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, -Y up.
+			That means that in the editor, the scene must save object transform values as (X, -Z, Y), otherwise it will be incorrect
+		*/
 
+		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
+	
 		auto fart = EngineGameObject::createGameObject();
 		fart.model = model;
 		fart.transform.translation = { .0f, 0.0f, 1.5f };
 		fart.transform.scale = { .5f, .5f, .5f };
-		fart.transform.rotation = { glm::radians(90.f), 0.f, 0.f};
+		fart.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(fart.getId(), std::move(fart));
 
 		auto fart2 = EngineGameObject::createGameObject();
 		fart2.model = model;
 		fart2.transform.translation = { 0.0f, 0.0f, 5.5f };
 		fart2.transform.scale = { .5f, .5f, .5f };
-		fart2.transform.rotation = { glm::radians(90.f), glm::radians(90.f), 0.f };
+		fart2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(fart2.getId(), std::move(fart2));
 
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/colored_cube.obj", ModelType::MODEL_TYPE_OBJ);
@@ -240,6 +246,16 @@ namespace Shard3D {
 		sphere.transform.scale = { 1.f, 1.f, 1.f };
 		sphere.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(sphere.getId(), std::move(sphere));
+
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/axis.obj", ModelType::MODEL_TYPE_OBJ, false);
+
+		auto axis = EngineGameObject::createGameObject();
+		axis.model = model;
+		axis.transform.translation = { 0.f, 0.f, 0.f };
+		axis.transform.scale = { .25f, .25f, .25f };
+		axis.transform.rotation = { 0.f, 0.f, 0.f };
+		gameObjects.emplace(axis.getId(), std::move(axis));
+
 
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cylinder.obj", ModelType::MODEL_TYPE_OBJ);
 

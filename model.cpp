@@ -303,8 +303,8 @@ namespace Shard3D {
 		for (int i = 0; i < positions.size(); i++) {
 			vertices.push_back(
 				Vertex{
-					positions[i],
-					normals[i],
+					{positions[i].x, -positions[i].z, positions[i].y},
+					{normals[i].x, -normals[i].z, normals[i].y},
 					glm::vec3(1.f, 1.f, 1.f),//colors[i],
 					texCoords[i]
 				}
@@ -353,10 +353,10 @@ namespace Shard3D {
 				Vertex vertex{};
 				if (index.vertex_index >= 0) {
 					vertex.position = {
-						attrib.vertices[3 * index.vertex_index],
-						attrib.vertices[3 * index.vertex_index + 1],
-						attrib.vertices[3 * index.vertex_index + 2],
-					};														
+						attrib.vertices[3 * index.vertex_index],		//X
+						-attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually -Y
+						attrib.vertices[3 * index.vertex_index + 1], 	//Y, but is actually Z		
+					};													
 					vertex.color = {
 						attrib.colors[3 * index.vertex_index],
 						attrib.colors[3 * index.vertex_index + 1],
@@ -365,9 +365,9 @@ namespace Shard3D {
 				}
 				if (index.normal_index >= 0) {
 					vertex.normal = {
-						attrib.normals[3 * index.normal_index],
-						attrib.normals[3 * index.normal_index + 1],
-						attrib.normals[3 * index.normal_index + 2],
+						attrib.normals[3 * index.normal_index],			//X
+						-attrib.normals[3 * index.normal_index + 2],	//Z, but is actually -Y
+						attrib.normals[3 * index.normal_index + 1],		//Y, but is actually Z
 					};
 				}
 				if (index.texcoord_index >= 0) {
@@ -406,25 +406,21 @@ namespace Shard3D {
 
 					if (index.vertex_index >= 0) {
 						vertex.position = {
-							attrib.vertices[3 * index.vertex_index],
-							attrib.vertices[3 * index.vertex_index + 1],
-							attrib.vertices[3 * index.vertex_index + 2],
+							attrib.vertices[3 * index.vertex_index],		//X
+							-attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually -Y
+							attrib.vertices[3 * index.vertex_index + 1], 	//Y, but is actually Z		
 						};
-
-						auto colorIndex = 3 * index.vertex_index + 2;
-						if (colorIndex < attrib.colors.size()) {
-							vertex.color = {
-								attrib.colors[colorIndex - 2],
-								attrib.colors[colorIndex - 1],
-								attrib.colors[colorIndex],
-							};
-						}
+						vertex.color = {
+							attrib.colors[3 * index.vertex_index],
+							attrib.colors[3 * index.vertex_index + 1],
+							attrib.colors[3 * index.vertex_index + 2],
+						};
 					}
 					if (index.normal_index >= 0) {
 						vertex.normal = {
-							attrib.normals[3 * index.normal_index],
-							attrib.normals[3 * index.normal_index + 1],
-							attrib.normals[3 * index.normal_index + 2],
+							attrib.normals[3 * index.normal_index],			//X
+							-attrib.normals[3 * index.normal_index + 2],	//Z, but is actually -Y
+							attrib.normals[3 * index.normal_index + 1],		//Y, but is actually Z
 						};
 					}
 					if (index.texcoord_index >= 0) {
