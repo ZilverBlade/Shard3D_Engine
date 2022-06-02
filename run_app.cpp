@@ -240,7 +240,7 @@ namespace Shard3D {
 
 		wb3d::Actor axis = activeScene->createActor();
 		axis.addComponent<Components::Model3DComponent>(model);
-		axis.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.0wf, 0.0f };
+		axis.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.0f, 0.0f };
 		axis.getComponent<Components::TransformComponent>().scale = { 1.f, 1.f, 1.f };
 		axis.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
 
