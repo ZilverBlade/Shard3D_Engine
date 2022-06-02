@@ -8,8 +8,7 @@
 namespace Shard3D {
 	namespace controller {
 
-		void MouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject) {
-
+		void MouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
 			
 			if (glfwGetMouseButton(window, buttons.canRotate) == GLFW_PRESS) {
 		
@@ -48,7 +47,7 @@ namespace Shard3D {
 			else { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); firstClick = true; }
 
 			if (glm::dot(orientation, orientation) > std::numeric_limits<float>::epsilon()) {
-				gameObject.transform.rotation = orientation;
+				actor.getComponent<Components::TransformComponent>().rotation = orientation;
 			}
 		}
 		/*

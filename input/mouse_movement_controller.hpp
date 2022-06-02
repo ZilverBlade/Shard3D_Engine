@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../game_object.hpp"
+#include "../wb3d/actor.hpp"
+#include "../components.hpp"
 #include "../engine_window.hpp"
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -12,7 +13,7 @@ namespace Shard3D {
 				int canRotate = GLFW_MOUSE_BUTTON_RIGHT;
 			};
 
-			void moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject);
+			void moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor);
 			//void adjustFOV(GLFWwindow* window, glm::vec2 scrollPosition);
 
 			ButtonMappings buttons{};

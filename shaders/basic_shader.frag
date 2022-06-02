@@ -52,13 +52,13 @@ float wrapDiffuse(vec3 normal, vec3 lightVector, float wrap) {
 }
 
 float getFogFactor(float d) {
-		const float FogMax = 20.0;
-		const float FogMin = 10.0;
+	const float FogMax = 20.0;
+	const float FogMin = 10.0;
 
-		if (d>=FogMax) return 1;
-		if (d<=FogMin) return 0;
+	if (d>=FogMax) return 1;
+	if (d<=FogMin) return 0;
 
-	 return 1 - (FogMax - d) / (FogMax - FogMin);
+	return 1 - (FogMax - d) / (FogMax - FogMin);
 }
 
 void main(){

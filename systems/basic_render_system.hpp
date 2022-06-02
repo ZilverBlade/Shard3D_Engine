@@ -6,7 +6,11 @@
 #include "../camera.hpp"
 #include "../frame_info.hpp"
 		  
-#include "../game_object.hpp"
+
+#include "../components.hpp"
+#include "../wb3d/scene.hpp"
+#include "../wb3d/actor.hpp"
+
 #include <string>
 #include "../renderer.hpp"
 
@@ -22,7 +26,7 @@ namespace Shard3D {
 		BasicRenderSystem(const BasicRenderSystem&) = delete;
 		BasicRenderSystem& operator=(const BasicRenderSystem&) = delete;
 
-		void renderGameObjects(FrameInfo &frameInfo);
+		void renderGameObjects(FrameInfo &frameInfo, std::shared_ptr<wb3d::Scene>& scene);
 
 	private:
 

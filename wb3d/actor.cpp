@@ -5,7 +5,5 @@ namespace Shard3D {
 
 		Actor::Actor(entt::entity handle, Scene* scene) : actorHandle(handle), eScene(scene){ }
 
-		Actor::~Actor() { }
-
 	}
 }

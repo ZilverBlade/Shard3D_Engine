@@ -96,19 +96,10 @@
     <ClCompile Include="input\mouse_movement_controller.cpp">
       <Filter>Source Files\controller</Filter>
     </ClCompile>
-    <ClCompile Include="game_object.cpp">
+    <ClCompile Include="components.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="systems\basic_render_system.cpp">
-      <Filter>Source Files\systems</Filter>
-    </ClCompile>
-    <ClCompile Include="systems\pointlight_system.cpp">
-      <Filter>Source Files\systems</Filter>
-    </ClCompile>
-    <ClCompile Include="systems\directional_light_system.cpp">
-      <Filter>Source Files\systems</Filter>
-    </ClCompile>
-    <ClCompile Include="systems\spotlight_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
     <ClCompile Include="swap_chain.cpp">
@@ -165,6 +156,18 @@
     <ClCompile Include="wb3d\actor.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
+    <ClCompile Include="GUID.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\directional_light_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\pointlight_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\spotlight_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -173,7 +176,7 @@
     <ClInclude Include="run_app.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_object.hpp">
+    <ClInclude Include="components.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="camera.hpp">
@@ -197,17 +200,8 @@
     <ClInclude Include="systems\basic_render_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>
-    <ClInclude Include="systems\pointlight_system.hpp">
-      <Filter>Header Files\systems</Filter>
-    </ClInclude>
     <ClInclude Include="utils\definitions.hpp">
       <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="systems\directional_light_system.hpp">
-      <Filter>Header Files\systems</Filter>
-    </ClInclude>
-    <ClInclude Include="systems\spotlight_system.hpp">
-      <Filter>Header Files\systems</Filter>
     </ClInclude>
     <ClInclude Include="buffer.hpp">
       <Filter>Header Files\core</Filter>
@@ -265,6 +259,18 @@
     </ClInclude>
     <ClInclude Include="wb3d\actor.hpp">
       <Filter>Header Files\wb3d</Filter>
+    </ClInclude>
+    <ClInclude Include="GUID.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\directional_light_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\pointlight_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\spotlight_system.hpp">
+      <Filter>Header Files\systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

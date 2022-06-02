@@ -134,7 +134,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\stb\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -181,7 +181,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\stb\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -216,15 +216,18 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="descriptors.cpp" />
+    <ClCompile Include="GUID.cpp" />
+    <ClCompile Include="systems\directional_light_system.cpp" />
+    <ClCompile Include="systems\pointlight_system.cpp" />
+    <ClCompile Include="systems\spotlight_system.cpp" />
     <ClCompile Include="wb3d\actor.cpp" />
     <ClCompile Include="wb3d\scene.cpp" />
     <ClCompile Include="UI\ImGuiLayer.cpp" />
-    <ClCompile Include="systems\directional_light_system.cpp" />
     <ClCompile Include="systems\basic_render_system.cpp" />
     <ClCompile Include="input\keyboard_movement_controller.cpp" />
     <ClCompile Include="input\mouse_movement_controller.cpp" />
     <ClCompile Include="buffer.cpp" />
-    <ClCompile Include="game_object.cpp" />
+    <ClCompile Include="components.cpp" />
     <ClCompile Include="swap_chain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="device.cpp" />
@@ -234,8 +237,6 @@
     <ClCompile Include="engine_window.cpp" />
     <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="systems\grid_system.cpp" />
-    <ClCompile Include="systems\pointlight_system.cpp" />
-    <ClCompile Include="systems\spotlight_system.cpp" />
     <ClCompile Include="UI\imgui_glfw_implementation.cpp" />
     <ClCompile Include="UI\imgui_implementation.cpp" />
     <ClCompile Include="UI\Layer.cpp" />
@@ -247,15 +248,17 @@
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="engine_logger.hpp" />
+    <ClInclude Include="GUID.hpp" />
+    <ClInclude Include="systems\directional_light_system.hpp" />
+    <ClInclude Include="systems\pointlight_system.hpp" />
+    <ClInclude Include="systems\spotlight_system.hpp" />
     <ClInclude Include="wb3d\actor.hpp" />
     <ClInclude Include="wb3d\scene.hpp" />
     <ClInclude Include="UI\imgui_glfw_implementation.hpp" />
     <ClInclude Include="UI\imgui_implementation.hpp" />
     <ClInclude Include="UI\TestLayer.hpp" />
     <ClInclude Include="UI\ImGuiLayer.hpp" />
-    <ClInclude Include="systems\directional_light_system.hpp" />
     <ClInclude Include="systems\grid_system.hpp" />
-    <ClInclude Include="systems\spotlight_system.hpp" />
     <ClInclude Include="UI\Layer.hpp" />
     <ClInclude Include="UI\LayerStack.hpp" />
     <ClInclude Include="utils\definitions.hpp" />
@@ -279,13 +282,12 @@
     </ClInclude>
     <ClInclude Include="device.hpp" />
     <ClInclude Include="run_app.hpp" />
-    <ClInclude Include="game_object.hpp" />
+    <ClInclude Include="components.hpp" />
     <ClInclude Include="model.hpp" />
     <ClInclude Include="pipeline.hpp" />
     <ClInclude Include="renderer.hpp" />
     <ClInclude Include="engine_window.hpp" />
     <ClInclude Include="simpleini\simple_ini.h" />
-    <ClInclude Include="systems\pointlight_system.hpp" />
     <ClInclude Include="utils\engine_utils.hpp" />
   </ItemGroup>
   <ItemGroup>

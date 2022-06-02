@@ -6,8 +6,9 @@
 #include "descriptors.hpp"
 #include "utils/engine_utils.hpp"
 #include "wb3d/actor.hpp"
+#include "wb3d/scene.hpp"
 
-#include "game_object.hpp"
+#include "components.hpp"
 #include <string>
 #include "renderer.hpp"
 
@@ -15,6 +16,7 @@
 
 #include <memory>
 #include <vector>
+using namespace Shard3D::wb3d;
 
 namespace Shard3D {
 	class RunApp {
@@ -41,9 +43,7 @@ namespace Shard3D {
 
 		// note: order of declaration matters
 		std::unique_ptr<EngineDescriptorPool> globalPool{};
-		EngineGameObject::Map gameObjects;
-
-		//Ref<wb3d::Scene> activeScene;
+		std::shared_ptr<Scene> activeScene{};
 };
 
 }

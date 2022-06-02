@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <iostream>
 #include "..\engine_logger.hpp"
+#include <miniaudio.h>
+
 #define GLFW_INCLUDE_VULKAN
 
 namespace Shard3D {
@@ -296,7 +298,7 @@ namespace Shard3D {
                 ImGui::Separator();
                 if (ImGui::MenuItem("New Level", NULL /*make sure to add some sort of shardcut */)) { }
                 if (ImGui::MenuItem("Open Level", NULL /*make sure to add some sort of shardcut */)) { }
-                if (ImGui::MenuItem("Delete Level", NULL /*make sure to add some sort of shardcut */)) { }
+                if (ImGui::MenuItem("Destroy Level", NULL /*make sure to add some sort of shardcut */)) { }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Close WorldBuilder3D", "")) { detach(); return; }
                 ImGui::Separator();
@@ -310,6 +312,19 @@ namespace Shard3D {
 
                 ImGui::EndMenu();
             }
+#ifdef NDEBUG
+#else
+            if (ImGui::BeginMenu("Debug")) {
+                ImGui::TextDisabled("Shard3D Debug menu");
+                ImGui::Separator();
+                if (ImGui::MenuItem("Play test audio", NULL /*make sure to add some sort of shardcut */)) {
+                }
+                //if (ImGui::MenuItem("", NULL /*make sure to add some sort of shardcut */)) {}
+
+                ImGui::EndMenu();
+             }
+#endif // DEBUG
+     
             if (ImGui::BeginMenu("Actions")) {
                 if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {
                     ShellExecuteA(nullptr, "open", "shadercompmgr.exe", "-o shaders/ shaders/", "/", false);

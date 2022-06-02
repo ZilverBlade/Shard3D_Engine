@@ -66,69 +66,66 @@ namespace Shard3D {
 		);
 	}
 
-	void PointlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {
+	void PointlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo, std::shared_ptr<wb3d::Scene>& scene) {
 		int lightIndex = 0;
-		for (auto& kv : frameInfo.gameObjects) {
-			auto& obj = kv.second;
-			if (obj.pointlight == nullptr) continue;
+		scene->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, scene.get() };
+			if (!actor) return;
 
-			// copy light to ubo
-			ubo.pointlights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
-			ubo.pointlights[lightIndex].color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
-			ubo.pointlights[lightIndex].attenuationMod = obj.pointlight->attenuationMod;
-			ubo.pointlights[lightIndex].specularMod = obj.pointlight->specularMod;
-
-			lightIndex += 1;
-		}
+			if (actor.hasComponent<Components::PointlightComponent>()) {
+				ubo.pointlights[lightIndex].position = glm::vec4(actor.getComponent<Components::TransformComponent>().translation, 1.f);
+				ubo.pointlights[lightIndex].color = glm::vec4(actor.getComponent<Components::PointlightComponent>().color, actor.getComponent<Components::PointlightComponent>().lightIntensity);
+				ubo.pointlights[lightIndex].attenuationMod = actor.getComponent<Components::PointlightComponent>().attenuationMod;
+				ubo.pointlights[lightIndex].specularMod = actor.getComponent<Components::PointlightComponent>().specularMod;
+				lightIndex += 1;
+			}
+		});
 		ubo.numPointlights = lightIndex;
 	}
 
-	void PointlightSystem::render(FrameInfo &frameInfo) {
-		//sort lights
-		std::map<float, EngineGameObject::id_t> sorted;
-		for (auto& kv : frameInfo.gameObjects) {
-			auto& obj = kv.second;
-			if (obj.pointlight == nullptr) continue;
-
-			// calc distance
-			auto offset = frameInfo.camera.getPosition() - obj.transform.translation;
-			float disSquared = glm::dot(offset, offset);
-			sorted[disSquared] = obj.getId();
-		}
-
+	void PointlightSystem::render(FrameInfo &frameInfo, std::shared_ptr<wb3d::Scene>& scene) {
 		enginePipeline->bind(frameInfo.commandBuffer);
 
-		vkCmdBindDescriptorSets(
-			frameInfo.commandBuffer,
-			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			pipelineLayout,
-			0,
-			1,
-			&frameInfo.globalDescriptorSet,
-			0,
-			nullptr
-		);
-		//iterate through sorted lights in reverse order
-		for (auto it = sorted.rbegin(); it != sorted.rend(); it++) {
-			//use game obj id to find light obj
-			auto& obj = frameInfo.gameObjects.at(it->second);
+		scene->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, scene.get() };
+			if (!actor) return;
+			// copy light to ubo
+			if (actor.hasComponent<Components::PointlightComponent>()) {
+				enginePipeline->bind(frameInfo.commandBuffer);
 
-			PointlightPushConstants push{};
-			push.position = glm::vec4(obj.transform.translation, 1.f);
-			push.color = glm::vec4(obj.color, obj.pointlight->lightIntensity);
-			push.radius = obj.transform.scale.x;
-			push.attenuationMod = obj.pointlight->attenuationMod;
-			push.specularMod = obj.pointlight->specularMod;
+				vkCmdBindDescriptorSets(
+					frameInfo.commandBuffer,
+					VK_PIPELINE_BIND_POINT_GRAPHICS,
+					pipelineLayout,
+					0,
+					1,
+					&frameInfo.globalDescriptorSet,
+					0,
+					nullptr
+				);
+				CSimpleIniA ini;
+				ini.SetUnicode();
+				ini.LoadFile(ENGINE_SETTINGS_PATH);
 
-			vkCmdPushConstants(
-				frameInfo.commandBuffer,
-				pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-				0,
-				sizeof(PointlightPushConstants),
-				&push
-			);
-			vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
-		}
+				if (actor.getComponent<Components::PointlightComponent>().attenuationMod != glm::vec4(0.f, 0.f, 1.f, 0.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
+					std::cout << "warn.NotInverseSquareAttenuation: \"Pointlight in level does not obey inverse square law\"\n";
+				}
+
+				PointlightPushConstants push{};
+				push.position = glm::vec4(actor.getComponent<Components::TransformComponent>().translation, 1.f);
+				push.color = glm::vec4(actor.getComponent<Components::PointlightComponent>().color, actor.getComponent<Components::PointlightComponent>().lightIntensity);
+				push.radius = actor.getComponent<Components::TransformComponent>().scale.x / 10;
+				push.attenuationMod = actor.getComponent<Components::PointlightComponent>().attenuationMod;
+				push.specularMod = actor.getComponent<Components::PointlightComponent>().specularMod;
+
+				vkCmdPushConstants(
+					frameInfo.commandBuffer,
+					pipelineLayout,
+					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+					0,
+					sizeof(PointlightPushConstants),
+					&push
+				);
+				vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
+			}
+		});
 	}
 }

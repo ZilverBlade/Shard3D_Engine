@@ -1,8 +1,8 @@
 #pragma once
 
 #include <entt.hpp>
-#include "../game_object.hpp"
-
+#include "../GUID.hpp"
+#include "../utils/definitions.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -10,27 +10,31 @@ namespace Shard3D {
 
 		class Scene {
 		public:
-				Scene();
-				~Scene();
-				
-				Actor createActor(std::string name = "Some kind of actor");
-				void killActor(Actor actor);
-
-				void update(); 
-				
-
-		private:
-			//template<typename T>
-			//void componentAdded();
-			entt::registry eRegistry;
+			Scene();
+			~Scene();
 			
+			Actor createActor(const char* name= "Some kind of actor");
+			Actor createActorWithGUID(GUID guid, const char* name = "Some kind of actor");
+
+			void killActor(Actor actor);
+			void killEverything();
+
+			void update(); 
+
+
+			entt::registry eRegistry;
+		private:
+
+			//template<typename T>
+//void componentAdded();
 			friend class Actor;
+			friend class RunApp;
 
 			//systems
 			friend class BasicRenderSystem;
-			friend class PointlightSystem;
-			friend class SpotlightSystem;
-			friend class DirectionalLightSystem;
+			//friend class PointlightSystem;
+			//friend class SpotlightSystem;
+			//friend class DirectionalLightSystem;
 
 		};
 	}

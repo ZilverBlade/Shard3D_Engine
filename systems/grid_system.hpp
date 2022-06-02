@@ -6,7 +6,7 @@
 #include "../camera.hpp"
 #include "../frame_info.hpp"
 
-#include "../game_object.hpp"
+#include "../components.hpp"
 #include <string>
 #include "../renderer.hpp"
 

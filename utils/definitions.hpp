@@ -2,7 +2,7 @@
 
 namespace Shard3D{
 
-#define ENABLE_WORLDBUILDER3D		true;
+#define ENABLE_WORLDBUILDER3D		false;
 
 #define ENGINE_VERSION				"1.0.5"	// Shard3D {major, minor, revision, build}
 #define EDITOR_VERSION				"0.1"	// WorldEditor3D{major, minor}
@@ -18,7 +18,10 @@ namespace Shard3D{
 #define WINDOW_ICON_PATH			"shardwinico.png"
 
 	//engine settings
-#define MAX_POINTLIGHTS			20 //dont change because these dont match shader code
-#define MAX_SPOTLIGHTS			20 
-#define MAX_DIRECTIONAL_LIGHTS	6
+#define MAX_POINTLIGHTS						20 //dont change because these dont match shader code
+#define MAX_SPOTLIGHTS						20 
+#define MAX_DIRECTIONAL_LIGHTS				6
+
+#define ACTOR_FORCE_TRANSFORM_COMPONENT		true; // creates transform component automatically for all actors
+
 }

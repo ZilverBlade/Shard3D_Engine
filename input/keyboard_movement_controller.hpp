@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../game_object.hpp"
+#include "../wb3d/actor.hpp"
+#include "../components.hpp"
 #include "../engine_window.hpp"
 
 namespace Shard3D {
@@ -22,7 +23,7 @@ namespace Shard3D {
             int slowDown = GLFW_KEY_LEFT_CONTROL;
         };
 
-        void moveInPlaneXZ(GLFWwindow* window, float dt, EngineGameObject& gameObject);
+        void moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor);
 
         KeyMappings keys{};
         float moveSpeed{ 3.f };

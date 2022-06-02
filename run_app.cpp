@@ -27,6 +27,7 @@
 #include "systems/pointlight_system.hpp"
 #include "systems/spotlight_system.hpp"
 #include "systems/directional_light_system.hpp"
+
 #include "systems/grid_system.hpp"
 
 //UI stuff
@@ -45,6 +46,9 @@ namespace Shard3D {
 			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)			
 			.build();
+		std::cout << "attempting to construct Scene Pointer\n";
+		activeScene = std::make_shared<Scene>();
+
 		loadGameObjects();
 	}
 	RunApp::~RunApp() {}
@@ -84,11 +88,14 @@ namespace Shard3D {
 		PointlightSystem pointlightSystem { engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		SpotlightSystem spotlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		DirectionalLightSystem directionalLightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-
+		
 		EngineCamera camera{};
+		
+		std::cout << "Loading camera actor\n";
+		wb3d::Actor cameraActor = activeScene->createActor("Camera Actor");
 
-		auto viewerObject = EngineGameObject::createGameObject();
-		viewerObject.transform.translation = glm::vec3(0.f, -1.f, -1.f);
+		//cameraActor.addComponent<Components::TransformComponent>();
+		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
 
 		controller::KeyboardMovementController cameraControllerKeyBoard{};
 		controller::MouseMovementController cameraControllerMouse{};
@@ -117,10 +124,10 @@ namespace Shard3D {
 
 			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
-			cameraControllerKeyBoard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, viewerObject);
-			cameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, viewerObject);
+			cameraControllerKeyBoard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
+			cameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
 			
-			camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+			camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
 
 			float aspect = engineRenderer.getAspectRatio();
 			
@@ -142,8 +149,7 @@ namespace Shard3D {
 					frameTime,
 					commandBuffer,
 					camera,
-					globalDescriptorSets[frameIndex],
-					gameObjects
+					globalDescriptorSets[frameIndex]
 				};
 
 				//	update
@@ -151,19 +157,19 @@ namespace Shard3D {
 				ubo.projection = camera.getProjection();
 				ubo.view = camera.getView();
 				ubo.inverseView = camera.getInverseView();
-
-				pointlightSystem.update(frameInfo, ubo);
+				
+				pointlightSystem.update(frameInfo, ubo, activeScene);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
-				spotlightSystem.update(frameInfo, ubo);
+				spotlightSystem.update(frameInfo, ubo, activeScene);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
-				directionalLightSystem.update(frameInfo, ubo);
+				directionalLightSystem.update(frameInfo, ubo, activeScene);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
-
+				
 				//	render
 
 				/*
@@ -179,16 +185,15 @@ namespace Shard3D {
 
 					Also order absolutely matters, post processing for example must go last
 				*/
-
 				
 				engineRenderer.beginSwapChainRenderPass(commandBuffer); 
 
-				basicRenderSystem.renderGameObjects(frameInfo);
-
-				pointlightSystem.render(frameInfo);
-				spotlightSystem.render(frameInfo);
-				directionalLightSystem.render(frameInfo);
-
+				basicRenderSystem.renderGameObjects(frameInfo, activeScene);
+				
+				pointlightSystem.render(frameInfo, activeScene);
+				spotlightSystem.render(frameInfo, activeScene);
+				directionalLightSystem.render(frameInfo, activeScene);
+				
 				gridSystem.render(frameInfo);
 
 				// Layer overlays
@@ -213,6 +218,61 @@ namespace Shard3D {
 			That means that in the editor, the scene must save object transform values as (X, -Z, Y), otherwise it will be incorrect
 		*/
 
+		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
+
+		wb3d::Actor fartObj = activeScene->createActor();
+		fartObj.addComponent<Components::Model3DComponent>(model);
+
+		fartObj.getComponent<Components::TransformComponent>().translation = {0.f, 0.f, 0.f};
+		fartObj.getComponent<Components::TransformComponent>().scale = { .5f, .5f, .5f };
+		fartObj.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
+
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
+
+		wb3d::Actor quad = activeScene->createActor();
+		quad.addComponent<Components::Model3DComponent>(model);
+		quad.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.9f, 0.0f };
+		quad.getComponent<Components::TransformComponent>().scale = { 100.f, 1.f, 100.f };
+		quad.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
+
+
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/axis.obj", ModelType::MODEL_TYPE_OBJ, false);
+
+		wb3d::Actor axis = activeScene->createActor();
+		axis.addComponent<Components::Model3DComponent>(model);
+		axis.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.0wf, 0.0f };
+		axis.getComponent<Components::TransformComponent>().scale = { 1.f, 1.f, 1.f };
+		axis.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
+
+
+
+		wb3d::Actor light = activeScene->createActor();
+		light.addComponent<Components::PointlightComponent>();
+		light.getComponent<Components::TransformComponent>().translation = { 2.0f, -1.0f, 0.0f };
+		light.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
+		light.getComponent<Components::PointlightComponent>().color = { 1.0f, 1.0f, 1.0f };
+		light.getComponent<Components::PointlightComponent>().lightIntensity = 1.0f;
+
+
+		wb3d::Actor light0 = activeScene->createActor();
+		light0.addComponent<Components::DirectionalLightComponent>();
+		light0.getComponent<Components::TransformComponent>().translation = { 0.0f, -1.0f, 5.0f };
+		light0.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
+		light0.getComponent<Components::DirectionalLightComponent>().color = { 1.0f, 1.0f, 1.0f };
+		light0.getComponent<Components::DirectionalLightComponent>().lightIntensity = 1.0f;
+		light0.getComponent<Components::DirectionalLightComponent>().specularMod = 0.0f;
+
+		wb3d::Actor light2 = activeScene->createActor();
+		light2.addComponent<Components::SpotlightComponent>();
+		light2.getComponent<Components::TransformComponent>().translation = { 0.0f, -1.0f, 0.0f };
+		light2.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
+		light2.getComponent<Components::SpotlightComponent>().color = { 1.0f, 1.0f, 1.0f };
+		light2.getComponent<Components::SpotlightComponent>().lightIntensity = 1.0f;
+
+
+		//light.getComponent<Components::DirectionalLightComponent>().attenuationMod = {1.f, 1.f, 1.f, 1.f};
+
+		/*
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 	
 		auto fart = EngineGameObject::createGameObject();
@@ -299,11 +359,7 @@ namespace Shard3D {
 		cone2.transform.scale = { 0.5f, 0.5f, 0.5f };
 		cone2.transform.rotation = { 0.f, 0.f, 0.f };
 		gameObjects.emplace(cone2.getId(), std::move(cone2));
-		
-		
-		//auto activeScene
-		//auto fartThing = 
-		//wb3d::Entity fartObj = {}
+
 		{
 			auto pointlight = EngineGameObject::makePointlight(1.f);
 			pointlight.transform.translation = { 2.0f, -1.0f, 2.0f };
@@ -357,6 +413,6 @@ namespace Shard3D {
 			directionalLight.transform.translation = { 2.0f, -0.5f, 0.2f };
 			gameObjects.emplace(directionalLight.getId(), std::move(directionalLight));
 		}
-		
+		*/
 	}
 }

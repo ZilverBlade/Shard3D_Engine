@@ -1,7 +1,7 @@
 #pragma once
 
 #include "camera.hpp"
-#include "game_object.hpp"
+#include "components.hpp"
 #include <vulkan/vulkan.h>
 #include "utils/definitions.hpp"
 
@@ -40,7 +40,7 @@ namespace Shard3D {
 		glm::mat4 inverseView{ 1.f };
 
 		//reyleigh scattering fakery and/or indirect light
-		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.014f };
+		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.54f };
 
 		Pointlight pointlights[MAX_POINTLIGHTS];
 		Spotlight spotlights[MAX_SPOTLIGHTS];
@@ -57,6 +57,5 @@ namespace Shard3D {
 		VkCommandBuffer commandBuffer;
 		EngineCamera& camera;
 		VkDescriptorSet globalDescriptorSet;
-		EngineGameObject::Map& gameObjects;
 	};
 }

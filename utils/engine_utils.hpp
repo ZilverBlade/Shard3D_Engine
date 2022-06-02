@@ -1,9 +1,5 @@
 #pragma once
-
-#include <functional>
 #include <sys/stat.h>
-#include <fstream>
-#include "definitions.hpp"
 
 namespace Shard3D {
 

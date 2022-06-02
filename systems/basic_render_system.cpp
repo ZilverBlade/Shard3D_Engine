@@ -59,7 +59,7 @@ namespace Shard3D {
 		);
 	}
 
-	void BasicRenderSystem::renderGameObjects(FrameInfo &frameInfo) {
+	void BasicRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::shared_ptr<wb3d::Scene>& scene) {
 		enginePipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
@@ -73,24 +73,29 @@ namespace Shard3D {
 			nullptr
 		);
 
-		for (auto& kv : frameInfo.gameObjects) {
-			auto& obj = kv.second;
-			if (obj.model == nullptr) continue;
-			SimplePushConstantData push{};
-			push.modelMatrix = obj.transform.mat4();
-			push.normalMatrix = obj.transform.normalMatrix();
+		scene->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, scene.get() };
+			if (!actor) return;
 
-			vkCmdPushConstants(
-				frameInfo.commandBuffer,
-				pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-				0,
-				sizeof(SimplePushConstantData),
-				&push
-			);
-			obj.model->bind(frameInfo.commandBuffer);
-			obj.model->draw(frameInfo.commandBuffer);
-		}
+			if (actor.hasComponent<Components::Model3DComponent>()) {
+				auto transform = actor.getComponent<Components::TransformComponent>();
+				SimplePushConstantData push{};
+				push.modelMatrix = transform.mat4();
+				push.normalMatrix = transform.normalMatrix();
+
+				vkCmdPushConstants(
+					frameInfo.commandBuffer,
+					pipelineLayout,
+					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+					0,
+					sizeof(SimplePushConstantData),
+					&push
+				);
+
+				auto model = actor.getComponent<Components::Model3DComponent>().getModel();
+				model->bind(frameInfo.commandBuffer);
+				model->draw(frameInfo.commandBuffer);
+			}
+		});
 	}
 
 }

@@ -5,11 +5,14 @@ namespace Shard3D {
 	class Log {
 	public:
 		void logString(const char* log, bool timestamp = true, bool createNewline = true) {
-			if (createNewline = true){
-				if (timestamp = false) std::cout << log << "\n"; return;
-			} else std::cout << log; return;
+			if (createNewline == true){
+				if (timestamp == false) { std::cout << log << "\n"; return; }
+			}
+			else {
+				if (timestamp == false) { std::cout << log; return; }
+			}
 
-			std::cout << "[" << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << "] " << log << "\n";
+			std::cout << "[" << "12:34:56.789" << "] " << log << "\n";
 		}
 	};
 }
