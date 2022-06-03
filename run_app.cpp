@@ -200,7 +200,7 @@ namespace Shard3D {
 
 				// Layer overlays
 				for (Layer* layer : layerStack) {
-					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime);
+					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime, activeLevel);
 				}
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 				engineRenderer.endFrame();
@@ -223,7 +223,7 @@ namespace Shard3D {
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
 		wb3d::Actor fartObj = activeLevel->createActor();
-		fartObj.addComponent<Components::Model3DComponent>(model);
+		fartObj.addComponent<Components::MeshComponent>(model);
 
 		fartObj.getComponent<Components::TransformComponent>().translation = {0.f, 0.f, 0.f};
 		fartObj.getComponent<Components::TransformComponent>().scale = { .5f, .5f, .5f };
@@ -232,7 +232,7 @@ namespace Shard3D {
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
 
 		wb3d::Actor quad = activeLevel->createActor();
-		quad.addComponent<Components::Model3DComponent>(model);
+		quad.addComponent<Components::MeshComponent>(model);
 		quad.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.9f, 0.0f };
 		quad.getComponent<Components::TransformComponent>().scale = { 100.f, 1.f, 100.f };
 		quad.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
@@ -241,7 +241,7 @@ namespace Shard3D {
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/axis.obj", ModelType::MODEL_TYPE_OBJ, false);
 
 		wb3d::Actor axis = activeLevel->createActor();
-		axis.addComponent<Components::Model3DComponent>(model);
+		axis.addComponent<Components::MeshComponent>(model);
 		axis.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.0f, 0.0f };
 		axis.getComponent<Components::TransformComponent>().scale = { 1.f, 1.f, 1.f };
 		axis.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
@@ -267,7 +267,7 @@ namespace Shard3D {
 
 		light2 = activeLevel->createActor();
 		light2.addComponent<Components::SpotlightComponent>();
-		light2.addComponent<Components::Model3DComponent>(model);
+		light2.addComponent<Components::MeshComponent>(model);
 		light2.getComponent<Components::TransformComponent>().scale = { 0.1f, 0.1f, 0.1f };
 		light2.getComponent<Components::TransformComponent>().translation = { 5.0f, -1.0f, 0.0f };
 		light2.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -0.f, -1.f);

@@ -3,6 +3,9 @@
 #include <GLFW/glfw3.h>
 #include "../device.hpp"
 #include "../utils/definitions.hpp"
+#include <memory>
+#include "../wb3d/level.hpp"
+
 namespace Shard3D {
 	class Layer {
 	public:
@@ -14,7 +17,7 @@ namespace Shard3D {
 
 		virtual void detach();
 
-		virtual void update(VkCommandBuffer buffer, GLFWwindow* window, float dt);
+		virtual void update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level);
 		//virtual void event();
 
 	private:

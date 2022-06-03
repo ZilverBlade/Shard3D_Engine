@@ -7,7 +7,7 @@ namespace Shard3D {
 	public:
 		TestLayer();
 
-		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt) override;
+		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level) override;
 
 	};
 }

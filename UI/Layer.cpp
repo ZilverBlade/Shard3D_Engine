@@ -12,6 +12,6 @@ namespace Shard3D {
 
 	void Layer::detach(){}
 
-	void Layer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt) {}
+	void Layer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level) {}
 
 }

@@ -13,8 +13,8 @@ namespace Shard3D {
 			Level();
 			~Level();
 			
-			Actor createActor(const char* name= "Some kind of actor");
-			Actor createActorWithGUID(GUID guid, const char* name = "Some kind of actor");
+			Actor createActor(std::string  name= "Some kind of actor");
+			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
 
 			void killActor(Actor actor);
 			void killEverything();
@@ -24,17 +24,16 @@ namespace Shard3D {
 
 			entt::registry eRegistry;
 		private:
-
-			//template<typename T>
-//void componentAdded();
 			friend class Actor;
-			friend class RunApp;
 
+			friend class LevelManager;
+
+			friend class RunApp;
 			//systems
 			friend class BasicRenderSystem;
-			//friend class PointlightSystem;
-			//friend class SpotlightSystem;
-			//friend class DirectionalLightSystem;
+			friend class PointlightSystem;
+			friend class SpotlightSystem;
+			friend class DirectionalLightSystem;
 
 		};
 	}

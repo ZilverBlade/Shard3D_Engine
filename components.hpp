@@ -36,14 +36,27 @@ namespace Shard3D {
 			glm::mat3 normalMatrix();
 		};
 
-		struct Model3DComponent {
+		struct MeshComponent {
 			std::shared_ptr<EngineModel> model{};
+			std::string path{};
+			ModelType type = ModelType::MODEL_TYPE_NULL;
 
-			Model3DComponent() = default;
-			Model3DComponent(const Model3DComponent&) = default;
-			Model3DComponent(const std::shared_ptr<EngineModel>& mdl) { model = mdl; }
+			MeshComponent() = default;
+			MeshComponent(const MeshComponent&) = default;
+			MeshComponent(const std::shared_ptr<EngineModel>& mdl) { model = mdl; }
 
 			std::shared_ptr<EngineModel> getModel() { return model; };
+			std::string getPath() { return "modeldata/axis.obj"; };
+			ModelType getModelType() { return type; };
+			/*
+			std::string operator()(ModelType) {
+				if (type == ModelType::MODEL_TYPE_NULL) return "null";
+				if (type == ModelType::MODEL_TYPE_OBJ) return "obj_type";
+				if (type == ModelType::MODEL_TYPE_COLLADA) return "collada_type";
+				if (type == ModelType::MODEL_TYPE_GLTF) return "gltf_type";
+				if (type == ModelType::MODEL_TYPE_FBX) return "fbx_type";
+			}
+			*/
 		};
 
 		struct PointlightComponent {

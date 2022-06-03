@@ -15,10 +15,12 @@ using json = nlohmann::json;
 namespace Shard3D {
 
 	enum class ModelType {
-		MODEL_TYPE_OBJ,
-		MODEL_TYPE_GLTF,
-		MODEL_TYPE_FBX,
-		MODEL_TYPE_COLLADA
+		MODEL_TYPE_NULL = 0,
+
+		MODEL_TYPE_OBJ = 1,
+		MODEL_TYPE_COLLADA = 2,
+		MODEL_TYPE_GLTF = 3,
+		MODEL_TYPE_FBX = 4
 	};
 
 	class EngineModel {

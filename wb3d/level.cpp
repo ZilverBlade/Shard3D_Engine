@@ -15,7 +15,7 @@ namespace Shard3D {
 			eRegistry.clear();
 		}
 		
-		Actor Level::createActor(const char* name) {
+		Actor Level::createActor(std::string  name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { eRegistry.create(), this };
 			actor.addComponent<Components::GUIDComponent>();
@@ -27,7 +27,7 @@ namespace Shard3D {
 			return actor;
 		}
 
-		Actor Level::createActorWithGUID(GUID guid, const char* name) {
+		Actor Level::createActorWithGUID(GUID guid, std::string name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { eRegistry.create(), this };
 			actor.addComponent<Components::GUIDComponent>(guid);

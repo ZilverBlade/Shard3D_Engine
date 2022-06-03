@@ -74,7 +74,7 @@ namespace Shard3D {
 		level->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
 			if (!actor) return;
 
-			if (actor.hasComponent<Components::Model3DComponent>()) {
+			if (actor.hasComponent<Components::MeshComponent>()) {
 				auto transform = actor.getComponent<Components::TransformComponent>();
 				SimplePushConstantData push{};
 				push.modelMatrix = transform.mat4();
@@ -89,7 +89,7 @@ namespace Shard3D {
 					&push
 				);
 
-				auto model = actor.getComponent<Components::Model3DComponent>().getModel();
+				auto model = actor.getComponent<Components::MeshComponent>().getModel();
 				model->bind(frameInfo.commandBuffer);
 				model->draw(frameInfo.commandBuffer);
 			}

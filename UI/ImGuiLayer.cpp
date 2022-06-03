@@ -9,6 +9,8 @@
 #include "..\engine_logger.hpp"
 #include <miniaudio.h>
 
+#include "../wb3d/levelmgr.hpp"
+
 #define GLFW_INCLUDE_VULKAN
 
 namespace Shard3D {
@@ -229,7 +231,7 @@ namespace Shard3D {
         hasBeenDetached = true;
 	}
 
-    void ImGuiLayer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt) {
+    void ImGuiLayer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level) {
         if (hasBeenDetached) return;
 
         CSimpleIniA ini;
@@ -292,15 +294,21 @@ namespace Shard3D {
             ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         }
 
-        if (ImGui::BeginMenuBar()) {\
+        if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
-                if (ImGui::MenuItem("New Level", NULL /*make sure to add some sort of shardcut */)) { }
-                if (ImGui::MenuItem("Open Level", NULL /*make sure to add some sort of shardcut */)) { }
-                if (ImGui::MenuItem("Destroy Level", NULL /*make sure to add some sort of shardcut */)) { }
+                if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) { }
+                if (ImGui::MenuItem("Open Level", NULL /* ctrl + o */)) { }
+                if (ImGui::MenuItem("Save Level", NULL /* ctrl + s */)) {
+                    wb3d::LevelManager levelMan(level);
+                    levelMan.save("scenedata/test.wbl");
+                    console.AddLog("Saved scene ", "scenedata/test.wbl");
+                }
+                if (ImGui::MenuItem("Save Level As", NULL /* ctrl + shift + s */)) {}
+                if (ImGui::MenuItem("Destroy Level", NULL /* ctrl + shift + del */)) { }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Close WorldBuilder3D", "")) { detach(); return; }
+                if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { detach(); return; }
                 ImGui::Separator();
                 ImGui::EndMenu();
             }

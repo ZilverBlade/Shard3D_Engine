@@ -168,6 +168,9 @@
     <ClCompile Include="systems\spotlight_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
+    <ClCompile Include="wb3d\levelmgr.cpp">
+      <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -271,6 +274,9 @@
     </ClInclude>
     <ClInclude Include="systems\spotlight_system.hpp">
       <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="wb3d\levelmgr.hpp">
+      <Filter>Header Files\wb3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
