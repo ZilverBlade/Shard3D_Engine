@@ -6,7 +6,7 @@
 #include "descriptors.hpp"
 #include "utils/engine_utils.hpp"
 #include "wb3d/actor.hpp"
-#include "wb3d/scene.hpp"
+#include "wb3d/level.hpp"
 
 #include "components.hpp"
 #include <string>
@@ -43,7 +43,7 @@ namespace Shard3D {
 
 		// note: order of declaration matters
 		std::unique_ptr<EngineDescriptorPool> globalPool{};
-		std::shared_ptr<Scene> activeScene{};
+		std::shared_ptr<Level> activeLevel{};
 };
 
 }

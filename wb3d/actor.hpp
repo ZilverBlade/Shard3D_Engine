@@ -1,6 +1,6 @@
 #pragma once
 #include <entt.hpp>
-#include "scene.hpp"
+#include "level.hpp"
 #include "../engine_logger.hpp"
 #include "../components.hpp"
 
@@ -10,7 +10,7 @@ namespace Shard3D {
 
 		public:
 			Actor() = default;
-			Actor(entt::entity handle, Scene* scene);
+			Actor(entt::entity handle, Level* level);
 
 			Actor(const Actor& other) = default;
 
@@ -22,34 +22,37 @@ namespace Shard3D {
 				//log.logString("name.component", false, true);
 
 				std::cout << "Added component " << typeid(T).name() << "\n";
-				return eScene->eRegistry.emplace<T>(actorHandle, std::forward<Args>(args)...);
+				return eLevel->eRegistry.emplace<T>(actorHandle, std::forward<Args>(args)...);
 			}
 
 			template<typename T>
 			T& getComponent() {
 				assert(hasComponent<T>() && "Actor does not have component!");
-				return eScene->eRegistry.get<T>(actorHandle);
+				return eLevel->eRegistry.get<T>(actorHandle);
 			}
 
 			template<typename T>
 			bool hasComponent() {
-				return eScene->eRegistry.all_of<T>(actorHandle);
+				return eLevel->eRegistry.all_of<T>(actorHandle);
 			}
 
 			template<typename T>
 			void removeComponent() {
 				assert(hasComponent<T>() && "Actor does not have component!");
-				eScene->eRegistry.remove<T>(actorHandle);
+				eLevel->eRegistry.remove<T>(actorHandle);
 			}
 
 			operator bool() const { return actorHandle != entt::null; }
 			operator entt::entity() const { return actorHandle; };
 			operator uint32_t() const { return (uint32_t)actorHandle; };
 
-			GUID GetGUID() { return getComponent<Components::GUIDComponent>().id; }
+			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
+			std::string getTag() { return getComponent<Components::TagComponent>(); }
+
+			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
 
 			bool operator==(const Actor& other) const {
-				return actorHandle == other.actorHandle && eScene == other.eScene;
+				return actorHandle == other.actorHandle && eLevel == other.eLevel;
 			}
 			bool operator!=(const Actor& other) const {
 				return !(*this == other);
@@ -57,7 +60,7 @@ namespace Shard3D {
 
 		private:
 			entt::entity actorHandle{entt::null};
-			Scene *eScene = nullptr; // 12 bytes (use it as much as needed)
+			Level *eLevel = nullptr; // 12 bytes (use it as much as needed)
 
 		};
 	}

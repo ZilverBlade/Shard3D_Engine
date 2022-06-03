@@ -8,10 +8,10 @@ namespace Shard3D {
 	namespace wb3d {
 		class Actor;
 
-		class Scene {
+		class Level {
 		public:
-			Scene();
-			~Scene();
+			Level();
+			~Level();
 			
 			Actor createActor(const char* name= "Some kind of actor");
 			Actor createActorWithGUID(GUID guid, const char* name = "Some kind of actor");

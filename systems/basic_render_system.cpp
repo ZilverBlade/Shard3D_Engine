@@ -42,8 +42,6 @@ namespace Shard3D {
 		}
 	}
 
-
-
 	void BasicRenderSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
@@ -59,7 +57,7 @@ namespace Shard3D {
 		);
 	}
 
-	void BasicRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::shared_ptr<wb3d::Scene>& scene) {
+	void BasicRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level) {
 		enginePipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
@@ -73,7 +71,7 @@ namespace Shard3D {
 			nullptr
 		);
 
-		scene->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, scene.get() };
+		level->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
 			if (!actor) return;
 
 			if (actor.hasComponent<Components::Model3DComponent>()) {

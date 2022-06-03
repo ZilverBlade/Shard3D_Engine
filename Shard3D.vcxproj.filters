@@ -150,7 +150,7 @@
     <ClCompile Include="wb3d\wb3d_imgui_frame.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
-    <ClCompile Include="wb3d\scene.cpp">
+    <ClCompile Include="wb3d\level.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
     <ClCompile Include="wb3d\actor.cpp">
@@ -254,7 +254,7 @@
     <ClInclude Include="UI\imgui_glfw_implementation.hpp">
       <Filter>Header Files\UI\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="wb3d\scene.hpp">
+    <ClInclude Include="wb3d\level.hpp">
       <Filter>Header Files\wb3d</Filter>
     </ClInclude>
     <ClInclude Include="wb3d\actor.hpp">

@@ -35,7 +35,7 @@
 #include "UI/ImGuiLayer.hpp"
 
 namespace Shard3D {
-
+	wb3d::Actor light2{};
 	RunApp::RunApp() {
 		std::ifstream infile(ENGINE_SETTINGS_PATH);
 		assert(infile.good() != false && "Critical error! Engine settings config file not found!");
@@ -46,8 +46,8 @@ namespace Shard3D {
 			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)			
 			.build();
-		std::cout << "attempting to construct Scene Pointer\n";
-		activeScene = std::make_shared<Scene>();
+		std::cout << "attempting to construct Level Pointer\n";
+		activeLevel = std::make_shared<Level>();
 
 		loadGameObjects();
 	}
@@ -92,7 +92,7 @@ namespace Shard3D {
 		EngineCamera camera{};
 		
 		std::cout << "Loading camera actor\n";
-		wb3d::Actor cameraActor = activeScene->createActor("Camera Actor");
+		wb3d::Actor cameraActor = activeLevel->createActor("Camera Actor");
 
 		//cameraActor.addComponent<Components::TransformComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
@@ -129,6 +129,8 @@ namespace Shard3D {
 			
 			camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
 
+			light2.getComponent<Components::TransformComponent>().translation.x += frameTime;
+
 			float aspect = engineRenderer.getAspectRatio();
 			
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
@@ -158,15 +160,15 @@ namespace Shard3D {
 				ubo.view = camera.getView();
 				ubo.inverseView = camera.getInverseView();
 				
-				pointlightSystem.update(frameInfo, ubo, activeScene);
+				pointlightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
-				spotlightSystem.update(frameInfo, ubo, activeScene);
+				spotlightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 
-				directionalLightSystem.update(frameInfo, ubo, activeScene);
+				directionalLightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 				
@@ -188,11 +190,11 @@ namespace Shard3D {
 				
 				engineRenderer.beginSwapChainRenderPass(commandBuffer); 
 
-				basicRenderSystem.renderGameObjects(frameInfo, activeScene);
+				basicRenderSystem.renderGameObjects(frameInfo, activeLevel);
 				
-				pointlightSystem.render(frameInfo, activeScene);
-				spotlightSystem.render(frameInfo, activeScene);
-				directionalLightSystem.render(frameInfo, activeScene);
+				pointlightSystem.render(frameInfo, activeLevel);
+				spotlightSystem.render(frameInfo, activeLevel);
+				directionalLightSystem.render(frameInfo, activeLevel);
 				
 				gridSystem.render(frameInfo);
 
@@ -215,12 +217,12 @@ namespace Shard3D {
 		/*
 			NOTE:
 			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, -Y up.
-			That means that in the editor, the scene must save object transform values as (X, -Z, Y), otherwise it will be incorrect
+			That means that in the editor, the level must save object transform values as (X, -Z, Y), otherwise it will be incorrect
 		*/
 
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
-		wb3d::Actor fartObj = activeScene->createActor();
+		wb3d::Actor fartObj = activeLevel->createActor();
 		fartObj.addComponent<Components::Model3DComponent>(model);
 
 		fartObj.getComponent<Components::TransformComponent>().translation = {0.f, 0.f, 0.f};
@@ -229,7 +231,7 @@ namespace Shard3D {
 
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
 
-		wb3d::Actor quad = activeScene->createActor();
+		wb3d::Actor quad = activeLevel->createActor();
 		quad.addComponent<Components::Model3DComponent>(model);
 		quad.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.9f, 0.0f };
 		quad.getComponent<Components::TransformComponent>().scale = { 100.f, 1.f, 100.f };
@@ -238,7 +240,7 @@ namespace Shard3D {
 
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/axis.obj", ModelType::MODEL_TYPE_OBJ, false);
 
-		wb3d::Actor axis = activeScene->createActor();
+		wb3d::Actor axis = activeLevel->createActor();
 		axis.addComponent<Components::Model3DComponent>(model);
 		axis.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.0f, 0.0f };
 		axis.getComponent<Components::TransformComponent>().scale = { 1.f, 1.f, 1.f };
@@ -246,7 +248,7 @@ namespace Shard3D {
 
 
 
-		wb3d::Actor light = activeScene->createActor();
+		wb3d::Actor light = activeLevel->createActor();
 		light.addComponent<Components::PointlightComponent>();
 		light.getComponent<Components::TransformComponent>().translation = { 2.0f, -1.0f, 0.0f };
 		light.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
@@ -254,18 +256,21 @@ namespace Shard3D {
 		light.getComponent<Components::PointlightComponent>().lightIntensity = 1.0f;
 
 
-		wb3d::Actor light0 = activeScene->createActor();
+		wb3d::Actor light0 = activeLevel->createActor();
 		light0.addComponent<Components::DirectionalLightComponent>();
 		light0.getComponent<Components::TransformComponent>().translation = { 0.0f, -1.0f, 5.0f };
 		light0.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
 		light0.getComponent<Components::DirectionalLightComponent>().color = { 1.0f, 1.0f, 1.0f };
-		light0.getComponent<Components::DirectionalLightComponent>().lightIntensity = 1.0f;
+		light0.getComponent<Components::DirectionalLightComponent>().lightIntensity = 0.1f;
 		light0.getComponent<Components::DirectionalLightComponent>().specularMod = 0.0f;
+		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false);
 
-		wb3d::Actor light2 = activeScene->createActor();
+		light2 = activeLevel->createActor();
 		light2.addComponent<Components::SpotlightComponent>();
-		light2.getComponent<Components::TransformComponent>().translation = { 0.0f, -1.0f, 0.0f };
-		light2.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
+		light2.addComponent<Components::Model3DComponent>(model);
+		light2.getComponent<Components::TransformComponent>().scale = { 0.1f, 0.1f, 0.1f };
+		light2.getComponent<Components::TransformComponent>().translation = { 5.0f, -1.0f, 0.0f };
+		light2.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -0.f, -1.f);
 		light2.getComponent<Components::SpotlightComponent>().color = { 1.0f, 1.0f, 1.0f };
 		light2.getComponent<Components::SpotlightComponent>().lightIntensity = 1.0f;
 

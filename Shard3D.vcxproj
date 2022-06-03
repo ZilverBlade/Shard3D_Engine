@@ -221,7 +221,7 @@
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
     <ClCompile Include="wb3d\actor.cpp" />
-    <ClCompile Include="wb3d\scene.cpp" />
+    <ClCompile Include="wb3d\level.cpp" />
     <ClCompile Include="UI\ImGuiLayer.cpp" />
     <ClCompile Include="systems\basic_render_system.cpp" />
     <ClCompile Include="input\keyboard_movement_controller.cpp" />
@@ -253,7 +253,7 @@
     <ClInclude Include="systems\pointlight_system.hpp" />
     <ClInclude Include="systems\spotlight_system.hpp" />
     <ClInclude Include="wb3d\actor.hpp" />
-    <ClInclude Include="wb3d\scene.hpp" />
+    <ClInclude Include="wb3d\level.hpp" />
     <ClInclude Include="UI\imgui_glfw_implementation.hpp" />
     <ClInclude Include="UI\imgui_implementation.hpp" />
     <ClInclude Include="UI\TestLayer.hpp" />

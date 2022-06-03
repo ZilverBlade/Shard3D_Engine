@@ -8,7 +8,7 @@
 		  
 
 #include "../components.hpp"
-#include "../wb3d/scene.hpp"
+#include "../wb3d/level.hpp"
 #include "../wb3d/actor.hpp"
 
 #include <string>
@@ -26,7 +26,7 @@ namespace Shard3D {
 		BasicRenderSystem(const BasicRenderSystem&) = delete;
 		BasicRenderSystem& operator=(const BasicRenderSystem&) = delete;
 
-		void renderGameObjects(FrameInfo &frameInfo, std::shared_ptr<wb3d::Scene>& scene);
+		void renderGameObjects(FrameInfo &frameInfo, std::shared_ptr<wb3d::Level>& level);
 
 	private:
 

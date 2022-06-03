@@ -6,7 +6,7 @@
 #include "../camera.hpp"
 #include "../frame_info.hpp"
 
-#include "../wb3d/scene.hpp"
+#include "../wb3d/level.hpp"
 #include "../wb3d/actor.hpp"
 
 #include "../components.hpp"
@@ -25,8 +25,8 @@ namespace Shard3D {
 		SpotlightSystem(const SpotlightSystem&) = delete;
 		SpotlightSystem& operator=(const SpotlightSystem&) = delete;
 
-		void update(FrameInfo& frameInfo, GlobalUbo &ubo, std::shared_ptr<wb3d::Scene>& scene);
-		void render(FrameInfo &frameInfo, std::shared_ptr<wb3d::Scene>& scene);
+		void update(FrameInfo& frameInfo, GlobalUbo &ubo, std::shared_ptr<wb3d::Level>& level);
+		void render(FrameInfo &frameInfo, std::shared_ptr<wb3d::Level>& level);
 
 	private:
 

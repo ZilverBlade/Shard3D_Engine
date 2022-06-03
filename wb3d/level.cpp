@@ -1,55 +1,56 @@
-#include "scene.hpp"
+#include "level.hpp"
 #include "actor.hpp"
 #include "../components.hpp"
 
 
 namespace Shard3D {
 	namespace wb3d {
-		Scene::Scene() {
-			std::cout << "creating scene\n";
+		Level::Level() {
+			std::cout << "Creating level\n";
 			entt::entity actor = eRegistry.create();
 			//eRegistry.emplace<Components::TransformComponent>(actor, glm::vec3(1.f, -1.f, 1.f));
 		}
-		Scene::~Scene() {
-			std::cout << "destroying scene\n";
+		Level::~Level() {
+			std::cout << "Destroying level\n";
 			eRegistry.clear();
 		}
 		
-		Actor Scene::createActor(const char* name) {
+		Actor Level::createActor(const char* name) {
+			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { eRegistry.create(), this };
 			actor.addComponent<Components::GUIDComponent>();
+			auto& tag = actor.addComponent<Components::TagComponent>();
+			tag.tag = name;
 #ifdef ACTOR_FORCE_TRANSFORM_COMPONENT
 			actor.addComponent<Components::TransformComponent>();
 #endif
-			auto& tag = actor.addComponent<Components::TagComponent>();
-			tag.tag = name;
-
 			return actor;
 		}
 
-		Actor Scene::createActorWithGUID(GUID guid, const char* name) {
+		Actor Level::createActorWithGUID(GUID guid, const char* name) {
+			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { eRegistry.create(), this };
 			actor.addComponent<Components::GUIDComponent>(guid);
+			auto& tag = actor.addComponent<Components::TagComponent>();
+			tag.tag = name;
 #ifdef ACTOR_FORCE_TRANSFORM_COMPONENT
 			actor.addComponent<Components::TransformComponent>();
 #endif
-			auto& tag = actor.addComponent<Components::TagComponent>();
-			tag.tag = name;
 
 			return actor;
 		}
 
-		void Scene::killActor(Actor actor) {			
+		void Level::killActor(Actor actor) {			
 			eRegistry.destroy(actor);
 		}
 
-		void Scene::killEverything() {
+		void Level::killEverything() {
 			eRegistry.clear();
 		}
 
 		/*
 
-		void Scene::componentAdded() { }
+		void Level::componentAdded() { }
 		*/
 	}
 }

@@ -21,6 +21,7 @@ namespace Shard3D {
 
 			TagComponent() = default;
 			TagComponent(const TagComponent&) = default;
+			operator std::string() { return tag; };
 		};
 
 		struct TransformComponent {
@@ -37,28 +38,29 @@ namespace Shard3D {
 
 		struct Model3DComponent {
 			std::shared_ptr<EngineModel> model{};
-			std::string modelPath;
 
 			Model3DComponent() = default;
 			Model3DComponent(const Model3DComponent&) = default;
-			Model3DComponent(const std::shared_ptr<EngineModel>& mdl) { model = mdl; modelPath = "modeldata/FART.obj"; }
+			Model3DComponent(const std::shared_ptr<EngineModel>& mdl) { model = mdl; }
 
 			std::shared_ptr<EngineModel> getModel() { return model; };
 		};
 
 		struct PointlightComponent {
+			float radius = 1.f;
 			glm::vec3 color = { 1.f, 1.f, 1.f };
 			float lightIntensity = 1.0f;
-			glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f);
+			glm::vec3 attenuationMod = { 0.f, 0.f, 1.f };
 			float specularMod = 1.0f;
 		};
 
 		struct SpotlightComponent {
+			float radius = 1.f;
 			glm::vec3 color = { 1.f, 1.f, 1.f };
 			float lightIntensity = 1.0f;
 			float outerAngle = glm::radians(15.0f);
 			float innerAngle = glm::radians(45.0f);
-			glm::vec4 attenuationMod = glm::vec4(0.f, 0.f, 1.f, 0.f);
+			glm::vec3 attenuationMod = { 0.f, 0.f, 1.f };
 			float specularMod = 1.0f;
 		};
 
