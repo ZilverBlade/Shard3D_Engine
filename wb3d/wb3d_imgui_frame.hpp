@@ -1,3 +1,5 @@
+#pragma once
+
 #include <imgui.h>
 #include <memory>
 #include <vector>
@@ -352,5 +354,5 @@ namespace Shard3D {
                 return 0;
             }
         };
-	}
+}
 }

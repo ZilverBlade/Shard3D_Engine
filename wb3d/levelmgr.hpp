@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../device.hpp"
 #include "level.hpp"
 namespace Shard3D {
 	namespace wb3d {
@@ -10,7 +10,11 @@ namespace Shard3D {
 			ErrorResult = -2,
 
 			WrongFileResult = 10,
-			InvalidEntryResult = 20
+			InvalidEntryResult = 20,
+			OldEngineVersionResult = 30,
+			OldEditorVersionResult = 31,
+			FutureVersionResult = 40,
+			FutureEditorVersionResult = 41
 		};
 
 		class LevelManager {
@@ -20,7 +24,7 @@ namespace Shard3D {
 			void save(const std::string& destinationPath);
 			void saveRuntime(const std::string& destinationPath);
 
-			LevelMgrResults load(const std::string& sourcePath);
+			LevelMgrResults load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns = false);
 			LevelMgrResults loadRuntime(const std::string& sourcePath);
 
 		private:

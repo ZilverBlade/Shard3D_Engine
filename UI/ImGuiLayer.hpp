@@ -5,7 +5,7 @@
 #include <imgui_node_editor.h>
 #include <memory>
 #include <vector>
-#include "../wb3d/wb3d_imgui_frame.hpp"
+#include "../wb3d/wb3d_imgui_frame.cpp"
 namespace Shard3D {
 
 	class ImGuiLayer : public Shard3D::Layer {
@@ -25,7 +25,7 @@ namespace Shard3D {
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 
-		VkDevice currentDevice{};
+		EngineDevice* currentDevice;
 
 		bool hasBeenDetached = false;
 		float timeSinceLastSecond;
@@ -59,7 +59,6 @@ namespace Shard3D {
 		EditorPreferences edpref;
 		EngineSettings enset;
 
-		wb3d::Console console;
 	};
 
 }

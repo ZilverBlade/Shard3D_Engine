@@ -92,7 +92,7 @@ namespace Shard3D {
 		EngineCamera camera{};
 		
 		std::cout << "Loading camera actor\n";
-		wb3d::Actor cameraActor = activeLevel->createActor("Camera Actor");
+		wb3d::Actor cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor");
 
 		//cameraActor.addComponent<Components::TransformComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
@@ -129,7 +129,7 @@ namespace Shard3D {
 			
 			camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
 
-			light2.getComponent<Components::TransformComponent>().translation.x += frameTime;
+			//light2.getComponent<Components::TransformComponent>().translation.x += frameTime;
 
 			float aspect = engineRenderer.getAspectRatio();
 			
@@ -219,7 +219,7 @@ namespace Shard3D {
 			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, -Y up.
 			That means that in the editor, the level must save object transform values as (X, -Z, Y), otherwise it will be incorrect
 		*/
-
+		/*
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
 		wb3d::Actor fartObj = activeLevel->createActor();
@@ -276,7 +276,7 @@ namespace Shard3D {
 
 
 		//light.getComponent<Components::DirectionalLightComponent>().attenuationMod = {1.f, 1.f, 1.f, 1.f};
-
+		*/
 		/*
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 	

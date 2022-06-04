@@ -4,7 +4,7 @@ namespace Shard3D{
 
 #define ENABLE_WORLDBUILDER3D		true;
 
-#define ENGINE_VERSION				"1.0.6"	// Shard3D {major, minor, revision, build}
+#define ENGINE_VERSION				"1.0.7"	// Shard3D {major, minor, revision, build}
 #define EDITOR_VERSION				"0.1"	// WorldEditor3D{major, minor}
 
 #define ENGINE_SETTINGS_PATH		"settings/engine_settings.ini"

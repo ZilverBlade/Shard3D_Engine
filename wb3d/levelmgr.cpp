@@ -2,8 +2,9 @@
 
 #include "actor.hpp" 
 #include "../components.hpp"
-
+#include "../wb3d/wb3d_imgui_frame.cpp"
 #include "../utils/definitions.hpp"
+
 
 #define YAML_CPP_STATIC_DEFINE
 
@@ -20,7 +21,7 @@ namespace YAML {
 			return node;
 		}
 		static bool decode(const Node& node, glm::vec2& rhs) {
-			if (!node.IsSequence() || node.size() != 2) return false;
+			if (!node.IsSequence() || node.size() < 2) return false;
 			
 			rhs.x = node[0].as<float>();
 			rhs.y = node[1].as<float>();
@@ -38,7 +39,7 @@ namespace YAML {
 			return node;
 		}
 		static bool decode(const Node& node, glm::vec3& rhs) {
-			if (!node.IsSequence() || node.size() != 3) return false;
+			if (!node.IsSequence() || node.size() < 3) return false;
 
 			rhs.x = node[0].as<float>();
 			rhs.y = node[1].as<float>();
@@ -58,7 +59,7 @@ namespace YAML {
 			return node;
 		}
 		static bool decode(const Node& node, glm::vec4& rhs) {
-			if (!node.IsSequence() || node.size() != 4) return false;
+			if (!node.IsSequence() || node.size() < 4) return false;
 
 			rhs.x = node[0].as<float>();
 			rhs.y = node[1].as<float>();
@@ -90,13 +91,18 @@ namespace Shard3D {
 			return out; // [float, float, float, float]
 		}
 
-		LevelManager::LevelManager(const std::shared_ptr<Level>& level) : mLevel(level) { }
+		LevelManager::LevelManager(const std::shared_ptr<Level>& level) : mLevel(level) { 
+			Log log;
+			log.logString("Constructing Level Manager");
+		}
 
 		static void saveActor(YAML::Emitter& out, Actor actor) {
+			if (!actor.hasComponent<Components::GUIDComponent>()) return;
 			if (actor.getGUID() == 0 || actor.getGUID() == sizeof(uint64_t)) return; // might be reserved for core engine purposes
 
 			out << YAML::BeginMap;
 			out << YAML::Key << "Actor" << YAML::Value << actor.getGUID();
+
 			// TAG
 			if (actor.hasComponent<Components::TagComponent>()) {
 				out << YAML::Key << "TagComponent";
@@ -154,8 +160,7 @@ namespace Shard3D {
 			}
 			out << YAML::EndMap;
 		}
-
-		void LevelManager::save(const std::string& destinationPath)  {
+		void LevelManager::save(const std::string& destinationPath) {
 			YAML::Emitter out;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION;
@@ -173,42 +178,95 @@ namespace Shard3D {
 
 			std::ofstream fout(destinationPath);
 			fout << out.c_str();
+
+			//wb3d::wbConsoleLogger.AddLog("Saved scene '", destinationPath, "'");
 		}
 
 		void LevelManager::saveRuntime(const std::string& destinationPath) {
 			assert(false);
 		}
 
-		LevelMgrResults LevelManager::load(const std::string& sourcePath) {
+		LevelMgrResults LevelManager::load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns) {
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
 
 			YAML::Node data = YAML::Load(strStream.str());
-			if (!data["Level"]) return LevelMgrResults::WrongFileResult;
+			if (ignoreWarns == false) {
+				if (!data["Level"]) return LevelMgrResults::WrongFileResult;
 
-			std::string levelName = data["Scene"].as<std::string>();
+				if (data["Shard3D"].as<std::string>() != ENGINE_VERSION) { 
+					std::cout << "wrong engin version\n";
+					return LevelMgrResults::OldEngineVersionResult;
+				}// change this to check if the version is less or more
+				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION) {
+					std::cout << "wrong wsit version\n";
+					return LevelMgrResults::OldEditorVersionResult;
+				}// change this to check if the version is less or more
+
+
+			}
+
+			std::string levelName = data["Level"].as<std::string>();
 			
 			if (data["Actors"]) {
 				for (auto actor : data["Actors"]) {
-					uint64_t guid = actor["Actor"].as<uint64_t>();
-
 					Actor loadedActor{};
+
+					std::cout << "Loading actor with ID " << actor["Actor"].as<uint64_t>() << "\n";
 					if (actor["TagComponent"]) {
-						Actor loadedActor = mLevel->createActorWithGUID(guid, actor["TagComponent"]["Tag"].as<std::string>());
+						loadedActor = mLevel->createActorWithGUID(actor["Actor"].as<uint64_t>(), actor["TagComponent"]["Tag"].as<std::string>());
 					} // Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing
 
 					if (actor["TransformComponent"]) {
 #ifndef ACTOR_FORCE_TRANSFORM_COMPONENT		
-						if (!loadedActor.hasComponent<Components::TransformComponent>()) loadedActor.addComponent<Components::TransformComponent>();
+						loadedActor.addComponent<Components::TransformComponent>();
 #endif
 						loadedActor.getComponent<Components::TransformComponent>().translation = actor["TransformComponent"]["Translation"].as<glm::vec3>();
 						loadedActor.getComponent<Components::TransformComponent>().rotation = actor["TransformComponent"]["Rotation"].as<glm::vec3>();
 						loadedActor.getComponent<Components::TransformComponent>().scale = actor["TransformComponent"]["Scale"].as<glm::vec3>();
+
 					}
 
+					if (actor["MeshComponent"]) {
+						loadedActor.addComponent<Components::MeshComponent>();
+						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(device, actor["MeshComponent"]["MeshPath"].as<std::string>(), ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
+
+						loadedActor.getComponent<Components::MeshComponent>().model = model;
+						//loadedActor.getComponent<Components::MeshComponent>().path = actor["MeshComponent"]["Emission"].as<glm::vec4>().w;
+						//loadedActor.getComponent<Components::MeshComponent>().type =actor["MeshComponent"]["Radius"].as<int>();
+					}
+					
+					if (actor["PointlightComponent"]) {
+						loadedActor.addComponent<Components::PointlightComponent>();
+
+						loadedActor.getComponent<Components::PointlightComponent>().color = actor["PointlightComponent"]["Emission"].as<glm::vec3>();
+						loadedActor.getComponent<Components::PointlightComponent>().lightIntensity = actor["PointlightComponent"]["Emission"].as<glm::vec4>().w;
+						loadedActor.getComponent<Components::PointlightComponent>().radius = actor["PointlightComponent"]["Radius"].as<float>();
+						loadedActor.getComponent<Components::PointlightComponent>().specularMod = actor["PointlightComponent"]["Specularness"].as<float>();
+						loadedActor.getComponent<Components::PointlightComponent>().attenuationMod = actor["PointlightComponent"]["AttenuationCLQ"].as<glm::vec3>();
+					}
+					if (actor["SpotlightComponent"]) {
+						loadedActor.addComponent<Components::SpotlightComponent>();
+
+						loadedActor.getComponent<Components::SpotlightComponent>().color = actor["SpotlightComponent"]["Emission"].as<glm::vec3>();
+						loadedActor.getComponent<Components::SpotlightComponent>().lightIntensity = actor["SpotlightComponent"]["Emission"].as<glm::vec4>().w;
+						loadedActor.getComponent<Components::SpotlightComponent>().radius = actor["SpotlightComponent"]["Radius"].as<float>();
+						loadedActor.getComponent<Components::SpotlightComponent>().innerAngle = actor["SpotlightComponent"]["Angle"].as<glm::vec2>().x;
+						loadedActor.getComponent<Components::SpotlightComponent>().outerAngle = actor["SpotlightComponent"]["Angle"].as<glm::vec2>().y;
+						loadedActor.getComponent<Components::SpotlightComponent>().specularMod = actor["SpotlightComponent"]["Specularness"].as<float>();
+						loadedActor.getComponent<Components::SpotlightComponent>().attenuationMod = actor["SpotlightComponent"]["AttenuationCLQ"].as<glm::vec3>();
+					}
+					if (actor["DirectionalLightComponent"]) {
+						loadedActor.addComponent<Components::DirectionalLightComponent>();
+
+						loadedActor.getComponent<Components::DirectionalLightComponent>().color = actor["DirectionalLightComponent"]["Emission"].as<glm::vec3>();
+						loadedActor.getComponent<Components::DirectionalLightComponent>().lightIntensity = actor["DirectionalLightComponent"]["Emission"].as<glm::vec4>().w;
+						loadedActor.getComponent<Components::DirectionalLightComponent>().specularMod = actor["DirectionalLightComponent"]["Specularness"].as<float>();
+					}
 				}
 			}
+			return LevelMgrResults::SuccessResult;
 		}
 
 		LevelMgrResults LevelManager::loadRuntime(const std::string& sourcePath) {

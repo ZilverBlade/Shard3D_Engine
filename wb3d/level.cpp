@@ -19,8 +19,7 @@ namespace Shard3D {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { eRegistry.create(), this };
 			actor.addComponent<Components::GUIDComponent>();
-			auto& tag = actor.addComponent<Components::TagComponent>();
-			tag.tag = name;
+			actor.addComponent<Components::TagComponent>().tag = name;
 #ifdef ACTOR_FORCE_TRANSFORM_COMPONENT
 			actor.addComponent<Components::TransformComponent>();
 #endif
@@ -31,8 +30,7 @@ namespace Shard3D {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { eRegistry.create(), this };
 			actor.addComponent<Components::GUIDComponent>(guid);
-			auto& tag = actor.addComponent<Components::TagComponent>();
-			tag.tag = name;
+			actor.addComponent<Components::TagComponent>().tag = name;
 #ifdef ACTOR_FORCE_TRANSFORM_COMPONENT
 			actor.addComponent<Components::TransformComponent>();
 #endif

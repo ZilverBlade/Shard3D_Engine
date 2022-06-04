@@ -23,7 +23,7 @@ namespace Shard3D {
 	}
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
-        currentDevice = device->device();
+        currentDevice = device;
         glfwSetWindowTitle(window, "Shard3D Engine 1.0 (EDITOR) (PHYSICS: null)");
         hasBeenDetached = false;
 
@@ -85,10 +85,10 @@ namespace Shard3D {
         pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
         pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
         pool_info.pPoolSizes = pool_sizes;
-        vkCreateDescriptorPool(currentDevice, &pool_info, nullptr, &descriptorPool);
+        vkCreateDescriptorPool(device->device(), &pool_info, nullptr, &descriptorPool);
 
         device->init_info.DescriptorPool = descriptorPool;
-        device->init_info.Device = currentDevice;
+        device->init_info.Device = device->device();
         device->init_info.Queue = device->graphicsQueue();
         device->init_info.QueueFamily = device->findPhysicalQueueFamilies().graphicsFamily;
 
@@ -299,11 +299,15 @@ namespace Shard3D {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
                 if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) { }
-                if (ImGui::MenuItem("Open Level", NULL /* ctrl + o */)) { }
+                if (ImGui::MenuItem("Open Level", NULL /* ctrl + o */)) {
+                    wb3d::LevelManager levelMan(level);
+                    if (levelMan.load("scenedata/test.wbl", *currentDevice) == wb3d::LevelMgrResults::SuccessResult) {
+                        std::cout << "successfully loaded scene\n";
+                    } 
+                }
                 if (ImGui::MenuItem("Save Level", NULL /* ctrl + s */)) {
                     wb3d::LevelManager levelMan(level);
                     levelMan.save("scenedata/test.wbl");
-                    console.AddLog("Saved scene ", "scenedata/test.wbl");
                 }
                 if (ImGui::MenuItem("Save Level As", NULL /* ctrl + shift + s */)) {}
                 if (ImGui::MenuItem("Destroy Level", NULL /* ctrl + shift + del */)) { }
@@ -320,8 +324,7 @@ namespace Shard3D {
 
                 ImGui::EndMenu();
             }
-#ifdef NDEBUG
-#else
+#ifndef NDEBUG
             if (ImGui::BeginMenu("Debug")) {
                 ImGui::TextDisabled("Shard3D Debug menu");
                 ImGui::Separator();
@@ -478,7 +481,7 @@ namespace Shard3D {
             ImGui::End();
         }
 
-        console.Draw("cool: Console", &visible);
+        //wb3d::wbConsoleLogger.Draw("cool: Console", &visible);
 
         ImGui::End();
 #pragma endregion
@@ -492,7 +495,7 @@ namespace Shard3D {
     }
 
     void ImGuiLayer::pushError(const char* message) {
-         console.AddLog(message);
+        //wb3d::wbConsoleLogger.AddLog(message);
     }
 
 }
