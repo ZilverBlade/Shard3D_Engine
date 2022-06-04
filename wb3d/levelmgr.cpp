@@ -93,7 +93,34 @@ namespace Shard3D {
 
 		LevelManager::LevelManager(const std::shared_ptr<Level>& level) : mLevel(level) { 
 			Log log;
-			log.logString("Constructing Level Manager");
+			log.logString("Loading Level Manager");
+		}
+
+		std::string LevelManager::encrypt(std::string input) {
+			auto newTime = std::chrono::high_resolution_clock::now();
+			char c;
+			std::string encryptedString;
+			for (int i = 0; i < input.length(); i++) {
+				c = input.at(i);
+				encryptedString.push_back((char)
+					((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
+			}
+
+			std::cout << "Duration of Level encryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			return encryptedString;
+		}
+		std::string LevelManager::decrypt(std::string input) {
+			auto newTime = std::chrono::high_resolution_clock::now();
+			char c;
+			std::string decryptedString;
+			for (int i = 0; i < input.length(); i++) {
+				c = input.at(i);
+				decryptedString.push_back((char)
+					(((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
+			}
+
+			std::cout << "Duration of Level decryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			return decryptedString;
 		}
 
 		static void saveActor(YAML::Emitter& out, Actor actor) {
@@ -125,8 +152,9 @@ namespace Shard3D {
 			if (actor.hasComponent<Components::MeshComponent>()) {
 				out << YAML::Key << "MeshComponent";
 				out << YAML::BeginMap;
-					out << YAML::Key << "MeshPath" << YAML::Value << actor.getComponent<Components::MeshComponent>().getPath();
-					out << YAML::Key << "MeshFormat" << YAML::Value << (int)actor.getComponent<Components::MeshComponent>().getModelType();
+					out << YAML::Key << "MeshPath" << YAML::Value << actor.getComponent<Components::MeshComponent>().file;
+					out << YAML::Key << "MeshFormat" << YAML::Value << (int)actor.getComponent<Components::MeshComponent>().type;
+					out << YAML::Key << "Indexed" << YAML::Value << actor.getComponent<Components::MeshComponent>().isIndexed;
 				out << YAML::EndMap;
 			}
 
@@ -160,7 +188,7 @@ namespace Shard3D {
 			}
 			out << YAML::EndMap;
 		}
-		void LevelManager::save(const std::string& destinationPath) {
+		void LevelManager::save(const std::string& destinationPath, bool encryptLevel) {
 			YAML::Emitter out;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION;
@@ -176,10 +204,19 @@ namespace Shard3D {
 			out << YAML::EndSeq;
 			out << YAML::EndMap;
 
-			std::ofstream fout(destinationPath);
-			fout << out.c_str();
-
-			//wb3d::wbConsoleLogger.AddLog("Saved scene '", destinationPath, "'");
+			if (encryptLevel) {
+				std::ofstream fout(destinationPath);
+				fout << encrypt(out.c_str());
+				fout.flush();
+				fout.close();
+			} else {
+				std::ofstream fout2(destinationPath);
+				fout2 << out.c_str();
+				fout2.flush();
+				fout2.close();
+			}
+		
+			std::cout << "Saved scene '" << destinationPath << "'";
 		}
 
 		void LevelManager::saveRuntime(const std::string& destinationPath) {
@@ -187,23 +224,34 @@ namespace Shard3D {
 		}
 
 		LevelMgrResults LevelManager::load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns) {
+			//mLevel->killEverything();
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
 
+#if GAME_RELEASE_READY
+			YAML::Node data = YAML::Load(decrypt(strStream.str()));
+#if BETA_DEBUG_TOOLS
+			std::ofstream fout(sourcePath + ".dcr");
+			fout << decrypt(strStream.str());
+			fout.flush();
+			fout.close();
+#endif
+#else
 			YAML::Node data = YAML::Load(strStream.str());
+#endif
+
 			if (ignoreWarns == false) {
 				if (!data["Level"]) return LevelMgrResults::WrongFileResult;
 
 				if (data["Shard3D"].as<std::string>() != ENGINE_VERSION) { 
-					std::cout << "wrong engin version\n";
+					std::cout << "wrong engine version\n";
 					return LevelMgrResults::OldEngineVersionResult;
 				}// change this to check if the version is less or more
 				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION) {
-					std::cout << "wrong wsit version\n";
+					std::cout << "wrong editor version\n";
 					return LevelMgrResults::OldEditorVersionResult;
 				}// change this to check if the version is less or more
-
 
 			}
 
@@ -229,12 +277,13 @@ namespace Shard3D {
 					}
 
 					if (actor["MeshComponent"]) {
-						loadedActor.addComponent<Components::MeshComponent>();
-						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(device, actor["MeshComponent"]["MeshPath"].as<std::string>(), ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
-
-						loadedActor.getComponent<Components::MeshComponent>().model = model;
-						//loadedActor.getComponent<Components::MeshComponent>().path = actor["MeshComponent"]["Emission"].as<glm::vec4>().w;
-						//loadedActor.getComponent<Components::MeshComponent>().type =actor["MeshComponent"]["Radius"].as<int>();
+						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(
+							device,
+							actor["MeshComponent"]["MeshPath"].as<std::string>(),
+				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>(),
+							actor["MeshComponent"]["Indexed"].as<bool>()
+						);
+						loadedActor.addComponent<Components::MeshComponent>(model);
 					}
 					
 					if (actor["PointlightComponent"]) {

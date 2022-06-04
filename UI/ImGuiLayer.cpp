@@ -298,19 +298,27 @@ namespace Shard3D {
             if (ImGui::BeginMenu("File")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
-                if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) { }
-                if (ImGui::MenuItem("Open Level", NULL /* ctrl + o */)) {
+                if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) {}
+                if (ImGui::MenuItem("Load Level", NULL /* ctrl + o */)) {
                     wb3d::LevelManager levelMan(level);
                     if (levelMan.load("scenedata/test.wbl", *currentDevice) == wb3d::LevelMgrResults::SuccessResult) {
                         std::cout << "successfully loaded scene\n";
-                    } 
+                    }
                 }
                 if (ImGui::MenuItem("Save Level", NULL /* ctrl + s */)) {
                     wb3d::LevelManager levelMan(level);
-                    levelMan.save("scenedata/test.wbl");
+                    levelMan.save("scenedata/test.wbl", false);
+                }
+                if (ImGui::MenuItem("Save Level (Encrypted)", NULL /* ctrl + s */)) {
+                    wb3d::LevelManager levelMan(level);
+                    levelMan.save("scenedata/test.wbl", true);
                 }
                 if (ImGui::MenuItem("Save Level As", NULL /* ctrl + shift + s */)) {}
-                if (ImGui::MenuItem("Destroy Level", NULL /* ctrl + shift + del */)) { }
+                if (ImGui::MenuItem("Destroy Level", NULL /* ctrl + shift + del */)) {
+                    Log log;
+                    log.logString("Destroying Level");
+                    level->killEverything();
+                }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { detach(); return; }
                 ImGui::Separator();
@@ -330,6 +338,33 @@ namespace Shard3D {
                 ImGui::Separator();
                 if (ImGui::MenuItem("Play test audio", NULL /*make sure to add some sort of shardcut */)) {
                 }
+                if (ImGui::MenuItem("Encrypt string")) {
+                    std::string originalString = "Hello World! ABCDabcd0123<> /\\[]+=.;'`~óòçñ";
+                    console.AddLog("Input string: %str", originalString);
+
+                    char c;
+                    std::string encryptedString;
+                    for (int i = 0; i < originalString.length(); i++) {
+                        c = originalString.at(i);
+                        encryptedString.push_back((char)
+                            ((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
+                    }
+
+                    console.AddLog("Encrypted result: %str", encryptedString);
+                    std::string decryptedString;
+
+                    for (int i = 0; i < encryptedString.length(); i++) {
+                        c = encryptedString.at(i);
+                        decryptedString.push_back((char)
+                            (((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
+                    }
+
+                    console.AddLog("Decrypted result: %str", decryptedString);
+
+                    if (decryptedString != originalString) pushError("Encryption and decryption don't match! Are you using a cipher key that is a multiple of 2?");
+                    else console.AddLog("Encryption and decryption match! Success!");
+                }
+        
                 //if (ImGui::MenuItem("", NULL /*make sure to add some sort of shardcut */)) {}
 
                 ImGui::EndMenu();
@@ -481,7 +516,7 @@ namespace Shard3D {
             ImGui::End();
         }
 
-        //wb3d::wbConsoleLogger.Draw("cool: Console", &visible);
+        console.Draw("Dev Console", &visible);
 
         ImGui::End();
 #pragma endregion
@@ -495,7 +530,7 @@ namespace Shard3D {
     }
 
     void ImGuiLayer::pushError(const char* message) {
-        //wb3d::wbConsoleLogger.AddLog(message);
+        console.AddLog(message);
     }
 
 }

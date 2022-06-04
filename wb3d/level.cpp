@@ -43,6 +43,8 @@ namespace Shard3D {
 		}
 
 		void Level::killEverything() {
+			Log log;
+			log.logString("Destroying Level");
 			eRegistry.clear();
 		}
 

@@ -21,7 +21,10 @@ namespace Shard3D {
 		public:
 			LevelManager(const std::shared_ptr<Level>& level);
 
-			void save(const std::string& destinationPath);
+			std::string encrypt(std::string input);
+			std::string decrypt(std::string input);
+
+			void save(const std::string& destinationPath, bool encryptLevel = false);
 			void saveRuntime(const std::string& destinationPath);
 
 			LevelMgrResults load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns = false);

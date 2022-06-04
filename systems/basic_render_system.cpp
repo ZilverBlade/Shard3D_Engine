@@ -89,7 +89,7 @@ namespace Shard3D {
 					&push
 				);
 
-				auto model = actor.getComponent<Components::MeshComponent>().getModel();
+				auto model = actor.getComponent<Components::MeshComponent>().model;
 				model->bind(frameInfo.commandBuffer);
 				model->draw(frameInfo.commandBuffer);
 			}

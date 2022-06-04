@@ -43,11 +43,15 @@ namespace Shard3D {
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
+		isIndexed = indexModel;
+		mType = modelType;
+		fpath = filepath;
+		
 		if (indexModel) {
 			builder.loadIndexedModel(filepath, modelType);
 			if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
 				std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << "\n";
-			}
+			}	
 			return std::make_unique<EngineModel>(device, builder);
 		}
 		else {

@@ -38,25 +38,18 @@ namespace Shard3D {
 
 		struct MeshComponent {
 			std::shared_ptr<EngineModel> model{};
-			std::string path{};
+			std::string file{};
 			ModelType type = ModelType::MODEL_TYPE_NULL;
+			bool isIndexed = true;
 
 			MeshComponent() = default;
 			MeshComponent(const MeshComponent&) = default;
-			MeshComponent(const std::shared_ptr<EngineModel>& mdl) { model = mdl; }
-
-			std::shared_ptr<EngineModel> getModel() { return model; };
-			std::string getPath() { return "modeldata/axis.obj"; };
-			ModelType getModelType() { return type; };
-			/*
-			std::string operator()(ModelType) {
-				if (type == ModelType::MODEL_TYPE_NULL) return "null";
-				if (type == ModelType::MODEL_TYPE_OBJ) return "obj_type";
-				if (type == ModelType::MODEL_TYPE_COLLADA) return "collada_type";
-				if (type == ModelType::MODEL_TYPE_GLTF) return "gltf_type";
-				if (type == ModelType::MODEL_TYPE_FBX) return "fbx_type";
+			MeshComponent(const std::shared_ptr<EngineModel>& mdl) {
+				model = mdl; 
+				file = mdl->getFile(); 
+				type = mdl->getType();
+				isIndexed = mdl->getIndexedState();
 			}
-			*/
 		};
 
 		struct PointlightComponent {

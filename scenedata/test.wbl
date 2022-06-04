@@ -2,20 +2,24 @@ Shard3D: 1.0.7
 WorldBuilder3D: 0.1
 Level: Some kind of level
 Actors:
-  - Actor: 15748325532916915883
+  - Actor: 13924992902372273446
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
       Translation: [5, -1, 0]
       Rotation: [1, -0, -1]
       Scale: [0.100000001, 0.100000001, 0.100000001]
+    MeshComponent:
+      MeshPath: modeldata/cone.obj
+      MeshFormat: 1
+      Indexed: false
     SpotlightComponent:
       Emission: [1, 1, 1, 1]
       Radius: 1
       Angle: [0.785398185, 0.261799395]
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
-  - Actor: 12539943218891077032
+  - Actor: 10065164187459732880
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
@@ -25,7 +29,7 @@ Actors:
     DirectionalLightComponent:
       Emission: [1, 1, 1, 0.100000001]
       Specularness: 0
-  - Actor: 5144321229558141934
+  - Actor: 1728906188830776322
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
@@ -37,7 +41,7 @@ Actors:
       Radius: 1
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
-  - Actor: 6972894482939471229
+  - Actor: 14960311789538431208
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
@@ -46,8 +50,9 @@ Actors:
       Scale: [1, 1, 1]
     MeshComponent:
       MeshPath: modeldata/axis.obj
-      MeshFormat: 0
-  - Actor: 14708734809509545181
+      MeshFormat: 1
+      Indexed: false
+  - Actor: 398526326378721290
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
@@ -55,9 +60,10 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [100, 1, 100]
     MeshComponent:
-      MeshPath: modeldata/axis.obj
-      MeshFormat: 0
-  - Actor: 15675791229096525157
+      MeshPath: modeldata/quad.obj
+      MeshFormat: 1
+      Indexed: true
+  - Actor: 14998998125996252061
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
@@ -65,5 +71,6 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [0.5, 0.5, 0.5]
     MeshComponent:
-      MeshPath: modeldata/axis.obj
-      MeshFormat: 0
+      MeshPath: modeldata/FART.obj
+      MeshFormat: 1
+      Indexed: false

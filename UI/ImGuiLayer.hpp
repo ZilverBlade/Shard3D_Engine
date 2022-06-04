@@ -58,7 +58,7 @@ namespace Shard3D {
 
 		EditorPreferences edpref;
 		EngineSettings enset;
-
+		wb3d::Console console;
 	};
 
 }
