@@ -47,7 +47,7 @@ namespace Shard3D {
 			operator uint32_t() const { return (uint32_t)actorHandle; };
 
 			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
-			std::string getTag() { return getComponent<Components::TagComponent>(); }
+			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
 
 			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
 

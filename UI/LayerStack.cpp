@@ -12,19 +12,19 @@ namespace Shard3D {
 		}
 	}
 
-	void LayerStack::pushLayer(Layer* layer, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window) {
+	void LayerStack::pushLayer(Layer* layer, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
 		layerInsert = layers.emplace(layerInsert, layer);
-		layer->attach(renderPass, device, window);
+		layer->attach(renderPass, device, window, level);
 	}
 
-	void LayerStack::pushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window) {
+	void LayerStack::pushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
 		layers.emplace_back(overlay);
-		overlay->attach(renderPass, device, window);
+		overlay->attach(renderPass, device, window, level);
 	}
 
-	void LayerStack::repushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
+	void LayerStack::repushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
 		//layers.emplace_back(overlay);
-		overlay->attach(renderPass, device, window);
+		overlay->attach(renderPass, device, window, level);
 	}
 
 	void LayerStack::popLayer(Layer* layer) {

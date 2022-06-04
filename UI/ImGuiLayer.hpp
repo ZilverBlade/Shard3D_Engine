@@ -6,6 +6,10 @@
 #include <memory>
 #include <vector>
 #include "../wb3d/wb3d_imgui_frame.cpp"
+
+// panels
+#include "level_tree_panel.hpp"
+#include "level_properties_panel.hpp"
 namespace Shard3D {
 
 	class ImGuiLayer : public Shard3D::Layer {
@@ -13,7 +17,7 @@ namespace Shard3D {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) override;
+		void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) override;
 		void detach() override;
 		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level) override;
 
@@ -59,6 +63,9 @@ namespace Shard3D {
 		EditorPreferences edpref;
 		EngineSettings enset;
 		wb3d::Console console;
+
+		LevelTreePanel levelTreePanel;
+		LevelPropertiesPanel levelPropertiesPanel;
 	};
 
 }

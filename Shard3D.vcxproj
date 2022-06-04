@@ -220,6 +220,8 @@
     <ClCompile Include="systems\directional_light_system.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
+    <ClCompile Include="UI\level_properties_panel.cpp" />
+    <ClCompile Include="UI\level_tree_panel.cpp" />
     <ClCompile Include="wb3d\actor.cpp" />
     <ClCompile Include="wb3d\level.cpp" />
     <ClCompile Include="UI\ImGuiLayer.cpp" />
@@ -250,6 +252,8 @@
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="engine_logger.hpp" />
     <ClInclude Include="GUID.hpp" />
+    <ClInclude Include="UI\level_properties_panel.hpp" />
+    <ClInclude Include="UI\level_tree_panel.hpp" />
     <ClInclude Include="wb3d\levelmgr.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
     <ClInclude Include="systems\pointlight_system.hpp" />

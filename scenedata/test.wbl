@@ -2,11 +2,11 @@ Shard3D: 1.0.7
 WorldBuilder3D: 0.1
 Level: Some kind of level
 Actors:
-  - Actor: 13924992902372273446
+  - Actor: 11041745289289356304
     TagComponent:
-      Tag: Some kind of actor
+      Tag: spotlight
     TransformComponent:
-      Translation: [5, -1, 0]
+      Translation: [5.63999987, -1, 0]
       Rotation: [1, -0, -1]
       Scale: [0.100000001, 0.100000001, 0.100000001]
     MeshComponent:
@@ -19,17 +19,17 @@ Actors:
       Angle: [0.785398185, 0.261799395]
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
-  - Actor: 10065164187459732880
+  - Actor: 6473355389825069262
     TagComponent:
-      Tag: Some kind of actor
+      Tag: sunlight
     TransformComponent:
-      Translation: [0, -1, 5]
+      Translation: [0, -1, 3.38000011]
       Rotation: [1, -3, -1]
       Scale: [1, 1, 1]
     DirectionalLightComponent:
       Emission: [1, 1, 1, 0.100000001]
       Specularness: 0
-  - Actor: 1728906188830776322
+  - Actor: 279020396416382903
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
@@ -41,35 +41,35 @@ Actors:
       Radius: 1
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
-  - Actor: 14960311789538431208
+  - Actor: 14379880132986827232
     TagComponent:
-      Tag: Some kind of actor
+      Tag: axis
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [0, -0.0500000007, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponent:
       MeshPath: modeldata/axis.obj
       MeshFormat: 1
       Indexed: false
-  - Actor: 398526326378721290
+  - Actor: 8478236753190339018
     TagComponent:
-      Tag: Some kind of actor
+      Tag: floor
     TransformComponent:
-      Translation: [0, 0.899999976, 0]
+      Translation: [0, 0.970000029, 0]
       Rotation: [0, 0, 0]
       Scale: [100, 1, 100]
     MeshComponent:
       MeshPath: modeldata/quad.obj
       MeshFormat: 1
       Indexed: true
-  - Actor: 14998998125996252061
+  - Actor: 7204028520566283701
     TagComponent:
-      Tag: Some kind of actor
+      Tag: car
     TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0.5, 0.5, 0.5]
+      Translation: [0, 0.419999987, 0]
+      Rotation: [1.26999998, 8.64000034, 0.0599999987]
+      Scale: [0.5, 1.99000001, 0.639999986]
     MeshComponent:
       MeshPath: modeldata/FART.obj
       MeshFormat: 1

@@ -125,7 +125,7 @@ namespace Shard3D {
 
 		static void saveActor(YAML::Emitter& out, Actor actor) {
 			if (!actor.hasComponent<Components::GUIDComponent>()) return;
-			if (actor.getGUID() == 0 || actor.getGUID() == sizeof(uint64_t)) return; // might be reserved for core engine purposes
+			if (actor.getGUID() == 0 || actor.getGUID() == std::numeric_limits<uint64_t>::max()) return; // might be reserved for core engine purposes
 
 			out << YAML::BeginMap;
 			out << YAML::Key << "Actor" << YAML::Value << actor.getGUID();

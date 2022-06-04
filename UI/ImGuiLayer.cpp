@@ -22,14 +22,17 @@ namespace Shard3D {
 
 	}
 
-    void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {
+    void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
         currentDevice = device;
         glfwSetWindowTitle(window, "Shard3D Engine 1.0 (EDITOR) (PHYSICS: null)");
         hasBeenDetached = false;
 
         nodeEditorContext = ax::NodeEditor::CreateEditor();
-
+        levelTreePanel.setContext(level);
+        levelPropertiesPanel.setContext(level);
         ImGui::CreateContext();
+
+
 
         ImGuiIO& io = ImGui::GetIO();
         io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -248,14 +251,17 @@ namespace Shard3D {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ax::NodeEditor::SetCurrentEditor(nodeEditorContext);
+        // start rendering stuff here
 
+        levelTreePanel.render();
+        levelPropertiesPanel.render(levelTreePanel);
+        ax::NodeEditor::SetCurrentEditor(nodeEditorContext);
         static bool visible = true;
 
         //ImGui::ShowDemoWindow(&visible);
 
 #pragma region DOCKSPACE    
-        static bool opt_fullscreen = true;
+        static bool opt_fullscreen = false;
         static bool opt_padding = false;
 
         static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -288,11 +294,11 @@ namespace Shard3D {
             ImGui::PopStyleVar(2);
 
         // Submit the DockSpace
-        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
-            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            //   ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
+       if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+          ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+               ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
             ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
-        }
+       }
 
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {

@@ -76,6 +76,12 @@
     <Filter Include="Header Files\wb3d">
       <UniqueIdentifier>{d3f983ea-c893-4619-95e5-37987e72a4b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UI\panels">
+      <UniqueIdentifier>{22edfbdd-8c8a-49e4-98d5-e04bcab53be4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\panels">
+      <UniqueIdentifier>{b7b51cd9-e2da-44cb-9d5c-4f9055ae8b48}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -170,6 +176,12 @@
     </ClCompile>
     <ClCompile Include="wb3d\levelmgr.cpp">
       <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\level_tree_panel.cpp">
+      <Filter>Source Files\UI\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\level_properties_panel.cpp">
+      <Filter>Source Files\UI\panels</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +289,12 @@
     </ClInclude>
     <ClInclude Include="wb3d\levelmgr.hpp">
       <Filter>Header Files\wb3d</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\level_tree_panel.hpp">
+      <Filter>Header Files\UI\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\level_properties_panel.hpp">
+      <Filter>Header Files\UI\panels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

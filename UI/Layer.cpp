@@ -8,7 +8,7 @@ namespace Shard3D {
 
 	void Layer::attach(){}
 
-	void Layer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window) {}
+	void Layer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {}
 
 	void Layer::detach(){}
 

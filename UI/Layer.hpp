@@ -13,7 +13,7 @@ namespace Shard3D {
 		virtual ~Layer();
 
 		virtual void attach();
-		virtual void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window);
+		virtual void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level);
 
 		virtual void detach();
 

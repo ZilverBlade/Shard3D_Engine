@@ -27,6 +27,7 @@ namespace Shard3D {
 			friend class Actor;
 
 			friend class LevelManager;
+			friend class LevelTreePanel;
 
 			friend class RunApp;
 			//systems
