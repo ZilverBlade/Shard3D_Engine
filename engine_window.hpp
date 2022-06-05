@@ -26,6 +26,7 @@ namespace Shard3D {
 		void resetWindowResizedFlag() { framebufferResized = false; }
 		GLFWwindow* getGLFWwindow() const { return window; }
 
+
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		void toggleFullscreen();
 	private:

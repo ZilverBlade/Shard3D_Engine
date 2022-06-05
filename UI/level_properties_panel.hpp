@@ -13,10 +13,18 @@ namespace Shard3D {
 
 		void setContext(const std::shared_ptr<Level>&levelContext);
 		void destroyContext();
-		void render(LevelTreePanel tree);
+		void render(LevelTreePanel tree, EngineDevice* device);
 	private:
-		void drawActorProperties(Actor actor);
+		void drawActorProperties(Actor actor, EngineDevice& device);
 
 		std::shared_ptr<Level> context;
+
+
+#pragma region Component Properties
+
+		// MeshComponent stuff
+		std::shared_ptr<EngineModel> model;
+#pragma endregion
+
 	};
 }

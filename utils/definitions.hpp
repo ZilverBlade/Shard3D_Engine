@@ -19,6 +19,7 @@ namespace Shard3D{
 #define DEFAULT_MODEL_PATH			"engine-assets/modeldata/"	//Default engine models
 #define FONT_PATH					"engine-assets/fonts/"		//Fonts
 #define DEFAULT_ENGINE_FONT			"engine-assets/fonts/sui-generis-free.rg-regular.ttf"		//Default engine font
+#define ENGINE_FONT_SIZE			16		//size in px
 #define WINDOW_ICON_PATH			"shardwinico.png"
 
 	//engine settings

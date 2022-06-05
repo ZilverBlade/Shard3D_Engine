@@ -50,6 +50,12 @@ namespace Shard3D {
 				type = mdl->getType();
 				isIndexed = mdl->getIndexedState();
 			}
+			void reapplyModel(const std::shared_ptr<EngineModel>& mdl) {
+				model = mdl;
+				file = mdl->getFile();
+				type = mdl->getType();
+				isIndexed = mdl->getIndexedState();
+			}
 		};
 
 		struct PointlightComponent {

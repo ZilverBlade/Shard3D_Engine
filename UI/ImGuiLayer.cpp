@@ -18,21 +18,18 @@ namespace Shard3D {
 
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
-	ImGuiLayer::~ImGuiLayer() {
-
-	}
+	ImGuiLayer::~ImGuiLayer() {}
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
         currentDevice = device;
         glfwSetWindowTitle(window, "Shard3D Engine 1.0 (EDITOR) (PHYSICS: null)");
         hasBeenDetached = false;
 
+        // Load any panels
         nodeEditorContext = ax::NodeEditor::CreateEditor();
         levelTreePanel.setContext(level);
         levelPropertiesPanel.setContext(level);
         ImGui::CreateContext();
-
-
 
         ImGuiIO& io = ImGui::GetIO();
         io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
@@ -65,7 +62,7 @@ namespace Shard3D {
         io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
         io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-        io.Fonts->AddFontFromFileTTF(DEFAULT_ENGINE_FONT, 16);
+        io.Fonts->AddFontFromFileTTF(DEFAULT_ENGINE_FONT, ENGINE_FONT_SIZE);
         io.Fonts->Build();
 
         VkDescriptorPoolSize pool_sizes[] =
@@ -257,7 +254,7 @@ namespace Shard3D {
         // start rendering stuff here
 
         levelTreePanel.render();
-        levelPropertiesPanel.render(levelTreePanel);
+        levelPropertiesPanel.render(levelTreePanel, currentDevice);
         ax::NodeEditor::SetCurrentEditor(nodeEditorContext);
         static bool visible = true;
 
@@ -349,7 +346,7 @@ namespace Shard3D {
                 }
                 if (ImGui::MenuItem("Encrypt string")) {
                     std::string originalString = "Hello World! ABCDabcd0123<> /\\[]+=.;'`~óòçñ";
-                    console.AddLog("Input string: %str", originalString);
+                    console.AddLog("Input string: %s", originalString.c_str());
 
                     char c;
                     std::string encryptedString;
@@ -359,7 +356,7 @@ namespace Shard3D {
                             ((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
                     }
 
-                    console.AddLog("Encrypted result: %str", encryptedString);
+                    console.AddLog("Encrypted result: %s", encryptedString.c_str());
                     std::string decryptedString;
 
                     for (int i = 0; i < encryptedString.length(); i++) {
@@ -368,7 +365,7 @@ namespace Shard3D {
                             (((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
                     }
 
-                    console.AddLog("Decrypted result: %str", decryptedString);
+                    console.AddLog("Decrypted result: %s", decryptedString.c_str());
 
                     if (decryptedString != originalString) pushError("Encryption and decryption don't match! Are you using a cipher key that is a multiple of 2?");
                     else console.AddLog("Encryption and decryption match! Success!");

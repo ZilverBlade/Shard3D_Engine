@@ -228,6 +228,9 @@ namespace Shard3D {
 		fartObj.getComponent<Components::TransformComponent>().translation = {0.f, 0.f, 0.f};
 		fartObj.getComponent<Components::TransformComponent>().scale = { .5f, .5f, .5f };
 		fartObj.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
+		std::shared_ptr<EngineModel> mode2l = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
+
+		fartObj.getComponent<Components::MeshComponent>().reapplyModel(mode2l);
 
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
 
