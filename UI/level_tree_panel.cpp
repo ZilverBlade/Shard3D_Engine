@@ -14,7 +14,7 @@ namespace Shard3D {
 
 	void LevelTreePanel::render() {
 		ImGui::Begin("Level Tree");
-		/*
+		
 		context->eRegistry.each([&](auto actorGUID) {
 			wb3d::Actor actor{ actorGUID, context.get() };	
 			if (!actor.hasComponent<Components::TagComponent>()) return;
@@ -22,7 +22,7 @@ namespace Shard3D {
 			drawActorEntry(actor);
 		});
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) selectedActor = {};
-		*/
+		
 		ImGui::End();
 	}
 	void LevelTreePanel::drawActorEntry(Actor actor) {

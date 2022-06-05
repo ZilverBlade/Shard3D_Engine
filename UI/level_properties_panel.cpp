@@ -14,7 +14,7 @@ namespace Shard3D {
 	void LevelPropertiesPanel::render(LevelTreePanel tree) {
 		ImGui::Begin("Properties");
 
-		//if (tree.selectedActor){ drawActorProperties(tree.selectedActor); }
+		if (tree.selectedActor){ drawActorProperties(tree.selectedActor); }
 		ImGui::End();
 	}
 	void LevelPropertiesPanel::drawActorProperties(Actor actor) {

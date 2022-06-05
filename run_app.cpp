@@ -49,7 +49,7 @@ namespace Shard3D {
 		std::cout << "attempting to construct Level Pointer\n";
 		activeLevel = std::make_shared<Level>();
 
-		loadGameObjects();
+		//loadGameObjects();
 	}
 	RunApp::~RunApp() {}
 
