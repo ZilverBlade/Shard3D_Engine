@@ -231,6 +231,9 @@ namespace Shard3D {
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
         ax::NodeEditor::DestroyEditor(nodeEditorContext);
+        levelTreePanel.destroyContext();
+        levelPropertiesPanel.destroyContext();
+
         hasBeenDetached = true;
 	}
 

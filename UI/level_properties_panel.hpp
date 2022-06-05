@@ -12,6 +12,7 @@ namespace Shard3D {
 		~LevelPropertiesPanel();
 
 		void setContext(const std::shared_ptr<Level>&levelContext);
+		void destroyContext();
 		void render(LevelTreePanel tree);
 	private:
 		void drawActorProperties(Actor actor);

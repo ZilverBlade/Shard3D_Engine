@@ -219,7 +219,7 @@ namespace Shard3D {
 			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, -Y up.
 			That means that in the editor, the level must save object transform values as (X, -Z, Y), otherwise it will be incorrect
 		*/
-		/*
+		
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
 		wb3d::Actor fartObj = activeLevel->createActor();
@@ -274,7 +274,7 @@ namespace Shard3D {
 		light2.getComponent<Components::SpotlightComponent>().color = { 1.0f, 1.0f, 1.0f };
 		light2.getComponent<Components::SpotlightComponent>().lightIntensity = 1.0f;
 
-		*/
+		
 		//light.getComponent<Components::DirectionalLightComponent>().attenuationMod = {1.f, 1.f, 1.f, 1.f};
 		
 		/*

@@ -10,6 +10,7 @@ namespace Shard3D {
 		~LevelTreePanel();
 
 		void setContext(const std::shared_ptr<Level>& levelContext);
+		void destroyContext();
 		void render();
 
 		Actor getSelectedActor() { return selectedActor; }

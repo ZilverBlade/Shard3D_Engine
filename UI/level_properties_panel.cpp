@@ -8,14 +8,13 @@ namespace Shard3D {
 
 	LevelPropertiesPanel::~LevelPropertiesPanel() {}
 
-	void LevelPropertiesPanel::setContext(const std::shared_ptr<Level>& levelContext) {
-		context = levelContext;
-	}
+	void LevelPropertiesPanel::setContext(const std::shared_ptr<Level>& levelContext) { context = levelContext; }
+	void LevelPropertiesPanel::destroyContext() { context = {}; }
 
 	void LevelPropertiesPanel::render(LevelTreePanel tree) {
 		ImGui::Begin("Properties");
 
-		if (tree.selectedActor){ drawActorProperties(tree.selectedActor); }
+		//if (tree.selectedActor){ drawActorProperties(tree.selectedActor); }
 		ImGui::End();
 	}
 	void LevelPropertiesPanel::drawActorProperties(Actor actor) {
