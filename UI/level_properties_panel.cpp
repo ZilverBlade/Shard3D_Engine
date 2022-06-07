@@ -16,12 +16,40 @@ namespace Shard3D {
 	void LevelPropertiesPanel::render(LevelTreePanel tree, EngineDevice* device) {
 		ImGui::Begin("Properties");
 
-		if (tree.selectedActor){ drawActorProperties(tree.selectedActor, *device); }
+		if (tree.selectedActor){ 
+			drawActorProperties(tree.selectedActor, *device); 
+			if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
+			if (ImGui::BeginPopup("AddComponent")) {
+#if !ACTOR_FORCE_TRANSFORM_COMPONENT
+				if (!tree.selectedActor.hasComponent<Components::TransformComponent>()) if (ImGui::MenuItem("Transform")) {
+					tree.selectedActor.addComponent<Components::TransformComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+#endif
+				if(!tree.selectedActor.hasComponent<Components::PointlightComponent>()) if (ImGui::MenuItem("Pointlight") ) {
+					tree.selectedActor.addComponent<Components::PointlightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (!tree.selectedActor.hasComponent<Components::SpotlightComponent>()) if (ImGui::MenuItem("Spotlight")) {
+					tree.selectedActor.addComponent<Components::SpotlightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (!tree.selectedActor.hasComponent<Components::DirectionalLightComponent>()) if (ImGui::MenuItem("Directional Light")) {
+					tree.selectedActor.addComponent<Components::DirectionalLightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
+					tree.selectedActor.addComponent<Components::MeshComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}			
+		}
 		ImGui::End();
 	}
 
 
-	static void drawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float stepVal = 0.01f, float columnWidth = 100.f) {
+	static void drawTransformControl(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float stepVal = 0.01f, float columnWidth = 100.f) {
 		ImGui::PushID(label.c_str());
 
 		ImGui::Columns(2);
@@ -47,6 +75,7 @@ namespace Shard3D {
 		if (ImGui::Button("Y", buttonSize)) values.y = resetValue;	
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine(); ImGui::DragFloat("##Y", &values.y, stepVal); ImGui::PopItemWidth(); ImGui::SameLine();
+		// correcting to be -Y
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.7f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.9f, 1.f));
@@ -54,7 +83,7 @@ namespace Shard3D {
 		if (ImGui::Button("Z", buttonSize)) values.z = resetValue;
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine(); ImGui::DragFloat("##Z", &values.z, stepVal); ImGui::PopItemWidth();
-
+		// correcting to be Z
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 
@@ -72,22 +101,23 @@ namespace Shard3D {
 				tag = std::string(tagBuffer);
 			}
 		}
+
 		if (actor.hasComponent<Components::TransformComponent>()) {
-			if (ImGui::TreeNodeEx((void*)typeid(Components::TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {			
-				drawVec3Control("Translation", actor.getComponent<Components::TransformComponent>().translation, 0.f);
+			if (ImGui::TreeNodeEx((void*)typeid(Components::TransformComponent).hash_code(), nodeFlags, "Transform")) {
+				drawTransformControl("Translation", actor.getComponent<Components::TransformComponent>().translation, 0.f);
 
 				glm::vec3 rot = glm::degrees(actor.getComponent<Components::TransformComponent>().rotation);
-				drawVec3Control("Rotation", rot, 0.f, 0.1f);
+				drawTransformControl("Rotation", rot, 0.f, 0.1f);
 				actor.getComponent<Components::TransformComponent>().rotation = glm::radians(rot);
 
-				drawVec3Control("Scale", actor.getComponent<Components::TransformComponent>().scale, 1.f);
+				drawTransformControl("Scale", actor.getComponent<Components::TransformComponent>().scale, 1.f);
 
 				ImGui::TreePop();
 			}
 		}
 
 		if (actor.hasComponent<Components::MeshComponent>()) {
-			if (ImGui::TreeNodeEx((void*)typeid(Components::MeshComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Mesh")) {
+			if (ImGui::TreeNodeEx((void*)typeid(Components::MeshComponent).hash_code(), nodeFlags, "Mesh")) {
 				auto& file = actor.getComponent<Components::MeshComponent>().file;
 				auto& isMeshIndexedChkBx = actor.getComponent<Components::MeshComponent>().isIndexed;
 				char fileBuffer[256];
@@ -108,7 +138,18 @@ namespace Shard3D {
 			}
 		}
 		if (actor.hasComponent<Components::PointlightComponent>()) {
-			if (ImGui::TreeNodeEx((void*)typeid(Components::PointlightComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Pointlight")) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::PointlightComponent).hash_code(), nodeFlags, "Pointlight");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+
+			if (open) {		
 				ImGui::ColorEdit3("Color", glm::value_ptr(actor.getComponent<Components::PointlightComponent>().color), ImGuiColorEditFlags_Float);
 				ImGui::DragFloat("Intensity", &actor.getComponent<Components::PointlightComponent>().lightIntensity, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Radius", &actor.getComponent<Components::PointlightComponent>().radius, 0.01f, 0.f, 100.f);
@@ -120,23 +161,46 @@ namespace Shard3D {
 				}
 				ImGui::TreePop();
 			}
+			if (killComponent) actor.killComponent<Components::PointlightComponent>();
 		}
 		if (actor.hasComponent<Components::SpotlightComponent>()) {
-			if (ImGui::TreeNodeEx((void*)typeid(Components::SpotlightComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Spotlight")) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::SpotlightComponent).hash_code(), nodeFlags, "Spotlight");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
 				ImGui::ColorEdit3("Color", glm::value_ptr(actor.getComponent<Components::SpotlightComponent>().color), ImGuiColorEditFlags_Float);
 				ImGui::DragFloat("Intensity", &actor.getComponent<Components::SpotlightComponent>().lightIntensity, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Radius", &actor.getComponent<Components::SpotlightComponent>().radius, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Specular", &actor.getComponent<Components::SpotlightComponent>().specularMod, 0.001f, 0.f, 1.f);
 				ImGui::TreePop();
 			}
+			if (killComponent) actor.killComponent<Components::SpotlightComponent>();
 		}
 		if (actor.hasComponent<Components::DirectionalLightComponent>()) {
-			if (ImGui::TreeNodeEx((void*)typeid(Components::DirectionalLightComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Directional Light")) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::DirectionalLightComponent).hash_code(), nodeFlags, "Directional Light");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
 				ImGui::ColorEdit3("Color", glm::value_ptr(actor.getComponent<Components::DirectionalLightComponent>().color), ImGuiColorEditFlags_Float);
 				ImGui::DragFloat("Intensity", &actor.getComponent<Components::DirectionalLightComponent>().lightIntensity, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Specular", &actor.getComponent<Components::DirectionalLightComponent>().specularMod, 0.001f, 0.f, 1.f);
 				ImGui::TreePop();
 			}
+			if (killComponent) actor.killComponent<Components::DirectionalLightComponent>();
 		}
 	}
 }

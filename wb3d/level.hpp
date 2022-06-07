@@ -3,6 +3,7 @@
 #include <entt.hpp>
 #include "../GUID.hpp"
 #include "../utils/definitions.hpp"
+#include <vulkan/vulkan.h>
 
 namespace Shard3D {
 	namespace wb3d {
@@ -15,14 +16,21 @@ namespace Shard3D {
 			
 			Actor createActor(std::string  name= "Some kind of actor");
 			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
+			//template<typename T>
+			//Actor createActorWithComponent(std::string name);
 
-			void killActor(Actor actor);
+
 			void killEverything();
+			void killActor(Actor actor);
+
+			void runGarbageCollector(VkDevice device);
 
 			void update(); 
 
 
 			entt::registry eRegistry;
+			std::vector<Actor> actorQueue;
+
 		private:
 			friend class Actor;
 

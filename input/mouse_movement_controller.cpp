@@ -33,7 +33,7 @@ namespace Shard3D {
 				// up down rotation
 				glm::vec3 newOrientation = glm::rotate(orientation, glm::radians(-rotX), upVec);
 				// check if can rotate up down
-				if (abs(glm::angle(newOrientation, glm::vec3(1.f, 0.f, 0.f)) - glm::radians(90.0f)) < glm::radians(90.0f)) {
+				if (abs(glm::angle(newOrientation, glm::vec3(glm::radians(45.f), 0.f, 0.f)) - glm::radians(90.f)) < glm::radians(90.f)) {
 					orientation = newOrientation;
 				}
 				// left right rotation

@@ -48,8 +48,6 @@ namespace Shard3D {
 			.build();
 		std::cout << "attempting to construct Level Pointer\n";
 		activeLevel = std::make_shared<Level>();
-
-		//loadGameObjects();
 	}
 	RunApp::~RunApp() {}
 
@@ -97,6 +95,9 @@ namespace Shard3D {
 		//cameraActor.addComponent<Components::TransformComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
 
+		loadGameObjects();
+
+
 		controller::KeyboardMovementController cameraControllerKeyBoard{};
 		controller::MouseMovementController cameraControllerMouse{};
 
@@ -123,6 +124,8 @@ namespace Shard3D {
 			currentTime = newTime;
 
 			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
+			activeLevel->runGarbageCollector(engineDevice.device());
+		//	add some kind of function for managing models since they rely on the gpu
 
 			cameraControllerKeyBoard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
 			cameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
@@ -195,9 +198,8 @@ namespace Shard3D {
 				pointlightSystem.render(frameInfo, activeLevel);
 				spotlightSystem.render(frameInfo, activeLevel);
 				directionalLightSystem.render(frameInfo, activeLevel);
-				
-				gridSystem.render(frameInfo);
 
+				gridSystem.render(frameInfo);
 				// Layer overlays
 				for (Layer* layer : layerStack) {
 					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime, activeLevel);
@@ -228,9 +230,11 @@ namespace Shard3D {
 		fartObj.getComponent<Components::TransformComponent>().translation = {0.f, 0.f, 0.f};
 		fartObj.getComponent<Components::TransformComponent>().scale = { .5f, .5f, .5f };
 		fartObj.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
-		std::shared_ptr<EngineModel> mode2l = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
+		//std::shared_ptr<EngineModel> mode2l = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
-		fartObj.getComponent<Components::MeshComponent>().reapplyModel(mode2l);
+		//fartObj.getComponent<Components::MeshComponent>().reapplyModel(mode2l);
+
+//		activeLevel->killActor(fartObj);
 
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
 
@@ -268,6 +272,9 @@ namespace Shard3D {
 		light0.getComponent<Components::DirectionalLightComponent>().specularMod = 0.0f;
 		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false);
 
+
+		activeLevel->killActor(axis);
+
 		light2 = activeLevel->createActor();
 		light2.addComponent<Components::SpotlightComponent>();
 		light2.addComponent<Components::MeshComponent>(model);
@@ -277,7 +284,6 @@ namespace Shard3D {
 		light2.getComponent<Components::SpotlightComponent>().color = { 1.0f, 1.0f, 1.0f };
 		light2.getComponent<Components::SpotlightComponent>().lightIntensity = 1.0f;
 
-		
 		//light.getComponent<Components::DirectionalLightComponent>().attenuationMod = {1.f, 1.f, 1.f, 1.f};
 		
 		/*

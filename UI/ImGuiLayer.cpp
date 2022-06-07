@@ -304,7 +304,10 @@ namespace Shard3D {
             if (ImGui::BeginMenu("File")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
-                if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) {}
+                if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) {
+                    level->killEverything();
+                   
+                }
                 if (ImGui::MenuItem("Load Level", NULL /* ctrl + o */)) {
                     wb3d::LevelManager levelMan(level);
                     if (levelMan.load("scenedata/test.wbl", *currentDevice) == wb3d::LevelMgrResults::SuccessResult) {

@@ -20,6 +20,7 @@ namespace Shard3D {
 		std::shared_ptr<Level> context;
 
 
+		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
 #pragma region Component Properties
 
 		// MeshComponent stuff

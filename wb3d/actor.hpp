@@ -37,7 +37,7 @@ namespace Shard3D {
 			}
 
 			template<typename T>
-			void removeComponent() {
+			void killComponent() {
 				assert(hasComponent<T>() && "Actor does not have component!");
 				eLevel->eRegistry.remove<T>(actorHandle);
 			}

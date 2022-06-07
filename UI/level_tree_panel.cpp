@@ -1,5 +1,6 @@
 #include "level_tree_panel.hpp"
 #include "../components.hpp"
+
 #include <imgui.h>
 namespace Shard3D {
 
@@ -23,6 +24,24 @@ namespace Shard3D {
 		});
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) selectedActor = {};
 		
+		// blank space RCLICK
+		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::MenuItem("New Blank Actor")) context->createActor();
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::MenuItem("New Pointlight")) context->createActor("Pointlight");
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::MenuItem("New Spotlight")) context->createActor("Spotlight");
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::MenuItem("New Directional Light")) context->createActor("Directional Light");
+			ImGui::EndPopup();
+		}
+
 		ImGui::End();
 	}
 	void LevelTreePanel::drawActorEntry(Actor actor) {
@@ -31,9 +50,21 @@ namespace Shard3D {
 
 		bool expanded = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)actor, flags, tag.c_str());
 		if (ImGui::IsItemClicked()) selectedActor = actor; 
+
+		// remove stuff
+		bool actorExists = true;
+		if (ImGui::BeginPopupContextItem()) {
+			if (ImGui::MenuItem("Remove Actor")) actorExists = false;
+			ImGui::EndPopup();
+		}
+
 		if (expanded) {
 			ImGui::TreePop();
 		}
 
+		if (!actorExists) {
+			context->killActor(actor);
+			if (selectedActor == actor) selectedActor = {};
+		}
 	}
 }
