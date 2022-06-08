@@ -42,6 +42,8 @@ namespace Shard3D {
 			ModelType type = ModelType::MODEL_TYPE_NULL;
 			bool isIndexed = true;
 
+			std::shared_ptr<EngineModel> newModel{};
+
 			MeshComponent() = default;
 			MeshComponent(const MeshComponent&) = default;
 			MeshComponent(const std::shared_ptr<EngineModel>& mdl) {

@@ -19,9 +19,10 @@ namespace Shard3D {
 			//template<typename T>
 			//Actor createActorWithComponent(std::string name);
 
-
 			void killEverything();
 			void killActor(Actor actor);
+			void killMesh(Actor actor);
+			void reloadMesh(Actor actor);
 
 			void runGarbageCollector(VkDevice device);
 
@@ -29,9 +30,13 @@ namespace Shard3D {
 
 
 			entt::registry eRegistry;
-			std::vector<Actor> actorQueue;
 
 		private:
+			// queues 
+			std::vector<Actor> actorKillQueue;
+			std::vector<Actor> actorKillMeshQueue;
+			std::vector<Actor> actorReloadMeshQueue;
+
 			friend class Actor;
 
 			friend class LevelManager;

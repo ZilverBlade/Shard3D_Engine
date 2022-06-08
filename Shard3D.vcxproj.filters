@@ -183,6 +183,9 @@
     <ClCompile Include="UI\level_properties_panel.cpp">
       <Filter>Source Files\UI\panels</Filter>
     </ClCompile>
+    <ClCompile Include="wb3d\master_manager.cpp">
+      <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="UI\level_properties_panel.hpp">
       <Filter>Header Files\UI\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="wb3d\master_manager.hpp">
+      <Filter>Header Files\wb3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -16,7 +16,7 @@
 #include "input/mouse_movement_controller.hpp"
 #include "camera.hpp"
 #include "utils/definitions.hpp"
-
+#include "wb3d/master_manager.hpp"
 
 #include "simpleini/simple_ini.h"
 #include "buffer.hpp"
@@ -123,16 +123,15 @@ namespace Shard3D {
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
 
-			//frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 			activeLevel->runGarbageCollector(engineDevice.device());
+			wb3d::MasterManager::excecuteQueue(activeLevel);
+
 		//	add some kind of function for managing models since they rely on the gpu
 
 			cameraControllerKeyBoard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
 			cameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
 			
 			camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
-
-			//light2.getComponent<Components::TransformComponent>().translation.x += frameTime;
 
 			float aspect = engineRenderer.getAspectRatio();
 			

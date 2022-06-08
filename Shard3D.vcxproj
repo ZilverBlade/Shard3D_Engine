@@ -217,6 +217,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="GUID.cpp" />
+    <ClCompile Include="wb3d\master_manager.cpp" />
     <ClCompile Include="systems\directional_light_system.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
     <ClCompile Include="systems\spotlight_system.cpp" />
@@ -295,6 +296,7 @@
     <ClInclude Include="engine_window.hpp" />
     <ClInclude Include="simpleini\simple_ini.h" />
     <ClInclude Include="utils\engine_utils.hpp" />
+    <ClInclude Include="wb3d\master_manager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />

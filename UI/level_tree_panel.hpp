@@ -11,6 +11,8 @@ namespace Shard3D {
 
 		void setContext(const std::shared_ptr<Level>& levelContext);
 		void destroyContext();
+		void clearSelectedActor();
+
 		void render();
 
 		Actor getSelectedActor() { return selectedActor; }

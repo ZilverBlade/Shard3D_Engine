@@ -1,7 +1,7 @@
 #include "level_properties_panel.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include "../engine_window.hpp"
-
+#include <fstream>
 #include <imgui_internal.h>
 namespace Shard3D {
 	LevelPropertiesPanel::LevelPropertiesPanel(const std::shared_ptr<Level>& levelContext) {
@@ -39,7 +39,9 @@ namespace Shard3D {
 					ImGui::CloseCurrentPopup();
 				}
 				if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
-					tree.selectedActor.addComponent<Components::MeshComponent>();
+					//add a default obj
+					tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, "modeldata/engineModels/cube.obj", ModelType::MODEL_TYPE_OBJ, true));
+
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndPopup();
@@ -117,7 +119,17 @@ namespace Shard3D {
 		}
 
 		if (actor.hasComponent<Components::MeshComponent>()) {
-			if (ImGui::TreeNodeEx((void*)typeid(Components::MeshComponent).hash_code(), nodeFlags, "Mesh")) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::MeshComponent).hash_code(), nodeFlags, "Mesh");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
 				auto& file = actor.getComponent<Components::MeshComponent>().file;
 				auto& isMeshIndexedChkBx = actor.getComponent<Components::MeshComponent>().isIndexed;
 				char fileBuffer[256];
@@ -128,14 +140,19 @@ namespace Shard3D {
 				}
 				ImGui::Checkbox("Index model", &isMeshIndexedChkBx);
 				if (ImGui::Button("(Re)Load Mesh")) {
-					std::cout << "guid " << actor.getGUID() << "\n";
-					model = actor.getComponent<Components::MeshComponent>().model; //dont index because model breaks
+					std::ifstream ifile(file);
+					if (ifile.good()) {
+						actor.getComponent<Components::MeshComponent>().newModel = EngineModel::createModelFromFile(device,
+							actor.getComponent<Components::MeshComponent>().file,
+							actor.getComponent<Components::MeshComponent>().type,
+							actor.getComponent<Components::MeshComponent>().isIndexed);
 
-					actor.getComponent<Components::MeshComponent>().reapplyModel(model);
+						context->reloadMesh(actor);
+					} else std::cout << "File '" << file << "' does not exist\n";
 				}
-
 				ImGui::TreePop();
 			}
+			if (killComponent) context->killMesh(actor);
 		}
 		if (actor.hasComponent<Components::PointlightComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::PointlightComponent).hash_code(), nodeFlags, "Pointlight");

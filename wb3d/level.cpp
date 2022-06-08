@@ -47,23 +47,45 @@ namespace Shard3D {
 		}
 		*/
 		void Level::runGarbageCollector(VkDevice device) {
-
-
-			for (int i = 0; i < actorQueue.size(); i++) {
-				std::cout << actorQueue.size() << "\n";
-				vkDeviceWaitIdle(device);		
-				eRegistry.destroy(actorQueue.at(i));
-
-				actorQueue.pop_back();
+			if (actorKillQueue.size() != 0) {
+				for (int i = 0; i < actorKillQueue.size(); i++) {
+					std::cout << "Destroying actor '" << actorKillQueue.at(i).getTag() << "'\n";
+					vkDeviceWaitIdle(device);
+					eRegistry.destroy(actorKillQueue.at(i));
+				}
+				actorKillQueue.clear();
+				return;
+			}
+			if (actorReloadMeshQueue.size() != 0) {
+				for (int i = 0; i < actorReloadMeshQueue.size(); i++) {
+					vkDeviceWaitIdle(device);
+					actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().reapplyModel(actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().newModel);
+				}
+				actorReloadMeshQueue.clear();
+				return;
+			}
+			if (actorKillMeshQueue.size() != 0) {
+				for (int i = 0; i < actorKillMeshQueue.size(); i++) {
+					vkDeviceWaitIdle(device);
+					eRegistry.remove<Components::MeshComponent>(actorKillMeshQueue.at(i));
+				}
+				actorKillMeshQueue.clear();
 			}
 		}
 
 		void Level::killActor(Actor actor) {
-			actorQueue.emplace_back(actor);
+			actorKillQueue.emplace_back(actor);
+		}
+
+		void Level::killMesh(Actor actor) {
+			actorKillMeshQueue.emplace_back(actor);
+		}
+
+		void Level::reloadMesh(Actor actor) {
+			actorReloadMeshQueue.emplace_back(actor);
 		}
 
 		void Level::killEverything() {
-
 			eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, this };
 				if (!actor) return;
 				if (!actor.hasComponent<Components::TagComponent>()) return;
@@ -72,10 +94,9 @@ namespace Shard3D {
 				
 				killActor(actor);
 			});
-			//Log log;
-			//log.logString("Destroying Level");
-			//eRegistry.clear();
 		}
+
+
 		/*
 
 		void Level::componentAdded() { }

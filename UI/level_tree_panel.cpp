@@ -12,6 +12,7 @@ namespace Shard3D {
 
 	void LevelTreePanel::setContext(const std::shared_ptr<Level>& levelContext) { context = levelContext; }
 	void LevelTreePanel::destroyContext() { context = {}; }
+	void LevelTreePanel::clearSelectedActor() { selectedActor = {}; }
 
 	void LevelTreePanel::render() {
 		ImGui::Begin("Level Tree");

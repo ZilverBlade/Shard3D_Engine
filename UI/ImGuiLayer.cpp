@@ -10,6 +10,7 @@
 #include <miniaudio.h>
 
 #include "../wb3d/levelmgr.hpp"
+#include "../wb3d/master_manager.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -305,13 +306,16 @@ namespace Shard3D {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
                 if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) {
-                    level->killEverything();
-                   
+                    if (MessageBoxA(NULL, "This will destroy the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+                        levelTreePanel.clearSelectedActor();
+                        level->killEverything();
+                    }
                 }
                 if (ImGui::MenuItem("Load Level", NULL /* ctrl + o */)) {
-                    wb3d::LevelManager levelMan(level);
-                    if (levelMan.load("scenedata/test.wbl", *currentDevice) == wb3d::LevelMgrResults::SuccessResult) {
-                        std::cout << "successfully loaded scene\n";
+                    if (MessageBoxA(NULL, "This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+                        levelTreePanel.clearSelectedActor();
+                        level->killEverything();
+                        wb3d::MasterManager::loadLevel("scenedata/test.wbl", *currentDevice);
                     }
                 }
                 if (ImGui::MenuItem("Save Level", NULL /* ctrl + s */)) {
@@ -323,11 +327,6 @@ namespace Shard3D {
                     levelMan.save("scenedata/test.wbl", true);
                 }
                 if (ImGui::MenuItem("Save Level As", NULL /* ctrl + shift + s */)) {}
-                if (ImGui::MenuItem("Destroy Level", NULL /* ctrl + shift + del */)) {
-                    Log log;
-                    log.logString("Destroying Level");
-                    level->killEverything();
-                }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { detach(); return; }
                 ImGui::Separator();
