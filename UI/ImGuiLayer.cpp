@@ -2,6 +2,7 @@
 #include "imgui_implementation.hpp"
 
 #include <imgui.h>
+#include "ImGuizmo.h"
 
 #include "imgui_glfw_implementation.hpp"
 #include <stdexcept>
@@ -14,6 +15,7 @@
 
 #define GLFW_INCLUDE_VULKAN
 
+#include "../utils/dialogs.h"
 namespace Shard3D {
 
 
@@ -30,6 +32,8 @@ namespace Shard3D {
         nodeEditorContext = ax::NodeEditor::CreateEditor();
         levelTreePanel.setContext(level);
         levelPropertiesPanel.setContext(level);
+       // levelGizmo.setContext(level);
+
         ImGui::CreateContext();
 
         ImGuiIO& io = ImGui::GetIO();
@@ -253,9 +257,12 @@ namespace Shard3D {
         ImGui::NewFrame();
 
         // start rendering stuff here
+     //   ImGuizmo::BeginFrame();
 
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel, currentDevice);
+        //levelGizmo.render(level, levelTreePanel);
+
         ax::NodeEditor::SetCurrentEditor(nodeEditorContext);
         static bool visible = true;
 
@@ -305,28 +312,69 @@ namespace Shard3D {
             if (ImGui::BeginMenu("File")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
-                if (ImGui::MenuItem("New Level", NULL /* ctrl + n */)) {
-                    if (MessageBoxA(NULL, "This will destroy the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+                if (ImGui::MenuItem("New Level", "Ctrl+N")) {
+#ifdef _WIN32
+                    if (MessageBoxA(glfwGetWin32Window(window), "This will destroy the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+                        
                         levelTreePanel.clearSelectedActor();
                         level->killEverything();
                     }
+#endif
+#ifdef __linux__ 
+                    std::cout << "unsupported function\n";
+#endif
                 }
-                if (ImGui::MenuItem("Load Level", NULL /* ctrl + o */)) {
-                    if (MessageBoxA(NULL, "This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
-                        levelTreePanel.clearSelectedActor();
-                        level->killEverything();
-                        wb3d::MasterManager::loadLevel("scenedata/test.wbl", *currentDevice);
+                if (ImGui::MenuItem("Load Level...", "Ctrl+O")) {
+#ifdef _WIN32
+                    if (MessageBoxA(glfwGetWin32Window(window), "This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+                        std::string filepath = FileDialogs::openFile(WORLDBUILDER3D_FILE_OPTIONS);
+                        if (!filepath.empty()) {
+                            levelTreePanel.clearSelectedActor();
+                            level->killEverything();
+                            wb3d::MasterManager::loadLevel(filepath, *currentDevice);
+                        }
                     }
+#endif
+#ifdef __linux__ 
+                    std::cout << "unsupported function\n";
+#endif
                 }
-                if (ImGui::MenuItem("Save Level", NULL /* ctrl + s */)) {
-                    wb3d::LevelManager levelMan(level);
-                    levelMan.save("scenedata/test.wbl", false);
+                if (ImGui::MenuItem("Save Level...", "Ctrl+S")) {
+#ifdef _WIN32
+                    std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
+                    if (!filepath.empty()) {
+                        wb3d::LevelManager levelMan(level);
+                        levelMan.save(filepath, false);
+                    }
+#endif
+#ifdef __linux__ 
+                    std::cout << "unsupported function\n";
+#endif
                 }
-                if (ImGui::MenuItem("Save Level (Encrypted)", NULL /* ctrl + s */)) {
-                    wb3d::LevelManager levelMan(level);
-                    levelMan.save("scenedata/test.wbl", true);
+                if (ImGui::MenuItem("Save Level... (Encrypted)", NULL)) {
+#ifdef _WIN32
+                    std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
+                    if (!filepath.empty()) {
+                        wb3d::LevelManager levelMan(level);
+                        levelMan.save(filepath, true);
+                    }
+#endif
+#ifdef __linux__ 
+                    std::cout << "unsupported function\n";
+#endif
                 }
-                if (ImGui::MenuItem("Save Level As", NULL /* ctrl + shift + s */)) {}
+                if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
+#ifdef _WIN32
+                    std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
+                    if (!filepath.empty()) {
+                        wb3d::LevelManager levelMan(level);
+                        levelMan.save(filepath, false);
+                    }
+#endif
+#ifdef __linux__ 
+                    std::cout << "unsupported function\n";
+#endif
+                }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { detach(); return; }
                 ImGui::Separator();
@@ -335,7 +383,8 @@ namespace Shard3D {
             if (ImGui::BeginMenu("Edit")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
-                if (ImGui::MenuItem("Add Component", NULL /*make sure to add some sort of shardcut */)) {}
+                if (ImGui::MenuItem("Add Actor Blueprint", NULL /*make sure to add some sort of shardcut */)) {}
+                if (ImGui::MenuItem("Add Struct Definition", NULL /*make sure to add some sort of shardcut */)) {}
                 //if (ImGui::MenuItem("", NULL /*make sure to add some sort of shardcut */)) {}
 
                 ImGui::EndMenu();
@@ -410,9 +459,9 @@ namespace Shard3D {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Help")) {
-                if (ImGui::MenuItem("Main Website", NULL /*make sure to add some sort of shardcut */)) { ShellExecuteA(nullptr, "open", "https://www.shard3d.com", nullptr, nullptr, false);}
-                if (ImGui::MenuItem("Documentation", NULL /*make sure to add some sort of shardcut */)) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com", nullptr, nullptr, false);}
-                if (ImGui::MenuItem("WorldBuilder3D", NULL /*make sure to add some sort of shardcut */)) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com/worldbuilder3d.html", nullptr, nullptr, false); }
+                if (ImGui::MenuItem("Main Website"))    { ShellExecuteA(nullptr, "open", "https://www.shard3d.com", nullptr, nullptr, false);}
+                if (ImGui::MenuItem("Documentation"))   { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com", nullptr, nullptr, false);}
+                if (ImGui::MenuItem("WorldBuilder3D"))  { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com/worldbuilder3d.html", nullptr, nullptr, false); }
                 ImGui::EndMenu();
             }
 

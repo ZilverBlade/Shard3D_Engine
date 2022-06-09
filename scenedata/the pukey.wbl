@@ -1,0 +1,62 @@
+Shard3D: 1.0.7
+WorldBuilder3D: 0.1
+Level: Some kind of level
+Actors:
+  - Actor: 8478236753190339018
+    TagComponent:
+      Tag: floor
+    TransformComponent:
+      Translation: [0, 0.970000029, 0]
+      Rotation: [0, 0, 0]
+      Scale: [100, 1, 100]
+    MeshComponent:
+      MeshPath: modeldata/quad.obj
+      MeshFormat: 1
+      Indexed: true
+  - Actor: 14379880132986827232
+    TagComponent:
+      Tag: axis
+    TransformComponent:
+      Translation: [0, -0.0500000007, 0]
+      Rotation: [0, 1.48178458, 0]
+      Scale: [3.8599999, 0.439999998, 1]
+    MeshComponent:
+      MeshPath: modeldata/axis.obj
+      MeshFormat: 1
+      Indexed: false
+  - Actor: 6487113066519653674
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, -0.310000002, 2.80999994]
+      Rotation: [1.584759, 0, 4.17831802]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: modeldata/puke.obj
+      MeshFormat: 1
+      Indexed: false
+  - Actor: 4064145473509223487
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [3.47000003, -1.57000005, 3.55999994]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1.85000002]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0.200000003, 0.100000001, 3.07999992]
+  - Actor: 16304847107315013427
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [0, -1.63999999, -0.899999976]
+      Rotation: [-0.254818082, 0.267035365, 0.513126791]
+      Scale: [1, 1, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Angle: [0.785398185, 0.261799395]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]

@@ -14,6 +14,7 @@ namespace Shard3D{
 #define GAME_SETTINGS_PATH			"settings/game_settings.ini"	
 
 #define LEVEL_CIPHER_KEY			126	// for level encyption and decryption for release ready games, MUST BE A MULTIPLE OF 2!!
+#define WORLDBUILDER3D_FILE_OPTIONS	"WorldBuilder3D Level (*.wbl)\0*.wbl\0All files (*.*)\0*.*\0"
 
 #define SHADER_FILES_PATH			"shaders/"					//Shader files (SPIR-V)
 #define DEFAULT_MODEL_PATH			"engine-assets/modeldata/"	//Default engine models

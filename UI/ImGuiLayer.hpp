@@ -10,6 +10,7 @@
 // panels
 #include "level_tree_panel.hpp"
 #include "level_properties_panel.hpp"
+#include "level_gizmo.hpp"
 namespace Shard3D {
 
 	class ImGuiLayer : public Shard3D::Layer {
@@ -66,6 +67,7 @@ namespace Shard3D {
 
 		LevelTreePanel levelTreePanel;
 		LevelPropertiesPanel levelPropertiesPanel;
+		Gizmo levelGizmo;
 	};
 
 }

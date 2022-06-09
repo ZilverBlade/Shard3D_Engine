@@ -73,6 +73,14 @@ namespace Shard3D {
 			}
 		}
 
+		Actor Level::getEditorCameraActor() {
+			Actor actor;
+			//eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, this.get() };
+			//	if (actor.getGUID() == 0) return actor;	// editor camera actor is a special actor that always has a GUID of 0
+			//});
+			return actor;
+		}
+
 		void Level::killActor(Actor actor) {
 			actorKillQueue.emplace_back(actor);
 		}

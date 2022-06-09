@@ -1,4 +1,8 @@
 #pragma once
+
+#ifdef NDEBUG
+#define ENTT_ASSERT(...) ((void)1)
+#endif
 #include <entt.hpp>
 #include "level.hpp"
 #include "../engine_logger.hpp"
@@ -27,7 +31,9 @@ namespace Shard3D {
 
 			template<typename T>
 			T& getComponent() {
+#ifndef NDEBUG
 				assert(hasComponent<T>() && "Actor does not have component!");
+#endif
 				return eLevel->eRegistry.get<T>(actorHandle);
 			}
 

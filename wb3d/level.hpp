@@ -26,6 +26,8 @@ namespace Shard3D {
 
 			void runGarbageCollector(VkDevice device);
 
+			Actor getEditorCameraActor();
+
 			void update(); 
 
 
