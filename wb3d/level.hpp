@@ -14,13 +14,18 @@ namespace Shard3D {
 			Level();
 			~Level();
 			
-			Actor createActor(std::string  name= "Some kind of actor");
+			Actor createActor(std::string name= "Some kind of actor");
 			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
+
+			Actor createChild(Actor actor, std::string name = "Some kind of actor");
+			Actor createChildWithGUID(GUID guid, Actor actor, std::string name);
+
 			//template<typename T>
 			//Actor createActorWithComponent(std::string name);
 
 			void killEverything();
 			void killActor(Actor actor);
+			void killChild(Actor parentActor, Actor childActor);
 			void killMesh(Actor actor);
 			void reloadMesh(Actor actor);
 
@@ -28,10 +33,11 @@ namespace Shard3D {
 
 			Actor getEditorCameraActor();
 
-			void update(); 
-
+			void update(float dt);
 
 			entt::registry eRegistry;
+
+
 
 		private:
 			// queues 

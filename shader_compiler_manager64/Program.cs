@@ -66,7 +66,7 @@ namespace shadercompmgr
                 else
                     Console.WriteLine($"Compiling miscellaneous shader: {shaderFile.Substring(inShaderLoc.Length)} ({index}/{totalCount})");
                 try {     
-                    Process.Start(compiler, $"{inShaderLoc}{shaderFile.Substring(inShaderLoc.Length)} -o {outShaderLoc}{shaderFile.Substring(outShaderLoc.Length)}.spv");
+                    Process.Start(compiler, $"{inShaderLoc}{shaderFile.Substring(inShaderLoc.Length)} -o {outShaderLoc}{shaderFile.Substring(inShaderLoc.Length)}.spv");
                 }
                 catch {
                     Console.WriteLine("glslc.exe not found");

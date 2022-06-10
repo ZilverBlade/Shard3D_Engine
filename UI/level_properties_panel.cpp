@@ -40,12 +40,16 @@ namespace Shard3D {
 				}
 				if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
 					//add a default obj
-					tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, "modeldata/engineModels/cube.obj", ModelType::MODEL_TYPE_OBJ, true));
+					tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, DEFAULT_MODEL_FILE, ModelType::MODEL_TYPE_OBJ, true));
 
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndPopup();
 			}			
+			if (ImGui::Button("Actor GUID to clipboard")) {
+				ImGui::SetClipboardText(std::to_string(tree.selectedActor.getGUID()).c_str());
+				std::cout << "copied " << std::to_string(tree.selectedActor.getGUID()).c_str() << " to clipboard\n";
+			}
 		}
 		ImGui::End();
 	}

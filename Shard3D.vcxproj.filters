@@ -42,9 +42,11 @@
     </Filter>
     <Filter Include="shaders\fragment">
       <UniqueIdentifier>{9ae8ef2b-52e5-4ad5-b467-a4581ce74553}</UniqueIdentifier>
+      <Extensions>*.frag</Extensions>
     </Filter>
     <Filter Include="shaders\vertex">
       <UniqueIdentifier>{025747d3-7fbb-4a1f-97db-4e1357ada593}</UniqueIdentifier>
+      <Extensions>*.vert</Extensions>
     </Filter>
     <Filter Include="Header Files\core">
       <UniqueIdentifier>{5c072065-5f99-49bd-84d0-b7cc333d43aa}</UniqueIdentifier>
@@ -81,6 +83,12 @@
     </Filter>
     <Filter Include="Source Files\UI\panels">
       <UniqueIdentifier>{b7b51cd9-e2da-44cb-9d5c-4f9055ae8b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins">
+      <UniqueIdentifier>{0cbb21f8-13da-4014-9052-180fcc6f6536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts">
+      <UniqueIdentifier>{9b8c2a5e-7ea5-4a6d-b626-4ce7038d5fee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -310,6 +318,21 @@
     </ClInclude>
     <ClInclude Include="utils\dialogs.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\example_component.hpp">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\example_script.cpp">
+      <Filter>scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_camera_script.hpp">
+      <Filter>Header Files\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\script_handler.hpp">
+      <Filter>scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="wb3d\acting_actor.hpp">
+      <Filter>Header Files\wb3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

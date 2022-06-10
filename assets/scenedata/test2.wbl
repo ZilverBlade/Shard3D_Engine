@@ -10,7 +10,7 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [100, 1, 100]
     MeshComponent:
-      MeshPath: modeldata/quad.obj
+      MeshPath: assets/modeldata/quad.obj
       MeshFormat: 1
       Indexed: true
   - Actor: 14379880132986827232
@@ -21,7 +21,7 @@ Actors:
       Rotation: [0, 1.48178458, 0]
       Scale: [3.8599999, 0.439999998, 1]
     MeshComponent:
-      MeshPath: modeldata/axis.obj
+      MeshPath: assets/modeldata/axis.obj
       MeshFormat: 1
       Indexed: false
   - Actor: 6487113066519653674
@@ -32,7 +32,7 @@ Actors:
       Rotation: [1.584759, 0, 4.17831802]
       Scale: [1, 1, 1]
     MeshComponent:
-      MeshPath: modeldata/puke.obj
+      MeshPath: assets/modeldata/puke.obj
       MeshFormat: 1
       Indexed: false
   - Actor: 4064145473509223487

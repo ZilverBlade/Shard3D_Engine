@@ -7,6 +7,7 @@
 #include "level.hpp"
 #include "../engine_logger.hpp"
 #include "../components.hpp"
+#include "../scripts/script_handler.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -48,11 +49,18 @@ namespace Shard3D {
 				eLevel->eRegistry.remove<T>(actorHandle);
 			}
 
+			struct Relationship {
+				std::vector<Actor> children{};
+			};
+
+			Relationship relationship;
+
 			operator bool() const { return actorHandle != entt::null; }
 			operator entt::entity() const { return actorHandle; };
 			operator uint32_t() const { return (uint32_t)actorHandle; };
 
 			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
+
 			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
 
 			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
@@ -66,6 +74,7 @@ namespace Shard3D {
 
 		private:
 			entt::entity actorHandle{entt::null};
+
 			Level *eLevel = nullptr; // 12 bytes (use it as much as needed)
 
 		};

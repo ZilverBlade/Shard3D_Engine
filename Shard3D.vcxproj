@@ -252,12 +252,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
+    <ClInclude Include="editor_camera_script.hpp">
+      <FileType>CppHeader</FileType>
+    </ClInclude>
+    <ClInclude Include="plugins\example_component.hpp" />
+    <ClInclude Include="scripts\example_script.cpp">
+      <FileType>CppCode</FileType>
+    </ClInclude>
+    <ClInclude Include="scripts\script_handler.hpp" />
     <ClInclude Include="utils\dialogs.h" />
     <ClInclude Include="engine_logger.hpp" />
     <ClInclude Include="GUID.hpp" />
     <ClInclude Include="UI\level_gizmo.hpp" />
     <ClInclude Include="UI\level_properties_panel.hpp" />
     <ClInclude Include="UI\level_tree_panel.hpp" />
+    <ClInclude Include="wb3d\acting_actor.hpp" />
     <ClInclude Include="wb3d\levelmgr.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
     <ClInclude Include="systems\pointlight_system.hpp" />

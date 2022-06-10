@@ -12,7 +12,7 @@ namespace Shard3D {
 		class MasterManager {
 		public:
 			static void loadLevel(std::string path, EngineDevice& device);
-			static void excecuteQueue(std::shared_ptr<Level>& level);
+			static void executeQueue(std::shared_ptr<Level>& level, float deltatime);
 		private:
 			inline static std::string levelPath;
 			inline static EngineDevice* engineDevice;

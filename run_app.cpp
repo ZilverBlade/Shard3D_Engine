@@ -34,14 +34,12 @@
 #include "UI/TestLayer.hpp"
 #include "UI/ImGuiLayer.hpp"
 
+//misc
+#include "scripts/example_script.cpp"
+
 namespace Shard3D {
 	wb3d::Actor light2{};
 	RunApp::RunApp() {
-		std::ifstream infile(ENGINE_SETTINGS_PATH);
-		assert(infile.good() != false && "Critical error! Engine settings config file not found!");
-		std::ifstream infile2(GAME_SETTINGS_PATH);
-		assert(infile2.good() != false && "Critical error! Game settings config file not found!");
-	
 		globalPool = EngineDescriptorPool::Builder(engineDevice)
 			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)			
@@ -124,7 +122,8 @@ namespace Shard3D {
 			currentTime = newTime;
 
 			activeLevel->runGarbageCollector(engineDevice.device());
-			wb3d::MasterManager::excecuteQueue(activeLevel);
+			wb3d::MasterManager::executeQueue(activeLevel, frameTime);
+
 
 		//	add some kind of function for managing models since they rely on the gpu
 
@@ -223,19 +222,8 @@ namespace Shard3D {
 		
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
-		wb3d::Actor fartObj = activeLevel->createActor();
-		fartObj.addComponent<Components::MeshComponent>(model);
-
-		fartObj.getComponent<Components::TransformComponent>().translation = {0.f, 0.f, 0.f};
-		fartObj.getComponent<Components::TransformComponent>().scale = { .5f, .5f, .5f };
-		fartObj.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
-		//std::shared_ptr<EngineModel> mode2l = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
-
-		//fartObj.getComponent<Components::MeshComponent>().reapplyModel(mode2l);
-
-//		activeLevel->killActor(fartObj);
-
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
+	
+		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
 
 		wb3d::Actor quad = activeLevel->createActor();
 		quad.addComponent<Components::MeshComponent>(model);
@@ -244,7 +232,7 @@ namespace Shard3D {
 		quad.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
 
 
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/axis.obj", ModelType::MODEL_TYPE_OBJ, false);
+		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/axis.obj", ModelType::MODEL_TYPE_OBJ, false);
 
 		wb3d::Actor axis = activeLevel->createActor();
 		axis.addComponent<Components::MeshComponent>(model);
@@ -269,7 +257,7 @@ namespace Shard3D {
 		light0.getComponent<Components::DirectionalLightComponent>().color = { 1.0f, 1.0f, 1.0f };
 		light0.getComponent<Components::DirectionalLightComponent>().lightIntensity = 0.1f;
 		light0.getComponent<Components::DirectionalLightComponent>().specularMod = 0.0f;
-		model = EngineModel::createModelFromFile(engineDevice, "modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false);
+		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false);
 
 
 		activeLevel->killActor(axis);
@@ -282,6 +270,28 @@ namespace Shard3D {
 		light2.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -0.f, -1.f);
 		light2.getComponent<Components::SpotlightComponent>().color = { 1.0f, 1.0f, 1.0f };
 		light2.getComponent<Components::SpotlightComponent>().lightIntensity = 1.0f;
+
+		activeLevel->killActor(light2);
+
+
+		activeLevel->killActor(light0);
+		activeLevel->killActor(quad);
+
+
+		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ);
+
+		wb3d::Actor cool = activeLevel->createActor("parent actor test");
+		cool.addComponent<Components::MeshComponent>(model);
+
+		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/engineModels/cube.obj", ModelType::MODEL_TYPE_OBJ);
+		wb3d::Actor child = activeLevel->createChild(cool, "child actor test");
+		
+		child.addComponent<Components::MeshComponent>(model);
+		child.getComponent<Components::TransformComponent>().translation = { 1.f, -1.f, 0.f };
+		child.getComponent<Components::TransformComponent>().scale = { 0.2f, 0.2f, 0.2f };
+
+
+		cool.addComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
 
 		//light.getComponent<Components::DirectionalLightComponent>().attenuationMod = {1.f, 1.f, 1.f, 1.f};
 		

@@ -45,14 +45,25 @@ namespace Shard3D {
 	void BasicRenderSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
+		const char* vertFile = "basic_shader.vert.spv";
+		const char* fragFile = "basic_shader.frag.spv";
+
+		char* vertShader = (char*)(calloc(strlen(SHADER_FILES_PATH) + strlen(vertFile) - 1, 1));
+		strncpy(vertShader, SHADER_FILES_PATH, strlen(SHADER_FILES_PATH));
+		strncat(vertShader, vertFile, strlen(vertFile));
+
+		char* fragShader = (char*)(calloc(strlen(SHADER_FILES_PATH) + strlen(fragFile) - 1, 1));
+		strncpy(fragShader, SHADER_FILES_PATH, strlen(SHADER_FILES_PATH));
+		strncat(fragShader, fragFile, strlen(fragFile));
+
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
-			"shaders/basic_shader.vert.spv",
-			"shaders/basic_shader.frag.spv",
+			vertShader,
+			fragShader,
 			pipelineConfig
 		);
 	}

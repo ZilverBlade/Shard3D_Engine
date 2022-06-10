@@ -2,6 +2,7 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "spotlight_system.hpp"
 #include <stdexcept>
@@ -50,16 +51,26 @@ namespace Shard3D {
 	void SpotlightSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
+		const char* vertFile = "spotlight.vert.spv";
+		const char* fragFile = "spotlight.frag.spv";
+
+		char* vertShader = (char*)(calloc(strlen(SHADER_FILES_PATH) + strlen(vertFile) - 1, 1));
+		strncpy(vertShader, SHADER_FILES_PATH, strlen(SHADER_FILES_PATH));
+		strncat(vertShader, vertFile, strlen(vertFile));
+
+		char* fragShader = (char*)(calloc(strlen(SHADER_FILES_PATH) + strlen(fragFile) - 1, 1));
+		strncpy(fragShader, SHADER_FILES_PATH, strlen(SHADER_FILES_PATH));
+		strncat(fragShader, fragFile, strlen(fragFile));
+
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
-		pipelineConfig.attributeDescriptions.clear();
-		pipelineConfig.bindingDescriptions.clear();
+		EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
-			"shaders/spotlight.vert.spv",
-			"shaders/spotlight.frag.spv",
+			vertShader,
+			fragShader,
 			pipelineConfig
 		);
 	}

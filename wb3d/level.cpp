@@ -1,7 +1,5 @@
 #include "level.hpp"
-#include "actor.hpp"
-#include "../components.hpp"
-
+#include "acting_actor.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -33,6 +31,18 @@ namespace Shard3D {
 			actor.addComponent<Components::TransformComponent>();
 #endif
 			return actor;
+		}
+
+		Actor Level::createChild(Actor actor, std::string name) {
+			Actor newActor = createActor(name);
+			actor.relationship.children.push_back(newActor);
+			return newActor;
+		}
+
+		Actor Level::createChildWithGUID(GUID guid, Actor actor, std::string name) {
+			Actor newActor = createActorWithGUID(guid, name);
+			actor.relationship.children.push_back(newActor);
+			return newActor;
 		}
 		/*template<typename T>
 		Actor Level::createActorWithComponent(std::string name) {
@@ -81,8 +91,30 @@ namespace Shard3D {
 			return actor;
 		}
 
+		void Level::update(float dt) {
+			// update scripts	
+			{
+				eRegistry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+					if (!csc.Inst) {
+						csc.createInstFunc();
+						csc.Inst->aActor = Actor{ actor, this };
+						csc.createFunc(csc.Inst);
+					}
+
+					csc.tickFunc(csc.Inst, dt);
+				});
+			}
+		}
+
 		void Level::killActor(Actor actor) {
 			actorKillQueue.emplace_back(actor);
+		}
+
+		void Level::killChild(Actor parentActor, Actor childActor) {
+			if (std::find(parentActor.relationship.children.begin(), parentActor.relationship.children.end(), childActor) != parentActor.relationship.children.end()) {
+				actorKillQueue.emplace_back(childActor);
+				//parentActor.relationship.children.erase(childActor);
+			}
 		}
 
 		void Level::killMesh(Actor actor) {
@@ -98,8 +130,6 @@ namespace Shard3D {
 				if (!actor) return;
 				if (!actor.hasComponent<Components::TagComponent>()) return;
 				if (actor.getGUID() == 0 || actor.getGUID() == std::numeric_limits<uint64_t>::max()) return;
-				std::cout << actor.getTag() << "\n";
-				
 				killActor(actor);
 			});
 		}
