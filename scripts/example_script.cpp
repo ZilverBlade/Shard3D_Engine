@@ -7,11 +7,11 @@ namespace Shard3D {
 		class ExampleCppScript : public wb3d::ActingActor {
 		public:
 			void beginEvent() {}
-			void endEvent() {}
+			void endEvent()	{}
 
 			void tickEvent(float dt) {
 				auto& transform = getComponent<Components::TransformComponent>();
-				transform.rotation += dt;
+				transform.translation += dt;
 			}
 
 			void spawnEvent() {

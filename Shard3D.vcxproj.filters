@@ -104,10 +104,10 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files\camera</Filter>
     </ClCompile>
-    <ClCompile Include="input\keyboard_movement_controller.cpp">
+    <ClCompile Include="input\editor\editor_keyboard_movement_controller.cpp">
       <Filter>Source Files\controller</Filter>
     </ClCompile>
-    <ClCompile Include="input\mouse_movement_controller.cpp">
+    <ClCompile Include="input\editor\editor_mouse_movement_controller.cpp">
       <Filter>Source Files\controller</Filter>
     </ClCompile>
     <ClCompile Include="components.cpp">
@@ -211,10 +211,10 @@
     <ClInclude Include="camera.hpp">
       <Filter>Header Files\camera</Filter>
     </ClInclude>
-    <ClInclude Include="input\keyboard_movement_controller.hpp">
+    <ClInclude Include="input\editor\editor_keyboard_movement_controller.hpp">
       <Filter>Header Files\controller</Filter>
     </ClInclude>
-    <ClInclude Include="input\mouse_movement_controller.hpp">
+    <ClInclude Include="input\editor\editor_mouse_movement_controller.hpp">
       <Filter>Header Files\controller</Filter>
     </ClInclude>
     <ClInclude Include="utils\engine_utils.hpp">
@@ -333,6 +333,9 @@
     </ClInclude>
     <ClInclude Include="wb3d\acting_actor.hpp">
       <Filter>Header Files\wb3d</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin_link.h">
+      <Filter>plugins</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

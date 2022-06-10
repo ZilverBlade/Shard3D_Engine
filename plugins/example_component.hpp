@@ -4,8 +4,17 @@
 namespace Shard3D {	
 	namespace Components {	// Components must always be in these namespaces
 		struct ExampleComponent {
-			std::string exampleValue;
+			/*  *
+* Value that does something
+*/
+			std::string exampleValue = "Hello! Example string!";
 
+			/*  *
+* Value that gets length of string
+*/
+			void getLength () {
+				return exampleValue.length();
+			}
 		};
 	}
 }

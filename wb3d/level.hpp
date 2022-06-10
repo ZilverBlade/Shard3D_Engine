@@ -33,14 +33,11 @@ namespace Shard3D {
 
 			Actor getEditorCameraActor();
 
-
 			void begin();
 			void update(float dt); 
 			void end();
 
 			entt::registry eRegistry;
-
-
 
 		private:
 			// queues 

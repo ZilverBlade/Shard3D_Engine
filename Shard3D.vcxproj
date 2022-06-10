@@ -228,8 +228,8 @@
     <ClCompile Include="wb3d\level.cpp" />
     <ClCompile Include="UI\ImGuiLayer.cpp" />
     <ClCompile Include="systems\basic_render_system.cpp" />
-    <ClCompile Include="input\keyboard_movement_controller.cpp" />
-    <ClCompile Include="input\mouse_movement_controller.cpp" />
+    <ClCompile Include="input\editor\editor_keyboard_movement_controller.cpp" />
+    <ClCompile Include="input\editor\editor_mouse_movement_controller.cpp" />
     <ClCompile Include="buffer.cpp" />
     <ClCompile Include="components.cpp" />
     <ClCompile Include="swap_chain.cpp" />
@@ -256,6 +256,7 @@
       <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="plugins\example_component.hpp" />
+    <ClInclude Include="plugin_link.h" />
     <ClInclude Include="scripts\example_script.cpp">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -281,8 +282,8 @@
     <ClInclude Include="UI\Layer.hpp" />
     <ClInclude Include="UI\LayerStack.hpp" />
     <ClInclude Include="utils\definitions.hpp" />
-    <ClInclude Include="input\keyboard_movement_controller.hpp" />
-    <ClInclude Include="input\mouse_movement_controller.hpp">
+    <ClInclude Include="input\editor\editor_keyboard_movement_controller.hpp" />
+    <ClInclude Include="input\editor\editor_mouse_movement_controller.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>

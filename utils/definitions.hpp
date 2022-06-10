@@ -26,10 +26,12 @@ namespace Shard3D{
 #define WINDOW_ICON_PATH			"shardwinico.png"
 
 	//engine settings
+
 #define MAX_POINTLIGHTS						20 //dont change because these dont match shader code
 #define MAX_SPOTLIGHTS						20 
 #define MAX_DIRECTIONAL_LIGHTS				6
 
+#define ENABLE_PLUGINS						true
 #define ACTOR_FORCE_TRANSFORM_COMPONENT		true // creates transform component automatically for all actors, recommended to keep enabled as meshes heavily rely on this
 #define MAX_ACTOR_CHILDREN_COUNT			256
 

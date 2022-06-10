@@ -12,8 +12,8 @@
 #include <glm/gtc/constants.hpp>
 
 //engine
-#include "input/keyboard_movement_controller.hpp"
-#include "input/mouse_movement_controller.hpp"
+#include "input/editor/editor_keyboard_movement_controller.hpp"
+#include "input/editor/editor_mouse_movement_controller.hpp"
 #include "camera.hpp"
 #include "utils/definitions.hpp"
 #include "wb3d/master_manager.hpp"
@@ -85,18 +85,15 @@ namespace Shard3D {
 		SpotlightSystem spotlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		DirectionalLightSystem directionalLightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		
-		EngineCamera camera{};
-		
 		std::cout << "Loading editor camera actor\n";
 		wb3d::Actor cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
-
+		cameraActor.addComponent<Components::CameraComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
 
 		loadGameObjects();
 
-
-		controller::KeyboardMovementController cameraControllerKeyBoard{};
-		controller::MouseMovementController cameraControllerMouse{};
+		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
+		controller::EditorMouseMovementController editorCameraControllerMouse{};
 
 		double mousePosX = {};
 		double mousePosY = {};
@@ -123,20 +120,19 @@ namespace Shard3D {
 			activeLevel->runGarbageCollector(engineDevice.device());
 			wb3d::MasterManager::executeQueue(activeLevel, frameTime);
 
-
-		//	add some kind of function for managing models since they rely on the gpu
-
-			cameraControllerKeyBoard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
-			cameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
+			editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
+			editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
 			
-			camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
-
-			float aspect = engineRenderer.getAspectRatio();
+			cameraActor.getComponent<Components::CameraComponent>().camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
+			cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
+			cameraActor.getComponent<Components::CameraComponent>().ar = engineRenderer.getAspectRatio();
 			
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
-				camera.setPerspectiveProjection(glm::radians(fov), aspect, ini.GetDoubleValue("RENDERING", "NearClipDistance"), ini.GetDoubleValue("RENDERING", "FarClipDistance"));
+				cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
+				cameraActor.getComponent<Components::CameraComponent>().setProjection();
 			} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
-				camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, ini.GetDoubleValue("RENDERING", "FarClipDistance"));  //Ortho perspective (not needed 99.99% of the time)
+				cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
+				cameraActor.getComponent<Components::CameraComponent>().setProjection();
 			}
 
 			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
@@ -150,15 +146,15 @@ namespace Shard3D {
 					frameIndex,
 					frameTime,
 					commandBuffer,
-					camera,
+					cameraActor.getComponent<Components::CameraComponent>(),
 					globalDescriptorSets[frameIndex]
 				};
 
 				//	update
 				GlobalUbo ubo{};
-				ubo.projection = camera.getProjection();
-				ubo.view = camera.getView();
-				ubo.inverseView = camera.getInverseView();
+				ubo.projection = cameraActor.getComponent<Components::CameraComponent>().camera.getProjection();
+				ubo.view = cameraActor.getComponent<Components::CameraComponent>().camera.getView();
+				ubo.inverseView = cameraActor.getComponent<Components::CameraComponent>().camera.getInverseView();
 				
 				pointlightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -289,8 +285,8 @@ namespace Shard3D {
 		child.getComponent<Components::TransformComponent>().translation = { 1.f, -1.f, 0.f };
 		child.getComponent<Components::TransformComponent>().scale = { 0.2f, 0.2f, 0.2f };
 
-
-		cool.addComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
+		cool.addComponent<Components::CppScriptComponent>();
+		cool.getComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
 
 	}
 }

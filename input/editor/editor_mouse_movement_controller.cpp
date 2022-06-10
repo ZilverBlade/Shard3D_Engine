@@ -1,4 +1,4 @@
-#include "mouse_movement_controller.hpp"
+#include "editor_mouse_movement_controller.hpp"
 #include <limits>
 #include <iostream>
 #include <glm/glm.hpp>
@@ -8,7 +8,7 @@
 namespace Shard3D {
 	namespace controller {
 
-		void MouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
+		void EditorMouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
 			
 			if (glfwGetMouseButton(window, buttons.canRotate) == GLFW_PRESS) {
 		

@@ -1,9 +1,9 @@
-#include "keyboard_movement_controller.hpp"
+#include "editor_keyboard_movement_controller.hpp"
 #include <limits>
 
 namespace Shard3D {
 	namespace controller {
-		void KeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
+		void EditorKeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
 			glm::vec3 rotate{ 0 };
 			if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
 			if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;

@@ -92,7 +92,13 @@ namespace Shard3D {
 		}
 
 		void Level::begin() {
-
+			eRegistry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+				if (!csc.Inst) {
+					csc.Inst = csc.InstScript();
+					csc.Inst->aActor = Actor{ actor, this };
+					csc.Inst->beginEvent();
+				}
+			});
 		}
 
 		void Level::update(float dt) {

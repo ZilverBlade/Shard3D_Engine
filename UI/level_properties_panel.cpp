@@ -223,5 +223,22 @@ namespace Shard3D {
 			}
 			if (killComponent) actor.killComponent<Components::DirectionalLightComponent>();
 		}
+		if (actor.hasComponent<Components::CppScriptComponent>()) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::CppScriptComponent).hash_code(), nodeFlags, "C++ Script");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
+				ImGui::Text(typeid(&actor.getComponent<Components::CppScriptComponent>().Inst).raw_name());
+				ImGui::TreePop();
+			}
+			if (killComponent) actor.killComponent<Components::CppScriptComponent>();
+		}
 	}
 }

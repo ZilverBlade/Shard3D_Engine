@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../wb3d/actor.hpp"
-#include "../components.hpp"
-#include "../engine_window.hpp"
+#include "../../wb3d/actor.hpp"
+#include "../../components.hpp"
+#include "../../engine_window.hpp"
 
 namespace Shard3D {
     namespace controller {
-	class KeyboardMovementController {
+	class EditorKeyboardMovementController {
 
 	public:
         struct KeyMappings {

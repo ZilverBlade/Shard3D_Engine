@@ -18,7 +18,7 @@ namespace Shard3D {
 
 	void EngineCamera::setPerspectiveProjection(float fovy, float aspect, float near /*Near clipping plane*/, float far /*Far clipping plane*/) {
 		assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
-		const float tanHalfFovy = tan(fovy / 2.f);
+		float tanHalfFovy = tan(fovy / 2.f);
 		projectionMatrix = glm::mat4{ 0.0f };
 		projectionMatrix[0][0] = 1.f / (aspect * tanHalfFovy);
 		projectionMatrix[1][1] = 1.f / (tanHalfFovy);
@@ -26,7 +26,9 @@ namespace Shard3D {
 		projectionMatrix[2][3] = 1.f;
 		projectionMatrix[3][2] = -(far * near) / (far - near);
 	}
-
+	/* *
+* Set camera view based on the camera's position and direction
+*/
 	void EngineCamera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
 		const glm::vec3 w{ glm::normalize(direction) };
 		const glm::vec3 u{ glm::normalize(glm::cross(w, up)) };
@@ -60,12 +62,16 @@ namespace Shard3D {
 		inverseViewMatrix[3][1] = position.y;
 		inverseViewMatrix[3][2] = position.z;
 	}
-
+	/* *
+* Set camera view based on the camera's position and target
+*/
 	void EngineCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
 		assert((target - position) != glm::vec3(0) && "direction cannot be 0");
 		setViewDirection(position, target - position, up);
 	}
-
+	/* *
+* Set camera view based on the camera's position and rotation
+*/
 	void EngineCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
 		const float c3 = glm::cos(rotation.z);
 		const float s3 = glm::sin(rotation.z);

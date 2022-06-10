@@ -2,7 +2,7 @@
 
 #include "model.hpp"
 #include "GUID.hpp"
-
+#include "../../camera.hpp"
 #include <memory>
 #include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,7 +24,6 @@ namespace Shard3D {
 			operator std::string() { return tag; };
 		};
 
-
 		struct TransformComponent {
 			glm::vec3 translation{ 0.f, 0.f, 0.f };
 			glm::vec3 scale{ 1.f, 1.f, 1.f };
@@ -35,6 +34,47 @@ namespace Shard3D {
 
 			glm::mat4 mat4();
 			glm::mat3 normalMatrix();
+		};
+
+		struct CameraComponent {
+			enum ProjectType {
+				Orthographic = 0,
+				Perspective = 1
+			};
+
+			EngineCamera camera{};
+			/* *
+* Projection type (Perspective/Orthographic)
+*/
+			ProjectType projectionType = ProjectType::Perspective;
+			/* *
+* Field of view (degrees)
+*/
+			float fov = 70.f;
+			/* *
+* Near clip distance (meters)
+*/
+			float nearClip = 0.0625f;
+			/* *
+* Far clip distance (meters)
+*/
+			float farClip = 1024.f;
+			/* *
+* Aspect ratio (width/height)
+*/
+			float ar = 16 / 9;
+			/* *
+* Set projection with the given settings
+*/
+			void setProjection() {
+				if (projectionType == ProjectType::Perspective)
+				camera.setPerspectiveProjection(glm::radians(fov), ar, nearClip, farClip);
+				else  camera.setOrthographicProjection(-ar, ar, -1, 1, -nearClip, farClip);
+			}
+
+			operator EngineCamera&() {
+				return camera;
+			}
 		};
 
 		struct MeshComponent {

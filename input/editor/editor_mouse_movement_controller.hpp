@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../wb3d/actor.hpp"
-#include "../components.hpp"
-#include "../engine_window.hpp"
+#include "../../wb3d/actor.hpp"
+#include "../../components.hpp"
+#include "../../engine_window.hpp"
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 namespace Shard3D {
 	namespace controller {
-		class MouseMovementController {
+		class EditorMouseMovementController {
 		public:
 			struct ButtonMappings {
 				int canRotate = GLFW_MOUSE_BUTTON_RIGHT;

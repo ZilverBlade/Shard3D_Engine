@@ -25,7 +25,7 @@ namespace Shard3D {
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
         currentDevice = device;
-        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (EDITOR) (PHYSICS: null)");
+        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Paused)");
         hasBeenDetached = false;
 
         // Load any panels
