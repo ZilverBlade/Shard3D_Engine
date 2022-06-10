@@ -96,8 +96,8 @@ namespace Shard3D {
 		}
 
 		void Level::update(float dt) {
-			// update scripts	
-			{
+			
+			{	// update scripts	
 				eRegistry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 					if (!csc.Inst) {
 						csc.Inst = csc.InstScript();
@@ -115,6 +115,10 @@ namespace Shard3D {
 
 		void Level::killActor(Actor actor) {
 			actorKillQueue.emplace_back(actor);
+			if (actor.hasComponent<Components::CppScriptComponent>()) {
+				actor.getComponent<Components::CppScriptComponent>().Inst->killEvent();
+				actor.getComponent<Components::CppScriptComponent>().killScript(&actor.getComponent<Components::CppScriptComponent>());
+			}
 		}
 
 		void Level::killChild(Actor parentActor, Actor childActor) {
