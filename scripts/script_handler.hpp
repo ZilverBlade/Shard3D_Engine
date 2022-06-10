@@ -15,22 +15,13 @@ namespace Shard3D {
 		struct CppScriptComponent {
 			wb3d::ActingActor* Inst = nullptr;
 
-			std::function<void()> createInstFunc;
-			std::function<void()> killInstFunc;
-
-			std::function<void(wb3d::ActingActor*)> createFunc;
-			std::function<void(wb3d::ActingActor*, float)> tickFunc;
-			std::function<void(wb3d::ActingActor*)> killFunc;
+			wb3d::ActingActor* (*InstScript)();
+			void (*killScript)(CppScriptComponent*);
 
 			template<typename T>
 			void bind() {
-
-				createInstFunc = [&]()	{Inst = new T(); };
-				killInstFunc = [&]()	{delete (T*)Inst; };
-
-				createFunc = [](wb3d::ActingActor* inst)				{((T*)inst)->createEvent(); };
-				tickFunc = [](wb3d::ActingActor* inst, float deltaTime)	{((T*)inst)->tickEvent(deltaTime); };
-				killFunc = [](wb3d::ActingActor* inst)					{((T*)inst)->killEvent(); };
+				InstScript = []()							{return static_cast<wb3d::ActingActor*>(new T()); };
+				killScript = [](CppScriptComponent* csc)	{delete csc->Inst; csc->Inst = nullptr; };
 			}
 		};
 	}

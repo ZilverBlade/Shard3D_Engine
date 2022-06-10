@@ -1,41 +1,37 @@
-Shard3D: 1.0.7
+Shard3D: 1.0.8
 WorldBuilder3D: 0.1
 Level: Some kind of level
 Actors:
-  - Actor: 10692944168946367547
+  - Actor: 9019667175009273918
     TagComponent:
-      Tag: Some kind of actor
+      Tag: child actor test
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [1, -1, 0]
       Rotation: [0, 0, 0]
-      Scale: [0.5, 0.5, 0.5]
+      Scale: [0.200000003, 0.200000003, 0.200000003]
     MeshComponent:
-      MeshPath: modeldata/FART.obj
-      MeshFormat: 1
-      Indexed: false
-  - Actor: 5474934928015020025
-    TagComponent:
-      Tag: Some kind of actor
-    TransformComponent:
-      Translation: [0, 0.899999976, 0]
-      Rotation: [0, 0, 0]
-      Scale: [100, 1, 100]
-    MeshComponent:
-      MeshPath: modeldata/quad.obj
+      MeshPath: assets/modeldata/engineModels/cube.obj
       MeshFormat: 1
       Indexed: true
-  - Actor: 14582849955899906367
+  - Actor: 14194560897275565558
     TagComponent:
-      Tag: Some kind of actor
+      Tag: parent actor test
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [60.47612, 60.47612, 60.47612]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: assets/modeldata/cone.obj
+      MeshFormat: 1
+      Indexed: true
+  - Actor: 14936490955387259340
+    TagComponent:
+      Tag: Directional Light
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
-      MeshPath: modeldata/axis.obj
-      MeshFormat: 1
-      Indexed: false
-  - Actor: 14793753078793317408
+  - Actor: 262029106815139821
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
@@ -47,30 +43,10 @@ Actors:
       Radius: 1
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
-  - Actor: 9413162245533690257
+  - Actor: 8301944432995714074
     TagComponent:
       Tag: Some kind of actor
     TransformComponent:
-      Translation: [0, -1, 5]
-      Rotation: [1, -3, -1]
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    DirectionalLightComponent:
-      Emission: [1, 1, 1, 0.100000001]
-      Specularness: 0
-  - Actor: 18083230413197269440
-    TagComponent:
-      Tag: Some kind of actor
-    TransformComponent:
-      Translation: [5, -1, 0]
-      Rotation: [1, -0, -1]
-      Scale: [0.100000001, 0.100000001, 0.100000001]
-    MeshComponent:
-      MeshPath: modeldata/cone.obj
-      MeshFormat: 1
-      Indexed: false
-    SpotlightComponent:
-      Emission: [1, 1, 1, 1]
-      Radius: 1
-      Angle: [0.785398185, 0.261799395]
-      Specularness: 1
-      AttenuationCLQ: [0, 0, 1]

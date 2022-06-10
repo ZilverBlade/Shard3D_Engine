@@ -91,19 +91,26 @@ namespace Shard3D {
 			return actor;
 		}
 
+		void Level::begin() {
+
+		}
+
 		void Level::update(float dt) {
 			// update scripts	
 			{
 				eRegistry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 					if (!csc.Inst) {
-						csc.createInstFunc();
+						csc.Inst = csc.InstScript();
 						csc.Inst->aActor = Actor{ actor, this };
-						csc.createFunc(csc.Inst);
+						csc.Inst->spawnEvent();
 					}
-
-					csc.tickFunc(csc.Inst, dt);
+					csc.Inst->tickEvent(dt);
 				});
 			}
+		}
+
+		void Level::end() {
+
 		}
 
 		void Level::killActor(Actor actor) {
