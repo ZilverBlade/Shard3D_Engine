@@ -54,7 +54,7 @@ namespace Shard3D {
 			/* *
 * Near clip distance (meters)
 */
-			float nearClip = 0.0625f;
+			float nearClip = 0.05f;
 			/* *
 * Far clip distance (meters)
 */
@@ -69,7 +69,7 @@ namespace Shard3D {
 			void setProjection() {
 				if (projectionType == ProjectType::Perspective)
 				camera.setPerspectiveProjection(glm::radians(fov), ar, nearClip, farClip);
-				else  camera.setOrthographicProjection(-ar, ar, -1, 1, -nearClip, farClip);
+				else  camera.setOrthographicProjection(-ar, ar, -1, 1, nearClip, farClip);
 			}
 
 			operator EngineCamera&() {

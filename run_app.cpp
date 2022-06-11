@@ -42,7 +42,7 @@ namespace Shard3D {
 	RunApp::RunApp() {
 		globalPool = EngineDescriptorPool::Builder(engineDevice)
 			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)			
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.build();
 		std::cout << "attempting to construct Level Pointer\n";
 		activeLevel = std::make_shared<Level>();
@@ -58,7 +58,7 @@ namespace Shard3D {
 				1,
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-			);
+				);
 			uboBuffers[i]->map();
 		}
 
@@ -80,11 +80,11 @@ namespace Shard3D {
 #endif
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		
-		PointlightSystem pointlightSystem { engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+
+		PointlightSystem pointlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		SpotlightSystem spotlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		DirectionalLightSystem directionalLightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		
+
 		std::cout << "Loading editor camera actor\n";
 		wb3d::Actor cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
 		cameraActor.addComponent<Components::CameraComponent>();
@@ -108,7 +108,8 @@ namespace Shard3D {
 
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
-	
+
+		activeLevel->begin();
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!engineWindow.shouldClose()) {
 			glfwPollEvents();
@@ -118,15 +119,16 @@ namespace Shard3D {
 			currentTime = newTime;
 
 			activeLevel->runGarbageCollector(engineDevice.device());
-			wb3d::MasterManager::executeQueue(activeLevel, frameTime);
+			wb3d::MasterManager::executeQueue(activeLevel);
+			activeLevel->update(frameTime);
 
 			editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
 			editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
-			
+
 			cameraActor.getComponent<Components::CameraComponent>().camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
 			cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 			cameraActor.getComponent<Components::CameraComponent>().ar = engineRenderer.getAspectRatio();
-			
+
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
 				cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
 				cameraActor.getComponent<Components::CameraComponent>().setProjection();
@@ -138,7 +140,7 @@ namespace Shard3D {
 			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
 				glfwGetWindowSize(engineWindow.getGLFWwindow(), &engineWindow.windowWidth, &engineWindow.windowHeight);
 				engineWindow.toggleFullscreen();
-			}	
+			}
 
 			if (auto commandBuffer = engineRenderer.beginFrame()) {
 				int frameIndex = engineRenderer.getFrameIndex();
@@ -155,7 +157,7 @@ namespace Shard3D {
 				ubo.projection = cameraActor.getComponent<Components::CameraComponent>().camera.getProjection();
 				ubo.view = cameraActor.getComponent<Components::CameraComponent>().camera.getView();
 				ubo.inverseView = cameraActor.getComponent<Components::CameraComponent>().camera.getInverseView();
-				
+
 				pointlightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
@@ -167,7 +169,7 @@ namespace Shard3D {
 				directionalLightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
-				
+
 				//	render
 
 				/*
@@ -183,11 +185,11 @@ namespace Shard3D {
 
 					Also order absolutely matters, post processing for example must go last
 				*/
-				
-				engineRenderer.beginSwapChainRenderPass(commandBuffer); 
+
+				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 
 				basicRenderSystem.renderGameObjects(frameInfo, activeLevel);
-				
+
 				pointlightSystem.render(frameInfo, activeLevel);
 				spotlightSystem.render(frameInfo, activeLevel);
 				directionalLightSystem.render(frameInfo, activeLevel);
@@ -201,23 +203,24 @@ namespace Shard3D {
 				engineRenderer.endFrame();
 			}
 		}
+		activeLevel->end();
 		for (Layer* layer : layerStack) {
 			layer->detach();
 		}
 		vkDeviceWaitIdle(engineDevice.device());
 	}
 
-	void RunApp::loadGameObjects() {	
+	void RunApp::loadGameObjects() {
 
 		/*
 			NOTE:
 			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, -Y up.
 			That means that in the editor, the level must save object transform values as (X, -Z, Y), otherwise it will be incorrect
 		*/
-		
+
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
-	
+
 		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
 
 		wb3d::Actor quad = activeLevel->createActor();
@@ -280,7 +283,7 @@ namespace Shard3D {
 
 		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/engineModels/cube.obj", ModelType::MODEL_TYPE_OBJ);
 		wb3d::Actor child = activeLevel->createChild(cool, "child actor test");
-		
+
 		child.addComponent<Components::MeshComponent>(model);
 		child.getComponent<Components::TransformComponent>().translation = { 1.f, -1.f, 0.f };
 		child.getComponent<Components::TransformComponent>().scale = { 0.2f, 0.2f, 0.2f };

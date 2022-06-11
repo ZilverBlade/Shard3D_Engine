@@ -12,7 +12,7 @@ namespace Shard3D {
 			/*  *
 * Value that gets length of string
 */
-			void getLength () {
+			int getLength () {
 				return exampleValue.length();
 			}
 		};

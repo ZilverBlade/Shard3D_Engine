@@ -6,7 +6,7 @@ namespace Shard3D {
 			engineDevice = &device;
 			levelPath = path;
 		}
-		void MasterManager::executeQueue(std::shared_ptr<Level>& level, float deltatime) {
+		void MasterManager::executeQueue(std::shared_ptr<Level>& level) {
 			if (levelPath != "wb3d_nullpath") {
 				//level = std::make_shared<Level>();
 				LevelManager levelMan(level);
@@ -21,7 +21,6 @@ namespace Shard3D {
 				}
 				levelPath = "wb3d_nullpath";
 			}
-			level->update(deltatime);
 		}
 	}
 }

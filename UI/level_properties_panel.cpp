@@ -44,6 +44,11 @@ namespace Shard3D {
 
 					ImGui::CloseCurrentPopup();
 				}
+				if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
+					tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, "assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ, true));
+					tree.selectedActor.addComponent<Components::CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 				ImGui::EndPopup();
 			}			
 			if (ImGui::Button("Actor GUID to clipboard")) {
@@ -121,7 +126,6 @@ namespace Shard3D {
 				ImGui::TreePop();
 			}
 		}
-
 		if (actor.hasComponent<Components::MeshComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::MeshComponent).hash_code(), nodeFlags, "Mesh");
 			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
@@ -157,6 +161,33 @@ namespace Shard3D {
 				ImGui::TreePop();
 			}
 			if (killComponent) context->killMesh(actor);
+		}
+		if (actor.hasComponent<Components::CameraComponent>()) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::CameraComponent).hash_code(), nodeFlags, "Camera");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
+				int projType = (int)actor.getComponent<Components::CameraComponent>().projectionType;
+				ImGui::Combo("Projection Type", &projType, "Orthographic\0Perspective");
+				actor.getComponent<Components::CameraComponent>().projectionType = (Components::CameraComponent::ProjectType)projType;
+				
+				bool enableFov = false;
+				if (actor.getComponent<Components::CameraComponent>().projectionType == Components::CameraComponent::ProjectType::Perspective) enableFov = true;
+				ImGui::BeginDisabled(!enableFov); ImGui::DragFloat("FOV", &actor.getComponent<Components::CameraComponent>().fov, 0.1f, 10.f, 180.f); ImGui::EndDisabled();
+				ImGui::DragFloat("Near Clip Plane", &actor.getComponent<Components::CameraComponent>().nearClip, 0.001f, 0.05f, 1.f);
+				ImGui::DragFloat("Far Clip Plane", &actor.getComponent<Components::CameraComponent>().farClip, 1.f, 16.f, 8192.f);
+				ImGui::DragFloat("Aspect ratio", &actor.getComponent<Components::CameraComponent>().ar, 0.001f, 0.f, 4.f);
+
+				ImGui::TreePop();
+			}
+			if (killComponent)  actor.killComponent<Components::CameraComponent>();
 		}
 		if (actor.hasComponent<Components::PointlightComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::PointlightComponent).hash_code(), nodeFlags, "Pointlight");

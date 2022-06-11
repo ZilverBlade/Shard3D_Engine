@@ -10,14 +10,35 @@ namespace Shard3D {
 			void endEvent()	{}
 
 			void tickEvent(float dt) {
-				auto& transform = getComponent<Components::TransformComponent>();
-				transform.translation += dt;
+				getComponent<Components::TransformComponent>().translation += dt;
+				if (getComponent<Components::TransformComponent>().translation.y > 1.7f)getComponent<Components::TransformComponent>().translation.y = 0.f;
 			}
 
 			void spawnEvent() {
 				std::cout << "Example script!\n";
 			}
 			
+			void killEvent() {
+				std::cout << "Example script ended!\n";
+			}
+		};
+
+		class InGameCameraPanScript : public wb3d::ActingActor {
+		public:
+			void beginEvent() {}
+			void endEvent() {}
+
+			void tickEvent(float dt) {
+				getComponent<Components::TransformComponent>().translation.z -= dt;
+				getComponent<Components::TransformComponent>().rotation.x += dt * 0.15;
+				getComponent<Components::TransformComponent>().rotation.y += dt * 0.15;
+				getComponent<Components::CameraComponent>().camera.setViewYXZ(getComponent<Components::TransformComponent>().translation, getComponent<Components::TransformComponent>().rotation);
+			}
+
+			void spawnEvent() {
+				getComponent<Components::TransformComponent>().translation = {1.f, -5.f, 6.f};
+			}
+
 			void killEvent() {
 				std::cout << "Example script ended!\n";
 			}

@@ -13,6 +13,7 @@ namespace Shard3D {
 			T& getComponent() {
 				return aActor.getComponent<T>();
 			}
+			
 		protected:
 /**
   Gets called upon the start of the level
