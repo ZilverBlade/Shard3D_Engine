@@ -1,74 +1,7 @@
-Shard3D: 1.0.7
+Shard3D: 1.0.8
 WorldBuilder3D: 0.1
 Level: Some kind of level
 Actors:
-  - Actor: 18280537286445342005
-    TagComponent:
-      Tag: Pointlight
-    TransformComponent:
-      Translation: [-2.11999989, -0.270000011, -0.409999996]
-      Rotation: [0, -0.305432618, 0]
-      Scale: [1, 1, 1]
-    PointlightComponent:
-      Emission: [1, 1, 1, 1]
-      Radius: 1
-      Specularness: 1
-      AttenuationCLQ: [0.319999993, 1.28499997, 0.135000005]
-  - Actor: 8478236753190339018
-    TagComponent:
-      Tag: floor
-    TransformComponent:
-      Translation: [0, 0.970000029, 0]
-      Rotation: [0, 0, 0]
-      Scale: [100, 1, 100]
-    MeshComponent:
-      MeshPath: assets/modeldata/quad.obj
-      MeshFormat: 1
-      Indexed: true
-  - Actor: 14379880132986827232
-    TagComponent:
-      Tag: axis
-    TransformComponent:
-      Translation: [0, 0.569999993, 3.02999997]
-      Rotation: [0, 0.670206428, 0]
-      Scale: [1, 1, 1.40999997]
-    MeshComponent:
-      MeshPath: assets/modeldata/axis.obj
-      MeshFormat: 1
-      Indexed: false
-  - Actor: 279020396416382903
-    TagComponent:
-      Tag: some of point
-    TransformComponent:
-      Translation: [2, -1, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0.829999983, 1, 1]
-    PointlightComponent:
-      Emission: [1, 0.651000023, 1, 1]
-      Radius: 1
-      Specularness: 1
-      AttenuationCLQ: [0, 0, 1]
-  - Actor: 7204028520566283701
-    TagComponent:
-      Tag: car
-    TransformComponent:
-      Translation: [0, -0.620000005, 0]
-      Rotation: [4.70889807, -0.239110097, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshPath: assets/modeldata/cone.obj
-      MeshFormat: 1
-      Indexed: false
-  - Actor: 6473355389825069262
-    TagComponent:
-      Tag: sunlight
-    TransformComponent:
-      Translation: [0, -0.319999993, 5.71000004]
-      Rotation: [1.04719758, -3.14159274, -0.785398185]
-      Scale: [1, 1, 1]
-    DirectionalLightComponent:
-      Emission: [1, 1, 1, 0.100000001]
-      Specularness: 0
   - Actor: 11041745289289356304
     TagComponent:
       Tag: spotlight
@@ -86,3 +19,70 @@ Actors:
       Angle: [0.785398185, 0.261799395]
       Specularness: 3
       AttenuationCLQ: [0, 0, 1]
+  - Actor: 6473355389825069262
+    TagComponent:
+      Tag: sunlight
+    TransformComponent:
+      Translation: [0, -0.319999993, 5.71000004]
+      Rotation: [1.04719758, -3.14159274, -0.785398185]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Emission: [1, 1, 1, 0.100000001]
+      Specularness: 0
+  - Actor: 7204028520566283701
+    TagComponent:
+      Tag: car
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, -0.239110097, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: assets/modeldata/fart.obj
+      MeshFormat: 1
+      Indexed: false
+  - Actor: 279020396416382903
+    TagComponent:
+      Tag: some of point
+    TransformComponent:
+      Translation: [2, -1.27999997, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.829999983, 1, 1]
+    PointlightComponent:
+      Emission: [1, 0.651000023, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 14379880132986827232
+    TagComponent:
+      Tag: axis
+    TransformComponent:
+      Translation: [0, 0.569999993, 3.02999997]
+      Rotation: [0, 0.670206428, 0]
+      Scale: [1, 1, 1.40999997]
+    MeshComponent:
+      MeshPath: assets/modeldata/axis.obj
+      MeshFormat: 1
+      Indexed: false
+  - Actor: 8478236753190339018
+    TagComponent:
+      Tag: floor
+    TransformComponent:
+      Translation: [0, 0.970000029, 0]
+      Rotation: [0, 0, 0]
+      Scale: [100, 1, 100]
+    MeshComponent:
+      MeshPath: assets/modeldata/quad.obj
+      MeshFormat: 1
+      Indexed: true
+  - Actor: 18280537286445342005
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-2.11999989, -0.730000019, -0.409999996]
+      Rotation: [0, -0.305432618, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0.319999993, 1.28499997, 0.135000005]

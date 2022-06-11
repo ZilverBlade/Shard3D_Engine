@@ -7,7 +7,15 @@
 #include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <entt.hpp>
+
 namespace Shard3D {
+
+	namespace wb3d {
+		class Actor;
+	}
+	class wb3d::Actor;
+
 	namespace Components {
 		struct GUIDComponent {
 			GUID id;

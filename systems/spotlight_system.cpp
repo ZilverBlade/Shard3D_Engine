@@ -2,7 +2,6 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 
 #include "spotlight_system.hpp"
 #include <stdexcept>
@@ -64,7 +63,6 @@ namespace Shard3D {
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
-		EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
 		pipelineConfig.attributeDescriptions.clear();
 		pipelineConfig.bindingDescriptions.clear();
 		pipelineConfig.renderPass = renderPass;
@@ -79,7 +77,7 @@ namespace Shard3D {
 
 	void SpotlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo, std::shared_ptr<wb3d::Level>& level) {
 		int lightIndex = 0;
-		level->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
+		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
 		if (!actor) return;
 
 		if (actor.hasComponent<Components::SpotlightComponent>()) {
@@ -97,7 +95,7 @@ namespace Shard3D {
 	}
 
 	void SpotlightSystem::render(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level) {
-		level->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
+		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
 		if (!actor) return;
 		// copy light to ubo
 		if (actor.hasComponent<Components::SpotlightComponent>()) {

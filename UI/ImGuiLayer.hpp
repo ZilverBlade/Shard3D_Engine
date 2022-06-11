@@ -5,7 +5,7 @@
 #include <imgui_node_editor.h>
 #include <memory>
 #include <vector>
-#include "../wb3d/wb3d_imgui_frame.cpp"
+#include "../wb3d/wb3d_imgui_frame.hpp"
 
 // panels
 #include "level_tree_panel.hpp"

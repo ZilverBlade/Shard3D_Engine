@@ -34,8 +34,8 @@
 #include "UI/TestLayer.hpp"
 #include "UI/ImGuiLayer.hpp"
 
-//misc
-#include "scripts/example_script.cpp"
+//scripts
+#include "scripts/script_link.h"
 
 namespace Shard3D {
 	wb3d::Actor light2{};
@@ -109,7 +109,6 @@ namespace Shard3D {
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
 
-		activeLevel->begin();
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!engineWindow.shouldClose()) {
 			glfwPollEvents();
@@ -218,7 +217,7 @@ namespace Shard3D {
 			That means that in the editor, the level must save object transform values as (X, -Z, Y), otherwise it will be incorrect
 		*/
 
-		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
+		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
 
 		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
@@ -280,16 +279,6 @@ namespace Shard3D {
 
 		wb3d::Actor cool = activeLevel->createActor("parent actor test");
 		cool.addComponent<Components::MeshComponent>(model);
-
-		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/engineModels/cube.obj", ModelType::MODEL_TYPE_OBJ);
-		wb3d::Actor child = activeLevel->createChild(cool, "child actor test");
-
-		child.addComponent<Components::MeshComponent>(model);
-		child.getComponent<Components::TransformComponent>().translation = { 1.f, -1.f, 0.f };
-		child.getComponent<Components::TransformComponent>().scale = { 0.2f, 0.2f, 0.2f };
-
-		cool.addComponent<Components::CppScriptComponent>();
-		cool.getComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
 
 	}
 }

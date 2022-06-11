@@ -1,0 +1,515 @@
+Shard3D: 1.0.8
+WorldBuilder3D: 0.1
+Level: Some kind of level
+Actors:
+  - Actor: 14048447887132860799
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 13167889530396628272
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 14976007034334954963
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 13259413312610078486
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 7482974345652967755
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 7130600007707225435
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 8754576374813929297
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 9934678229942603774
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 8257807322946860141
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 11600395634227863683
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 18065065479916019813
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 1645915148310788249
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 17883453831448439009
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 13968122882890602015
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 6498467963413316209
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 5056825244408971306
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 12282780730174130499
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 14758856910448846933
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 8843469353102746396
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 6281635137447301233
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 1997407644230337801
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 10718867054772403746
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 1649956932418235400
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 15636262079514338208
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 2196270333377346293
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 13753695832372283517
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 4802924441061617400
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 14113639702210429226
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 16390160433455329285
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 3904321989657832449
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 2420307716735974573
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 8154672835573044241
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 2929675332717711847
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 13408252550550315341
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 12854070764742516809
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 6713917395448416112
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 7120193637145058990
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 6059561857965066075
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 285187272972466637
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 4670009680109482772
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 2020358652302246425
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 12869764851389651724
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 8121364060235731480
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 11398745177571031895
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 4220525537398764137
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 14967990571470537190
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 12029313091570113254
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 4458436977415096099
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 12781117445581433655
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 18409807970626410445
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 16499225132606156561
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 3260661538289260331
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 12802793030354304604
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 16125860489523749034
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 11012416235776593418
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 1361630723849654500
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 5708738202935383635
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 211633495924975232
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 3948544697242107606
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 6018725521796942223
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 6089475575185175339
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 4629556432881354758
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 13891100082678971426
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 10501187014452136827
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 11449076371053853147
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 6604871070447978472
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 16231697123003895093
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 512426488021054976
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 10631699071417505441
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 703163080219581483
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 7561536463479175990
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 10408269279064134265
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 17023304892196512343
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]

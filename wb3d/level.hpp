@@ -13,19 +13,12 @@ namespace Shard3D {
 		public:
 			Level();
 			~Level();
-			
+
 			Actor createActor(std::string name= "Some kind of actor");
 			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
 
-			Actor createChild(Actor actor, std::string name = "Some kind of actor");
-			Actor createChildWithGUID(GUID guid, Actor actor, std::string name);
-
-			//template<typename T>
-			//Actor createActorWithComponent(std::string name);
-
 			void killEverything();
 			void killActor(Actor actor);
-			void killChild(Actor parentActor, Actor childActor);
 			void killMesh(Actor actor);
 			void reloadMesh(Actor actor);
 
@@ -47,26 +40,24 @@ namespace Shard3D {
 */
 			void end();
 
-			entt::registry eRegistry;
-
+			entt::registry registry;
+			bool isPlayingLevel = false;
 		private:
+			bool loadRegistryCapture = false;
+
+			void captureLevel();
+			void reloadLevel();
+
 			// queues 
 			std::vector<Actor> actorKillQueue;
 			std::vector<Actor> actorKillMeshQueue;
 			std::vector<Actor> actorReloadMeshQueue;
 
 			friend class Actor;
+			friend class MasterManager;
 
 			friend class LevelManager;
 			friend class LevelTreePanel;
-
-			friend class RunApp;
-			//systems
-			friend class BasicRenderSystem;
-			friend class PointlightSystem;
-			friend class SpotlightSystem;
-			friend class DirectionalLightSystem;
-
 		};
 	}
 }

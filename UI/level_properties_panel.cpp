@@ -45,8 +45,11 @@ namespace Shard3D {
 					ImGui::CloseCurrentPopup();
 				}
 				if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
-					tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, "assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ, true));
 					tree.selectedActor.addComponent<Components::CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
+					tree.selectedActor.addComponent<Components::CppScriptComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndPopup();
@@ -266,7 +269,13 @@ namespace Shard3D {
 				ImGui::EndPopup();
 			}
 			if (open) {
+				auto& className = actor.getComponent<Components::CppScriptComponent>().className;
+				char classNameBuffer[256];
+				memset(classNameBuffer, 0, 256);
+				strncpy(classNameBuffer, className.c_str(), 256);
 				ImGui::Text(typeid(&actor.getComponent<Components::CppScriptComponent>().Inst).raw_name());
+				ImGui::Text("Script class:");
+				ImGui::Text("Script::"); ImGui::SameLine; ImGui::InputText("", classNameBuffer, 256);
 				ImGui::TreePop();
 			}
 			if (killComponent) actor.killComponent<Components::CppScriptComponent>();

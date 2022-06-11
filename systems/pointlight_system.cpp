@@ -79,7 +79,7 @@ namespace Shard3D {
 
 	void PointlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo, std::shared_ptr<wb3d::Level>& level) {
 		int lightIndex = 0;
-		level->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
+		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
 			if (!actor) return;
 
 			if (actor.hasComponent<Components::PointlightComponent>()) {
@@ -96,7 +96,7 @@ namespace Shard3D {
 	void PointlightSystem::render(FrameInfo &frameInfo, std::shared_ptr<wb3d::Level>& level) {
 		enginePipeline->bind(frameInfo.commandBuffer);
 
-		level->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
+		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
 			if (!actor) return;
 			// copy light to ubo
 			if (actor.hasComponent<Components::PointlightComponent>()) {

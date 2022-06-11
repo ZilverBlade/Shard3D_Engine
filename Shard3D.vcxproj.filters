@@ -161,9 +161,6 @@
     <ClCompile Include="wb3d\wb3d_imgui_frame.hpp">
       <Filter>Header Files\wb3d</Filter>
     </ClCompile>
-    <ClCompile Include="wb3d\wb3d_imgui_frame.cpp">
-      <Filter>Source Files\wb3d</Filter>
-    </ClCompile>
     <ClCompile Include="wb3d\level.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
@@ -334,8 +331,11 @@
     <ClInclude Include="wb3d\acting_actor.hpp">
       <Filter>Header Files\wb3d</Filter>
     </ClInclude>
-    <ClInclude Include="plugin_link.h">
+    <ClInclude Include="plugins\plugin_link.h">
       <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\script_link.h">
+      <Filter>scripts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,7 @@ namespace Shard3D {
 	namespace Components {	// Components must always be in these namespaces
 
 		struct CppScriptComponent {
+			std::string className = "TestClass";
 			wb3d::ActingActor* Inst = nullptr;
 
 			wb3d::ActingActor* (*InstScript)();

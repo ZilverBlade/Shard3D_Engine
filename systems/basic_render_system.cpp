@@ -86,7 +86,7 @@ namespace Shard3D {
 			nullptr
 		);
 
-		level->eRegistry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
+		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
 			if (!actor) return;
 
 			if (actor.hasComponent<Components::MeshComponent>()) {

@@ -17,7 +17,7 @@ namespace Shard3D {
 	void LevelTreePanel::render() {
 		ImGui::Begin("Level Tree");
 		
-		context->eRegistry.each([&](auto actorGUID) {
+		context->registry.each([&](auto actorGUID) {
 			wb3d::Actor actor{ actorGUID, context.get() };	
 			if (!actor.hasComponent<Components::TagComponent>()) return;
 			if (actor.getGUID() == 0 || actor.getGUID() == std::numeric_limits<uint64_t>::max()) return;	 // dont display these actors as they are engine reserved
@@ -27,19 +27,23 @@ namespace Shard3D {
 		
 		// blank space RCLICK
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Blank Actor")) context->createActor();
+			if (ImGui::MenuItem("New Blank Actor")) selectedActor = context->createActor();
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Pointlight")) context->createActor("Pointlight");
+			if (ImGui::MenuItem("New Camera Actor")) { auto actor = context->createActor("Camera Actor"); actor.addComponent<Components::CameraComponent>(); selectedActor = actor; }//actor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(EngineDevice::getDevice(), "assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ, true));
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Spotlight")) context->createActor("Spotlight");
+			if (ImGui::MenuItem("New Pointlight")) { auto actor = context->createActor("Pointlight"); actor.addComponent<Components::PointlightComponent>(); selectedActor = actor; }
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Directional Light")) context->createActor("Directional Light");
+			if (ImGui::MenuItem("New Spotlight")) { auto actor = context->createActor("Spotlight"); actor.addComponent<Components::SpotlightComponent>(); selectedActor = actor; }
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::MenuItem("New Directional Light")) { auto actor = context->createActor("Directional Light"); actor.addComponent<Components::DirectionalLightComponent>(); selectedActor = actor; }
 			ImGui::EndPopup();
 		}
 

@@ -383,6 +383,22 @@ namespace Shard3D {
             if (ImGui::BeginMenu("Edit")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
+                if (ImGui::BeginMenu("Level Simulation")) {
+                    if (ImGui::MenuItem("Begin")) {
+                        if (!level->isPlayingLevel) { 
+                            level->begin(); 
+                            glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: PLAYING)");
+                        }
+                    }
+                    if (ImGui::MenuItem("End")) {
+                        if (level->isPlayingLevel) { 
+                            level->end(); 
+                            glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Paused)");
+                        }
+                    }
+                    ImGui::EndMenu();
+                }
+                ImGui::Separator();
                 if (ImGui::MenuItem("Add Actor Blueprint", NULL /*make sure to add some sort of shardcut */)) {}
                 if (ImGui::MenuItem("Add Struct Definition", NULL /*make sure to add some sort of shardcut */)) {}
                 //if (ImGui::MenuItem("", NULL /*make sure to add some sort of shardcut */)) {}

@@ -27,7 +27,7 @@ namespace Shard3D {
 				//log.logString("name.component", false, true);
 
 				std::cout << "Added component " << typeid(T).name() << "\n";
-				return eLevel->eRegistry.emplace<T>(actorHandle, std::forward<Args>(args)...);
+				return eLevel->registry.emplace<T>(actorHandle, std::forward<Args>(args)...);
 			}
 
 			template<typename T>
@@ -35,25 +35,19 @@ namespace Shard3D {
 #ifndef NDEBUG
 				assert(hasComponent<T>() && "Actor does not have component!");
 #endif
-				return eLevel->eRegistry.get<T>(actorHandle);
+				return eLevel->registry.get<T>(actorHandle);
 			}
 
 			template<typename T>
 			bool hasComponent() {
-				return eLevel->eRegistry.all_of<T>(actorHandle);
+				return eLevel->registry.all_of<T>(actorHandle);
 			}
 
 			template<typename T>
 			void killComponent() {
 				assert(hasComponent<T>() && "Actor does not have component!");
-				eLevel->eRegistry.remove<T>(actorHandle);
+				eLevel->registry.remove<T>(actorHandle);
 			}
-
-			struct Relationship {
-				std::vector<Actor> children{};
-			};
-
-			Relationship relationship;
 
 			operator bool() const { return actorHandle != entt::null; }
 			operator entt::entity() const { return actorHandle; };

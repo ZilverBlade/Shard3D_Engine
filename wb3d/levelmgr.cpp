@@ -2,7 +2,7 @@
 
 #include "actor.hpp" 
 #include "../components.hpp"
-#include "../wb3d/wb3d_imgui_frame.cpp"
+#include "../wb3d/wb3d_imgui_frame.hpp"
 #include "../utils/definitions.hpp"
 
 
@@ -148,6 +148,18 @@ namespace Shard3D {
 				out << YAML::EndMap;
 			}
 
+			// CAMERA
+			if (actor.hasComponent<Components::CameraComponent>()) {
+				out << YAML::Key << "CameraComponent";
+				out << YAML::BeginMap;
+				out << YAML::Key << "ProjectionType" << YAML::Value << (int)actor.getComponent<Components::CameraComponent>().projectionType;
+				out << YAML::Key << "FOV" << YAML::Value << actor.getComponent<Components::CameraComponent>().fov;
+				out << YAML::Key << "NearClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().nearClip;
+				out << YAML::Key << "FarClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().farClip;
+				out << YAML::Key << "AspectRatio" << YAML::Value << actor.getComponent<Components::CameraComponent>().ar;
+				out << YAML::EndMap;
+			}
+
 			// MODEL
 			if (actor.hasComponent<Components::MeshComponent>()) {
 				out << YAML::Key << "MeshComponent";
@@ -196,7 +208,7 @@ namespace Shard3D {
 			out << YAML::Key << "Level" << YAML::Value << "Some kind of level";
 			out << YAML::Key << "Actors" << YAML::Value << YAML::BeginSeq;
 
-			mLevel->eRegistry.each([&](auto actorGUID) { Actor actor = { actorGUID, mLevel.get() };
+			mLevel->registry.each([&](auto actorGUID) { Actor actor = { actorGUID, mLevel.get() };
 				if (!actor) return;
 				saveActor(out, actor);
 			});
@@ -229,7 +241,7 @@ namespace Shard3D {
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
 
-#if GAME_RELEASE_READY
+#ifdef GAME_RELEASE_READY
 			YAML::Node data = YAML::Load(decrypt(strStream.str()));
 #if BETA_DEBUG_TOOLS
 			std::ofstream fout(sourcePath + ".dcr");
@@ -274,6 +286,15 @@ namespace Shard3D {
 						loadedActor.getComponent<Components::TransformComponent>().rotation = actor["TransformComponent"]["Rotation"].as<glm::vec3>();
 						loadedActor.getComponent<Components::TransformComponent>().scale = actor["TransformComponent"]["Scale"].as<glm::vec3>();
 
+					}
+
+					// CAMERA
+					if (actor["CameraComponent"]) {
+						loadedActor.getComponent<Components::CameraComponent>().projectionType = (Components::CameraComponent::ProjectType)actor["CameraComponent"]["ProjectionType"].as<int>();
+						loadedActor.getComponent<Components::CameraComponent>().fov = actor["CameraComponent"]["FOV"].as<float>();
+						loadedActor.getComponent<Components::CameraComponent>().nearClip = actor["CameraComponent"]["NearClipPlane"].as<float>();
+						loadedActor.getComponent<Components::CameraComponent>().farClip = actor["CameraComponent"]["FarClipPlane"].as<float>();
+						loadedActor.getComponent<Components::CameraComponent>().ar = actor["CameraComponent"]["AspectRatio"].as<float>();
 					}
 
 					if (actor["MeshComponent"]) {

@@ -3,7 +3,6 @@
 namespace Shard3D{
 
 #define ENABLE_WORLDBUILDER3D		true
-#define GAME_RELEASE_READY			false // ONLY ENABLE WHEN READY FOR SHIPPING OR BETA TESTING! 
 #define BETA_DEBUG_TOOLS			true
 
 #define ENGINE_VERSION				"1.0.8"	// Shard3D {major, minor, revision, build}

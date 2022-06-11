@@ -13,8 +13,12 @@ namespace Shard3D {
 		public:
 			static void loadLevel(std::string path, EngineDevice& device);
 			static void executeQueue(std::shared_ptr<Level>& level);
+
+			inline static Level* levelCapture;
 		private:
-			inline static std::string levelPath;
+			//std::shared_ptr<Level>& levelPtrCapture = nullptr;
+
+			inline static std::string levelPath = "wb3d_nullpath";;
 			inline static EngineDevice* engineDevice;
 		};
 	}

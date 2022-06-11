@@ -21,6 +21,11 @@ namespace Shard3D {
 				}
 				levelPath = "wb3d_nullpath";
 			}
+			if (level->loadRegistryCapture) {
+				//std::shared_ptr<Level>& levelsharedptr;
+				
+				//level
+			}
 		}
 	}
 }
