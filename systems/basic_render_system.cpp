@@ -45,9 +45,13 @@ namespace Shard3D {
 	void BasicRenderSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
+#if USE_PBR
+		const char* vertFile = "pbr_shader.vert.spv";
+		const char* fragFile = "pbr_shader.frag.spv";
+#else
 		const char* vertFile = "basic_shader.vert.spv";
 		const char* fragFile = "basic_shader.frag.spv";
-
+#endif
 		char* vertShader = (char*)(calloc(strlen(SHADER_FILES_PATH) + strlen(vertFile) - 1, 1));
 		strncpy(vertShader, SHADER_FILES_PATH, strlen(SHADER_FILES_PATH));
 		strncat(vertShader, vertFile, strlen(vertFile));

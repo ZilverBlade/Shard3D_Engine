@@ -102,7 +102,7 @@ namespace Shard3D {
 			});
 		}
 
-		void Level::update(float dt) {
+		void Level::tick(float dt) {
 			// update scripts	
 			eRegistry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->tickEvent(dt);		

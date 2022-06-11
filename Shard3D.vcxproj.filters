@@ -370,6 +370,12 @@
     <None Include="shaders\grid.vert">
       <Filter>shaders\vertex</Filter>
     </None>
+    <None Include="shaders\pbr_shader.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\pbr_shader.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Shard3D.rc">

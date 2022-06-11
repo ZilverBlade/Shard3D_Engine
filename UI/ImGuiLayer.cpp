@@ -459,9 +459,14 @@ namespace Shard3D {
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Help")) {
-                if (ImGui::MenuItem("Main Website"))    { ShellExecuteA(nullptr, "open", "https://www.shard3d.com", nullptr, nullptr, false);}
-                if (ImGui::MenuItem("Documentation"))   { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com", nullptr, nullptr, false);}
-                if (ImGui::MenuItem("WorldBuilder3D"))  { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com/worldbuilder3d.html", nullptr, nullptr, false); }
+#ifdef WIN32
+                if (ImGui::MenuItem("Main Website")) { ShellExecuteA(nullptr, "open", "https://www.shard3d.com", nullptr, nullptr, false); }
+                if (ImGui::MenuItem("Documentation")) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com", nullptr, nullptr, false); }
+                if (ImGui::MenuItem("WorldBuilder3D")) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com/worldbuilder3d.html", nullptr, nullptr, false); }
+#endif  
+#ifdef __linux__ 
+                ImGui::MenuItem("Unsupported");
+#endif
                 ImGui::EndMenu();
             }
 

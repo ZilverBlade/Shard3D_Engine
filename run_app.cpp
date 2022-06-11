@@ -90,7 +90,7 @@ namespace Shard3D {
 		cameraActor.addComponent<Components::CameraComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
 
-		loadGameObjects();
+		//loadGameObjects();
 
 		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
 		controller::EditorMouseMovementController editorCameraControllerMouse{};
@@ -120,7 +120,7 @@ namespace Shard3D {
 
 			activeLevel->runGarbageCollector(engineDevice.device());
 			wb3d::MasterManager::executeQueue(activeLevel);
-			activeLevel->update(frameTime);
+			activeLevel->tick(frameTime);
 
 			editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
 			editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);

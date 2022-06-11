@@ -33,8 +33,18 @@ namespace Shard3D {
 
 			Actor getEditorCameraActor();
 
+			/* *
+* Call when level events must begin
+*/
 			void begin();
-			void update(float dt); 
+			/* *
+* Gets called upon every frame
+* \param dt Frame time
+*/
+			void tick(float dt);
+			/* *
+* Call when level events must end
+*/
 			void end();
 
 			entt::registry eRegistry;
