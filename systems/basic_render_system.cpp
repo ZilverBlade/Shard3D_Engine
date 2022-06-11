@@ -45,31 +45,25 @@ namespace Shard3D {
 	void BasicRenderSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-#if USE_PBR
-		const char* vertFile = "pbr_shader.vert.spv";
-		const char* fragFile = "pbr_shader.frag.spv";
-#else
-		const char* vertFile = "basic_shader.vert.spv";
-		const char* fragFile = "basic_shader.frag.spv";
-#endif
-		char* vertShader = (char*)(calloc(strlen(SHADER_FILES_PATH) + strlen(vertFile) - 1, 1));
-		strncpy(vertShader, SHADER_FILES_PATH, strlen(SHADER_FILES_PATH));
-		strncat(vertShader, vertFile, strlen(vertFile));
-
-		char* fragShader = (char*)(calloc(strlen(SHADER_FILES_PATH) + strlen(fragFile) - 1, 1));
-		strncpy(fragShader, SHADER_FILES_PATH, strlen(SHADER_FILES_PATH));
-		strncat(fragShader, fragFile, strlen(fragFile));
-
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
+#if USE_PBR
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
-			vertShader,
-			fragShader,
+			"assets/shaders/pbr_shader.vert.spv",
+			"assets/shaders/pbr_shader.frag.spv",
 			pipelineConfig
 		);
+#else
+		enginePipeline = std::make_unique<EnginePipeline>(
+			engineDevice,
+			"assets/shaders/basic_shader.vert.spv",
+			"assets/shaders/basic_shader.frag.spv",
+			pipelineConfig
+		);
+#endif
 	}
 
 	void BasicRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level) {
