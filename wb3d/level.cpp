@@ -62,12 +62,11 @@ namespace Shard3D {
 		}
 
 		void Level::captureLevel() {
-			//MasterManager::levelCapture = this;
 		}
 
 		void Level::reloadLevel() {
-			killEverything();
-			
+			//killEverything();
+			std::cout << "reloading level\n";
 			loadRegistryCapture = true;
 		}
 
@@ -81,8 +80,7 @@ namespace Shard3D {
 
 		void Level::begin() {
 			captureLevel();
-
-			isPlayingLevel = true;
+			simulationState = PlayState::Simulating;
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				if (!csc.Inst) {
 					csc.Inst = csc.InstScript();
@@ -95,7 +93,7 @@ namespace Shard3D {
 
 		void Level::tick(float dt) {
 			// update scripts	
-			if (isPlayingLevel)
+			if (simulationState == PlayState::Simulating)
 				registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->tickEvent(dt);
 			});
@@ -104,7 +102,7 @@ namespace Shard3D {
 		}
 
 		void Level::end() {
-			isPlayingLevel = false;
+			simulationState = PlayState::Stopped;
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->endEvent();
 			});

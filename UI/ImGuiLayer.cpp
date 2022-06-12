@@ -25,7 +25,7 @@ namespace Shard3D {
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
         currentDevice = device;
-        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Paused)");
+        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Null)");
         hasBeenDetached = false;
 
         // Load any panels
@@ -109,7 +109,7 @@ namespace Shard3D {
         ImGuiStyle& style = ImGui::GetStyle();
         ImVec4* colors = ImGui::GetStyle().Colors;
         colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-        colors[ImGuiCol_TextDisabled] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+        colors[ImGuiCol_TextDisabled] = ImVec4(1.00f, 1.00f, 1.00f, 0.30f);
         colors[ImGuiCol_WindowBg] = ImVec4(0.07f, 0.07f, 0.07f, 1.00f);
         colors[ImGuiCol_ChildBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
         colors[ImGuiCol_PopupBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
@@ -163,7 +163,7 @@ namespace Shard3D {
         colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
-
+        style.DisabledAlpha = 0.3f;
 
         style.PopupRounding = 3;
 
@@ -384,18 +384,30 @@ namespace Shard3D {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
                 if (ImGui::BeginMenu("Level Simulation")) {
+                    ImGui::BeginDisabled(level->simulationState != PlayState::Stopped || level->simulationState == PlayState::Paused);
                     if (ImGui::MenuItem("Begin")) {
-                        if (!level->isPlayingLevel) { 
-                            level->begin(); 
-                            glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: PLAYING)");
-                        }
+                        wb3d::MasterManager::captureLevel(level);
+                        level->begin();
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: SIMULATING)");      
+                    } ImGui::EndDisabled();   
+                    if (level->simulationState != PlayState::Paused) {
+                        ImGui::BeginDisabled(level->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
+                        level->simulationState = PlayState::Paused;
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Paused)");
+
+                    } ImGui::EndDisabled();  }
+                    else {
+                        ImGui::BeginDisabled(level->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
+                        level->simulationState = PlayState::Simulating;
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: SIMULATING)");
+                    } ImGui::EndDisabled();
                     }
+                    
+                    ImGui::BeginDisabled(level->simulationState == PlayState::Stopped);
                     if (ImGui::MenuItem("End")) {
-                        if (level->isPlayingLevel) { 
-                            level->end(); 
-                            glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Paused)");
-                        }
-                    }
+                        level->end(); 
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Null)");
+                    } ImGui::EndDisabled();
                     ImGui::EndMenu();
                 }
                 ImGui::Separator();

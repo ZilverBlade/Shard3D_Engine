@@ -1,10 +1,18 @@
 #include "master_manager.hpp"
+#include <iostream>
 
 namespace Shard3D {
 	namespace wb3d {
 		void MasterManager::loadLevel(std::string path, EngineDevice& device) {
 			engineDevice = &device;
 			levelPath = path;
+		}
+		class Actor;
+		void MasterManager::captureLevel(std::shared_ptr<Level>& level) {
+			std::cout << "capturing level\n";
+			//memcpy_s(&regCap, sizeof(regCap), &level->registry, sizeof(level->registry));
+
+			//std::cout << regCap.alive() << "\n";
 		}
 		void MasterManager::executeQueue(std::shared_ptr<Level>& level) {
 			if (levelPath != "wb3d_nullpath") {
@@ -22,9 +30,18 @@ namespace Shard3D {
 				levelPath = "wb3d_nullpath";
 			}
 			if (level->loadRegistryCapture) {
-				//std::shared_ptr<Level>& levelsharedptr;
-				
-				//level
+				std::cout << "loading back level capture\n";
+				/*
+				const std::shared_ptr<Level>& lvl = std::make_shared<Level>();
+				memmove(&lvl->registry, &regCap, sizeof(regCap));
+				regCap = {};
+				level = std::make_shared<Level>();
+				level = lvl;
+
+				std::cout << level->registry.alive() << "\n";
+*/
+				//level = level;
+				level->loadRegistryCapture = false;
 			}
 		}
 	}

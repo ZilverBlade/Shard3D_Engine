@@ -90,7 +90,7 @@ namespace Shard3D {
 		cameraActor.addComponent<Components::CameraComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
 
-		//loadGameObjects();
+		loadGameObjects();
 
 		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
 		controller::EditorMouseMovementController editorCameraControllerMouse{};
@@ -202,7 +202,7 @@ namespace Shard3D {
 				engineRenderer.endFrame();
 			}
 		}
-		activeLevel->end();
+		if (activeLevel->simulationState != PlayState::Stopped) activeLevel->end();
 		for (Layer* layer : layerStack) {
 			layer->detach();
 		}
@@ -279,6 +279,6 @@ namespace Shard3D {
 
 		wb3d::Actor cool = activeLevel->createActor("parent actor test");
 		cool.addComponent<Components::MeshComponent>(model);
-
+		cool.addComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
 	}
 }

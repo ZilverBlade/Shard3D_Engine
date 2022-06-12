@@ -8,9 +8,15 @@
 namespace Shard3D {
 	namespace wb3d {
 		class Actor;
+		enum class PlayState {
+			Stopped = 0,
+			Simulating = 1,
+			Paused = -1
+		};
 
 		class Level {
 		public:
+
 			Level();
 			~Level();
 
@@ -41,7 +47,7 @@ namespace Shard3D {
 			void end();
 
 			entt::registry registry;
-			bool isPlayingLevel = false;
+			PlayState simulationState = PlayState::Stopped;
 		private:
 			bool loadRegistryCapture = false;
 
