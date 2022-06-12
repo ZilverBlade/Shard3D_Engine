@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../wb3d/acting_actor.hpp"
 
 namespace Shard3D {
@@ -9,9 +7,10 @@ namespace Shard3D {
 			void beginEvent() {}
 			void endEvent()	{}
 
-			void tickEvent(float dt) {
-				getComponent<Components::TransformComponent>().translation += dt;
-				if (getComponent<Components::TransformComponent>().translation.y > 1.7f)getComponent<Components::TransformComponent>().translation.y = 0.f;
+			void tickEvent(float dt) {	
+				if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_B) != GLFW_PRESS) {
+					getComponent<Components::TransformComponent>().translation += dt;
+				}
 			}
 
 			void spawnEvent() {

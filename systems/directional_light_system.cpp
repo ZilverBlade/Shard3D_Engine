@@ -65,16 +65,12 @@ namespace Shard3D {
 
 	void DirectionalLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo, std::shared_ptr<wb3d::Level>& level) {
 		int lightIndex = 0;
-		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
-			if (!actor) return;
-				
-			if (actor.hasComponent<Components::DirectionalLightComponent>()) {
-				ubo.directionalLights[lightIndex].position = glm::vec4(actor.getComponent<Components::TransformComponent>().translation, 1.f);
-				ubo.directionalLights[lightIndex].color = glm::vec4(actor.getComponent<Components::DirectionalLightComponent>().color, actor.getComponent<Components::DirectionalLightComponent>().lightIntensity);
-				ubo.directionalLights[lightIndex].direction = glm::vec4(actor.getComponent<Components::TransformComponent>().rotation, 1.f);
-				ubo.directionalLights[lightIndex].specularMod = actor.getComponent<Components::DirectionalLightComponent>().specularMod;
-				lightIndex += 1;
-			}
+		level->registry.view<Components::DirectionalLightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
+			ubo.directionalLights[lightIndex].position = glm::vec4(transform.translation, 1.f);
+			ubo.directionalLights[lightIndex].color = glm::vec4(light.color, light.lightIntensity);
+			ubo.directionalLights[lightIndex].direction = glm::vec4(transform.rotation, 1.f);
+			ubo.directionalLights[lightIndex].specularMod = light.specularMod;
+			lightIndex += 1;
 		});
 		ubo.numDirectionalLights = lightIndex;
 	}
@@ -82,11 +78,7 @@ namespace Shard3D {
 	void DirectionalLightSystem::render(FrameInfo &frameInfo, std::shared_ptr<wb3d::Level>& level) {
 		enginePipeline->bind(frameInfo.commandBuffer);
 
-		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
-		if (!actor) return;
-		// copy light to ubo
-		if (actor.hasComponent<Components::DirectionalLightComponent>()) {
-
+		level->registry.view<Components::DirectionalLightComponent, Components::TransformComponent>().each([=](auto light, auto transform) {
 			enginePipeline->bind(frameInfo.commandBuffer);
 			vkCmdBindDescriptorSets(
 				frameInfo.commandBuffer,
@@ -100,10 +92,10 @@ namespace Shard3D {
 			);
 
 			DirectionalLightPushConstants push{};
-			push.position = glm::vec4(actor.getComponent<Components::TransformComponent>().translation, 1.f);
-			push.color = glm::vec4(actor.getComponent<Components::DirectionalLightComponent>().color, actor.getComponent<Components::DirectionalLightComponent>().lightIntensity);
-			push.direction = glm::vec4(actor.getComponent<Components::TransformComponent>().rotation, 1.f);
-			push.specularMod = actor.getComponent<Components::DirectionalLightComponent>().specularMod;
+			push.position = glm::vec4(transform.translation, 1.f);
+			push.color = glm::vec4(light.color, light.lightIntensity);
+			push.direction = glm::vec4(transform.rotation, 1.f);
+			push.specularMod = light.specularMod;
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
@@ -115,7 +107,6 @@ namespace Shard3D {
 			);
 
 			vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
-		}
 		});
 		
 	}

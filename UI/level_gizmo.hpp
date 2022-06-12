@@ -1,6 +1,6 @@
 #pragma once
 #include "level_tree_panel.hpp"
-#include "ImGuizmo.h"
+#include <../imguizmo/ImGuizmo.h>
 #include "..\wb3d\level.hpp"
 
 namespace Shard3D {

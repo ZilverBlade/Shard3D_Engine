@@ -80,28 +80,24 @@ namespace Shard3D {
 			nullptr
 		);
 
-		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
-			if (!actor) return;
+		level->registry.view<Components::MeshComponent, Components::TransformComponent>().each([=](auto mesh, auto transform){
+			SimplePushConstantData push{};
+			push.modelMatrix = transform.mat4();
+			push.normalMatrix = transform.normalMatrix();
 
-			if (actor.hasComponent<Components::MeshComponent>()) {
-				auto transform = actor.getComponent<Components::TransformComponent>();
-				SimplePushConstantData push{};
-				push.modelMatrix = transform.mat4();
-				push.normalMatrix = transform.normalMatrix();
+			vkCmdPushConstants(
+				frameInfo.commandBuffer,
+				pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				0,
+				sizeof(SimplePushConstantData),
+				&push
+			);
 
-				vkCmdPushConstants(
-					frameInfo.commandBuffer,
-					pipelineLayout,
-					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-					0,
-					sizeof(SimplePushConstantData),
-					&push
-				);
-
-				auto model = actor.getComponent<Components::MeshComponent>().model;
-				model->bind(frameInfo.commandBuffer);
-				model->draw(frameInfo.commandBuffer);
-			}
+			auto model = mesh.model ;
+			model->bind(frameInfo.commandBuffer);
+			model->draw(frameInfo.commandBuffer);
+			
 		});
 	}
 

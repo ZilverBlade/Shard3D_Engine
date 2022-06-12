@@ -90,6 +90,9 @@
     <Filter Include="scripts">
       <UniqueIdentifier>{9b8c2a5e-7ea5-4a6d-b626-4ce7038d5fee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="events">
+      <UniqueIdentifier>{dfa8f196-b249-42bf-ab93-729b8df215d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -337,6 +340,18 @@
     <ClInclude Include="scripts\script_link.h">
       <Filter>scripts</Filter>
     </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="events\events.hpp">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="events\event_handler.hpp">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="events\key_events.hpp">
+      <Filter>events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
@@ -376,6 +391,7 @@
     <None Include="shaders\pbr_shader.vert">
       <Filter>shaders\vertex</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Shard3D.rc">
@@ -393,6 +409,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="shard3d_engine.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="shard3d.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -2,7 +2,7 @@
 #include "imgui_implementation.hpp"
 
 #include <imgui.h>
-#include "ImGuizmo.h"
+#include <../imguizmo/ImGuizmo.h>
 
 #include "imgui_glfw_implementation.hpp"
 #include <stdexcept>
@@ -32,7 +32,7 @@ namespace Shard3D {
         nodeEditorContext = ax::NodeEditor::CreateEditor();
         levelTreePanel.setContext(level);
         levelPropertiesPanel.setContext(level);
-       // levelGizmo.setContext(level);
+        //levelGizmo.setContext(level);
 
         ImGui::CreateContext();
 
@@ -257,7 +257,7 @@ namespace Shard3D {
         ImGui::NewFrame();
 
         // start rendering stuff here
-     //   ImGuizmo::BeginFrame();
+        //ImGuizmo::BeginFrame();
 
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel, currentDevice);

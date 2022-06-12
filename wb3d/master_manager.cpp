@@ -10,9 +10,8 @@ namespace Shard3D {
 		class Actor;
 		void MasterManager::captureLevel(std::shared_ptr<Level>& level) {
 			std::cout << "capturing level\n";
-			//memcpy_s(&regCap, sizeof(regCap), &level->registry, sizeof(level->registry));
-
-			//std::cout << regCap.alive() << "\n";
+			std::shared_ptr<Level>& lcap = level;
+			levelCapture = lcap;
 		}
 		void MasterManager::executeQueue(std::shared_ptr<Level>& level) {
 			if (levelPath != "wb3d_nullpath") {
@@ -31,16 +30,10 @@ namespace Shard3D {
 			}
 			if (level->loadRegistryCapture) {
 				std::cout << "loading back level capture\n";
-				/*
-				const std::shared_ptr<Level>& lvl = std::make_shared<Level>();
-				memmove(&lvl->registry, &regCap, sizeof(regCap));
-				regCap = {};
-				level = std::make_shared<Level>();
-				level = lvl;
+				
+				memcpy_s(&level, sizeof(level), &levelCapture, sizeof(levelCapture));
 
 				std::cout << level->registry.alive() << "\n";
-*/
-				//level = level;
 				level->loadRegistryCapture = false;
 			}
 		}

@@ -194,7 +194,7 @@
       <PreprocessorDefinitions>_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imguizmo;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -313,6 +313,9 @@
     <ClInclude Include="editor_camera_script.hpp">
       <FileType>CppHeader</FileType>
     </ClInclude>
+    <ClInclude Include="events\events.hpp" />
+    <ClInclude Include="events\event_handler.hpp" />
+    <ClInclude Include="events\key_events.hpp" />
     <ClInclude Include="plugins\example_component.hpp" />
     <ClInclude Include="plugins\plugin_link.h" />
     <ClInclude Include="scripts\example_script.cpp">
@@ -326,6 +329,7 @@
     <ClInclude Include="UI\level_gizmo.hpp" />
     <ClInclude Include="UI\level_properties_panel.hpp" />
     <ClInclude Include="UI\level_tree_panel.hpp" />
+    <ClInclude Include="version.h" />
     <ClInclude Include="wb3d\acting_actor.hpp" />
     <ClInclude Include="wb3d\levelmgr.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
@@ -378,6 +382,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
+    <None Include="cpp.hint" />
     <None Include="shaders\directional_light.frag" />
     <None Include="shaders\directional_light.vert" />
     <None Include="shaders\basic_shader.frag" />
@@ -400,6 +405,7 @@
   <ItemGroup>
     <Image Include="shard.ico" />
     <Image Include="shard.png" />
+    <Image Include="shard3d.ico" />
     <Image Include="shard3d_engine.png" />
   </ItemGroup>
   <ItemGroup>

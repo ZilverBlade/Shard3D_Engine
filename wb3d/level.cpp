@@ -65,7 +65,7 @@ namespace Shard3D {
 		}
 
 		void Level::reloadLevel() {
-			//killEverything();
+			killEverything();
 			std::cout << "reloading level\n";
 			loadRegistryCapture = true;
 		}
@@ -112,8 +112,10 @@ namespace Shard3D {
 		void Level::killActor(Actor actor) {
 			actorKillQueue.emplace_back(actor);
 			if (actor.hasComponent<Components::CppScriptComponent>()) {
-				actor.getComponent<Components::CppScriptComponent>().Inst->killEvent();
-				actor.getComponent<Components::CppScriptComponent>().killScript(&actor.getComponent<Components::CppScriptComponent>());
+				if (actor.getComponent<Components::CppScriptComponent>().Inst) {
+					actor.getComponent<Components::CppScriptComponent>().Inst->killEvent();
+					actor.getComponent<Components::CppScriptComponent>().killScript(&actor.getComponent<Components::CppScriptComponent>());
+				}
 			}
 		}
 

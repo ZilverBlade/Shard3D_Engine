@@ -10,9 +10,9 @@ namespace Shard3D {
 	void Gizmo::render(LevelTreePanel treePanel) {
 		Actor selectedActor = treePanel.getSelectedActor();
 		if (selectedActor) {
-		//	ImGuizmo::SetOrthographic(false);
-		//	ImGuizmo::SetDrawlist();
-		//	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+		   // ImGuizmo::SetOrthographic(false);
+		   // ImGuizmo::SetDrawlist();
+		   // ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
 			auto cameraActor = level->getEditorCameraActor();
 		}

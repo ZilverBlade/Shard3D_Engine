@@ -66,28 +66,21 @@ namespace Shard3D {
 
 	void SpotlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo, std::shared_ptr<wb3d::Level>& level) {
 		int lightIndex = 0;
-		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
-		if (!actor) return;
-
-		if (actor.hasComponent<Components::SpotlightComponent>()) {
-			ubo.spotlights[lightIndex].position = glm::vec4(actor.getComponent<Components::TransformComponent>().translation, 1.f);
-			ubo.spotlights[lightIndex].color = glm::vec4(actor.getComponent<Components::SpotlightComponent>().color, actor.getComponent<Components::SpotlightComponent>().lightIntensity);
-			ubo.spotlights[lightIndex].direction = glm::vec4(actor.getComponent<Components::TransformComponent>().rotation, 1.f);
-			ubo.spotlights[lightIndex].angle = glm::vec2(actor.getComponent<Components::SpotlightComponent>().outerAngle, actor.getComponent<Components::SpotlightComponent>().innerAngle);
-			ubo.spotlights[lightIndex].attenuationMod = glm::vec4(actor.getComponent<Components::SpotlightComponent>().attenuationMod, 0.f);
-			ubo.spotlights[lightIndex].specularMod = actor.getComponent<Components::SpotlightComponent>().specularMod;
+		level->registry.view<Components::SpotlightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
+			ubo.spotlights[lightIndex].position = glm::vec4(transform.translation, 1.f);
+			ubo.spotlights[lightIndex].color = glm::vec4(light.color, light.lightIntensity);
+			ubo.spotlights[lightIndex].direction = glm::vec4(transform.rotation, 1.f);
+			ubo.spotlights[lightIndex].angle = glm::vec2(light.outerAngle, light.innerAngle);
+			ubo.spotlights[lightIndex].attenuationMod = glm::vec4(light.attenuationMod, 0.f);
+			ubo.spotlights[lightIndex].specularMod = light.specularMod;
 			lightIndex += 1;
-		}
-
 		});
 		ubo.numSpotlights = lightIndex;
 	}
 
 	void SpotlightSystem::render(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level) {
-		level->registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, level.get() };
-		if (!actor) return;
+		level->registry.view<Components::SpotlightComponent, Components::TransformComponent>().each([=](auto light, auto transform) {
 		// copy light to ubo
-		if (actor.hasComponent<Components::SpotlightComponent>()) {
 			enginePipeline->bind(frameInfo.commandBuffer);
 
 			vkCmdBindDescriptorSets(
@@ -104,21 +97,21 @@ namespace Shard3D {
 			ini.SetUnicode();
 			ini.LoadFile(ENGINE_SETTINGS_PATH);
 
-			if (actor.getComponent<Components::SpotlightComponent>().attenuationMod != glm::vec3(0.f, 0.f, 1.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
+			if (light.attenuationMod != glm::vec3(0.f, 0.f, 1.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
 				std::cout << "warn.NotInverseSquareAttenuation: \"Spotlight in level does not obey inverse square law\"\n";
 			}
-			if (actor.getComponent<Components::SpotlightComponent>().outerAngle > actor.getComponent<Components::SpotlightComponent>().innerAngle && ini.GetBoolValue("WARNINGS", "warn.InvertedSpotlightAngle")) {
+			if (light.outerAngle > light.innerAngle && ini.GetBoolValue("WARNINGS", "warn.InvertedSpotlightAngle")) {
 				std::cout << "warn.InvertedSpotlightAngle: \"Spotlight in level that has inner angle greater than outer angle, spotlight won't render correctly\"\n";
 			}
 
 			SpotlightPushConstants push{};
-			push.position = glm::vec4(actor.getComponent<Components::TransformComponent>().translation, 1.f);
-			push.color = glm::vec4(actor.getComponent<Components::SpotlightComponent>().color, actor.getComponent<Components::SpotlightComponent>().lightIntensity);
-			push.direction = glm::vec4(actor.getComponent<Components::TransformComponent>().rotation, 1.f);
-			push.angle = glm::vec2(actor.getComponent<Components::SpotlightComponent>().outerAngle, actor.getComponent<Components::SpotlightComponent>().innerAngle);
-			push.radius = actor.getComponent<Components::SpotlightComponent>().radius / 10;
-			push.attenuationMod = glm::vec4(actor.getComponent<Components::SpotlightComponent>().attenuationMod, 0.f);
-			push.specularMod = actor.getComponent<Components::SpotlightComponent>().specularMod;
+			push.position = glm::vec4(transform.translation, 1.f);
+			push.color = glm::vec4(light.color, light.lightIntensity);
+			push.direction = glm::vec4(transform.rotation, 1.f);
+			push.angle = glm::vec2(light.outerAngle, light.innerAngle);
+			push.radius = light.radius / 10;
+			push.attenuationMod = glm::vec4(light.attenuationMod, 0.f);
+			push.specularMod = light.specularMod;
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
@@ -129,7 +122,6 @@ namespace Shard3D {
 				&push
 			);
 			vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
-		}
 		});
 	}
 
