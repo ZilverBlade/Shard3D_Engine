@@ -19,3 +19,15 @@ Make sure to install GLM and SDL2. The install of the contents of the SDK **MUST
 
 - [@ZilverBlade](https://www.github.com/ZilverBlade)
 - [@DhiBaid](https://www.github.com/DHIBAID)
+
+
+### Controls
+
+- Look Around = Right MB
+- Move Left = A
+- Move Right = D
+- Move Forward = W
+- Move Backward = S
+- Move Up = SPACE
+- Move Down = LEFT SHIFT
+- Slow Down Movement = LEFT CONTROL
