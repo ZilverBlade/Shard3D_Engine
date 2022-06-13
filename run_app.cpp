@@ -202,8 +202,6 @@ namespace Shard3D {
 				engineRenderer.endFrame();
 			}
 		}
-		glfwSetWindowShouldClose(engineWindow.getGLFWwindow(), GLFW_FALSE);
-		run();
 		if (activeLevel->simulationState != PlayState::Stopped) activeLevel->end();
 		for (Layer* layer : layerStack) {
 			layer->detach();
