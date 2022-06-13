@@ -47,7 +47,7 @@ class EngineDevice {
   int getMaxUsableSampleCount();
 
   VkCommandPool getCommandPool() { return commandPool; }
-  VkDevice device() { return device_; }
+  static VkDevice device() { return device_; }
   VkSurfaceKHR surface() { return surface_; }
   VkQueue graphicsQueue() { return graphicsQueue_; }
   VkQueue presentQueue() { return presentQueue_; }
@@ -105,7 +105,7 @@ class EngineDevice {
   EngineWindow &window;
   VkCommandPool commandPool;
 
-  VkDevice device_;
+  inline static VkDevice device_;
   VkSurfaceKHR surface_;
   VkQueue graphicsQueue_;
   VkQueue presentQueue_;

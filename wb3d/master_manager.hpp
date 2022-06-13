@@ -11,9 +11,9 @@ namespace Shard3D {
 	namespace wb3d {
 		class MasterManager {
 		public:
-			static void loadLevel(std::string path, EngineDevice& device);
+			static void loadLevel(std::string path);
 			static void captureLevel(std::shared_ptr<Level>& level);
-			static void executeQueue(std::shared_ptr<Level>& level);     
+			static void executeQueue(std::shared_ptr<Level>& level, EngineDevice& engineDevice);
 		protected:
 			inline static std::shared_ptr<Level> lc;
 		public:

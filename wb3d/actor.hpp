@@ -71,6 +71,7 @@ namespace Shard3D {
 
 			Level *eLevel = nullptr; // 12 bytes (use it as much as needed)
 
+			friend class Level;
 		};
 	}
 }

@@ -14,8 +14,7 @@ namespace Shard3D {
 	void LevelPropertiesPanel::destroyContext() { context = {}; }
 
 	void LevelPropertiesPanel::render(LevelTreePanel tree, EngineDevice* device) {
-		ImGui::Begin("Properties");
-
+		ImGui::Begin("Properties"); ImGui::BeginDisabled(context->simulationState == PlayState::Simulating/*&& ini.canEditDuringSimulation*/);
 		if (tree.selectedActor){ 
 			drawActorProperties(tree.selectedActor, *device); 
 			if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
@@ -59,7 +58,7 @@ namespace Shard3D {
 				std::cout << "copied " << std::to_string(tree.selectedActor.getGUID()).c_str() << " to clipboard\n";
 			}
 		}
-		ImGui::End();
+		ImGui::EndDisabled(); ImGui::End();
 	}
 
 

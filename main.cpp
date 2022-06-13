@@ -14,6 +14,7 @@ int main() {
     assert(infile2.good() != false && "Critical error! Game settings config file not found!");
 
     Shard3D::RunApp app{};
+
     try {
         app.run();
     }

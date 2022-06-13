@@ -15,25 +15,25 @@
 namespace Shard3D {
 
     class EngineSwapChain {
-         public:
-              static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+    public:
+         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
     
-              EngineSwapChain(EngineDevice &deviceRef, VkExtent2D windowExtent);
-              EngineSwapChain(EngineDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<EngineSwapChain> previous);
-              ~EngineSwapChain();
+         EngineSwapChain(EngineDevice &deviceRef, VkExtent2D windowExtent);
+         EngineSwapChain(EngineDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<EngineSwapChain> previous);
+         ~EngineSwapChain();
     
-              EngineSwapChain(const EngineSwapChain &) = delete;
-              EngineSwapChain& operator=(const EngineSwapChain &) = delete;
-              EngineSwapChain() = default;
+         EngineSwapChain(const EngineSwapChain &) = delete;
+         EngineSwapChain& operator=(const EngineSwapChain &) = delete;
+         EngineSwapChain() = default;
     
-              VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
-              VkRenderPass getRenderPass() { return renderPass; }
-              VkImageView getImageView(int index) { return swapChainImageViews[index]; }
-              size_t imageCount() { return swapChainImages.size(); }
-              VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
-              VkExtent2D getSwapChainExtent() { return swapChainExtent; }
-              uint32_t width() { return swapChainExtent.width; }
-              uint32_t height() { return swapChainExtent.height; }
+         VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
+         VkRenderPass getRenderPass() { return renderPass; }
+         VkImageView getImageView(int index) { return swapChainImageViews[index]; }
+         size_t imageCount() { return swapChainImages.size(); }
+         VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
+         VkExtent2D getSwapChainExtent() { return swapChainExtent; }
+         uint32_t width() { return swapChainExtent.width; }
+         uint32_t height() { return swapChainExtent.height; }
     
         float extentAspectRatio() {
               return static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);

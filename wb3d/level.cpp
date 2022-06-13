@@ -11,7 +11,7 @@ namespace Shard3D {
 			std::cout << "Destroying level\n";
 			registry.clear();
 		}
-		
+
 		Actor Level::createActor(std::string name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { registry.create(), this };
@@ -33,6 +33,9 @@ namespace Shard3D {
 #endif
 			return actor;
 		}
+
+		// Actor Level::getActorByGUID() {}
+		// Actor Level::getActorByTag() {}
 
 		void Level::runGarbageCollector(VkDevice device) {
 			if (actorKillQueue.size() != 0) {
@@ -65,6 +68,7 @@ namespace Shard3D {
 		}
 
 		void Level::reloadLevel() {
+			MasterManager::loadLevel("assets/scenedata/LVLNOEDIT3D.wbu");
 			killEverything();
 			std::cout << "reloading level\n";
 			loadRegistryCapture = true;

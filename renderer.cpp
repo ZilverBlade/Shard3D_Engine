@@ -5,7 +5,6 @@
 
 #include <cassert>
 #include <stdexcept>
-#include <array>
 
 namespace Shard3D {
 
@@ -13,12 +12,22 @@ namespace Shard3D {
 		: engineWindow{window}, engineDevice{device} {
 		recreateSwapchain();
 		createCommandBuffers();
+
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+		noEditBgColor[0] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorR");
+		noEditBgColor[1] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorG");
+		noEditBgColor[2] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorB");
+
+		clearValues[0].color = { noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.f };
+
+		clearValues[1].depthStencil = { 1.0f, 0 };
 	}
 	EngineRenderer::~EngineRenderer() {
 		freeCommandBuffers();
 	}
 	
-
 	void EngineRenderer::recreateSwapchain() {
 		auto extent = engineWindow.getExtent();
 		while (extent.width == 0 || extent.height == 0) {
@@ -67,8 +76,9 @@ namespace Shard3D {
 
 	
 	VkCommandBuffer EngineRenderer::beginFrame() {
+#ifndef NDEBUG
 		assert(!isFrameStarted && "Can't call beginFrame while already in progress");
-
+#endif
 		auto result = engineSwapChain->acquireNextImage(&currentImageIndex);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
@@ -94,7 +104,9 @@ namespace Shard3D {
 		return commandBuffer;
 	}
 	void EngineRenderer::endFrame() {
+#ifndef NDEBUG
 		assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
+#endif
 		auto commandBuffer = getCurrentCommandBuffer();
 
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
@@ -113,9 +125,10 @@ namespace Shard3D {
 		currentFrameIndex = (currentFrameIndex + 1) % EngineSwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
 	void EngineRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+#ifndef NDEBUG
 		assert(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
 		assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
-
+#endif
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = engineSwapChain->getRenderPass();
@@ -124,19 +137,6 @@ namespace Shard3D {
 		renderPassInfo.renderArea.offset = { 0,0 };
 		renderPassInfo.renderArea.extent = engineSwapChain->getSwapChainExtent();
 
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		ini.LoadFile(ENGINE_SETTINGS_PATH);
-
-		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = { 
-			(float)ini.GetDoubleValue("RENDERING", "DefaultBGColorR"), 
-			(float)ini.GetDoubleValue("RENDERING", "DefaultBGColorG"),
-			(float)ini.GetDoubleValue("RENDERING", "DefaultBGColorB"),
-			1.0f
-		};
-
-		clearValues[1].depthStencil = { 1.0f, 0 };
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfo.pClearValues = clearValues.data();
 
@@ -155,9 +155,10 @@ namespace Shard3D {
 
 	}
 	void EngineRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+#ifndef NDEBUG
 		assert(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
 		assert(commandBuffer == getCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame");
-
+#endif NDEBUG
 		vkCmdEndRenderPass(commandBuffer);
 	}
 

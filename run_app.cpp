@@ -118,7 +118,7 @@ namespace Shard3D {
 			currentTime = newTime;
 
 			activeLevel->runGarbageCollector(engineDevice.device());
-			wb3d::MasterManager::executeQueue(activeLevel);
+			wb3d::MasterManager::executeQueue(activeLevel, engineDevice);
 			activeLevel->tick(frameTime);
 
 			editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
@@ -279,6 +279,7 @@ namespace Shard3D {
 
 		wb3d::Actor cool = activeLevel->createActor("parent actor test");
 		cool.addComponent<Components::MeshComponent>(model);
+		auto cool = typeid(CppScripts::ExampleCppScript).name();
 		cool.addComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
 	}
 }

@@ -19,13 +19,32 @@ namespace Shard3D {
 
 		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
+		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
 		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
 		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
+	}
+
+	EnginePipeline::EnginePipeline(
+		EngineDevice& device,
+		VkShaderStageFlagBits shaderStageFlag,
+		const std::string& shaderFilePath,
+		const PipelineConfigInfo& configInfo,
+		bool recreate
+	)
+		: engineDevice{ device } {
+		if (!recreate) { createSingleGraphicsPipeline(shaderStageFlag, shaderFilePath, configInfo); return; }
+
+		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
+		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
+		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
+		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
+		createSingleGraphicsPipeline(shaderStageFlag, shaderFilePath, configInfo);
 	}
 
 	EnginePipeline::~EnginePipeline() {
 		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
+		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
 		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
 	}
 
@@ -93,6 +112,65 @@ namespace Shard3D {
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipelineInfo.stageCount = 2;
+		pipelineInfo.pStages = shaderStages;
+		pipelineInfo.pVertexInputState = &vertexInputInfo;
+		pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
+		pipelineInfo.pViewportState = &configInfo.viewportInfo;
+		pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
+		pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
+		pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
+		pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
+		pipelineInfo.pDynamicState = &configInfo.dynamicStateInfo;
+
+		pipelineInfo.layout = configInfo.pipelineLayout;
+		pipelineInfo.renderPass = configInfo.renderPass;
+		pipelineInfo.subpass = configInfo.subpass;
+
+		pipelineInfo.basePipelineIndex = -1;
+		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+
+		if (vkCreateGraphicsPipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create graphics pipeline!");
+		}
+	}
+
+	void EnginePipeline::createSingleGraphicsPipeline(
+		const VkShaderStageFlagBits shaderType,
+		const std::string& shaderFilePath,
+		const PipelineConfigInfo& configInfo
+	) {
+		assert(
+			configInfo.pipelineLayout != VK_NULL_HANDLE &&
+			"Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
+		assert(
+			configInfo.renderPass != VK_NULL_HANDLE &&
+			"Cannot create graphics pipeline:: no renderPass provided in configInfo");
+		auto shaderCode = readFile(shaderFilePath);
+
+		VkPipelineShaderStageCreateInfo shaderStages[1];
+		if (shaderType == VK_SHADER_STAGE_COMPUTE_BIT) {
+			createShaderModule(shaderCode, &computeShaderModule);
+			shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			shaderStages[0].stage = VK_SHADER_STAGE_COMPUTE_BIT;
+			shaderStages[0].module = computeShaderModule;
+			shaderStages[0].pName = "main";
+			shaderStages[0].flags = 0;
+			shaderStages[0].pNext = nullptr;
+			shaderStages[0].pSpecializationInfo = nullptr;
+		}
+
+		auto& bindingDescriptions = configInfo.bindingDescriptions;
+		auto& attributeDescriptions = configInfo.attributeDescriptions;
+		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+
+		VkGraphicsPipelineCreateInfo pipelineInfo{};
+		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipelineInfo.stageCount = 1;
 		pipelineInfo.pStages = shaderStages;
 		pipelineInfo.pVertexInputState = &vertexInputInfo;
 		pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
@@ -221,7 +299,7 @@ namespace Shard3D {
 			VK_COLOR_COMPONENT_A_BIT;
 		configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 		configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA; 
-		configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;             
+		configInfo.colorBlendAttachment.colorBlendOp = blendOp;
 		configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; 
 		configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
 		configInfo.colorBlendAttachment.alphaBlendOp = blendOp;

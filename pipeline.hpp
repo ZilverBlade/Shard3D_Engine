@@ -36,6 +36,13 @@ namespace Shard3D {
 			const PipelineConfigInfo& configInfo,
 			bool recreate = false
 		);
+		EnginePipeline(
+			EngineDevice& device,
+			VkShaderStageFlagBits shaderStageFlag,
+			const std::string& shaderFilePath,
+			const PipelineConfigInfo& configInfo,
+			bool recreate = false
+		);
 		~EnginePipeline();
 
 		EnginePipeline(const EnginePipeline&) = delete;
@@ -58,6 +65,12 @@ namespace Shard3D {
 			const PipelineConfigInfo& configInfo
 		);
 
+		void createSingleGraphicsPipeline(
+			const VkShaderStageFlagBits shaderType,
+			const std::string& shaderFilePath,
+			const PipelineConfigInfo& configInfo
+		);
+
 
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
@@ -66,5 +79,6 @@ namespace Shard3D {
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;
 
+		VkShaderModule computeShaderModule;
 	};
 }

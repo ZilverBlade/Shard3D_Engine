@@ -458,16 +458,14 @@ VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat(
               return availableFormat;
           }
       }
-      else if (colormode == "10BIT_UNORM") {
-          if (availableFormat.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32 && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+      else if (colormode == "10BIT_UFLOAT") {
+          if (availableFormat.format == VK_FORMAT_B10G11R11_UFLOAT_PACK32 && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
               return availableFormat;
           }
       }
       else {
           std::cout << "Invalid color format chosen: " << ini.GetValue("DISPLAY", "ColorFormat") << std::endl;
       }
-    
-
   }
 
   return availableFormats[0];

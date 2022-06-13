@@ -12,7 +12,7 @@ namespace Shard3D{
 #define EDITOR_SETTINGS_PATH		"assets/settings/editor_settings.ini"	//unused
 #define GAME_SETTINGS_PATH			"assets/settings/game_settings.ini"	
 
-#define LEVEL_CIPHER_KEY			126	// for level encyption and decryption for release ready games, MUST BE A MULTIPLE OF 2!!
+#define LEVEL_CIPHER_KEY			128	// for level encyption and decryption for release ready games, MUST BE A MULTIPLE OF 2!!
 #define WORLDBUILDER3D_FILE_OPTIONS	"WorldBuilder3D Level (*.wbl)\0*.wbl\0All files (*.*)\0*.*\0"
 
 #define ASSETS_PATH					"assets/"

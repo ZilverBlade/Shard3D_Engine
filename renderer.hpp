@@ -8,11 +8,14 @@
 
 #include <memory>
 #include <vector>
+#include <array>
 
 namespace Shard3D {
 	class EngineRenderer {
+	private:
+		float noEditBgColor[3] = { 0.01f, 0.01f, 0.01f };
+		std::array<VkClearValue, 2> clearValues{};
 	public:
-
 		EngineRenderer(EngineWindow &window, EngineDevice &device);
 		~EngineRenderer();
 
@@ -51,5 +54,6 @@ namespace Shard3D {
 		uint32_t currentImageIndex;
 		int currentFrameIndex;
 		bool isFrameStarted{false};
+
 	};
 }

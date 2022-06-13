@@ -10,6 +10,7 @@ namespace Shard3D {
 		class Actor;
 		enum class PlayState {
 			Stopped = 0,
+			Playing = 2, // unused, for future when stuff like player controls can be properly integrated in game
 			Simulating = 1,
 			Paused = -1
 		};
@@ -46,8 +47,9 @@ namespace Shard3D {
 */
 			void end();
 
-			entt::registry registry;
 			PlayState simulationState = PlayState::Stopped;
+
+			entt::registry registry;
 		private:
 			bool loadRegistryCapture = false;
 

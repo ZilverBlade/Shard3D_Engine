@@ -273,7 +273,6 @@ namespace Shard3D {
         static bool opt_padding = false;
 
         static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
         // We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
         // because it would be confusing to have two docking targets within each others.
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
@@ -288,30 +287,28 @@ namespace Shard3D {
             window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
         }
         else { dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode; }
-
         if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
             window_flags |= ImGuiWindowFlags_NoBackground;
-
         if (!opt_padding)
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Shard3D", &visible, window_flags);
         if (!opt_padding)
             ImGui::PopStyleVar();
-
         if (opt_fullscreen)
             ImGui::PopStyleVar(2);
 
         // Submit the DockSpace
        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
           ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-               ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiWindowFlags_NoTitleBar | ImGuiDockNodeFlags_PassthruCentralNode);
-            ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+          ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+           // ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
        }
 
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
+                ImGui::BeginDisabled(level->simulationState != PlayState::Stopped);
                 if (ImGui::MenuItem("New Level", "Ctrl+N")) {
 #ifdef _WIN32
                     if (MessageBoxA(glfwGetWin32Window(window), "This will destroy the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
@@ -331,7 +328,7 @@ namespace Shard3D {
                         if (!filepath.empty()) {
                             levelTreePanel.clearSelectedActor();
                             level->killEverything();
-                            wb3d::MasterManager::loadLevel(filepath, *currentDevice);
+                            wb3d::MasterManager::loadLevel(filepath);
                         }
                     }
 #endif
@@ -378,6 +375,8 @@ namespace Shard3D {
                 ImGui::Separator();
                 if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { detach(); return; }
                 ImGui::Separator();
+                ImGui::EndDisabled();   
+
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Edit")) {
@@ -405,6 +404,7 @@ namespace Shard3D {
                     
                     ImGui::BeginDisabled(level->simulationState == PlayState::Stopped);
                     if (ImGui::MenuItem("End")) {
+                        levelTreePanel.clearSelectedActor();
                         level->end(); 
                         glfwSetWindowTitle(window, "Shard3D Engine 1.0 (Playstate: Null)");
                     } ImGui::EndDisabled();
