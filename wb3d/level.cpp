@@ -12,6 +12,44 @@ namespace Shard3D {
 			registry.clear();
 		}
 
+		template<typename Component>
+		static void copyComponent(entt::registry& dst, entt::registry& src, std::unordered_map<GUID, entt::entity>& map) {
+			auto view = src.view<Component>();
+			for (auto e : view) {
+				GUID guid = src.get<Components::GUIDComponent>(e).id;
+				entt::entity dstEnttID = map.at(guid);
+				
+				auto& component = src.get<Component>(e);
+
+				dst.emplace_or_replace<Component>(dstEnttID, component);
+			}
+		}
+
+		std::shared_ptr<Level> Level::copy(std::shared_ptr<Level> other) {
+			std::shared_ptr<Level> newLvl = std::make_shared<Level>();
+			
+			std::unordered_map<GUID, entt::entity> enttMap;
+
+			auto& srcLvlRegistry = other->registry;
+			auto& dstLvlRegistry = newLvl->registry;
+			auto idView = srcLvlRegistry.view<Components::GUIDComponent>();
+			for (auto e : idView) {
+				GUID guid = srcLvlRegistry.get<Components::GUIDComponent>(e).id;
+				Actor newActor = newLvl->createActorWithGUID(guid, srcLvlRegistry.get<Components::TagComponent>(e).tag);
+				enttMap[guid] = (entt::entity)newActor;
+			}
+
+			copyComponent<Components::TransformComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::MeshComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::CameraComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::DirectionalLightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+
+			return newLvl;
+		}
+
 		Actor Level::createActor(std::string name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { registry.create(), this };
@@ -68,8 +106,6 @@ namespace Shard3D {
 		}
 
 		void Level::reloadLevel() {
-			MasterManager::loadLevel("assets/scenedata/LVLNOEDIT3D.wbu");
-			killEverything();
 			std::cout << "reloading level\n";
 			loadRegistryCapture = true;
 		}

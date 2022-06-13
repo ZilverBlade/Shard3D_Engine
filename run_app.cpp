@@ -202,6 +202,8 @@ namespace Shard3D {
 				engineRenderer.endFrame();
 			}
 		}
+		glfwSetWindowShouldClose(engineWindow.getGLFWwindow(), GLFW_FALSE);
+		run();
 		if (activeLevel->simulationState != PlayState::Stopped) activeLevel->end();
 		for (Layer* layer : layerStack) {
 			layer->detach();
@@ -279,7 +281,6 @@ namespace Shard3D {
 
 		wb3d::Actor cool = activeLevel->createActor("parent actor test");
 		cool.addComponent<Components::MeshComponent>(model);
-		auto cool = typeid(CppScripts::ExampleCppScript).name();
 		cool.addComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
 	}
 }

@@ -21,6 +21,8 @@ namespace Shard3D {
 			Level();
 			~Level();
 
+			static std::shared_ptr<Level> copy(std::shared_ptr<Level> other);
+
 			Actor createActor(std::string name= "Some kind of actor");
 			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
 

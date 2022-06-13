@@ -8,17 +8,14 @@ namespace Shard3D {
 		}
 		class Actor;
 		void MasterManager::captureLevel(std::shared_ptr<Level>& level) {
-			std::cout << "capturing level\n";
-			//levelCapture = std::make_shared<Level>();
+			std::cout << "Capturing level\n";
+
+			levelCapture = level->copy(level);
+
 			LevelManager levelMan(level);
 			levelMan.save("assets/scenedata/LVLNOEDIT3D.wbu");
 		}
 		void MasterManager::executeQueue(std::shared_ptr<Level>& level, EngineDevice& engineDevice) {
-			if (level->loadRegistryCapture) {
-				std::cout << "loading back level capture\n";
-
-				level->loadRegistryCapture = false;
-			}
 			if (levelPath != "wb3d_nullpath") {
 
 				LevelManager levelMan(level);
@@ -32,6 +29,13 @@ namespace Shard3D {
 					}
 				}
 				levelPath = "wb3d_nullpath";
+			}
+			if (level->loadRegistryCapture) {
+				std::cout << "Loading back Captured level\n";
+
+				level = level->copy(levelCapture);
+
+				level->loadRegistryCapture = false;
 			}
 		}
 	}
