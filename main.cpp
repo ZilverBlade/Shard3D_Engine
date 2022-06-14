@@ -3,8 +3,6 @@
 #include <cstdlib>
 #include <stdexcept>
 
-#include <fstream>
-
 /*
     Shard3D 1.0 (2022) created by ZilverBlade
 */

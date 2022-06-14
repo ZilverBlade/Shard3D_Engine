@@ -34,6 +34,7 @@ namespace Shard3D {
 				std::cout << "Loading back Captured level\n";
 
 				level = level->copy(levelCapture);
+				levelCapture = std::make_shared<Level>();
 
 				level->loadRegistryCapture = false;
 			}
