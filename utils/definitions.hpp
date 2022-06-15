@@ -1,12 +1,13 @@
 #pragma once
 
 namespace Shard3D{
-
+#ifndef GAME_RELEASE_READY
 #define ENABLE_WORLDBUILDER3D		true
+#endif
 #define BETA_DEBUG_TOOLS			true
 
-#define ENGINE_VERSION				"1.0.8"	// Shard3D {major, minor, revision, build}
-#define EDITOR_VERSION				"0.1"	// WorldEditor3D{major, minor}
+#define ENGINE_VERSION				"1.0.8.r4"	// Shard3D {major, minor, patch, revision}
+#define EDITOR_VERSION				"0.1"	// WorldEditor3D {major, minor}
 
 #define ENGINE_SETTINGS_PATH		"assets/settings/engine_settings.ini"
 #define EDITOR_SETTINGS_PATH		"assets/settings/editor_settings.ini"	//unused

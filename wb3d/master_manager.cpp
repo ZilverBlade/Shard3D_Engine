@@ -11,9 +11,6 @@ namespace Shard3D {
 			std::cout << "Capturing level\n";
 
 			levelCapture = level->copy(level);
-
-			LevelManager levelMan(level);
-			levelMan.save("assets/scenedata/LVLNOEDIT3D.wbu");
 		}
 		void MasterManager::executeQueue(std::shared_ptr<Level>& level, EngineDevice& engineDevice) {
 			if (levelPath != "wb3d_nullpath") {
@@ -34,7 +31,7 @@ namespace Shard3D {
 				std::cout << "Loading back Captured level\n";
 
 				level = level->copy(levelCapture);
-				levelCapture = std::make_shared<Level>();
+				levelCapture = std::make_shared<Level>("__WB3D:NOEDITcapturelvl");
 
 				level->loadRegistryCapture = false;
 			}

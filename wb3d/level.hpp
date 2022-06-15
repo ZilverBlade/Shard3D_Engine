@@ -4,6 +4,7 @@
 #include "../GUID.hpp"
 #include "../utils/definitions.hpp"
 #include <vulkan/vulkan.h>
+#include "../camera.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -18,7 +19,7 @@ namespace Shard3D {
 		class Level {
 		public:
 
-			Level();
+			Level(std::string lvlName = "Some kind of level");
 			~Level();
 
 			static std::shared_ptr<Level> copy(std::shared_ptr<Level> other);
@@ -33,7 +34,10 @@ namespace Shard3D {
 
 			void runGarbageCollector(VkDevice device);
 
-			Actor getEditorCameraActor();
+			void setPossessedCameraActor(Actor actor);
+			void setPossessedCameraActor(GUID guid);
+			Actor getPossessedCameraActor();
+			EngineCamera& getPossessedCamera();
 
 			/* *
 * Call when level events must begin
@@ -51,12 +55,12 @@ namespace Shard3D {
 
 			PlayState simulationState = PlayState::Stopped;
 
-			entt::registry registry;
+			entt::registry registry;	
+		protected:
+			GUID possessedCameraActorGUID;
 		private:
+			std::string name = "Some kind of level";
 			bool loadRegistryCapture = false;
-
-			void captureLevel();
-			void reloadLevel();
 
 			// queues 
 			std::vector<Actor> actorKillQueue;

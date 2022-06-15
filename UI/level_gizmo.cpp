@@ -14,7 +14,7 @@ namespace Shard3D {
 		   // ImGuizmo::SetDrawlist();
 		   // ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
-			auto cameraActor = level->getEditorCameraActor();
+			//auto cameraActor = level->getEditorCameraActor();
 		}
 	}
 

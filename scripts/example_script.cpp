@@ -4,17 +4,25 @@ namespace Shard3D {
 	namespace CppScripts {
 		class ExampleCppScript : public wb3d::ActingActor {
 		public:
-			void beginEvent() {}
+			wb3d::Actor camAct;
+			void beginEvent() {
+			
+			}
 			void endEvent()	{}
 
 			void tickEvent(float dt) {	
 				if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_B) != GLFW_PRESS) {
 					getComponent<Components::TransformComponent>().translation += dt;
 				}
+
+				camAct.getComponent<Components::TransformComponent>().translation += 1.f * dt;
 			}
 
 			void spawnEvent() {
 				std::cout << "Example script!\n";
+				camAct = getActiveLevel()->createActor("cambeam");
+				camAct.addComponent<Components::CameraComponent>();
+				posessCameraActor(camAct);
 			}
 			
 			void killEvent() {

@@ -45,7 +45,7 @@ namespace Shard3D {
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.build();
 		std::cout << "attempting to construct Level Pointer\n";
-		activeLevel = std::make_shared<Level>();
+		activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
 	RunApp::~RunApp() {}
 
@@ -90,13 +90,12 @@ namespace Shard3D {
 		cameraActor.addComponent<Components::CameraComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
 
+		activeLevel->setPossessedCameraActor(cameraActor);
+
 		loadGameObjects();
 
 		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
 		controller::EditorMouseMovementController editorCameraControllerMouse{};
-
-		double mousePosX = {};
-		double mousePosY = {};
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
@@ -113,6 +112,8 @@ namespace Shard3D {
 		while (!engineWindow.shouldClose()) {
 			glfwPollEvents();
 
+			auto possessedCamera = activeLevel->getPossessedCameraActor();
+
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
@@ -121,21 +122,24 @@ namespace Shard3D {
 			wb3d::MasterManager::executeQueue(activeLevel, engineDevice);
 			activeLevel->tick(frameTime);
 
-			editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
-			editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, cameraActor);
+			if (activeLevel->simulationState != PlayState::Simulating) {
+				editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCamera);
+				editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCamera);
+			}
 
-			cameraActor.getComponent<Components::CameraComponent>().camera.setViewYXZ(cameraActor.getComponent<Components::TransformComponent>().translation, cameraActor.getComponent<Components::TransformComponent>().rotation);
 			cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 			cameraActor.getComponent<Components::CameraComponent>().ar = engineRenderer.getAspectRatio();
 
+			activeLevel->getPossessedCamera().setViewYXZ(possessedCamera.getComponent<Components::TransformComponent>().translation, possessedCamera.getComponent<Components::TransformComponent>().rotation);
+			
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
-				cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
-				cameraActor.getComponent<Components::CameraComponent>().setProjection();
+				possessedCamera.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
+				possessedCamera.getComponent<Components::CameraComponent>().setProjection();
 			} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
-				cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
-				cameraActor.getComponent<Components::CameraComponent>().setProjection();
+				possessedCamera.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
+				possessedCamera.getComponent<Components::CameraComponent>().setProjection();
 			}
-
+			
 			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
 				glfwGetWindowSize(engineWindow.getGLFWwindow(), &engineWindow.windowWidth, &engineWindow.windowHeight);
 				engineWindow.toggleFullscreen();
@@ -147,15 +151,15 @@ namespace Shard3D {
 					frameIndex,
 					frameTime,
 					commandBuffer,
-					cameraActor.getComponent<Components::CameraComponent>(),
+				    activeLevel->getPossessedCamera(),
 					globalDescriptorSets[frameIndex]
 				};
 
 				//	update
 				GlobalUbo ubo{};
-				ubo.projection = cameraActor.getComponent<Components::CameraComponent>().camera.getProjection();
-				ubo.view = cameraActor.getComponent<Components::CameraComponent>().camera.getView();
-				ubo.inverseView = cameraActor.getComponent<Components::CameraComponent>().camera.getInverseView();
+				ubo.projection = activeLevel->getPossessedCamera().getProjection();
+				ubo.view = activeLevel->getPossessedCamera().getView();
+				ubo.inverseView = activeLevel->getPossessedCamera().getInverseView();
 
 				pointlightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -280,5 +284,12 @@ namespace Shard3D {
 		wb3d::Actor cool = activeLevel->createActor("parent actor test");
 		cool.addComponent<Components::MeshComponent>(model);
 		cool.addComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
+
+		wb3d::Actor epic = activeLevel->createActor("camerabeamer");
+		epic.addComponent<Components::CameraComponent>().setProjection();
+		epic.getComponent<Components::TransformComponent>().translation = {2.f, -2.f, 0.f};
+		
+		
+		//activeLevel->possessedCam = epic.getComponent<Components::CameraComponent>().camera;
 	}
 }

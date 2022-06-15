@@ -5,13 +5,22 @@ namespace Shard3D {
 	namespace wb3d {
 		class ActingActor {
 		public:
+
 			virtual ~ActingActor() {}
 
 			template<typename T>
 			T& getComponent() {
 				return aActor.getComponent<T>();
 			}
+
+			void posessCameraActor(Actor actor) {
+				aActor.eLevel->setPossessedCameraActor(actor);
+			}
 			
+			Level* getActiveLevel() {
+				return aActor.eLevel;
+			}
+
 		protected:
 /**
   Gets called upon the start of the level

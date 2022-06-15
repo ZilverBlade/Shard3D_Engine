@@ -15,7 +15,7 @@ namespace Shard3D {
 			static void captureLevel(std::shared_ptr<Level>& level);
 			static void executeQueue(std::shared_ptr<Level>& level, EngineDevice& engineDevice);
 		protected:
-			inline static std::shared_ptr<Level> lc;
+			inline static std::shared_ptr<Level> lc = std::make_shared<Level>("__WB3D:NOEDITcapturelvl");
 		public:
 			inline static std::shared_ptr<Level>& levelCapture = lc;
 		private:

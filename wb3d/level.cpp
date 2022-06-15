@@ -4,8 +4,8 @@
 
 namespace Shard3D {
 	namespace wb3d {
-		Level::Level() {
-			std::cout << "Creating level\n";
+		Level::Level(std::string lvlName) {
+			std::cout << "Creating level '" << lvlName <<"'\n";
 		}
 		Level::~Level() {
 			std::cout << "Destroying level\n";
@@ -26,12 +26,12 @@ namespace Shard3D {
 		}
 
 		std::shared_ptr<Level> Level::copy(std::shared_ptr<Level> other) {
-			std::shared_ptr<Level> newLvl = std::make_shared<Level>();
-			
+			std::shared_ptr<Level> newLvl = std::make_shared<Level>(other->name);
 			std::unordered_map<GUID, entt::entity> enttMap;
 
 			auto& srcLvlRegistry = other->registry;
 			auto& dstLvlRegistry = newLvl->registry;
+
 			auto idView = srcLvlRegistry.view<Components::GUIDComponent>();
 			for (auto e : idView) {
 				GUID guid = srcLvlRegistry.get<Components::GUIDComponent>(e).id;
@@ -46,6 +46,13 @@ namespace Shard3D {
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+
+			std::cout << "source Level " << other->name << "\n";
+			std::cout << "Copying source possessed cam GUID " << other->getPossessedCameraActor().getGUID() << "\n";
+			std::cout << "Copying source possessed cam name " << other->getPossessedCameraActor().getTag() << "\n";
+			newLvl->setPossessedCameraActor(other->getPossessedCameraActor());
+			std::cout << "Destination possessed cam GUID " << newLvl->getPossessedCameraActor().getGUID() << "\n";
+			std::cout << "Destination possessed cam name " << newLvl->getPossessedCameraActor().getTag() << "\n";
 
 			return newLvl;
 		}
@@ -102,24 +109,35 @@ namespace Shard3D {
 			}
 		}
 
-		void Level::captureLevel() {
+		void Level::setPossessedCameraActor(Actor actor) {
+			if (!actor.hasComponent<Components::CameraComponent>()) {
+				throw std::runtime_error("Can't possess a non camera actor!!");
+			}
+			possessedCameraActorGUID = actor.getGUID();
 		}
 
-		void Level::reloadLevel() {
-			std::cout << "reloading level\n";
-			loadRegistryCapture = true;
+		void Level::setPossessedCameraActor(GUID guid) {
+			possessedCameraActorGUID = guid;
 		}
 
-		Actor Level::getEditorCameraActor() {
-			Actor actor;
-			//registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, this.get() };
-			//	if (actor.getGUID() == 0) return actor;	// editor camera actor is a special actor that always has a GUID of 0
-			//});
-			return actor;
+		Actor Level::getPossessedCameraActor() {
+			auto guidView = registry.view<Components::GUIDComponent>();
+			for (auto actor : guidView) {
+				if (guidView.get<Components::GUIDComponent>(actor).id == possessedCameraActorGUID) {
+					//std::cout << "Using possessed: 0x" << &camView.get<Components::CameraComponent>(actor).camera << "\n";
+					return Actor{actor, this}; 
+				}
+			}
+			std::cout << "No possessed camera found!!!!\n";
+			std::cout << "Attempted to find GUID: " << possessedCameraActorGUID << "\n";
+			std::cout << "Registry alive " << registry.alive() << "\n";
 		}
+
+		 EngineCamera& Level::getPossessedCamera() {
+			return getPossessedCameraActor().getComponent<Components::CameraComponent>().camera;
+		 }
 
 		void Level::begin() {
-			captureLevel();
 			simulationState = PlayState::Simulating;
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				if (!csc.Inst) {
@@ -146,7 +164,8 @@ namespace Shard3D {
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->endEvent();
 			});
-			reloadLevel();
+			std::cout << "reloading level\n";
+			loadRegistryCapture = true;
 		}
 
 		void Level::killActor(Actor actor) {

@@ -21,11 +21,6 @@ namespace Shard3D {
 
 
 		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
-#pragma region Component Properties
-
-		// MeshComponent stuff
-		std::shared_ptr<EngineModel> model;
-#pragma endregion
 
 	};
 }
