@@ -88,7 +88,6 @@ namespace Shard3D {
 		if (ImGui::Button("Y", buttonSize)) values.y = resetValue;	
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine(); ImGui::DragFloat("##Y", &values.y, stepVal); ImGui::PopItemWidth(); ImGui::SameLine();
-		// correcting to be -Y
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.7f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.9f, 1.f));
@@ -96,7 +95,7 @@ namespace Shard3D {
 		if (ImGui::Button("Z", buttonSize)) values.z = resetValue;
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine(); ImGui::DragFloat("##Z", &values.z, stepVal); ImGui::PopItemWidth();
-		// correcting to be Z
+
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 
@@ -141,14 +140,12 @@ namespace Shard3D {
 			}
 			if (open) {
 				auto& file = actor.getComponent<Components::MeshComponent>().file;
-				auto& isMeshIndexedChkBx = actor.getComponent<Components::MeshComponent>().isIndexed;
 				char fileBuffer[256];
 				memset(fileBuffer, 0, 256);
 				strncpy(fileBuffer, file.c_str(), 256);
 				if (ImGui::InputText("Mesh File", fileBuffer, 256)) {
 					file = std::string(fileBuffer);
 				}
-				ImGui::Checkbox("Index model", &isMeshIndexedChkBx);
 				if (ImGui::Button("(Re)Load Mesh")) {
 					std::ifstream ifile(file);
 					if (ifile.good()) {

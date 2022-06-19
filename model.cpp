@@ -7,7 +7,7 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
-#include <unordered_map>>
+#include <unordered_map>
 
 //object loaders
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -81,7 +81,7 @@ namespace Shard3D {
 		};
 
 		stagingBuffer.map();
-		stagingBuffer.writeToBuffer((void *)vertices.data());
+		stagingBuffer.writeToBuffer((void*)vertices.data());
 
 		vertexBuffer = std::make_unique<EngineBuffer>(
 			engineDevice,
@@ -139,7 +139,6 @@ namespace Shard3D {
 		} else {
 			vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
 		}
-		vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
 	}
 
 	std::vector<VkVertexInputBindingDescription> EngineModel::Vertex::getBindingDescriptions() {

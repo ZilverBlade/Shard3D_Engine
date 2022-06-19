@@ -166,7 +166,6 @@ namespace Shard3D {
 				out << YAML::BeginMap;
 					out << YAML::Key << "MeshPath" << YAML::Value << actor.getComponent<Components::MeshComponent>().file;
 					out << YAML::Key << "MeshFormat" << YAML::Value << (int)actor.getComponent<Components::MeshComponent>().type;
-					out << YAML::Key << "Indexed" << YAML::Value << actor.getComponent<Components::MeshComponent>().isIndexed;
 				out << YAML::EndMap;
 			}
 
@@ -290,6 +289,8 @@ namespace Shard3D {
 
 					// CAMERA
 					if (actor["CameraComponent"]) {
+						loadedActor.addComponent<Components::CameraComponent>();
+
 						loadedActor.getComponent<Components::CameraComponent>().projectionType = (Components::CameraComponent::ProjectType)actor["CameraComponent"]["ProjectionType"].as<int>();
 						loadedActor.getComponent<Components::CameraComponent>().fov = actor["CameraComponent"]["FOV"].as<float>();
 						loadedActor.getComponent<Components::CameraComponent>().nearClip = actor["CameraComponent"]["NearClipPlane"].as<float>();
@@ -302,7 +303,7 @@ namespace Shard3D {
 							device,
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),
 				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>(),
-							actor["MeshComponent"]["Indexed"].as<bool>()
+							true
 						);
 						loadedActor.addComponent<Components::MeshComponent>(model);
 					}

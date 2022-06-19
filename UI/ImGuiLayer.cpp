@@ -25,7 +25,7 @@ namespace Shard3D {
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
         currentDevice = device;
-        glfwSetWindowTitle(window, "Shard3D Engine (TechDemo) 1.0.8 (REV 3) (Playstate: Null)");
+        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: Null)");
         hasBeenDetached = false;
 
         // Load any panels
@@ -387,18 +387,18 @@ namespace Shard3D {
                     if (ImGui::MenuItem("Begin")) {
                         wb3d::MasterManager::captureLevel(level);
                         level->begin();
-                        glfwSetWindowTitle(window, "Shard3D Engine (TechDemo) 1.0.8 (REV 3) (Playstate: SIMULATING)");      
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: SIMULATING)");      
                     } ImGui::EndDisabled();   
                     if (level->simulationState != PlayState::Paused) {
                         ImGui::BeginDisabled(level->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
                         level->simulationState = PlayState::Paused;
-                        glfwSetWindowTitle(window, "Shard3D Engine (TechDemo) 1.0.8 (REV 3) (Playstate: Paused)");
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: Paused)");
 
                     } ImGui::EndDisabled();  }
                     else {
                         ImGui::BeginDisabled(level->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
                         level->simulationState = PlayState::Simulating;
-                        glfwSetWindowTitle(window, "Shard3D Engine (TechDemo) 1.0.8 (REV 3) (Playstate: SIMULATING)");
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: SIMULATING)");
                     } ImGui::EndDisabled();
                     }
                     
@@ -406,7 +406,7 @@ namespace Shard3D {
                     if (ImGui::MenuItem("End")) {
                         levelTreePanel.clearSelectedActor();
                         level->end(); 
-                        glfwSetWindowTitle(window, "Shard3D Engine (TechDemo) 1.0.8 (REV 3) (Playstate: Null)");
+                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: Null)");
                     } ImGui::EndDisabled();
                     ImGui::EndMenu();
                 }
