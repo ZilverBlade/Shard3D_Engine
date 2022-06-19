@@ -277,6 +277,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="GUID.cpp" />
+    <ClCompile Include="systems\compute_system.cpp" />
     <ClCompile Include="UI\level_gizmo.cpp" />
     <ClCompile Include="wb3d\master_manager.cpp" />
     <ClCompile Include="systems\directional_light_system.cpp" />
@@ -324,6 +325,7 @@
     </ClInclude>
     <ClInclude Include="scripts\script_handler.hpp" />
     <ClInclude Include="scripts\script_link.h" />
+    <ClInclude Include="systems\compute_system.hpp" />
     <ClInclude Include="utils\dialogs.h" />
     <ClInclude Include="engine_logger.hpp" />
     <ClInclude Include="GUID.hpp" />

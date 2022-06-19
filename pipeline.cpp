@@ -25,20 +25,22 @@ namespace Shard3D {
 	}
 
 	EnginePipeline::EnginePipeline(
+		std::string trash,
 		EngineDevice& device,
 		VkShaderStageFlagBits shaderStageFlag,
+		VkPipelineLayout& pipelineLayout,
 		const std::string& shaderFilePath,
 		const PipelineConfigInfo& configInfo,
 		bool recreate
 	)
 		: engineDevice{ device } {
-		if (!recreate) { createSingleGraphicsPipeline(shaderStageFlag, shaderFilePath, configInfo); return; }
+		if (!recreate) { if(shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputeGraphicsPipeline(pipelineLayout, shaderFilePath, configInfo); return; }
 
 		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
 		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
-		createSingleGraphicsPipeline(shaderStageFlag, shaderFilePath, configInfo);
+		if (shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputeGraphicsPipeline(pipelineLayout, shaderFilePath, configInfo);
 	}
 
 	EnginePipeline::~EnginePipeline() {
@@ -134,8 +136,8 @@ namespace Shard3D {
 		}
 	}
 
-	void EnginePipeline::createSingleGraphicsPipeline(
-		const VkShaderStageFlagBits shaderType,
+	void EnginePipeline::createComputeGraphicsPipeline(
+		VkPipelineLayout& pipelineLayout,
 		const std::string& shaderFilePath,
 		const PipelineConfigInfo& configInfo
 	) {
@@ -148,47 +150,25 @@ namespace Shard3D {
 		auto shaderCode = readFile(shaderFilePath);
 
 		VkPipelineShaderStageCreateInfo shaderStages[1];
-		if (shaderType == VK_SHADER_STAGE_COMPUTE_BIT) {
-			createShaderModule(shaderCode, &computeShaderModule);
-			shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-			shaderStages[0].stage = VK_SHADER_STAGE_COMPUTE_BIT;
-			shaderStages[0].module = computeShaderModule;
-			shaderStages[0].pName = "main";
-			shaderStages[0].flags = 0;
-			shaderStages[0].pNext = nullptr;
-			shaderStages[0].pSpecializationInfo = nullptr;
-		}
+		createShaderModule(shaderCode, &computeShaderModule);
+		shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		shaderStages[0].stage = VK_SHADER_STAGE_COMPUTE_BIT;
+		shaderStages[0].module = computeShaderModule;
+		shaderStages[0].pName = "main";
+		shaderStages[0].flags = 0;
+		shaderStages[0].pNext = nullptr;
+		shaderStages[0].pSpecializationInfo = nullptr;
 
 		auto& bindingDescriptions = configInfo.bindingDescriptions;
 		auto& attributeDescriptions = configInfo.attributeDescriptions;
-		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
-		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
-		VkGraphicsPipelineCreateInfo pipelineInfo{};
-		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		pipelineInfo.stageCount = 1;
-		pipelineInfo.pStages = shaderStages;
-		pipelineInfo.pVertexInputState = &vertexInputInfo;
-		pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
-		pipelineInfo.pViewportState = &configInfo.viewportInfo;
-		pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
-		pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
-		pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
-		pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
-		pipelineInfo.pDynamicState = &configInfo.dynamicStateInfo;
+		VkComputePipelineCreateInfo computePipelineCreateInfo{};
+		computePipelineCreateInfo.stage = shaderStages[0];
+		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+		computePipelineCreateInfo.layout = configInfo.pipelineLayout;
+		computePipelineCreateInfo.flags = 0;
 
-		pipelineInfo.layout = configInfo.pipelineLayout;
-		pipelineInfo.renderPass = configInfo.renderPass;
-		pipelineInfo.subpass = configInfo.subpass;
-
-		pipelineInfo.basePipelineIndex = -1;
-		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-
-		if (vkCreateGraphicsPipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+		if (vkCreateComputePipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
 	}
@@ -215,6 +195,10 @@ namespace Shard3D {
 
 	void EnginePipeline::bind(VkCommandBuffer commandBuffer) {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+	}
+
+	void EnginePipeline::bindCompute(VkCommandBuffer commandBuffer) {
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, graphicsPipeline);
 	}
 
 	void EnginePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {

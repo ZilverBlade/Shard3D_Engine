@@ -30,6 +30,8 @@
 
 #include "systems/grid_system.hpp"
 
+#include "systems/compute_system.hpp" //mostly post processing prob
+
 //UI stuff
 #include "UI/TestLayer.hpp"
 #include "UI/ImGuiLayer.hpp"
@@ -79,6 +81,7 @@ namespace Shard3D {
 		layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow(), activeLevel);
 #endif
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		ComputeSystem computeSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		PointlightSystem pointlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -198,6 +201,9 @@ namespace Shard3D {
 				directionalLightSystem.render(frameInfo, activeLevel);
 
 				gridSystem.render(frameInfo);
+
+				computeSystem.render(frameInfo);
+
 				// Layer overlays
 				for (Layer* layer : layerStack) {
 					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime, activeLevel);

@@ -37,8 +37,10 @@ namespace Shard3D {
 			bool recreate = false
 		);
 		EnginePipeline(
+			std::string trash,
 			EngineDevice& device,
 			VkShaderStageFlagBits shaderStageFlag,
+			VkPipelineLayout& pipelineLayout,
 			const std::string& shaderFilePath,
 			const PipelineConfigInfo& configInfo,
 			bool recreate = false
@@ -50,6 +52,7 @@ namespace Shard3D {
 		EnginePipeline() = default;
 
 		void bind(VkCommandBuffer commandBuffer);
+		void bindCompute(VkCommandBuffer commandBuffer);
 
 		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 		static void enableAlphaBlending(PipelineConfigInfo& configInfo, VkBlendOp blendOp);
@@ -65,8 +68,8 @@ namespace Shard3D {
 			const PipelineConfigInfo& configInfo
 		);
 
-		void createSingleGraphicsPipeline(
-			const VkShaderStageFlagBits shaderType,
+		void createComputeGraphicsPipeline(
+			VkPipelineLayout& pipelineLayout,
 			const std::string& shaderFilePath,
 			const PipelineConfigInfo& configInfo
 		);

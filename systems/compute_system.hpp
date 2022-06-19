@@ -13,21 +13,19 @@
 #include <vector>
 
 namespace Shard3D {
-	class GridSystem {
+	class ComputeSystem {
 	public:
-		GridSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-		~GridSystem();
+		ComputeSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		~ComputeSystem();
 
-		GridSystem(const GridSystem&) = delete;
-		GridSystem& operator=(const GridSystem&) = delete;
+		ComputeSystem(const ComputeSystem&) = delete;
+		ComputeSystem& operator=(const ComputeSystem&) = delete;
 
 		void render(FrameInfo& frameInfo);
-		void recreatePipeline(VkRenderPass renderPass);
 	private:
 
 		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
-
 
 		EngineDevice& engineDevice;
 

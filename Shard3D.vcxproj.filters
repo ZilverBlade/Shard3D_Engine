@@ -197,6 +197,9 @@
     <ClCompile Include="UI\level_gizmo.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="systems\compute_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -351,6 +354,9 @@
     </ClInclude>
     <ClInclude Include="events\key_events.hpp">
       <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\compute_system.hpp">
+      <Filter>Header Files\systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
