@@ -103,10 +103,11 @@ void main(){
 
 		vec3 lightDistance = spotlight.position.xyz - fragPosWorld;
 
-		float attenuation = 1.0 / (
-	/*				c		*/		spotlight.attenuationMod.x +																
-	/*				bx		*/		spotlight.attenuationMod.y * length(lightDistance) +  
-	/*				ax^2	*/		spotlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
+		//attenuation mod is broken for spotlights
+		float attenuation = 1.0 / dot(lightDistance, lightDistance); //(
+	/*				c		*/		//spotlight.attenuationMod.x +																
+	/*				bx		*/		//spotlight.attenuationMod.y * length(lightDistance) +  
+	/*				ax^2	*/		//spotlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
 		lightDistance = normalize(lightDistance);
 		float cosAngIndicence = max(dot(surfaceNormal, normalize(lightDistance)), 0);
 		vec3 color_intensity = spotlight.color.xyz * spotlight.color.w * attenuation;

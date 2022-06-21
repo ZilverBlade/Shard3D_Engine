@@ -31,7 +31,6 @@ void EngineSwapChain::init() {
        createSwapChain();
         createImageViews();
         createRenderPass();
-       // createColorResources();
         createDepthResources();
         createFramebuffers();
         createSyncObjects();
@@ -53,14 +52,6 @@ EngineSwapChain::~EngineSwapChain() {
     vkDestroyImage(device.device(), depthImages[i], nullptr);
     vkFreeMemory(device.device(), depthImageMemorys[i], nullptr);
   }
-
-  /*
-  for (int i = 0; i < colorImageViews.size(); i++) {
-      vkDestroyImageView(device.device(), colorImageViews[i], nullptr);
-      vkDestroyImage(device.device(), colorImages[i], nullptr);
-      vkFreeMemory(device.device(), colorImageMemorys[i], nullptr);
-  }
-  */
 
   for (auto framebuffer : swapChainFramebuffers) {
     vkDestroyFramebuffer(device.device(), framebuffer, nullptr);
@@ -259,27 +250,12 @@ void EngineSwapChain::createRenderPass() {
   VkAttachmentReference colorAttachmentRef = {};
   colorAttachmentRef.attachment = 0;
   colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-  /*
-  VkAttachmentDescription colorAttachmentResolve{};
-  colorAttachmentResolve.format = getSwapChainImageFormat();
-  colorAttachmentResolve.samples = VK_SAMPLE_COUNT_1_BIT;
-  colorAttachmentResolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  colorAttachmentResolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-  colorAttachmentResolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  colorAttachmentResolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-  colorAttachmentResolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  colorAttachmentResolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-  VkAttachmentReference colorAttachmentResolveRef{};
-  colorAttachmentResolveRef.attachment = 2;
-  colorAttachmentResolveRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-  */
+  
   VkSubpassDescription subpass = {};
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = 1;
   subpass.pColorAttachments = &colorAttachmentRef;
   subpass.pDepthStencilAttachment = &depthAttachmentRef;
-  // subpass.pResolveAttachments = &colorAttachmentResolveRef;
 
   VkSubpassDependency dependency = {};
   dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -289,7 +265,7 @@ void EngineSwapChain::createRenderPass() {
   dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
   dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-  std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment/*, colorAttachmentResolve*/ };
+  std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment };
   VkRenderPassCreateInfo renderPassInfo = {};
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
   renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -308,7 +284,7 @@ void EngineSwapChain::createRenderPass() {
 void EngineSwapChain::createFramebuffers() {
   swapChainFramebuffers.resize(imageCount());
   for (size_t i = 0; i < imageCount(); i++) {
-    std::array<VkImageView, 2> attachments = { swapChainImageViews[i], /*colorImageViews[i], */depthImageViews[i]};
+    std::array<VkImageView, 2> attachments = { swapChainImageViews[i], depthImageViews[i]};
 
     VkExtent2D swapChainExtent = getSwapChainExtent();
     VkFramebufferCreateInfo framebufferInfo = {};
@@ -330,39 +306,6 @@ void EngineSwapChain::createFramebuffers() {
   }
 }
 
-/*
-void EngineSwapChain::createColorResources() {
-    VkFormat colorFormat = getSwapChainImageFormat();
-    swapChainImageFormat = colorFormat;
-    VkExtent2D swapChainExtent = getSwapChainExtent();
-
-    for (int i = 0; i < colorImages.size(); i++) {
-        VkImageCreateInfo imageInfo{};
-        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        imageInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageInfo.extent.width = swapChainExtent.width;
-        imageInfo.extent.height = swapChainExtent.height;
-        imageInfo.extent.depth = 1;
-        imageInfo.mipLevels = 1;
-        imageInfo.arrayLayers = 1;
-        imageInfo.format = colorFormat;
-        imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        imageInfo.usage = VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        imageInfo.samples = device.msaaSamples;
-        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        imageInfo.flags = 0;
-
-        device.createImageWithInfo(
-            imageInfo,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            device.msaaSamples,
-            colorImages[i],
-            colorImageMemorys[i]);
-        
-    }
-}
-*/
 void EngineSwapChain::createDepthResources() {
   VkFormat depthFormat = findDepthFormat();
   swapChainDepthFormat = depthFormat;
@@ -392,7 +335,6 @@ for (int i = 0; i < depthImages.size(); i++) {
     device.createImageWithInfo(
         imageInfo,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-       // device.msaaSamples,
         depthImages[i],
         depthImageMemorys[i]);
 
@@ -497,6 +439,7 @@ VkPresentModeKHR EngineSwapChain::chooseSwapPresentMode(const std::vector<VkPres
         return VK_PRESENT_MODE_FIFO_KHR;
     } else {
         std::cout << "Invalid present mode chosen: " << ini.GetValue("DISPLAY", "V-Sync") << std::endl;
+        return VK_PRESENT_MODE_FIFO_KHR;
     }
 
 }
@@ -523,5 +466,4 @@ VkFormat EngineSwapChain::findDepthFormat() {
       VK_IMAGE_TILING_OPTIMAL,
       VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 }
-
 }

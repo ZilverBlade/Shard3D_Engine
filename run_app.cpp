@@ -20,6 +20,8 @@
 
 #include "simpleini/simple_ini.h"
 #include "buffer.hpp"
+#include "utils/dialogs.h"
+//#include "video/video_decode.hpp"
 
 //systems
 #include "systems/basic_render_system.hpp"
@@ -39,6 +41,7 @@
 //scripts
 #include "scripts/script_link.h"
 
+
 namespace Shard3D {
 	wb3d::Actor light2{};
 	RunApp::RunApp() {
@@ -49,7 +52,9 @@ namespace Shard3D {
 		std::cout << "attempting to construct Level Pointer\n";
 		activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
-	RunApp::~RunApp() {}
+	RunApp::~RunApp() {
+		globalPool = nullptr;
+	}
 
 	void RunApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -81,7 +86,7 @@ namespace Shard3D {
 		layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow(), activeLevel);
 #endif
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		ComputeSystem computeSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		//ComputeSystem computeSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		PointlightSystem pointlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -107,6 +112,10 @@ namespace Shard3D {
 		CSimpleIniA gini;
 		gini.SetUnicode();
 		gini.LoadFile(GAME_SETTINGS_PATH);
+
+		//VideoPlaybackEngine::EngineH264Video videoEngine;
+		
+		//videoEngine.createVideoSession(engineWindow.getGLFWwindow(), "stoer");
 
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
@@ -191,7 +200,7 @@ namespace Shard3D {
 
 					Also order absolutely matters, post processing for example must go last
 				*/
-
+				
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 
 				basicRenderSystem.renderGameObjects(frameInfo, activeLevel);
@@ -202,7 +211,7 @@ namespace Shard3D {
 
 				gridSystem.render(frameInfo);
 
-				computeSystem.render(frameInfo);
+				//computeSystem.render(frameInfo);
 
 				// Layer overlays
 				for (Layer* layer : layerStack) {

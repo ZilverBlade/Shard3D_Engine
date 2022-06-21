@@ -16,6 +16,7 @@
 #define GLFW_INCLUDE_VULKAN
 
 #include "../utils/dialogs.h"
+//#include "../video/video_decode.hpp"
 namespace Shard3D {
 
 
@@ -230,6 +231,7 @@ namespace Shard3D {
 	void ImGuiLayer::detach() {
      // check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
         if (hasBeenDetached) return;
+        vkDestroyDescriptorPool(currentDevice->device(), descriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -311,20 +313,14 @@ namespace Shard3D {
                 ImGui::Separator();
                 ImGui::BeginDisabled(level->simulationState != PlayState::Stopped);
                 if (ImGui::MenuItem("New Level", "Ctrl+N")) {
-#ifdef _WIN32
-                    if (MessageBoxA(glfwGetWin32Window(window), "This will destroy the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
-                        
+                    if (MessageDialogs::show("This will destroy the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {                   
                         levelTreePanel.clearSelectedActor();
                         level->killEverything();
                     }
-#endif
-#ifdef __linux__ 
-                    std::cout << "unsupported function\n";
-#endif
+
                 }
                 if (ImGui::MenuItem("Load Level...", "Ctrl+O")) {
-#ifdef _WIN32
-                    if (MessageBoxA(glfwGetWin32Window(window), "This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+                    if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
                         std::string filepath = FileDialogs::openFile(WORLDBUILDER3D_FILE_OPTIONS);
                         if (!filepath.empty()) {
                             levelTreePanel.clearSelectedActor();
@@ -332,10 +328,6 @@ namespace Shard3D {
                             wb3d::MasterManager::loadLevel(filepath);
                         }
                     }
-#endif
-#ifdef __linux__ 
-                    std::cout << "unsupported function\n";
-#endif
                 }
                 if (ImGui::MenuItem("Save Level...", "Ctrl+S")) {
                     std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
@@ -411,6 +403,10 @@ namespace Shard3D {
                 ImGui::TextDisabled("Shard3D Debug menu");
                 ImGui::Separator();
                 if (ImGui::MenuItem("Play test audio", NULL /*make sure to add some sort of shardcut */)) {
+                }
+                if (ImGui::MenuItem("Play test video", NULL /*make sure to add some sort of shardcut */)) {
+                    //VideoPlaybackEngine::EngineH264Video videoEngine;
+                    //videoEngine.createVideoSession(window, nullptr);
                 }
                 if (ImGui::MenuItem("Encrypt string")) {
                     std::string originalString = "Hello World! ABCDabcd0123<> /\\[]+=.;'`~утзс";

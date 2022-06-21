@@ -67,11 +67,7 @@ namespace Shard3D {
   VkFormat swapChainImageFormat;
   VkFormat swapChainDepthFormat;
   VkExtent2D swapChainExtent;
-  /*
-  std::vector <VkImage> colorImages;
-  std::vector <VkDeviceMemory> colorImageMemorys;
-  std::vector <VkImageView> colorImageViews;
-  */
+
   std::vector<VkFramebuffer> swapChainFramebuffers;
   VkRenderPass renderPass;
 
