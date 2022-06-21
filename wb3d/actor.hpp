@@ -48,17 +48,15 @@ namespace Shard3D {
 				assert(hasComponent<T>() && "Actor does not have component!");
 				eLevel->registry.remove<T>(actorHandle);
 			}
+			
+			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
+			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
+			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
 
 			operator bool() const { return actorHandle != entt::null; }
 			operator entt::entity() const { return actorHandle; };
 			operator uint32_t() const { return (uint32_t)actorHandle; };
-
-			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
-
-			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
-
-			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
-
+			
 			bool operator==(const Actor& other) const {
 				return actorHandle == other.actorHandle && eLevel == other.eLevel;
 			}
@@ -69,10 +67,11 @@ namespace Shard3D {
 		private:
 			entt::entity actorHandle{entt::null};
 
-			Level *eLevel = nullptr; // 12 bytes (use it as much as needed)
+			Level *eLevel = nullptr; // 8 bytes (use it as much as needed)
 
 			friend class Level;
 			friend class ActingActor;
+			friend class BlueprintManager;
 		};
 	}
 }

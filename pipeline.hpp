@@ -68,7 +68,7 @@ namespace Shard3D {
 			const PipelineConfigInfo& configInfo
 		);
 
-		void createComputeGraphicsPipeline(
+		void createComputePipeline(
 			VkPipelineLayout& pipelineLayout,
 			const std::string& shaderFilePath,
 			const PipelineConfigInfo& configInfo

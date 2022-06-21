@@ -14,6 +14,7 @@ namespace Shard3D {
 	public:
 		// no string returned if cancelled
 		static std::string openFile(const char* filter) {
+#ifdef _WIN32
 			OPENFILENAMEA ofn;
 			CHAR szFile[256] = { 0 };
 			ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -27,9 +28,15 @@ namespace Shard3D {
 			if (GetOpenFileNameA(&ofn) == TRUE) {
 				return ofn.lpstrFile;
 			}
+#endif
+#ifdef __linux__ 
+			std::cout << "unsupported function\n";
+#endif
 			return std::string();
+
 		}
 		static std::string saveFile(const char* filter) {
+#ifdef _WIN32
 			OPENFILENAMEA ofn;
 			CHAR szFile[256] = { 0 };
 			ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -43,6 +50,10 @@ namespace Shard3D {
 			if (GetSaveFileNameA(&ofn) == TRUE) {
 				return ofn.lpstrFile;
 			}
+#endif
+#ifdef __linux__ 
+			std::cout << "unsupported function\n";
+#endif
 			return std::string();
 		}
 	};

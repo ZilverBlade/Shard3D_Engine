@@ -18,7 +18,7 @@ namespace Shard3D {
 
 			wb3d::ActingActor* (*InstScript)();
 			void (*killScript)(CppScriptComponent*);
-
+		 
 			template<typename T>
 			void bind() {
 				InstScript = []()							{return static_cast<wb3d::ActingActor*>(new T()); };

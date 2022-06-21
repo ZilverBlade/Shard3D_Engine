@@ -1,4 +1,4 @@
-#include "levelmgr.hpp"
+#include "bpmgr.hpp"
 
 #include "actor.hpp" 
 #include "../components.hpp"
@@ -8,15 +8,16 @@
 #include "../utils/yaml_ext.hpp"
 
 #include <fstream>
+#include "level.hpp" // for the killMesh function
 
 namespace Shard3D {
 	namespace wb3d {
-		LevelManager::LevelManager(const std::shared_ptr<Level>& level) : mLevel(level) { 
+		BlueprintManager::BlueprintManager(Actor& mActor) : actor(mActor) {
 			Log log;
-			log.logString("Loading Level Manager");
+			log.logString("Loading Blueprint Manager");
 		}
 
-		std::string LevelManager::encrypt(std::string input) {
+		std::string BlueprintManager::encrypt(std::string input) {
 			auto newTime = std::chrono::high_resolution_clock::now();
 			char c;
 			std::string encryptedString;
@@ -26,10 +27,10 @@ namespace Shard3D {
 					((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
 			}
 
-			std::cout << "Duration of Level encryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			std::cout << "Duration of Blueprint encryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
 			return encryptedString;
 		}
-		std::string LevelManager::decrypt(std::string input) {
+		std::string BlueprintManager::decrypt(std::string input) {
 			auto newTime = std::chrono::high_resolution_clock::now();
 			char c;
 			std::string decryptedString;
@@ -39,25 +40,12 @@ namespace Shard3D {
 					(((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
 			}
 
-			std::cout << "Duration of Level decryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			std::cout << "Duration of Blueprint decryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
 			return decryptedString;
-		}
+		}		
 
 		static void saveActor(YAML::Emitter& out, Actor actor) {
-			if (!actor.hasComponent<Components::GUIDComponent>()) return;
-			if (actor.getGUID() == 0 || actor.getGUID() == std::numeric_limits<uint64_t>::max()) return; // might be reserved for core engine purposes
-
 			out << YAML::BeginMap;
-			out << YAML::Key << "Actor" << YAML::Value << actor.getGUID();
-
-			// TAG
-			if (actor.hasComponent<Components::TagComponent>()) {
-				out << YAML::Key << "TagComponent";
-				out << YAML::BeginMap;
-					out << YAML::Key << "Tag" << YAML::Value << actor.getTag();
-				out << YAML::EndMap;
-			}
-
 			// TRANSFORM
 			if (actor.hasComponent<Components::TransformComponent>()) {
 				out << YAML::Key << "TransformComponent";
@@ -119,44 +107,55 @@ namespace Shard3D {
 			}
 			out << YAML::EndMap;
 		}
-		void LevelManager::save(const std::string& destinationPath, bool encryptLevel) {
+
+
+		void BlueprintManager::removeAllComponents(Actor actor) {
+			//don't remove 3 crutial components like transform, tag and GUID since they must be controllable on any actor
+			if (actor.hasComponent<Components::CameraComponent>()) actor.killComponent<Components::CameraComponent>();
+			if (actor.hasComponent<Components::CppScriptComponent>()) actor.killComponent<Components::CppScriptComponent>();
+			if (actor.hasComponent<Components::DirectionalLightComponent>()) actor.killComponent<Components::DirectionalLightComponent>();
+			if (actor.hasComponent<Components::MeshComponent>()) actor.eLevel->killMesh(actor);
+			if (actor.hasComponent<Components::PointlightComponent>()) actor.killComponent<Components::PointlightComponent>();
+			if (actor.hasComponent<Components::SpotlightComponent>()) actor.killComponent<Components::SpotlightComponent>();
+		}
+
+		void BlueprintManager::convert(const std::string& destinationPath, Blueprint blueprint, bool encryptLevel) {
 			YAML::Emitter out;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION;
 			out << YAML::Key << "WorldBuilder3D" << YAML::Value << EDITOR_VERSION;
-			out << YAML::Key << "Level" << YAML::Value << "Some kind of level";
-			out << YAML::Key << "Actors" << YAML::Value << YAML::BeginSeq;
+			out << YAML::Key << "WBASSET_Blueprint" << YAML::Value << blueprint.name;
+			out << YAML::Key << "BlueprintID" << YAML::Value << blueprint.getGUID();
+			out << YAML::Key << "Container" << YAML::Value << YAML::BeginSeq;
 
-			mLevel->registry.each([&](auto actorGUID) { Actor actor = { actorGUID, mLevel.get() };
-				if (!actor) return;
-				saveActor(out, actor);
-			});
+			saveActor(out, actor);
 
 			out << YAML::EndSeq;
 			out << YAML::EndMap;
 			std::string newPath = destinationPath;
-			if (!strUtils::hasEnding(destinationPath, ".wbl")) newPath = destinationPath + ".wbl";
+			if (!strUtils::hasEnding(destinationPath, ".wbasset")) newPath = destinationPath + ".wbasset";
 			if (encryptLevel) {
 				std::ofstream fout(newPath);
 				fout << encrypt(out.c_str());
 				fout.flush();
 				fout.close();
-			} else {
+			}
+			else {
 				std::ofstream fout(newPath);
 				fout << out.c_str();
 				fout.flush();
 				fout.close();
 			}
-		
-			std::cout << "Saved scene '" << newPath << "'\n";
+			removeAllComponents(actor);
+			blueprint.assetFile = newPath.substr(newPath.rfind("assets\\blueprintdata")); // this is strictly a local path, which means all blueprints must be in this folder
+			std::cout << "Saved blueprint '" << newPath << "'\n";
 		}
 
-		void LevelManager::saveRuntime(const std::string& destinationPath) {
+		void BlueprintManager::convertRuntime(const std::string& destinationPath) {
 			assert(false);
 		}
 
-		LevelMgrResults LevelManager::load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns) {
-			//mLevel->killEverything();
+		BlueprintMgrResults BlueprintManager::load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns) {
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
@@ -172,31 +171,27 @@ namespace Shard3D {
 #else
 			YAML::Node data = YAML::Load(strStream.str());
 #endif
-
+			
 			if (ignoreWarns == false) {
-				if (!data["Level"]) return LevelMgrResults::WrongFileResult;
+				if (!data["WBASSET_Blueprint"]) return BlueprintMgrResults::WrongFileResult;
 
 				if (data["Shard3D"].as<std::string>() != ENGINE_VERSION) { 
 					std::cout << "wrong engine version\n";
-					return LevelMgrResults::OldEngineVersionResult;
+					return BlueprintMgrResults::OldEngineVersionResult;
 				}// change this to check if the version is less or more
 				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION) {
 					std::cout << "wrong editor version\n";
-					return LevelMgrResults::OldEditorVersionResult;
+					return BlueprintMgrResults::OldEditorVersionResult;
 				}// change this to check if the version is less or more
 
 			}
-
-			std::string levelName = data["Level"].as<std::string>();
 			
-			if (data["Actors"]) {
-				for (auto actor : data["Actors"]) {
+			if (data["Container"]) {
+				for (auto actor : data["Container"]) {
 					Actor loadedActor{};
 
-					std::cout << "Loading actor with ID " << actor["Actor"].as<uint64_t>() << "\n";
-					if (actor["TagComponent"]) {
-						loadedActor = mLevel->createActorWithGUID(actor["Actor"].as<uint64_t>(), actor["TagComponent"]["Tag"].as<std::string>());
-					} // Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing
+					std::cout << "Building blueprint with ID " << actor["BlueprintID"].as<uint64_t>() << "\n";
+					// Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing
 
 					if (actor["TransformComponent"]) {
 #ifndef ACTOR_FORCE_TRANSFORM_COMPONENT		
@@ -258,12 +253,14 @@ namespace Shard3D {
 					}
 				}
 			}
-			return LevelMgrResults::SuccessResult;
+			return BlueprintMgrResults::SuccessResult;
 		}
 
-		LevelMgrResults LevelManager::loadRuntime(const std::string& sourcePath) {
+
+
+		BlueprintMgrResults BlueprintManager::loadRuntime(const std::string& sourcePath) {
 			assert(false);
-			return LevelMgrResults::ErrorResult;
+			return BlueprintMgrResults::ErrorResult;
 		}
 	}
 }

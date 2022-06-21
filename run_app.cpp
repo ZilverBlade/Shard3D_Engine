@@ -229,62 +229,6 @@ namespace Shard3D {
 
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
-
-		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/quad.obj", ModelType::MODEL_TYPE_OBJ);
-
-		wb3d::Actor quad = activeLevel->createActor();
-		quad.addComponent<Components::MeshComponent>(model);
-		quad.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.9f, 0.0f };
-		quad.getComponent<Components::TransformComponent>().scale = { 100.f, 1.f, 100.f };
-		quad.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
-
-
-		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/axis.obj", ModelType::MODEL_TYPE_OBJ, false);
-
-		wb3d::Actor axis = activeLevel->createActor();
-		axis.addComponent<Components::MeshComponent>(model);
-		axis.getComponent<Components::TransformComponent>().translation = { 0.0f, 0.0f, 0.0f };
-		axis.getComponent<Components::TransformComponent>().scale = { 1.f, 1.f, 1.f };
-		axis.getComponent<Components::TransformComponent>().rotation = { 0.f, 0.f, 0.f };
-
-
-
-		wb3d::Actor light = activeLevel->createActor();
-		light.addComponent<Components::PointlightComponent>();
-		light.getComponent<Components::TransformComponent>().translation = { 2.0f, -1.0f, 0.0f };
-		light.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
-		light.getComponent<Components::PointlightComponent>().color = { 1.0f, 1.0f, 1.0f };
-		light.getComponent<Components::PointlightComponent>().lightIntensity = 1.0f;
-
-
-		wb3d::Actor light0 = activeLevel->createActor();
-		light0.addComponent<Components::DirectionalLightComponent>();
-		light0.getComponent<Components::TransformComponent>().translation = { 0.0f, -1.0f, 5.0f };
-		light0.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -3.f, -1.f);
-		light0.getComponent<Components::DirectionalLightComponent>().color = { 1.0f, 1.0f, 1.0f };
-		light0.getComponent<Components::DirectionalLightComponent>().lightIntensity = 0.1f;
-		light0.getComponent<Components::DirectionalLightComponent>().specularMod = 0.0f;
-		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ, false);
-
-
-		activeLevel->killActor(axis);
-
-		light2 = activeLevel->createActor();
-		light2.addComponent<Components::SpotlightComponent>();
-		light2.addComponent<Components::MeshComponent>(model);
-		light2.getComponent<Components::TransformComponent>().scale = { 0.1f, 0.1f, 0.1f };
-		light2.getComponent<Components::TransformComponent>().translation = { 5.0f, -1.0f, 0.0f };
-		light2.getComponent<Components::TransformComponent>().rotation = glm::vec3(1.f, -0.f, -1.f);
-		light2.getComponent<Components::SpotlightComponent>().color = { 1.0f, 1.0f, 1.0f };
-		light2.getComponent<Components::SpotlightComponent>().lightIntensity = 1.0f;
-
-		activeLevel->killActor(light2);
-
-
-		activeLevel->killActor(light0);
-		activeLevel->killActor(quad);
-
-
 		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ);
 
 		wb3d::Actor cool = activeLevel->createActor("parent actor test");

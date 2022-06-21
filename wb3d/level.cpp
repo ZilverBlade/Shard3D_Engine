@@ -1,6 +1,9 @@
 #include "level.hpp"
-#include "acting_actor.hpp"
+#include "acting_actor.hpp" // also includes "actor.hpp"
+#include "blueprint.hpp"
+
 #include "master_manager.hpp"
+#include "bpmgr.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -39,6 +42,7 @@ namespace Shard3D {
 				enttMap[guid] = (entt::entity)newActor;
 			}
 
+			copyComponent<Components::BlueprintComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::TransformComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::MeshComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CameraComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
@@ -55,6 +59,16 @@ namespace Shard3D {
 			std::cout << "Destination possessed cam name " << newLvl->getPossessedCameraActor().getTag() << "\n";
 
 			return newLvl;
+		}
+
+		Blueprint Level::createBlueprint(Actor actor, std::string path, std::string name) {
+			
+			Blueprint blueprint = { actor, path, name };
+			BlueprintManager bpMan = actor;
+			blueprint.attach(actor);
+			bpMan.convert(path, blueprint);
+
+			return blueprint;
 		}
 
 		Actor Level::createActor(std::string name) {

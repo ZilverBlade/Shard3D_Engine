@@ -10,6 +10,18 @@ namespace Shard3D {
 		(hashCombine(seed, rest), ...);
 	};
 
+	class strUtils {
+	public:
+		static bool hasEnding(std::string const& fullString, std::string const& ending) {
+			if (fullString.length() >= ending.length()) {
+				return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+			}
+			else {
+				return false;
+			}
+		}
+	};
+
 	/*
 	//no checks or anything, so can only be used by core functions that know what type of value it returns
 	auto getValFromEngineConfig(const char* header, const char* key) {

@@ -34,13 +34,13 @@ namespace Shard3D {
 		bool recreate
 	)
 		: engineDevice{ device } {
-		if (!recreate) { if(shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputeGraphicsPipeline(pipelineLayout, shaderFilePath, configInfo); return; }
+		if (!recreate) { if(shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputePipeline(pipelineLayout, shaderFilePath, configInfo); return; }
 
 		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
 		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
-		if (shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputeGraphicsPipeline(pipelineLayout, shaderFilePath, configInfo);
+		if (shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputePipeline(pipelineLayout, shaderFilePath, configInfo);
 	}
 
 	EnginePipeline::~EnginePipeline() {
@@ -136,7 +136,7 @@ namespace Shard3D {
 		}
 	}
 
-	void EnginePipeline::createComputeGraphicsPipeline(
+	void EnginePipeline::createComputePipeline(
 		VkPipelineLayout& pipelineLayout,
 		const std::string& shaderFilePath,
 		const PipelineConfigInfo& configInfo

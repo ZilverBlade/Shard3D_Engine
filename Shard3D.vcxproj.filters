@@ -200,6 +200,12 @@
     <ClCompile Include="systems\compute_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
+    <ClCompile Include="wb3d\bpmgr.cpp">
+      <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
+    <ClCompile Include="wb3d\blueprint.cpp">
+      <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -357,6 +363,15 @@
     </ClInclude>
     <ClInclude Include="systems\compute_system.hpp">
       <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="wb3d\bpmgr.hpp">
+      <Filter>Header Files\wb3d</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\yaml_ext.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="wb3d\blueprint.hpp">
+      <Filter>Header Files\wb3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

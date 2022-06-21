@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace Shard3D{
 #ifndef GAME_RELEASE_READY
@@ -6,8 +7,8 @@ namespace Shard3D{
 #endif
 #define BETA_DEBUG_TOOLS			true
 
-#define ENGINE_VERSION				"1.0.8.r4"	// Shard3D {major, minor, patch, revision}
-#define EDITOR_VERSION				"0.1"	// WorldEditor3D {major, minor}
+const static std::string ENGINE_VERSION = "1.0.9.r0";	// Shard3D {major, minor, patch, revision}
+const static std::string EDITOR_VERSION = "0.1";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/settings/engine_settings.ini"
 #define EDITOR_SETTINGS_PATH		"assets/settings/editor_settings.ini"	//unused
@@ -15,6 +16,7 @@ namespace Shard3D{
 
 #define LEVEL_CIPHER_KEY			128	// for level encyption and decryption for release ready games, MUST BE A MULTIPLE OF 2!!
 #define WORLDBUILDER3D_FILE_OPTIONS	"WorldBuilder3D Level (*.wbl)\0*.wbl\0All files (*.*)\0*.*\0"
+#define WORLDBUILDER3D_ASSETFILE_OPTIONS "WorldBuilder3D Asset (*.wbasset)\0*.wbasset\0All files (*.*)\0*.*\0"
 
 #define ASSETS_PATH					"assets/"
 #define SHADER_FILES_PATH			"assets/shaders/"			//Shader files (SPIR-V)

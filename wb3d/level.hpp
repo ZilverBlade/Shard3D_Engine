@@ -9,6 +9,8 @@
 namespace Shard3D {
 	namespace wb3d {
 		class Actor;
+		class Blueprint;
+
 		enum class PlayState {
 			Stopped = 0,
 			Playing = 2, // unused, for future when stuff like player controls can be properly integrated in game
@@ -23,6 +25,8 @@ namespace Shard3D {
 			~Level();
 
 			static std::shared_ptr<Level> copy(std::shared_ptr<Level> other);
+
+			Blueprint createBlueprint(Actor actor, std::string path, std::string name = "Some kind of blueprint");
 
 			Actor createActor(std::string name= "Some kind of actor");
 			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");

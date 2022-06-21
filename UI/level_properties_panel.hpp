@@ -16,7 +16,7 @@ namespace Shard3D {
 		void render(LevelTreePanel tree, EngineDevice* device);
 	private:
 		void drawActorProperties(Actor actor, EngineDevice& device);
-
+		void drawBlueprintInfo(Actor actor);
 		std::shared_ptr<Level> context;
 
 

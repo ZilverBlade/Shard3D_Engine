@@ -2,6 +2,7 @@
 
 #include "model.hpp"
 #include "GUID.hpp"
+
 #include "../../camera.hpp"
 #include <memory>
 #include <unordered_map>
@@ -10,11 +11,10 @@
 #include <entt.hpp>
 
 namespace Shard3D {
-
 	namespace wb3d {
-		class Actor;
+		class Blueprint;
 	}
-	class wb3d::Actor;
+	class wb3d::Blueprint;
 
 	namespace Components {
 		struct GUIDComponent {
@@ -30,6 +30,10 @@ namespace Shard3D {
 			TagComponent() = default;
 			TagComponent(const TagComponent&) = default;
 			operator std::string() { return tag; };
+		};
+
+		struct BlueprintComponent {
+			wb3d::Blueprint* blueprint;
 		};
 
 		struct TransformComponent {

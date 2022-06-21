@@ -1,6 +1,7 @@
 #include "level_tree_panel.hpp"
 #include "../components.hpp"
-
+#include "../wb3d/bpmgr.hpp"
+#include "../utils/dialogs.h"
 #include <imgui.h>
 namespace Shard3D {
 
@@ -60,6 +61,13 @@ namespace Shard3D {
 		bool actorExists = true;
 		if (ImGui::BeginPopupContextItem()) {
 			if (ImGui::MenuItem("Remove Actor")) actorExists = false;
+			if (!actor.hasComponent<Components::BlueprintComponent>())
+				if (ImGui::MenuItem("Convert to Blueprint")) {
+					std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_ASSETFILE_OPTIONS);
+					if (!filepath.empty()) {
+						context->createBlueprint(selectedActor, filepath);
+					}
+				}	
 			ImGui::EndPopup();
 		}
 

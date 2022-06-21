@@ -16,43 +16,47 @@ namespace Shard3D {
 	void LevelPropertiesPanel::render(LevelTreePanel tree, EngineDevice* device) {
 		ImGui::Begin("Properties"); ImGui::BeginDisabled(context->simulationState == PlayState::Simulating/*&& ini.canEditDuringSimulation*/);
 		if (tree.selectedActor){ 
-			drawActorProperties(tree.selectedActor, *device); 
-			if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
-			if (ImGui::BeginPopup("AddComponent")) {
+			if (!tree.selectedActor.hasComponent<Components::BlueprintComponent>()) {
+				drawActorProperties(tree.selectedActor, *device);
+				if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
+				if (ImGui::BeginPopup("AddComponent")) {
 #if !ACTOR_FORCE_TRANSFORM_COMPONENT
-				if (!tree.selectedActor.hasComponent<Components::TransformComponent>()) if (ImGui::MenuItem("Transform")) {
-					tree.selectedActor.addComponent<Components::TransformComponent>();
-					ImGui::CloseCurrentPopup();
-				}
+					if (!tree.selectedActor.hasComponent<Components::TransformComponent>()) if (ImGui::MenuItem("Transform")) {
+						tree.selectedActor.addComponent<Components::TransformComponent>();
+						ImGui::CloseCurrentPopup();
+					}
 #endif
-				if(!tree.selectedActor.hasComponent<Components::PointlightComponent>()) if (ImGui::MenuItem("Pointlight") ) {
-					tree.selectedActor.addComponent<Components::PointlightComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				if (!tree.selectedActor.hasComponent<Components::SpotlightComponent>()) if (ImGui::MenuItem("Spotlight")) {
-					tree.selectedActor.addComponent<Components::SpotlightComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				if (!tree.selectedActor.hasComponent<Components::DirectionalLightComponent>()) if (ImGui::MenuItem("Directional Light")) {
-					tree.selectedActor.addComponent<Components::DirectionalLightComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
-					//add a default obj
-					tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, DEFAULT_MODEL_FILE, ModelType::MODEL_TYPE_OBJ, true));
+					if (!tree.selectedActor.hasComponent<Components::PointlightComponent>()) if (ImGui::MenuItem("Pointlight")) {
+						tree.selectedActor.addComponent<Components::PointlightComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::SpotlightComponent>()) if (ImGui::MenuItem("Spotlight")) {
+						tree.selectedActor.addComponent<Components::SpotlightComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::DirectionalLightComponent>()) if (ImGui::MenuItem("Directional Light")) {
+						tree.selectedActor.addComponent<Components::DirectionalLightComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
+						//add a default obj
+						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, DEFAULT_MODEL_FILE, ModelType::MODEL_TYPE_OBJ, true));
 
-					ImGui::CloseCurrentPopup();
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
+						tree.selectedActor.addComponent<Components::CameraComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
+						tree.selectedActor.addComponent<Components::CppScriptComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
 				}
-				if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
-					tree.selectedActor.addComponent<Components::CameraComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
-					tree.selectedActor.addComponent<Components::CppScriptComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}			
+			}
+			else { drawBlueprintInfo(tree.selectedActor); }
+
 			if (ImGui::Button("Actor GUID to clipboard")) {
 				ImGui::SetClipboardText(std::to_string(tree.selectedActor.getGUID()).c_str());
 				std::cout << "copied " << std::to_string(tree.selectedActor.getGUID()).c_str() << " to clipboard\n";
@@ -102,7 +106,38 @@ namespace Shard3D {
 		ImGui::PopID();
 	}
 
+	void LevelPropertiesPanel::drawBlueprintInfo(Actor actor) {
+		std::string info = "Blueprint asset location: ";//  + actor.getComponent<Components::BlueprintComponent>().blueprint;
+		ImGui::TextColored(ImVec4(0.2f, 0.5f, 0.95f, 1.f), info.c_str());
+		ImGui::Separator;
+		if (ImGui::Button("Blueprint GUID to clipboard")) {
+			ImGui::SetClipboardText("id.id");
+			std::cout << "copied " << "id.id" << " to clipboard\n";
+		}
+		ImGui::Separator;
+		if (actor.hasComponent<Components::TagComponent>()) {
+			auto& tag = actor.getComponent<Components::TagComponent>().tag;
+			char tagBuffer[256];
+			memset(tagBuffer, 0, 256);
+			strncpy(tagBuffer, tag.c_str(), 256);
+			if (ImGui::InputText("Tag", tagBuffer, 256)) {
+				tag = std::string(tagBuffer);
+			}
+		}
+		if (actor.hasComponent<Components::TransformComponent>()) {
+			if (ImGui::TreeNodeEx((void*)typeid(Components::TransformComponent).hash_code(), nodeFlags, "Transform")) {
+				drawTransformControl("Translation", actor.getComponent<Components::TransformComponent>().translation, 0.f);
 
+				glm::vec3 rot = glm::degrees(actor.getComponent<Components::TransformComponent>().rotation);
+				drawTransformControl("Rotation", rot, 0.f, 0.1f);
+				actor.getComponent<Components::TransformComponent>().rotation = glm::radians(rot);
+
+				drawTransformControl("Scale", actor.getComponent<Components::TransformComponent>().scale, 1.f);
+
+				ImGui::TreePop();
+			}
+		}	
+	}
 	void LevelPropertiesPanel::drawActorProperties(Actor actor, EngineDevice& device) {
 		if (actor.hasComponent<Components::TagComponent>()) {
 			auto& tag = actor.getComponent<Components::TagComponent>().tag;
@@ -113,7 +148,6 @@ namespace Shard3D {
 				tag = std::string(tagBuffer);
 			}
 		}
-
 		if (actor.hasComponent<Components::TransformComponent>()) {
 			if (ImGui::TreeNodeEx((void*)typeid(Components::TransformComponent).hash_code(), nodeFlags, "Transform")) {
 				drawTransformControl("Translation", actor.getComponent<Components::TransformComponent>().translation, 0.f);
@@ -230,6 +264,14 @@ namespace Shard3D {
 				ImGui::DragFloat("Intensity", &actor.getComponent<Components::SpotlightComponent>().lightIntensity, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Radius", &actor.getComponent<Components::SpotlightComponent>().radius, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Specular", &actor.getComponent<Components::SpotlightComponent>().specularMod, 0.001f, 0.f, 1.f);
+				
+				float oa = glm::degrees(actor.getComponent<Components::SpotlightComponent>().outerAngle);
+				ImGui::DragFloat("Outer Angle", &oa, 0.1f, 5.f, 90.f);
+				actor.getComponent<Components::SpotlightComponent>().outerAngle = glm::radians(oa);
+				float ia = glm::degrees(actor.getComponent<Components::SpotlightComponent>().innerAngle);
+				ImGui::DragFloat("Inner Angle", &ia, 0.1f, 5.f, 90.f);
+				actor.getComponent<Components::SpotlightComponent>().innerAngle = glm::radians(ia);
+				
 				ImGui::TreePop();
 			}
 			if (killComponent) actor.killComponent<Components::SpotlightComponent>();
@@ -269,7 +311,7 @@ namespace Shard3D {
 				char classNameBuffer[256];
 				memset(classNameBuffer, 0, 256);
 				strncpy(classNameBuffer, className.c_str(), 256);
-				ImGui::Text(typeid(&actor.getComponent<Components::CppScriptComponent>().Inst).raw_name());
+				ImGui::Text(typeid(&actor.getComponent<Components::CppScriptComponent>().Inst).name());
 				ImGui::Text("Script class:");
 				ImGui::Text("Script::"); ImGui::SameLine; ImGui::InputText("", classNameBuffer, 256);
 				ImGui::TreePop();

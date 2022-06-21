@@ -25,7 +25,8 @@ namespace Shard3D {
 
     void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
         currentDevice = device;
-        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: Null)");
+        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
+        glfwSetWindowTitle(window, title.c_str());
         hasBeenDetached = false;
 
         // Load any panels
@@ -337,40 +338,25 @@ namespace Shard3D {
 #endif
                 }
                 if (ImGui::MenuItem("Save Level...", "Ctrl+S")) {
-#ifdef _WIN32
                     std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
                     if (!filepath.empty()) {
                         wb3d::LevelManager levelMan(level);
                         levelMan.save(filepath, false);
                     }
-#endif
-#ifdef __linux__ 
-                    std::cout << "unsupported function\n";
-#endif
                 }
                 if (ImGui::MenuItem("Save Level... (Encrypted)", NULL)) {
-#ifdef _WIN32
                     std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
                     if (!filepath.empty()) {
                         wb3d::LevelManager levelMan(level);
                         levelMan.save(filepath, true);
                     }
-#endif
-#ifdef __linux__ 
-                    std::cout << "unsupported function\n";
-#endif
                 }
                 if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
-#ifdef _WIN32
                     std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
                     if (!filepath.empty()) {
                         wb3d::LevelManager levelMan(level);
                         levelMan.save(filepath, false);
                     }
-#endif
-#ifdef __linux__ 
-                    std::cout << "unsupported function\n";
-#endif
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { detach(); return; }
@@ -387,18 +373,20 @@ namespace Shard3D {
                     if (ImGui::MenuItem("Begin")) {
                         wb3d::MasterManager::captureLevel(level);
                         level->begin();
-                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: SIMULATING)");      
+                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
+                        glfwSetWindowTitle(window, title.c_str());
                     } ImGui::EndDisabled();   
                     if (level->simulationState != PlayState::Paused) {
                         ImGui::BeginDisabled(level->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
                         level->simulationState = PlayState::Paused;
-                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: Paused)");
-
+                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused)";
+                        glfwSetWindowTitle(window, title.c_str());
                     } ImGui::EndDisabled();  }
                     else {
                         ImGui::BeginDisabled(level->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
                         level->simulationState = PlayState::Simulating;
-                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: SIMULATING)");
+                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
+                        glfwSetWindowTitle(window, title.c_str());
                     } ImGui::EndDisabled();
                     }
                     
@@ -406,7 +394,8 @@ namespace Shard3D {
                     if (ImGui::MenuItem("End")) {
                         levelTreePanel.clearSelectedActor();
                         level->end(); 
-                        glfwSetWindowTitle(window, "Shard3D Engine 1.0.8 (Playstate: Null)");
+                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
+                        glfwSetWindowTitle(window, title.c_str());
                     } ImGui::EndDisabled();
                     ImGui::EndMenu();
                 }

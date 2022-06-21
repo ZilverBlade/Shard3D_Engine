@@ -279,6 +279,8 @@
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="systems\compute_system.cpp" />
     <ClCompile Include="UI\level_gizmo.cpp" />
+    <ClCompile Include="wb3d\blueprint.cpp" />
+    <ClCompile Include="wb3d\bpmgr.cpp" />
     <ClCompile Include="wb3d\master_manager.cpp" />
     <ClCompile Include="systems\directional_light_system.cpp" />
     <ClCompile Include="systems\pointlight_system.cpp" />
@@ -332,8 +334,11 @@
     <ClInclude Include="UI\level_gizmo.hpp" />
     <ClInclude Include="UI\level_properties_panel.hpp" />
     <ClInclude Include="UI\level_tree_panel.hpp" />
+    <ClInclude Include="utils\yaml_ext.hpp" />
     <ClInclude Include="version.h" />
     <ClInclude Include="wb3d\acting_actor.hpp" />
+    <ClInclude Include="wb3d\blueprint.hpp" />
+    <ClInclude Include="wb3d\bpmgr.hpp" />
     <ClInclude Include="wb3d\levelmgr.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
     <ClInclude Include="systems\pointlight_system.hpp" />
