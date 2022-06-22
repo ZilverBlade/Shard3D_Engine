@@ -1,11 +1,13 @@
 #pragma once
 #include <string>
 
+#ifdef _WIN32	
 #include <Windows.h>
 #include <commdlg.h>
+#endif
 
-#include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #include "../engine_window.hpp"
 
@@ -78,15 +80,14 @@ namespace Shard3D {
 #ifdef _WIN32
 			return (DialogResult)(UINT)(MessageBoxA(
 				glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow()), 
-				text, caption, (UINT)options)
-			);
+				text, caption, options
+			));
 #endif
 #ifdef __linux__ 
 			std::cout << "unsupported function\n";
 #endif
 			return RESERROR;
-		}
-		
+		}	
 	};
 	class FileDialogs {
 	public:

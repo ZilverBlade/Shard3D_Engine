@@ -1,7 +1,6 @@
 #pragma once
 
 #include "device.hpp"
-
 // std
 #include <memory>
 #include <unordered_map>

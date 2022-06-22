@@ -21,7 +21,6 @@
 #include "simpleini/simple_ini.h"
 #include "buffer.hpp"
 #include "utils/dialogs.h"
-//#include "video/video_decode.hpp"
 
 //systems
 #include "systems/basic_render_system.hpp"
@@ -43,19 +42,26 @@
 
 
 namespace Shard3D {
-	wb3d::Actor light2{};
 	RunApp::RunApp() {
-		globalPool = EngineDescriptorPool::Builder(engineDevice)
-			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.build();
+		setupDescriptors();
 		std::cout << "attempting to construct Level Pointer\n";
 		activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
 	RunApp::~RunApp() {
-		globalPool = nullptr;
+		SharedPools::destructPools();
 	}
-
+	void RunApp::setupDescriptors() {
+		SharedPools::globalPool = EngineDescriptorPool::Builder(engineDevice)
+			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.build();
+#if ENABLE_COMPUTE_SHADERS == true
+		SharedPools::computePool = EngineDescriptorPool::Builder(engineDevice)
+			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.build();
+#endif
+	}
 	void RunApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
@@ -68,25 +74,43 @@ namespace Shard3D {
 				);
 			uboBuffers[i]->map();
 		}
-
 		auto globalSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-			.build();
-
+			.build();	
 		std::vector<VkDescriptorSet> globalDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < globalDescriptorSets.size(); i++) {
 			auto bufferInfo = uboBuffers[i]->descriptorInfo();
-			EngineDescriptorWriter(*globalSetLayout, *globalPool)
+			EngineDescriptorWriter(*globalSetLayout, *SharedPools::globalPool)
 				.writeBuffer(0, &bufferInfo)
 				.build(globalDescriptorSets[i]);
 		}
+#if ENABLE_COMPUTE_SHADERS == true
+		VkDescriptorImageInfo computeImageInfo;
+		ComputeUbo cUbo{};
+	
+		computeImageInfo.sampler = cUbo.inputImage;
+		computeImageInfo.imageView = engineRenderer.getSwapchainImageView(0);
+		computeImageInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		auto computeSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT)
+			.build();
+		std::vector<VkDescriptorSet> computeDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < computeDescriptorSets.size(); i++) {
+			EngineDescriptorWriter(*computeSetLayout, *computePool)
+				.writeImage(0, &computeImageInfo)
+				.build(computeDescriptorSets[i]);
+		}
+#endif
 
 		layerStack.pushLayer(new TestLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow(), activeLevel);
 #if ENABLE_WORLDBUILDER3D
 		layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow(), activeLevel);
 #endif
 		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		//ComputeSystem computeSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+#if ENABLE_COMPUTE_SHADERS == true
+		ComputeSystem computeSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), computeSetLayout->getDescriptorSetLayout() };
+#endif
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		PointlightSystem pointlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -112,10 +136,6 @@ namespace Shard3D {
 		CSimpleIniA gini;
 		gini.SetUnicode();
 		gini.LoadFile(GAME_SETTINGS_PATH);
-
-		//VideoPlaybackEngine::EngineH264Video videoEngine;
-		
-		//videoEngine.createVideoSession(engineWindow.getGLFWwindow(), "stoer");
 
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
@@ -153,8 +173,13 @@ namespace Shard3D {
 			}
 			
 			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
+#ifndef NDEBUG
+				MessageDialogs::show("No fullscreen in Debug Mode allowed!", "Debug", MessageDialogs::OPTICONASTERISK);
+#endif
+#ifdef NDEBUG
 				glfwGetWindowSize(engineWindow.getGLFWwindow(), &engineWindow.windowWidth, &engineWindow.windowHeight);
 				engineWindow.toggleFullscreen();
+#endif
 			}
 
 			if (auto commandBuffer = engineRenderer.beginFrame()) {
@@ -210,9 +235,9 @@ namespace Shard3D {
 				directionalLightSystem.render(frameInfo, activeLevel);
 
 				gridSystem.render(frameInfo);
-
-				//computeSystem.render(frameInfo);
-
+#if ENABLE_COMPUTE_SHADERS == true
+				computeSystem.render(frameInfo);
+#endif
 				// Layer overlays
 				for (Layer* layer : layerStack) {
 					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime, activeLevel);

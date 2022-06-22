@@ -24,8 +24,7 @@ namespace Shard3D {
 		void render(FrameInfo& frameInfo);
 	private:
 
-		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-		void createPipeline(VkRenderPass renderPass);
+		void createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
 		EngineDevice& engineDevice;
 

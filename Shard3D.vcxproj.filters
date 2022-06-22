@@ -93,6 +93,15 @@
     <Filter Include="events">
       <UniqueIdentifier>{dfa8f196-b249-42bf-ab93-729b8df215d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="video\Header">
+      <UniqueIdentifier>{5f9e7440-b0b8-40b8-a839-aa70a6a11a86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="video\Source">
+      <UniqueIdentifier>{6ef152f3-4785-4859-a1cb-e54a7e81656a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\compute">
+      <UniqueIdentifier>{9df61183-ed93-4d95-8497-aa5fe14ee3b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -205,6 +214,12 @@
     </ClCompile>
     <ClCompile Include="wb3d\blueprint.cpp">
       <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
+    <ClCompile Include="video\video_decode.cpp">
+      <Filter>video\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\material_system.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -373,6 +388,15 @@
     <ClInclude Include="wb3d\blueprint.hpp">
       <Filter>Header Files\wb3d</Filter>
     </ClInclude>
+    <ClInclude Include="video\video_decode.hpp">
+      <Filter>video\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\material_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="descriptor_pools.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
@@ -413,6 +437,9 @@
       <Filter>shaders\vertex</Filter>
     </None>
     <None Include="cpp.hint" />
+    <None Include="shaders\test.comp">
+      <Filter>shaders\compute</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Shard3D.rc">

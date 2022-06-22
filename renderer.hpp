@@ -28,6 +28,8 @@ namespace Shard3D {
 			return commandBuffers[currentFrameIndex]; 
 		}
 
+		VkImageView getSwapchainImageView(int index) { return engineSwapChain->getImageView(index); }
+
 		int getFrameIndex()const {
 			assert(isFrameStarted && "Cannot get frame index when frame is not in progress");
 			return currentFrameIndex;

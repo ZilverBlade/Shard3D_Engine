@@ -1,6 +1,6 @@
 #pragma once
 #include <sys/stat.h>
-
+#include <string>
 namespace Shard3D {
 
 	// from: https://stackoverflow.com/a/57595105
@@ -10,6 +10,16 @@ namespace Shard3D {
 		(hashCombine(seed, rest), ...);
 	};
 
+	template <class T>
+	static void SafeRelease(T** ppT)
+	{
+		if (*ppT)
+		{
+			(*ppT)->Release();
+			*ppT = NULL;
+		}
+	}
+	
 	class strUtils {
 	public:
 		static bool hasEnding(std::string const& fullString, std::string const& ending) {
@@ -21,6 +31,7 @@ namespace Shard3D {
 			}
 		}
 	};
+
 
 	/*
 	//no checks or anything, so can only be used by core functions that know what type of value it returns

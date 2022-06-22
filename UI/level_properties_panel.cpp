@@ -46,6 +46,8 @@ namespace Shard3D {
 					}
 					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
 						tree.selectedActor.addComponent<Components::CameraComponent>();
+						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, "assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ, true));
+
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {

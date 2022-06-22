@@ -74,7 +74,6 @@ namespace Shard3D {
 		commandBuffers.clear();
 	}
 
-	
 	VkCommandBuffer EngineRenderer::beginFrame() {
 #ifndef NDEBUG
 		assert(!isFrameStarted && "Can't call beginFrame while already in progress");

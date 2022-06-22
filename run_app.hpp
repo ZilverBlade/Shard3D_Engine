@@ -3,7 +3,7 @@
 #include "engine_window.hpp"
 #include "pipeline.hpp"
 #include "device.hpp"
-#include "descriptors.hpp"
+#include "descriptor_pools.hpp"
 #include "utils/engine_utils.hpp"
 #include "wb3d/actor.hpp"
 #include "wb3d/level.hpp"
@@ -34,6 +34,7 @@ namespace Shard3D {
 
 		void run();
 	private:
+		void setupDescriptors();
 		void loadGameObjects();
 		LayerStack layerStack;
 
@@ -41,8 +42,6 @@ namespace Shard3D {
 		EngineDevice engineDevice{ engineWindow };
 		EngineRenderer engineRenderer{ engineWindow, engineDevice };
 
-		// note: order of declaration matters
-		std::unique_ptr<EngineDescriptorPool> globalPool{};
 		std::shared_ptr<Level> activeLevel{};
 };
 

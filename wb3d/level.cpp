@@ -144,7 +144,6 @@ namespace Shard3D {
 			}
 			std::cout << "No possessed camera found!!!!\n";
 			std::cout << "Attempted to find GUID: " << possessedCameraActorGUID << "\n";
-			std::cout << "Registry alive " << registry.alive() << "\n";
 		}
 
 		 EngineCamera& Level::getPossessedCamera() {

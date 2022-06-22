@@ -11,15 +11,14 @@
 namespace Shard3D {
 
     ComputeSystem::ComputeSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
-        createPipelineLayout(globalSetLayout);
-        createPipeline(renderPass);
+        createPipeline(renderPass, globalSetLayout);
     }
 
     ComputeSystem::~ComputeSystem() {
         vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
     }
 
-    void ComputeSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+    void ComputeSystem::createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) {
         std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -28,13 +27,11 @@ namespace Shard3D {
         pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
         pipelineLayoutInfo.pushConstantRangeCount = 0;
         pipelineLayoutInfo.pPushConstantRanges = nullptr;
-        if (vkCreatePipelineLayout(engineDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
-            VK_SUCCESS) {
+ 
+        if (vkCreatePipelineLayout(engineDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout!");
         }
-    }
 
-    void ComputeSystem::createPipeline(VkRenderPass renderPass) {
         assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
         PipelineConfigInfo pipelineConfig{};
@@ -44,6 +41,8 @@ namespace Shard3D {
         pipelineConfig.bindingDescriptions.clear();
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
+
+
         enginePipeline = std::make_unique<EnginePipeline>(
             "had to add this because std::make_unique gets the wrong overload",
             engineDevice,
@@ -54,9 +53,9 @@ namespace Shard3D {
         );
     }
 
+
     void ComputeSystem::render(FrameInfo& frameInfo) {
-        enginePipeline->bindCompute(frameInfo.commandBuffer);
-        
+        enginePipeline->bindCompute(frameInfo.commandBuffer);      
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
             VK_PIPELINE_BIND_POINT_COMPUTE,

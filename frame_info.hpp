@@ -50,6 +50,9 @@ namespace Shard3D {
 		int numDirectionalLights;
 	};
 
+	struct ComputeUbo {
+		VkSampler inputImage;
+	};
 
 	struct FrameInfo {
 		int frameIndex;

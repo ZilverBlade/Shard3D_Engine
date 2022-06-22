@@ -116,7 +116,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib;mfplay.lib;shlwapi.lib</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
       <ForceSymbolReferences>
@@ -167,7 +167,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;mfplay.lib;shlwapi.lib</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -213,7 +213,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;mfplay.lib;shlwapi.lib</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -255,7 +255,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;mfplay.lib;shlwapi.lib</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -278,7 +278,9 @@
     <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="systems\compute_system.cpp" />
+    <ClCompile Include="systems\material_system.cpp" />
     <ClCompile Include="UI\level_gizmo.cpp" />
+    <ClCompile Include="video\video_decode.cpp" />
     <ClCompile Include="wb3d\blueprint.cpp" />
     <ClCompile Include="wb3d\bpmgr.cpp" />
     <ClCompile Include="wb3d\master_manager.cpp" />
@@ -314,12 +316,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
+    <ClInclude Include="descriptor_pools.hpp" />
     <ClInclude Include="editor_camera_script.hpp">
       <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="events\events.hpp" />
     <ClInclude Include="events\event_handler.hpp" />
     <ClInclude Include="events\key_events.hpp" />
+    <ClInclude Include="systems\material_system.hpp" />
     <ClInclude Include="plugins\example_component.hpp" />
     <ClInclude Include="plugins\plugin_link.h" />
     <ClInclude Include="scripts\example_script.cpp">
@@ -336,6 +340,7 @@
     <ClInclude Include="UI\level_tree_panel.hpp" />
     <ClInclude Include="utils\yaml_ext.hpp" />
     <ClInclude Include="version.h" />
+    <ClInclude Include="video\video_decode.hpp" />
     <ClInclude Include="wb3d\acting_actor.hpp" />
     <ClInclude Include="wb3d\blueprint.hpp" />
     <ClInclude Include="wb3d\bpmgr.hpp" />
@@ -405,6 +410,7 @@
     <None Include="shaders\pointlight.vert" />
     <None Include="shaders\spotlight.frag" />
     <None Include="shaders\spotlight.vert" />
+    <None Include="shaders\test.comp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

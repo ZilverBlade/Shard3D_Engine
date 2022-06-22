@@ -16,7 +16,8 @@
 #define GLFW_INCLUDE_VULKAN
 
 #include "../utils/dialogs.h"
-//#include "../video/video_decode.hpp"
+#include "../video/video_decode.hpp"
+#include "../systems/material_system.hpp"
 namespace Shard3D {
 
 
@@ -392,8 +393,8 @@ namespace Shard3D {
                     ImGui::EndMenu();
                 }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Add Actor Blueprint", NULL /*make sure to add some sort of shardcut */)) {}
-                if (ImGui::MenuItem("Add Struct Definition", NULL /*make sure to add some sort of shardcut */)) {}
+                if (ImGui::MenuItem("Create Blueprint", NULL /*make sure to add some sort of shardcut */)) {}
+                if (ImGui::MenuItem("Create Module Definition", NULL /*make sure to add some sort of shardcut */)) {}
                 //if (ImGui::MenuItem("", NULL /*make sure to add some sort of shardcut */)) {}
 
                 ImGui::EndMenu();
@@ -405,8 +406,16 @@ namespace Shard3D {
                 if (ImGui::MenuItem("Play test audio", NULL /*make sure to add some sort of shardcut */)) {
                 }
                 if (ImGui::MenuItem("Play test video", NULL /*make sure to add some sort of shardcut */)) {
-                    //VideoPlaybackEngine::EngineH264Video videoEngine;
-                    //videoEngine.createVideoSession(window, nullptr);
+                    VideoPlaybackEngine::EngineH264Video videoEngine;
+                    videoEngine.createVideoSession(window, "assets/mediadata/video.wmw");
+                }
+                if (ImGui::MenuItem("Save test material", NULL /*make sure to add some sort of shardcut */)) {
+                    MaterialSystem::SurfaceMaterialData surfaceMat;
+                    surfaceMat.atMeshName = "newmaterial.001";
+                    surfaceMat.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
+                    surfaceMat.roughnessTex.path = "assets/texturedata/coolroughness.png";
+
+                    MaterialSystem::saveMaterial(surfaceMat, "assets/mycoolmat");
                 }
                 if (ImGui::MenuItem("Encrypt string")) {
                     std::string originalString = "Hello World! ABCDabcd0123<> /\\[]+=.;'`~óòçñ";

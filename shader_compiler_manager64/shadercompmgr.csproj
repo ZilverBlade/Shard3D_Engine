@@ -4,8 +4,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Configurations>Debug;Release;Deploy;Release Debug</Configurations>
-    <AssemblyVersion>1.0.21.21</AssemblyVersion>
-    <FileVersion>1.0.21.21</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -26,11 +26,11 @@
     <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
     <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-    <AssemblyFileVersionSettings>1.0.6.6</AssemblyFileVersionSettings>
+    <AssemblyFileVersionSettings>NoneWithAutoReset.None.None.None</AssemblyFileVersionSettings>
     <UpdatePackageVersion>False</UpdatePackageVersion>
     <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
     <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-    <AssemblyVersionSettings>1.0.6.6</AssemblyVersionSettings>
+    <AssemblyVersionSettings>NoneWithAutoReset.None.None.None</AssemblyVersionSettings>
   </PropertyGroup>
 
 </Project>
