@@ -1,0 +1,23 @@
+Shard3D: 1.0.9.r1
+WorldBuilder3D: 0.1
+WBASSET_Material: Some kind of material
+MaterialID: 2987589084631998545
+Material:
+  - Container:
+      Physics:
+        MaterialStruct: SurfaceMaterial
+        MaterialType: OpaqueMaterial
+        MaterialProperties: SurfaceStandardLit
+      Draw:
+        culling: 0
+        polygonMode: 0
+      Data:
+        normalTex: 0x807ffe.png
+        diffuseVec4: [1, 0, 1, 1]
+        diffuseTex: 0xffffff.png
+        specularFloat: 0.5
+        specularTex: 0xffffff.png
+        roughnessFloat: 0.5
+        roughnessTex: assets/texturedata/coolroughness.png
+        metallicFloat: 0
+        metallicTex: 0xffffff.png

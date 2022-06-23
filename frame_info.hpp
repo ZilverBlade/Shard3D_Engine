@@ -54,6 +54,33 @@ namespace Shard3D {
 		VkSampler inputImage;
 	};
 
+	struct SurfaceLitMaterialUbo {
+		VkSampler normalTex{};
+
+		//glm::vec4 emissiveColor{};
+		//VkSampler emissiveTex{};
+
+		glm::vec4 diffuseColor{};
+		VkSampler diffuseTex{};
+
+		alignas(16) float specular{};
+		VkSampler specularTex{};
+
+		alignas(16) float roughness{};
+		VkSampler roughnessTex{};
+
+		alignas(16) float metallic{};
+		VkSampler metallicTex{};
+
+		VkSampler maskTex{};
+	};
+	struct SurfaceUnlitMaterialUbo {
+		glm::vec4 emissiveColor{};
+		VkSampler emissiveTex{};
+
+		VkSampler maskTex{};
+	};
+
 	struct FrameInfo {
 		int frameIndex;
 		float frameTime;

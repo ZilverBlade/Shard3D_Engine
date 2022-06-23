@@ -1,5 +1,6 @@
 #include "material_system.hpp"
 #include "../utils/engine_utils.hpp"
+#include "../utils/yaml_ext.hpp"
 
 namespace Shard3D {
 	MaterialSystem::MaterialSystem(SurfaceMaterialData materialData, EngineDevice& device, VkDescriptorSetLayout matSetLayout) : surfaceMaterialData{materialData}, engineDevice { device }, materialSetLayout(matSetLayout) {
@@ -9,51 +10,73 @@ namespace Shard3D {
 		//vkDestroyDescriptorSetLayout(engineDevice.device(), materialSetLayout, VK_NULL_HANDLE);
 	}
 
+	void MaterialSystem::createDescriptorPools() {
+		SharedPools::staticMaterialPool = EngineDescriptorPool::Builder(engineDevice)
+			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.build();
+		auto materialSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+			.build();
+	}
+
 	void MaterialSystem::modifyCurrentMaterial(SurfaceMaterialData materialData) {
 		surfaceMaterialData = materialData;
 		// overwrite
 	}
 
 	void MaterialSystem::saveMaterial(SurfaceMaterialData materialData, const std::string& saveLoc) {
-		json out = "{";
-		out.emplace_back("\""+ materialData.atMeshName + "\" { ");
-		out.emplace_back("\"MaterialStruct\": \"SurfaceMaterial\",");
-		out.emplace_back("\"MaterialType\": \"" + stringFromEnum(materialData.surfaceMat) + "\",");
-		out.emplace_back("\"MaterialProperties\": \"" + stringFromEnum(materialData.surfaceProp) + "\",");
-		out.emplace_back("\"Data\": [");
-		out.emplace_back("{");
-			
-		out.emplace_back("\"normalTex\": " + materialData.normalTex.path + ",");
-		out.emplace_back("\"diffuseVec4\": " + stringFromVec4(materialData.diffuseColor) + ",");
-		out.emplace_back("\"diffuseTex\": " + materialData.diffuseTex.path + ",");
-		out.emplace_back("\"specularFloat\": " + std::to_string(materialData.specular) + ",");
-		out.emplace_back("\"specularTex\": " + materialData.specularTex.path + ",");
-		out.emplace_back("\"roughnessFloat\": " + std::to_string(materialData.roughness) + ",");
-		out.emplace_back("\"roughnessTex\": " + materialData.roughnessTex.path + ",");
-		out.emplace_back("\"metallicFloat\": " + std::to_string(materialData.metallic) + ",");
-		out.emplace_back("\"metallicTex\": " + materialData.metallicTex.path + ",");
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION;
+			out << YAML::Key << "WorldBuilder3D" << YAML::Value << EDITOR_VERSION;
+			out << YAML::Key << "WBASSET_Material" << YAML::Value << materialData.materialTag;
+			out << YAML::Key << "MaterialID" << YAML::Value << materialData.guid;
+			out << YAML::Key << "Material" << YAML::Value << YAML::BeginSeq;
+			out << YAML::BeginMap;
+			out << YAML::Key << "Container" << YAML::Value;
+			out << YAML::BeginMap;
+				out << YAML::Key << "Physics";
+				out << YAML::BeginMap;
+					out << YAML::Key << "MaterialStruct" << YAML::Value << "SurfaceMaterial";
+					out << YAML::Key << "MaterialType" << YAML::Value << stringFromEnum(materialData.surfaceMat);
+					out << YAML::Key << "MaterialProperties" << YAML::Value << stringFromEnum(materialData.surfaceProp);
+				out << YAML::EndMap;
 
-		if (materialData.surfaceMat == MaskedMaterial || materialData.surfaceMat == MaskedTranslucentMaterial)
-			out.emplace_back("\"maskTex\": " + materialData.maskTex.path + ",");
-		out.emplace_back("\"null\": 0");
-		out.emplace_back("},");
-		out.emplace_back("\"culling\": none");
-		out.emplace_back("]");
-		out.emplace_back("}");
-		out.emplace_back("}");
+				out << YAML::Key << "Draw";
+				out << YAML::BeginMap;
+					out << YAML::Key << "culling" << YAML::Value << materialData.drawData.culling;
+					out << YAML::Key << "polygonMode" << YAML::Value << materialData.drawData.polygonMode;
+				out << YAML::EndMap;
+
+				out << YAML::Key << "Data";
+				out << YAML::BeginMap;
+					out << YAML::Key << "normalTex" << YAML::Value << materialData.normalTex.path;
+					out << YAML::Key << "diffuseVec4" << YAML::Value << materialData.diffuseColor;
+					out << YAML::Key << "diffuseTex" << YAML::Value << materialData.diffuseTex.path;
+					out << YAML::Key << "specularFloat" << YAML::Value << materialData.specular;
+					out << YAML::Key << "specularTex" << YAML::Value << materialData.specularTex.path;
+					out << YAML::Key << "roughnessFloat" << YAML::Value << materialData.roughness;
+					out << YAML::Key << "roughnessTex" << YAML::Value << materialData.roughnessTex.path;
+					out << YAML::Key << "metallicFloat" << YAML::Value <<  materialData.metallic;
+					out << YAML::Key << "metallicTex" << YAML::Value << materialData.metallicTex.path;
+
+			if (materialData.surfaceMat == MaskedMaterial || materialData.surfaceMat == MaskedTranslucentMaterial)
+					out << YAML::Key << "maskTex" << YAML::Value << materialData.maskTex.path;
+				out << YAML::EndMap;
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+		out << YAML::EndMap;
 
 		auto newPath = saveLoc;
-		if (!strUtils::hasEnding(saveLoc, ".staticmat.json")) newPath = saveLoc + ".staticmat.json";
+		if (!strUtils::hasEnding(saveLoc, ".wbasset")) newPath = saveLoc + ".wbasset";
 		std::ofstream fout(newPath);
-		fout << out.dump();
+		fout << out.c_str();
 		fout.flush();
 		fout.close();
 	}
 
 	void MaterialSystem::createDescriptorSetLayout() {
-		SharedPools::staticMaterialPool = EngineDescriptorPool::Builder(engineDevice)
-			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.build();
+		
 	}
 }

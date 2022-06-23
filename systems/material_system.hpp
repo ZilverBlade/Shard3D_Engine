@@ -7,9 +7,7 @@
 #include "../device.hpp"
 #include "../descriptor_pools.hpp"
 #include "../renderer.hpp"
-
-#include <json.hpp>
-using json = nlohmann::json;
+#include "../GUID.hpp"
 
 namespace Shard3D {
 	enum MaterialType {
@@ -46,48 +44,65 @@ namespace Shard3D {
 			std::string path;
 			VkSampler sampler;
 		};
+
+		enum Culling {
+			NoCulling = 0,
+			FrontCulling = 1,
+			BackCulling = 2,
+			BothCulling = 3,
+		};
+		struct DrawData {
+			VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
+			VkCullModeFlags culling = VK_CULL_MODE_NONE;
+		};
 	public:
 		struct SurfaceMaterialData {
 			SurfaceMaterialType surfaceMat = OpaqueMaterial;
 			SurfaceMaterialProperties surfaceProp = SurfaceStandardLit;
+			DrawData drawData;
 
 			MaterialTexture normalTex = { "0x807ffe.png", VkSampler() };
 
-			glm::vec4 emissiveColor{ 1.f };
-			MaterialTexture emissiveTex = { "0xffffff.png", VkSampler() };
+			//glm::vec4 emissiveColor{ 0.f };
+			//MaterialTexture emissiveTex = { "0xffffff.png", VkSampler() };
 
 			glm::vec4 diffuseColor{1.f};
 			MaterialTexture diffuseTex = { "0xffffff.png", VkSampler() };
 		
-			float specular{ 0.5f };
-			MaterialTexture specularTex = { "0x808080.png", VkSampler() };
+			float specular = 0.5f;
+			MaterialTexture specularTex = { "0xffffff.png", VkSampler() };
 
-			float roughness{ 0.5f };
-			MaterialTexture roughnessTex = { "0x808080.png", VkSampler() };
+			float roughness = 0.5f;
+			MaterialTexture roughnessTex = { "0xffffff.png", VkSampler() };
 
-			float metallic{ 0.f };
-			MaterialTexture metallicTex = { "0x000000.png", VkSampler() };
+			float metallic = 0.f;
+			MaterialTexture metallicTex = { "0xffffff.png", VkSampler() };
 
 			MaterialTexture maskTex = { "0xffffff.png", VkSampler() };
 
 
 			// not relevant for the shaders since this will be handled in the material system
-			std::string atMeshName;
+			std::string materialTag = "Some kind of material";
+			GUID guid;
 		};
 
 		struct PostProcessMaterialData {
 			VkSampler viewportOut;
 		};
 
-		MaterialSystem(SurfaceMaterialData materialData, EngineDevice& device, VkDescriptorSetLayout materialSetLayout);
+		MaterialSystem(SurfaceMaterialData materialData, 
+			EngineDevice& device, 
+			VkDescriptorSetLayout materialSetLayout
+		);
+
 		~MaterialSystem();
+
+		void createDescriptorPools();
 
 		void modifyCurrentMaterial(SurfaceMaterialData materialData);
 		static void saveMaterial(SurfaceMaterialData materialData, const std::string& saveLoc);
 	private:
 		void createDescriptorSetLayout();
-
-		json JSON;
 
 		EngineDevice& engineDevice;
 		SurfaceMaterialData surfaceMaterialData;

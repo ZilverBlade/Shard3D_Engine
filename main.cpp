@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
-
+#include "utils/dialogs.h"
 /*
     Shard3D 1.0 (2022) created by ZilverBlade
 */
@@ -21,6 +21,7 @@ int main() {
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << '\n';
+        Shard3D::MessageDialogs::show(e.what(), "FATAL ERROR!!!", Shard3D::MessageDialogs::OPTICONERROR);
         return EXIT_FAILURE;
     }
 

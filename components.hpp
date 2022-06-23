@@ -44,6 +44,8 @@ namespace Shard3D {
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
 
+			glm::mat4 transformMatrix_cache = mat4();
+
 			glm::mat4 mat4();
 			glm::mat3 normalMatrix();
 		};

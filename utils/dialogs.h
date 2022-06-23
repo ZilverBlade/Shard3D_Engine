@@ -46,10 +46,10 @@ namespace Shard3D {
 				   				 
 			OPTCANCELTRYCONTINUE       = 0x00000006L, 
 								   				 
-			OPTICONHAND                = 0x00000010L, 
+			OPTICONERROR               = 0x00000010L, 
 			OPTICONQUESTION            = 0x00000020L, 
 			OPTICONEXCLAMATION         = 0x00000030L, 
-			OPTICONASTERISK            = 0x00000040L, 
+			OPTICONINFO				   = 0x00000040L, 
 								   				 
 			OPTUSERICON                = 0x00000080L, 
 								   				 

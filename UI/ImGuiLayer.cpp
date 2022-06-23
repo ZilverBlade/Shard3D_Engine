@@ -411,11 +411,10 @@ namespace Shard3D {
                 }
                 if (ImGui::MenuItem("Save test material", NULL /*make sure to add some sort of shardcut */)) {
                     MaterialSystem::SurfaceMaterialData surfaceMat;
-                    surfaceMat.atMeshName = "newmaterial.001";
                     surfaceMat.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
                     surfaceMat.roughnessTex.path = "assets/texturedata/coolroughness.png";
 
-                    MaterialSystem::saveMaterial(surfaceMat, "assets/mycoolmat");
+                    MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
                 }
                 if (ImGui::MenuItem("Encrypt string")) {
                     std::string originalString = "Hello World! ABCDabcd0123<> /\\[]+=.;'`~óòçñ";
