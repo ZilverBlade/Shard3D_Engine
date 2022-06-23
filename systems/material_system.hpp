@@ -80,7 +80,6 @@ namespace Shard3D {
 
 			MaterialTexture maskTex = { "0xffffff.png", VkSampler() };
 
-
 			// not relevant for the shaders since this will be handled in the material system
 			std::string materialTag = "Some kind of material";
 			GUID guid;

@@ -16,18 +16,14 @@ namespace Shard3D {
             int moveBackward = GLFW_KEY_S;
             int moveUp = GLFW_KEY_SPACE;
             int moveDown = GLFW_KEY_LEFT_SHIFT;
-            int lookLeft = GLFW_KEY_LEFT;
-            int lookRight = GLFW_KEY_RIGHT;
-            int lookUp = GLFW_KEY_UP;
-            int lookDown = GLFW_KEY_DOWN;
             int slowDown = GLFW_KEY_LEFT_CONTROL;
         };
 
         void moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor);
 
         KeyMappings keys{};
-        float moveSpeed{ 3.f };
-        float lookSpeed{ 1.0f };
+        float moveSpeed{ 5.f };
+        float speedModifier = 1.f;
 	};
 
     }

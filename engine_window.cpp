@@ -33,23 +33,42 @@ namespace Shard3D {
 		else {
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 		}
-		
-		window = glfwCreateWindow(ini.GetLongValue("WINDOW", "DEFAULT_WIDTH"), ini.GetLongValue("WINDOW", "DEFAULT_HEIGHT"), ini.GetValue("WINDOW", "WindowName"), nullptr, nullptr);
+
+		monitor = glfwGetPrimaryMonitor();
+		window = glfwCreateWindow(
+			ini.GetLongValue("WINDOW", "DEFAULT_WIDTH"), 
+			ini.GetLongValue("WINDOW", "DEFAULT_HEIGHT"), 
+			ini.GetValue("WINDOW", "WindowName"), 
+			nullptr, 
+			nullptr
+		);
+
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+
 		GLFWimage images[1];
 		images[0].pixels = stbi_load(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
 		glfwSetWindowIcon(window, 1, images);
 		stbi_image_free(images[0].pixels);
 
-		monitor = glfwGetPrimaryMonitor();
-
+		
+		//monitor = glfwGetWindowMonitor(window);
 		ini.LoadFile(GAME_SETTINGS_PATH);
 
 		if ((std::string)ini.GetValue("WINDOW", "WINDOW_TYPE") == "Borderless") {
-			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+			glfwDestroyWindow(window);
+			glfwWindowHint(GLFW_DECORATED, false);
+			window = glfwCreateWindow(
+				ini.GetLongValue("WINDOW", "DEFAULT_WIDTH"),
+				ini.GetLongValue("WINDOW", "DEFAULT_HEIGHT"),
+				ini.GetValue("WINDOW", "WindowName"),
+				nullptr,
+				nullptr
+			);
+
 			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-			glfwSetWindowSize(window, mode->width, mode->height);
+			glfwSetWindowSize(window, mode->width, mode->height + 1);
+			glfwSetWindowPos(window, 0, 0);
 			std::cout << "Set Borderless Fullscreen\n";
 			windowType = 1;
 		} else if ((std::string)ini.GetValue("WINDOW", "WINDOW_TYPE") == "Fullscreen") {
@@ -61,6 +80,16 @@ namespace Shard3D {
 			windowType = 2;
 
 		} else { //for windowed mode, used as a fallback if invalid options chosen lol
+			glfwDestroyWindow(window);
+			glfwWindowHint(GLFW_DECORATED, true);
+			window = glfwCreateWindow(
+				ini.GetLongValue("WINDOW", "DEFAULT_WIDTH"),
+				ini.GetLongValue("WINDOW", "DEFAULT_HEIGHT"),
+				ini.GetValue("WINDOW", "WindowName"),
+				nullptr,
+				nullptr
+			);
+
 			std::cout << "Set Windowed\n";
 			windowType = 0;
 		}
@@ -109,5 +138,4 @@ namespace Shard3D {
 		engineWindow->width = width;
 		engineWindow->height = height;
 	}
-
 }

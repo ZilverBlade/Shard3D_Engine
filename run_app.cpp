@@ -139,6 +139,7 @@ namespace Shard3D {
 
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
+		cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!engineWindow.shouldClose()) {
@@ -159,7 +160,6 @@ namespace Shard3D {
 				editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCamera);
 			}
 
-			cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 			cameraActor.getComponent<Components::CameraComponent>().ar = engineRenderer.getAspectRatio();
 
 			activeLevel->getPossessedCamera().setViewYXZ(possessedCamera.getComponent<Components::TransformComponent>().translation, possessedCamera.getComponent<Components::TransformComponent>().rotation);

@@ -4,16 +4,6 @@
 namespace Shard3D {
 	namespace controller {
 		void EditorKeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
-			glm::vec3 rotate{ 0 };
-			if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
-			if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;
-			if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) rotate.x += 1.f;
-			if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) rotate.x -= 1.f;
-
-			if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
-				actor.getComponent<Components::TransformComponent>().rotation += lookSpeed * dt * glm::normalize(rotate);
-			}
-
 			actor.getComponent<Components::TransformComponent>().rotation.x = glm::clamp(actor.getComponent<Components::TransformComponent>().rotation.x, -1.5f, 1.5f);
 			actor.getComponent<Components::TransformComponent>().rotation.y = glm::mod(actor.getComponent<Components::TransformComponent>().rotation.y, glm::two_pi<float>());
 
@@ -32,11 +22,11 @@ namespace Shard3D {
 			if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir += upDir;
 			if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir -= upDir;
 
-			float slowDownModifier = 1.f;
-			if (glfwGetKey(window, keys.slowDown) == GLFW_PRESS) slowDownModifier = 0.5f;
+			if (glfwGetKey(window, keys.slowDown) == GLFW_PRESS) speedModifier = 0.25f;
+			else speedModifier = 1.f;
 
 			if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
-				actor.getComponent<Components::TransformComponent>().translation += moveSpeed * dt * glm::normalize(moveDir) * slowDownModifier;
+				actor.getComponent<Components::TransformComponent>().translation += moveSpeed * dt * glm::normalize(moveDir) * speedModifier;
 			}
 		}
 	}

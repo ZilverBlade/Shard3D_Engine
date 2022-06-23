@@ -8,11 +8,11 @@ namespace Shard3D {
 	class EngineWindow {
 
 	public:
-		int windowType = 0; // 0 = windowed; 1 = borderless windowed; 2 = fullscreen
-		int borderlessFullscreen = false;
+		inline static int windowType = 0; // 0 = windowed; 1 = borderless windowed; 2 = fullscreen
+		inline static int borderlessFullscreen = false;
 
-		int windowWidth;
-		int windowHeight;
+		inline static int windowWidth;
+		inline static int windowHeight;
 
 		EngineWindow(int w, int h, std::string name);
 		~EngineWindow();
@@ -27,7 +27,7 @@ namespace Shard3D {
 		static GLFWwindow* getGLFWwindow() { return window; }
 
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
-		void toggleFullscreen();
+		static void toggleFullscreen();
 	private:
 		static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 		void initWindow();
@@ -35,13 +35,13 @@ namespace Shard3D {
 		int width;
 		int height;
 
-		int windowPosX;
-		int windowPosY;
+		inline static int windowPosX;
+		inline static int windowPosY;
 
 		bool framebufferResized = false;
 
 		std::string windowName;
 		inline static GLFWwindow* window;
-		GLFWmonitor* monitor = nullptr;
+		inline static GLFWmonitor* monitor = nullptr;
 	};
 }

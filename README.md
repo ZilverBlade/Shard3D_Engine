@@ -31,3 +31,4 @@ Make sure to install GLM and SDL2. The install of the contents of the SDK **MUST
 - Move Up = SPACE
 - Move Down = LEFT SHIFT
 - Slow Down Movement = LEFT CONTROL
+- Adjust FOV = Scroll Wheel
