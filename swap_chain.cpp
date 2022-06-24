@@ -74,12 +74,12 @@ VkResult EngineSwapChain::acquireNextImage(uint32_t *imageIndex) {
       1,
       &inFlightFences[currentFrame],
       VK_TRUE,
-      std::numeric_limits<uint64_t>::max());
+      UINT64_MAX);
 
   VkResult result = vkAcquireNextImageKHR(
       device.device(),
       swapChain,
-      std::numeric_limits<uint64_t>::max(),
+      UINT64_MAX,
       imageAvailableSemaphores[currentFrame],  // must be a not signaled semaphore
       VK_NULL_HANDLE,
       imageIndex);

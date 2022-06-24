@@ -1,3 +1,4 @@
+#pragma once
 #include "../wb3d/acting_actor.hpp"
 
 namespace Shard3D {

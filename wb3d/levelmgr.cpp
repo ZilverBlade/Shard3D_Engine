@@ -44,7 +44,7 @@ namespace Shard3D {
 
 		static void saveActor(YAML::Emitter& out, Actor actor) {
 			if (!actor.hasComponent<Components::GUIDComponent>()) return;
-			if (actor.getGUID() == 0 || actor.getGUID() == std::numeric_limits<uint64_t>::max()) return; // might be reserved for core engine purposes
+			if (actor.getGUID() == 0 || actor.getGUID() == UINT64_MAX) return; // might be reserved for core engine purposes
 
 			out << YAML::BeginMap;
 			out << YAML::Key << "Actor" << YAML::Value << actor.getGUID();
@@ -192,7 +192,7 @@ namespace Shard3D {
 				for (auto actor : data["Actors"]) {
 					Actor loadedActor{};
 
-					SHARD3D_LOG("Loading actor with ID {0}", actor["Actor"].as<uint64_t>());
+					SHARD3D_INFO("Loading actor with ID {0}", actor["Actor"].as<uint64_t>());
 					if (actor["TagComponent"]) {
 						loadedActor = mLevel->createActorWithGUID(actor["Actor"].as<uint64_t>(), actor["TagComponent"]["Tag"].as<std::string>());
 					} // Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing

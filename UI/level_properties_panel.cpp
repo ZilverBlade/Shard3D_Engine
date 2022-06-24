@@ -191,7 +191,7 @@ namespace Shard3D {
 							actor.getComponent<Components::MeshComponent>().isIndexed
 						);
 						context->reloadMesh(actor);
-					} else SHARD3D_WARN("File '{0}' does not exist!");
+					} else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
 				}
 				ImGui::TreePop();
 			}
@@ -222,7 +222,7 @@ namespace Shard3D {
 
 				ImGui::TreePop();
 			}
-			if (killComponent)  actor.killComponent<Components::CameraComponent>();
+			if (killComponent) actor.killComponent<Components::CameraComponent>();
 		}
 		if (actor.hasComponent<Components::PointlightComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::PointlightComponent).hash_code(), nodeFlags, "Pointlight");

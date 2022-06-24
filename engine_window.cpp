@@ -7,6 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "engine_logger.hpp"
+#include "cheat_codes.hpp"
 
 namespace Shard3D {
 
@@ -46,6 +47,8 @@ namespace Shard3D {
 
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+
+		Shard3D::CheatCodes::init(window);
 
 		GLFWimage images[1];
 		images[0].pixels = stbi_load(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 

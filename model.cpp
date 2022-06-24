@@ -49,7 +49,7 @@ namespace Shard3D {
 		fpath = filepath;
 		
 		std::ifstream f(filepath.c_str());
-		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found"); return nullptr; };
+		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", filepath); return nullptr; };
 
 		builder.loadIndexedModel(filepath, modelType);
 		if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {

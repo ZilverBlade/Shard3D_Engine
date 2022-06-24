@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "utils/dialogs.h"
 #include "engine_logger.hpp"
+#include "cheat_codes.hpp"
 /*
     Shard3D 1.0 (2022) created by ZilverBlade
 */
@@ -15,6 +16,9 @@ int main() {
     if (infile2.good() == false) throw std::runtime_error("Critical error! Game settings config file not found!");
     */
     Shard3D::LOGGER::init();
+#ifdef _WIN32
+    ShowWindow(GetConsoleWindow(), SW_SHOW);
+#endif
 #ifndef NDEBUG
     SHARD3D_LOG("Test debug");
     SHARD3D_INFO("Test info");

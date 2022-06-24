@@ -349,7 +349,7 @@
     <ClInclude Include="plugins\example_component.hpp">
       <Filter>plugins</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\example_script.cpp">
+    <ClInclude Include="scripts\example_script.hpp">
       <Filter>scripts</Filter>
     </ClInclude>
     <ClInclude Include="editor_camera_script.hpp">
@@ -398,6 +398,12 @@
       <Filter>Header Files\systems</Filter>
     </ClInclude>
     <ClInclude Include="descriptor_pools.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\def_dynamic.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="cheat_codes.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

@@ -144,6 +144,7 @@ namespace Shard3D {
 		 }
 
 		void Level::begin() {
+			SHARD3D_LOG("Beginning simulation");
 			simulationState = PlayState::Simulating;
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				if (!csc.Inst) {
@@ -166,6 +167,7 @@ namespace Shard3D {
 		}
 
 		void Level::end() {
+			SHARD3D_LOG("Ending simulation");
 			simulationState = PlayState::Stopped;
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->endEvent();
@@ -196,7 +198,7 @@ namespace Shard3D {
 			registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, this };
 				if (!actor) return;
 				if (!actor.hasComponent<Components::TagComponent>()) return;
-				if (actor.getGUID() == 0 || actor.getGUID() == std::numeric_limits<uint64_t>::max()) return;
+				if (actor.getGUID() == 0 || actor.getGUID() == UINT64_MAX) return;
 				killActor(actor);
 			});
 		}
