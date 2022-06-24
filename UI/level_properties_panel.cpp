@@ -61,7 +61,7 @@ namespace Shard3D {
 
 			if (ImGui::Button("Actor GUID to clipboard")) {
 				ImGui::SetClipboardText(std::to_string(tree.selectedActor.getGUID()).c_str());
-				std::cout << "copied " << std::to_string(tree.selectedActor.getGUID()).c_str() << " to clipboard\n";
+				SHARD3D_INFO("copied {0} to clipboard", std::to_string(tree.selectedActor.getGUID()).c_str());
 			}
 		}
 		ImGui::EndDisabled(); ImGui::End();
@@ -114,7 +114,7 @@ namespace Shard3D {
 		ImGui::Separator;
 		if (ImGui::Button("Blueprint GUID to clipboard")) {
 			ImGui::SetClipboardText("id.id");
-			std::cout << "copied " << "id.id" << " to clipboard\n";
+			SHARD3D_INFO("copied id.id to clipboard");
 		}
 		ImGui::Separator;
 		if (actor.hasComponent<Components::TagComponent>()) {
@@ -188,10 +188,10 @@ namespace Shard3D {
 						actor.getComponent<Components::MeshComponent>().newModel = EngineModel::createModelFromFile(device,
 							actor.getComponent<Components::MeshComponent>().file,
 							actor.getComponent<Components::MeshComponent>().type,
-							actor.getComponent<Components::MeshComponent>().isIndexed);
-
+							actor.getComponent<Components::MeshComponent>().isIndexed
+						);
 						context->reloadMesh(actor);
-					} else std::cout << "File '" << file << "' does not exist\n";
+					} else SHARD3D_WARN("File '{0}' does not exist!");
 				}
 				ImGui::TreePop();
 			}

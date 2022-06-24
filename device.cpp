@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <cassert>
 #include "utils/definitions.hpp"
+#include "engine_logger.hpp"
 
 namespace Shard3D {
 
@@ -16,7 +17,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageTypeFlagsEXT messageType,
     const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
     void *pUserData) {
-  std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+    SHARD3D_ERROR("validation layer: {0}", pCallbackData->pMessage);
 
   return VK_FALSE;
 }
@@ -132,7 +133,7 @@ void EngineDevice::pickPhysicalDevice() {
   if (deviceCount == 0) {
     throw std::runtime_error("failed to find GPUs with Vulkan support!");
   }
-  std::cout << "Device count: " << deviceCount << std::endl;
+  SHARD3D_INFO("Device count: {0}", deviceCount);
   std::vector<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -145,10 +146,10 @@ void EngineDevice::pickPhysicalDevice() {
 
       //MSAA setup
       assert(msaaSamples >= 1 && "MSAA samples cannot be inferior to 1!");
-      if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { std::cout << "MSAA Sample count exceeds device capability, dropping down to device limit\n"; }
+      if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { SHARD3D_WARN("MSAA Sample count exceeds device capability, dropping down to device's limit"); }
       msaaSamples = (VkSampleCountFlagBits)std::min((int)ini.GetLongValue("GRAPHICS", "MSAASamples"), getMaxUsableSampleCount());
    
-      std::cout << "Using " << msaaSamples << "x MSAA\n";
+      SHARD3D_INFO("Using {0}x MSAA", msaaSamples);
       break;
     }
   }
@@ -160,7 +161,7 @@ void EngineDevice::pickPhysicalDevice() {
   init_info.PhysicalDevice = physicalDevice;
 
   vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-  std::cout << "physical device: " << properties.deviceName << std::endl;
+  SHARD3D_INFO("physical device: {0}", properties.deviceName);
 }
 
 void EngineDevice::createLogicalDevice() {
@@ -310,14 +311,14 @@ void EngineDevice::hasGflwRequiredInstanceExtensions() {
   std::vector<VkExtensionProperties> extensions(extensionCount);
   vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-  std::cout << "available extensions:" << std::endl;
+  SHARD3D_INFO("available extensions:");
   std::unordered_set<std::string> available;
   for (const auto &extension : extensions) {
     std::cout << "\t" << extension.extensionName << std::endl;
     available.insert(extension.extensionName);
   }
 
-  std::cout << "required extensions:" << std::endl;
+  SHARD3D_INFO("required extensions:");
   auto requiredExtensions = getRequiredExtensions();
   for (const auto &required : requiredExtensions) {
     std::cout << "\t" << required << std::endl;

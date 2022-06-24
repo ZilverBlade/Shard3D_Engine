@@ -119,7 +119,7 @@ void main(){
 	float NdH = max(0.001, dot(N, H));
 
 	float HdV = max(0.001, dot(H, viewDirection));
-	vec3 specfresnel = F_schlick(baseRefl, HdV);
+	vec3 specfresnel = F_schlick(baseRefl, NdH);
 
 	//Pointlight
 	for (int i = 0; i < ubo.numPointlights; i++) {
@@ -151,10 +151,11 @@ void main(){
 
 		vec3 lightDistance = spotlight.position.xyz - fragPosWorld;
 
-		float attenuation = 1.0 / (
-	/*				c		*/		spotlight.attenuationMod.x +																
-	/*				bx		*/		spotlight.attenuationMod.y * length(lightDistance) +  
-	/*				ax^2	*/		spotlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
+			//attenuation mod is broken for spotlights
+		float attenuation = 1.0 / dot(lightDistance, lightDistance); //(
+	/*				c		*/		//spotlight.attenuationMod.x +																
+	/*				bx		*/		//spotlight.attenuationMod.y * length(lightDistance) +  
+	/*				ax^2	*/		//spotlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
 		lightDistance = normalize(lightDistance);
 		float cosAngIndicence = max(dot(surfaceNormal, normalize(lightDistance)), 0);
 		vec3 color_intensity = spotlight.color.xyz * spotlight.color.w * attenuation;
@@ -171,9 +172,8 @@ void main(){
 
 			vec3 diffref = (vec3(1.0) - specfresnel) * lambertian_diffuse() * NdL;
 
-			specularLight += specref * color_intensity * spotlight.specularMod;
-			diffuseLight += diffref * color_intensity;
-
+			specularLight += specref * color_intensity * spotlight.specularMod * intensity;
+			diffuseLight += diffref * color_intensity * intensity;
 		}		
 	}
 

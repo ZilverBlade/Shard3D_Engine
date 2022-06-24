@@ -44,7 +44,7 @@
 namespace Shard3D {
 	RunApp::RunApp() {
 		setupDescriptors();
-		std::cout << "attempting to construct Level Pointer\n";
+		SHARD3D_INFO("attempting to construct Level Pointer");
 		activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
 	RunApp::~RunApp() {
@@ -117,7 +117,7 @@ namespace Shard3D {
 		SpotlightSystem spotlightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		DirectionalLightSystem directionalLightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		std::cout << "Loading editor camera actor\n";
+		SHARD3D_INFO("Loading editor camera actor");
 		wb3d::Actor cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
 		cameraActor.addComponent<Components::CameraComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
@@ -138,7 +138,7 @@ namespace Shard3D {
 		gini.LoadFile(GAME_SETTINGS_PATH);
 
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
-		std::cout << "Default FOV set to " << fov << " degrees" << std::endl;
+		SHARD3D_INFO("Default FOV set to {0} degrees", fov);
 		cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
@@ -177,7 +177,6 @@ namespace Shard3D {
 				MessageDialogs::show("No fullscreen in Debug Mode allowed!", "Debug", MessageDialogs::OPTICONERROR);
 #endif
 #ifdef NDEBUG
-				glfwGetWindowSize(engineWindow.getGLFWwindow(), &engineWindow.windowWidth, &engineWindow.windowHeight);
 				engineWindow.toggleFullscreen();
 #endif
 			}

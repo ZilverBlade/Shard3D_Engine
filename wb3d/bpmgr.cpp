@@ -13,8 +13,7 @@
 namespace Shard3D {
 	namespace wb3d {
 		BlueprintManager::BlueprintManager(Actor& mActor) : actor(mActor) {
-			Log log;
-			log.logString("Loading Blueprint Manager");
+			SHARD3D_INFO("Loading Blueprint Manager");
 		}
 
 		std::string BlueprintManager::encrypt(std::string input) {
@@ -27,7 +26,7 @@ namespace Shard3D {
 					((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
 			}
 
-			std::cout << "Duration of Blueprint encryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			SHARD3D_LOG("Duration of Blueprint encryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
 			return encryptedString;
 		}
 		std::string BlueprintManager::decrypt(std::string input) {
@@ -40,7 +39,7 @@ namespace Shard3D {
 					(((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
 			}
 
-			std::cout << "Duration of Blueprint decryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			SHARD3D_LOG("Duration of Blueprint decryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
 			return decryptedString;
 		}		
 
@@ -148,7 +147,7 @@ namespace Shard3D {
 			}
 			removeAllComponents(actor);
 			blueprint.assetFile = newPath.substr(newPath.rfind("assets\\blueprintdata")); // this is strictly a local path, which means all blueprints must be in this folder
-			std::cout << "Saved blueprint '" << newPath << "'\n";
+			SHARD3D_LOG("Saved blueprint '{0}'", newPath);
 		}
 
 		void BlueprintManager::convertRuntime(const std::string& destinationPath) {
@@ -176,11 +175,11 @@ namespace Shard3D {
 				if (!data["WBASSET_Blueprint"]) return BlueprintMgrResults::WrongFileResult;
 
 				if (data["Shard3D"].as<std::string>() != ENGINE_VERSION) { 
-					std::cout << "wrong engine version\n";
+					SHARD3D_WARN("Incorrect engine version");
 					return BlueprintMgrResults::OldEngineVersionResult;
 				}// change this to check if the version is less or more
 				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION) {
-					std::cout << "wrong editor version\n";
+					SHARD3D_WARN("Incorrect editor version");
 					return BlueprintMgrResults::OldEditorVersionResult;
 				}// change this to check if the version is less or more
 
@@ -190,7 +189,7 @@ namespace Shard3D {
 				for (auto actor : data["Container"]) {
 					Actor loadedActor{};
 
-					std::cout << "Building blueprint with ID " << actor["BlueprintID"].as<uint64_t>() << "\n";
+					SHARD3D_LOG("Building blueprint with ID {0}", actor["BlueprintID"].as<uint64_t>());
 					// Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing
 
 					if (actor["TransformComponent"]) {

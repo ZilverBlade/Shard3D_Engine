@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include "utils/dialogs.h"
+#include "engine_logger.hpp"
 /*
     Shard3D 1.0 (2022) created by ZilverBlade
 */
@@ -13,9 +14,24 @@ int main() {
     std::ifstream infile2(GAME_SETTINGS_PATH);
     if (infile2.good() == false) throw std::runtime_error("Critical error! Game settings config file not found!");
     */
+    Shard3D::LOGGER::init();
+#ifndef NDEBUG
+    SHARD3D_LOG("Test debug");
+    SHARD3D_INFO("Test info");
+    SHARD3D_WARN("Test warn");
+    SHARD3D_ERROR("Test error");
+    SHARD3D_FATAL("Test fatal");
 
+    SHARD3D_INFO("Validation layers enabled");
+#endif
     Shard3D::RunApp app{};
-
+#if BETA_DEBUG_TOOLS == false // dont hide for beta testing, as it might be useful
+#ifdef GAME_RELEASE_READY  // hide for deploy, and logging would be done in a file anyway, console is only for dev purposes
+#ifdef _WIN32 // this function is exclusive to windows
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+#endif
+#endif
     try {
         app.run();
     }

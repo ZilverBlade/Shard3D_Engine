@@ -6,9 +6,14 @@
 namespace Shard3D {
 
 	class EngineWindow {
-
+	protected:
+		enum WindowMode {
+			Windowed = 0,
+			Borderless = 1,
+			Fullscreen = 2
+		};
 	public:
-		inline static int windowType = 0; // 0 = windowed; 1 = borderless windowed; 2 = fullscreen
+		inline static WindowMode windowType = Windowed; // 0 = windowed; 1 = borderless windowed; 2 = fullscreen
 		inline static int borderlessFullscreen = false;
 
 		inline static int windowWidth;
@@ -27,7 +32,9 @@ namespace Shard3D {
 		static GLFWwindow* getGLFWwindow() { return window; }
 
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
-		static void toggleFullscreen();
+		inline void setWindowMode(WindowMode winType);
+
+		void toggleFullscreen();
 	private:
 		static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 		void initWindow();

@@ -1,6 +1,7 @@
 #include "video_decode.hpp"
 #include <iostream>
 #include <filesystem>
+#include "../engine_logger.hpp"
 
 namespace VideoPlaybackEngine {
 	EngineH264Video::EngineH264Video() {}
@@ -12,7 +13,7 @@ namespace VideoPlaybackEngine {
 	}
 
 	void EngineH264Video::createVideoSession(GLFWwindow* window, const std::string& mediaFile) {
-		std::cout << "Creating video session\n";
+		SHARD3D_INFO("Creating video session");
 		PCWSTR absolutePath = std::filesystem::absolute(mediaFile).c_str();
 		PlayVideo(glfwGetWin32Window(window), L"D:\\video.wmv");
 	}
@@ -41,12 +42,12 @@ namespace VideoPlaybackEngine {
 				// Set the media item on the player. This method completes
 				// asynchronously.
 				hr = g_pPlayer->SetMediaItem(pEvent->pMediaItem);
-				std::cout << "Succeded playing this file. " << hr << "\n";
+				SHARD3D_INFO("Succeded playing this file. {0}", hr);
 			}
 
 			if (FAILED(hr))
 			{
-				std::cout << "Error playing this file. " << hr << "\n";
+				SHARD3D_WARN("Failed playing this file. {0}", hr);
 			}
 		}
 	}
@@ -57,7 +58,7 @@ namespace VideoPlaybackEngine {
 		HRESULT hr = g_pPlayer->Play();
 		if (FAILED(hr))
 		{
-			std::cout << "IMFPMediaPlayer::Play failed." << hr << "\n";
+			SHARD3D_WARN("IMFPMediaPlayer::Play failed. {0}", hr);
 		}
 	}
 	IFACEMETHODIMP_(void) MediaPlayerCallback::OnMediaPlayerEvent(MFP_EVENT_HEADER* pEventHeader)
@@ -65,7 +66,7 @@ namespace VideoPlaybackEngine {
 		std::cout << "OnMediaPlayerEvent\n";
 		if (FAILED(pEventHeader->hrEvent))
 		{
-			std::cout << "Playback error " << pEventHeader->hrEvent << "\n";
+			SHARD3D_WARN("Playback failed {0}", pEventHeader->hrEvent);
 			return;
 		}
 

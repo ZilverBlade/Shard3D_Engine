@@ -7,11 +7,9 @@
 
 namespace Shard3D {
 	namespace wb3d {
-		Level::Level(std::string lvlName) {
-			std::cout << "Creating level '" << lvlName <<"'\n";
-		}
+		Level::Level(std::string lvlName) {}
 		Level::~Level() {
-			std::cout << "Destroying level\n";
+			SHARD3D_INFO("Destroying level");
 			registry.clear();
 		}
 
@@ -51,13 +49,8 @@ namespace Shard3D {
 			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
-			std::cout << "source Level " << other->name << "\n";
-			std::cout << "Copying source possessed cam GUID " << other->getPossessedCameraActor().getGUID() << "\n";
-			std::cout << "Copying source possessed cam name " << other->getPossessedCameraActor().getTag() << "\n";
 			newLvl->setPossessedCameraActor(other->getPossessedCameraActor());
-			std::cout << "Destination possessed cam GUID " << newLvl->getPossessedCameraActor().getGUID() << "\n";
-			std::cout << "Destination possessed cam name " << newLvl->getPossessedCameraActor().getTag() << "\n";
-
+			
 			return newLvl;
 		}
 
@@ -99,8 +92,8 @@ namespace Shard3D {
 		void Level::runGarbageCollector(VkDevice device) {
 			if (actorKillQueue.size() != 0) {
 				for (int i = 0; i < actorKillQueue.size(); i++) {
-					std::cout << "Destroying actor '" << actorKillQueue.at(i).getTag() << "'\n";
-					vkDeviceWaitIdle(device);
+					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
+					if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>()) vkDeviceWaitIdle(device);
 					registry.destroy(actorKillQueue.at(i));
 				}
 				actorKillQueue.clear();
@@ -142,8 +135,8 @@ namespace Shard3D {
 					return Actor{actor, this}; 
 				}
 			}
-			std::cout << "No possessed camera found!!!!\n";
-			std::cout << "Attempted to find GUID: " << possessedCameraActorGUID << "\n";
+			SHARD3D_FATAL("No possessed camera found!!!!");
+			SHARD3D_ERROR("Attempted to find GUID: {0}", possessedCameraActorGUID);
 		}
 
 		 EngineCamera& Level::getPossessedCamera() {
@@ -177,7 +170,7 @@ namespace Shard3D {
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->endEvent();
 			});
-			std::cout << "reloading level\n";
+			SHARD3D_INFO("Reloading level");
 			loadRegistryCapture = true;
 		}
 

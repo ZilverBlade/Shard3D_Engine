@@ -100,7 +100,7 @@ namespace Shard3D {
 				ini.LoadFile(ENGINE_SETTINGS_PATH);
 
 				if (light.attenuationMod != glm::vec3(0.f, 0.f, 1.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
-					std::cout << "warn.NotInverseSquareAttenuation: \"Pointlight in level does not obey inverse square law\"\n";
+					SHARD3D_WARN("NotInverseSquareAttenuation: \"Pointlight in level does not obey inverse square law\"");
 				}
 
 				PointlightPushConstants push{};

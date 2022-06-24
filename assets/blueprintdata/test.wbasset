@@ -1,13 +1,12 @@
 Shard3D: 1.0.9.r1
 WorldBuilder3D: 0.1
 WBASSET_Blueprint: Some kind of blueprint
-BlueprintID: 13639902877726510309
-Blueprint:
-  - Container:
-      ? TransformComponent:
-          Translation: [0, 0, 0]
-          Rotation: [0, 0, 0]
-          Scale: [1, 1, 1]
-        MeshComponent:
-          MeshPath: assets/modeldata/cone.obj
-          MeshFormat: 1
+BlueprintID: 10060580331453714625
+Container:
+  - TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: assets/modeldata/cone.obj
+      MeshFormat: 1

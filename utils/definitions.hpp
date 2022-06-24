@@ -23,9 +23,8 @@ const static std::string EDITOR_VERSION = "0.1";	// WorldEditor3D {major, minor}
 #define DEFAULT_ENGINE_FONT			"assets/engine-assets/fonts/sui-generis-free.rg-regular.ttf"		//Default engine font
 #define ENGINE_FONT_SIZE			16		//size in px
 
-
 // experimentals
-#define USE_PBR								false	// PBR can look better, but it's experimental as of now and it's significantly slower
+#define USE_PBR								false	// PBR can look better, but it's experimental as of now and it's significantly slower and buggier;
 #define ENABLE_COMPUTE_SHADERS				false	// Compute shaders can be very useful, however as of now they have not been fully implemented, only enable for development
 
 // engine settings

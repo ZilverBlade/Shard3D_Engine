@@ -11,6 +11,7 @@
 #include <typeinfo>
 #include "simpleini/simple_ini.h"
 #include "utils/definitions.hpp"
+#include "engine_logger.hpp"
 
 namespace Shard3D {
 
@@ -406,7 +407,7 @@ VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat(
           }
       }
       else {
-          std::cout << "Invalid color format chosen: " << ini.GetValue("DISPLAY", "ColorFormat") << std::endl;
+          SHARD3D_WARN("Invalid color format chosen: {0}", ini.GetValue("DISPLAY", "ColorFormat"));
       }
   }
 
@@ -425,20 +426,20 @@ VkPresentModeKHR EngineSwapChain::chooseSwapPresentMode(const std::vector<VkPres
     if (vsync == "false") {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-                std::cout << "Present mode: Mailbox" << std::endl;
+                SHARD3D_INFO("Present mode: Mailbox");
                 return availablePresentMode;               
             }
             else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-                std::cout << "Present mode: Immediate" << std::endl;
+                SHARD3D_INFO("Present mode: Immediate");
                 return availablePresentMode;
             }
         }
     }
     else if (vsync == "true") {
-        std::cout << "Present mode: V-Sync" << std::endl;
+        SHARD3D_INFO("Present mode: V-Sync");
         return VK_PRESENT_MODE_FIFO_KHR;
     } else {
-        std::cout << "Invalid present mode chosen: " << ini.GetValue("DISPLAY", "V-Sync") << std::endl;
+        SHARD3D_WARN("Invalid present mode chosen: {0}", ini.GetValue("DISPLAY", "V-Sync"));
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 

@@ -588,11 +588,10 @@ namespace Shard3D {
                     ini.SetDoubleValue("RENDERING", "DefaultBGColorB", enset.defaultBGColor[2]);
 
                     ini.SaveFile(ENGINE_SETTINGS_PATH);
-                    Log log;
-                    log.logString("Saved engine settings succesfully");
+                    SHARD3D_INFO("Saved engine settings succesfully");
                 }
                 else {
-                    std::cout << "Failed to write to ini file\n";
+                    SHARD3D_ERROR("Failed to write to ini file");
                 }
             }
             if (ImGui::Button("Revert Changes")) {}

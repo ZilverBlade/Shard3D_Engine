@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\spdlog;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -152,7 +152,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\spdlog;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -194,7 +194,7 @@
       <PreprocessorDefinitions>_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imguizmo;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\spdlog;extern\imguizmo;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -240,7 +240,7 @@
       <PreprocessorDefinitions>NDEBUG;GAME_RELEASE_READY;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\spdlog;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -276,6 +276,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="descriptors.cpp" />
+    <ClCompile Include="engine_logger.cpp" />
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="systems\compute_system.cpp" />
     <ClCompile Include="systems\material_system.cpp" />

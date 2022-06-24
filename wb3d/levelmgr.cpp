@@ -12,8 +12,7 @@
 namespace Shard3D {
 	namespace wb3d {
 		LevelManager::LevelManager(const std::shared_ptr<Level>& level) : mLevel(level) { 
-			Log log;
-			log.logString("Loading Level Manager");
+			LOGGER::getInfoLogger()->info("Loading Level Manager");
 		}
 
 		std::string LevelManager::encrypt(std::string input) {
@@ -26,7 +25,7 @@ namespace Shard3D {
 					((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
 			}
 
-			std::cout << "Duration of Level encryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			SHARD3D_LOG("Duration of Level encryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
 			return encryptedString;
 		}
 		std::string LevelManager::decrypt(std::string input) {
@@ -39,7 +38,7 @@ namespace Shard3D {
 					(((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
 			}
 
-			std::cout << "Duration of Level decryption: " << std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000 << "ms\n";
+			SHARD3D_LOG("Duration of Level decryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
 			return decryptedString;
 		}
 
@@ -148,7 +147,7 @@ namespace Shard3D {
 				fout.close();
 			}
 		
-			std::cout << "Saved scene '" << newPath << "'\n";
+			SHARD3D_LOG("Saved scene '{0}'", newPath);
 		}
 
 		void LevelManager::saveRuntime(const std::string& destinationPath) {
@@ -177,11 +176,11 @@ namespace Shard3D {
 				if (!data["Level"]) return LevelMgrResults::WrongFileResult;
 
 				if (data["Shard3D"].as<std::string>() != ENGINE_VERSION) { 
-					std::cout << "wrong engine version\n";
+					SHARD3D_WARN("Incorrect engine version");
 					return LevelMgrResults::OldEngineVersionResult;
 				}// change this to check if the version is less or more
 				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION) {
-					std::cout << "wrong editor version\n";
+					SHARD3D_WARN("Incorrect editor version");
 					return LevelMgrResults::OldEditorVersionResult;
 				}// change this to check if the version is less or more
 
@@ -193,7 +192,7 @@ namespace Shard3D {
 				for (auto actor : data["Actors"]) {
 					Actor loadedActor{};
 
-					std::cout << "Loading actor with ID " << actor["Actor"].as<uint64_t>() << "\n";
+					SHARD3D_LOG("Loading actor with ID {0}", actor["Actor"].as<uint64_t>());
 					if (actor["TagComponent"]) {
 						loadedActor = mLevel->createActorWithGUID(actor["Actor"].as<uint64_t>(), actor["TagComponent"]["Tag"].as<std::string>());
 					} // Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing

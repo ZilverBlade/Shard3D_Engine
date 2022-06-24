@@ -1,5 +1,6 @@
 #include "master_manager.hpp"
 #include <iostream>
+#include "../engine_logger.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -8,13 +9,12 @@ namespace Shard3D {
 		}
 		class Actor;
 		void MasterManager::captureLevel(std::shared_ptr<Level>& level) {
-			std::cout << "Capturing level\n";
+			SHARD3D_INFO("Capturing level");
 
 			levelCapture = level->copy(level);
 		}
 		void MasterManager::executeQueue(std::shared_ptr<Level>& level, EngineDevice& engineDevice) {
 			if (levelPath != "wb3d_nullpath") {
-
 				LevelManager levelMan(level);
 				LevelMgrResults result = levelMan.load(levelPath, engineDevice, false);
 				if (result == LevelMgrResults::OldEngineVersionResult) {
@@ -28,7 +28,7 @@ namespace Shard3D {
 				levelPath = "wb3d_nullpath";
 			}
 			if (level->loadRegistryCapture) {
-				std::cout << "Loading back Captured level\n";
+				SHARD3D_INFO("Loading back Captured level");
 
 				level = level->copy(levelCapture);
 				levelCapture = std::make_shared<Level>("__WB3D:NOEDITcapturelvl");

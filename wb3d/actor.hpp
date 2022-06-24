@@ -21,20 +21,20 @@ namespace Shard3D {
 
 			template<typename T, typename... Args>
 			T& addComponent(Args&&... args) {
-				assert(!hasComponent<T>() && "Actor already has component!");
-				//Log log;
-				//log.logString("Added component ", true, false);
-				//log.logString("name.component", false, true);
-
-				std::cout << "Added component " << typeid(T).name() << "\n";
+				if (hasComponent<T>()) {	// is error, not because it's likely to cause a crash, but because idk how to handle the return
+					SHARD3D_ERROR("Actor {0} already has component {1}!", this->getGUID(), typeid(T).name());
+					throw std::runtime_error("Incorrect component!");
+				}
+				SHARD3D_LOG("Added component {0}", typeid(T).name());
 				return eLevel->registry.emplace<T>(actorHandle, std::forward<Args>(args)...);
 			}
 
 			template<typename T>
 			T& getComponent() {
-#ifndef NDEBUG
-				assert(hasComponent<T>() && "Actor does not have component!");
-#endif
+				if (!hasComponent<T>()) { // is error since it will very likely cause a crash
+					SHARD3D_ERROR("Actor {0} does not have component '{1}'!", this->getGUID(), typeid(T).name());
+					throw std::runtime_error("Incorrect component!");
+				}
 				return eLevel->registry.get<T>(actorHandle);
 			}
 
@@ -44,8 +44,11 @@ namespace Shard3D {
 			}
 
 			template<typename T>
-			void killComponent() {
-				assert(hasComponent<T>() && "Actor does not have component!");
+			void killComponent() { // is warn since it has the chance of not causing a crash or undefined behaviour
+				if (!hasComponent<T>()) {
+					SHARD3D_WARN("Actor {0} does not have component '{1}'!", this->getGUID(), typeid(T).name());
+					return;
+				}
 				eLevel->registry.remove<T>(actorHandle);
 			}
 			

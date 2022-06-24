@@ -98,10 +98,10 @@ namespace Shard3D {
 			ini.LoadFile(ENGINE_SETTINGS_PATH);
 
 			if (light.attenuationMod != glm::vec3(0.f, 0.f, 1.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
-				std::cout << "warn.NotInverseSquareAttenuation: \"Spotlight in level does not obey inverse square law\"\n";
+				SHARD3D_WARN("NotInverseSquareAttenuation: \"Spotlight in level does not obey inverse square law\"");
 			}
 			if (light.outerAngle > light.innerAngle && ini.GetBoolValue("WARNINGS", "warn.InvertedSpotlightAngle")) {
-				std::cout << "warn.InvertedSpotlightAngle: \"Spotlight in level that has inner angle greater than outer angle, spotlight won't render correctly\"\n";
+				SHARD3D_WARN("InvertedSpotlightAngle: \"Spotlight in level that has inner angle greater than outer angle, spotlight won't render correctly\"");
 			}
 
 			SpotlightPushConstants push{};

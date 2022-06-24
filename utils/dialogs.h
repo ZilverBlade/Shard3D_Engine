@@ -84,7 +84,7 @@ namespace Shard3D {
 			));
 #endif
 #ifdef __linux__ 
-			std::cout << "unsupported function\n";
+			SHARD3D_WARN("unsupported function");
 #endif
 			return RESERROR;
 		}	
@@ -109,7 +109,7 @@ namespace Shard3D {
 			}
 #endif
 #ifdef __linux__ 
-			std::cout << "unsupported function\n";
+			SHARD3D_WARN("unsupported function");
 #endif
 			return std::string();
 
@@ -131,7 +131,7 @@ namespace Shard3D {
 			}
 #endif
 #ifdef __linux__ 
-			std::cout << "unsupported function\n";
+			SHARD3D_WARN("unsupported function");
 #endif
 			return std::string();
 		}

@@ -16,6 +16,7 @@
 
 #include "simpleini/simple_ini.h"
 #include "utils/definitions.hpp"
+#include "engine_logger.hpp"
 
 namespace std {
 	template <>
@@ -48,22 +49,13 @@ namespace Shard3D {
 		fpath = filepath;
 		
 		std::ifstream f(filepath.c_str());
-		if (!f.good()) { std::cout << "Invalid model, file '" << filepath << "' not found\n"; return nullptr; };
+		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found"); return nullptr; };
 
-		if (indexModel) {
-			builder.loadIndexedModel(filepath, modelType);
-			if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
-				std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << "\n";
-			}	
-			return std::make_unique<EngineModel>(device, builder);
-		}
-		else {
-			builder.loadModel(filepath, modelType);
-			if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
-				std::cout << "Loaded model: " << filepath << "\n" << "Model vertex count: " << builder.vertices.size() << " (higher vertex count due to no indexing)\n";
-			}
-			return std::make_unique<EngineModel>(device, builder);
+		builder.loadIndexedModel(filepath, modelType);
+		if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
+			SHARD3D_INFO("Loaded model: '{0}'\n\t\tModel vertex count: {1}", filepath, builder.vertices.size());
 		}	
+		return std::make_unique<EngineModel>(device, builder);
 	}
 
 	void EngineModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
