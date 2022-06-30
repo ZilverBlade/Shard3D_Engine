@@ -230,6 +230,9 @@
     <ClCompile Include="wb3d\assetmgr.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
+    <ClCompile Include="UI\level_peakers.cpp">
+      <Filter>Source Files\UI\panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -417,6 +420,9 @@
     </ClInclude>
     <ClInclude Include="wb3d\assetmgr.hpp">
       <Filter>Header Files\wb3d</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\level_peakers.hpp">
+      <Filter>Header Files\UI\panels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

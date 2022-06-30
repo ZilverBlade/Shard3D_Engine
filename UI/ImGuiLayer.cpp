@@ -393,8 +393,8 @@ namespace Shard3D {
                     ImGui::EndMenu();
                 }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Create Blueprint", NULL /*make sure to add some sort of shardcut */)) {}
-                if (ImGui::MenuItem("Create Module Definition", NULL /*make sure to add some sort of shardcut */)) {}
+                if (ImGui::MenuItem("Create Blueprint")) {}
+                if (ImGui::MenuItem("Create Module Definition")) {}
                 //if (ImGui::MenuItem("", NULL /*make sure to add some sort of shardcut */)) {}
 
                 ImGui::EndMenu();
@@ -403,18 +403,42 @@ namespace Shard3D {
             if (ImGui::BeginMenu("Debug")) {
                 ImGui::TextDisabled("Shard3D Debug menu");
                 ImGui::Separator();
-                if (ImGui::MenuItem("Play test audio", NULL /*make sure to add some sort of shardcut */)) {
+                if (ImGui::MenuItem("Play test audio")) {
                 }
-                if (ImGui::MenuItem("Play test video", NULL /*make sure to add some sort of shardcut */)) {
+                if (ImGui::MenuItem("Play test video")) {
                     VideoPlaybackEngine::EngineH264Video videoEngine;
                     videoEngine.createVideoSession(window, "assets/mediadata/video.wmw");
                 }
-                if (ImGui::MenuItem("Save test material", NULL /*make sure to add some sort of shardcut */)) {
+                if (ImGui::MenuItem("Save test material")) {
                     MaterialSystem::Material surfaceMat;
+                    surfaceMat.type = SurfaceMaterial;
+                    surfaceMat.surfaceMaterial.surfaceProp = SurfaceStandardLit;
+                    surfaceMat.surfaceMaterial.surfaceMat = SurfaceOpaqueMaterial;
                     surfaceMat.surfaceMaterial.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
                     surfaceMat.surfaceMaterial.roughnessTex.path = "assets/texturedata/coolroughness.png";
 
                     MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
+                }
+                if (ImGui::MenuItem("Save test material list")) {
+                    MaterialSystem::Material surfaceMat;
+                    surfaceMat.type = SurfaceMaterial;
+                    surfaceMat.surfaceMaterial.surfaceProp = SurfaceStandardLit;
+                    surfaceMat.surfaceMaterial.surfaceMat = SurfaceOpaqueMaterial;
+                    surfaceMat.surfaceMaterial.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
+                    surfaceMat.surfaceMaterial.roughnessTex.path = "assets/texturedata/coolroughness.png";
+                    MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
+                    MaterialSystem::Material surfaceMat2;
+                    surfaceMat2.type = SurfaceMaterial;
+                    surfaceMat2.surfaceMaterial.surfaceProp = SurfaceStandardUnlit;
+                    surfaceMat2.surfaceMaterial.surfaceMat = SurfaceMaskedMaterial;
+                    surfaceMat2.surfaceMaterial.diffuseTex.path = "assets/texturedata/grid.png";
+                    surfaceMat2.surfaceMaterial.maskTex.path = "assets/texturedata/gridmask.png";
+                    MaterialSystem::saveMaterial(surfaceMat2, "assets/materialdata/mycoolgridmat2");
+
+                    MaterialSystem::MaterialList matlist;
+                    matlist.list.push_back(surfaceMat);
+                    matlist.list.push_back(surfaceMat2);
+                    MaterialSystem::saveList(matlist, "assets/material-listdata/mycoollist");
                 }
                 if (ImGui::MenuItem("Encrypt string")) {
                     std::string originalString = "Hello World! ABCDabcd0123<> /\\[]+=.;'`~óòçñ";

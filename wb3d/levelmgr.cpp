@@ -6,7 +6,7 @@
 #include "../utils/definitions.hpp"
 #include "../utils/engine_utils.hpp"
 #include "../utils/yaml_ext.hpp"
-
+#include "assetmgr.hpp"
 #include <fstream>
 
 namespace Shard3D {
@@ -257,6 +257,8 @@ namespace Shard3D {
 					}
 				}
 			}
+			AssetManager::clearLevelAssets();
+			AssetManager::loadLevelAssets();
 			return LevelMgrResults::SuccessResult;
 		}
 

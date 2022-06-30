@@ -7,7 +7,7 @@ namespace Shard3D{
 #endif
 #define BETA_DEBUG_TOOLS			true
 
-const static std::string ENGINE_VERSION = "1.1.0.r0-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string ENGINE_VERSION = "1.1.0.r1-alpha";	// Shard3D {major, minor, patch, revision}-state
 const static std::string EDITOR_VERSION = "0.1";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/settings/engine_settings.ini"

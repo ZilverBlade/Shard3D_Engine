@@ -35,9 +35,12 @@ namespace Shard3D {
         VkFormat getFormat() const { return mFormat; }
 
         void updateDescriptor();
+        
         void transitionLayout(
             VkCommandBuffer commandBuffer, VkImageLayout oldLayout, VkImageLayout newLayout);
 
+        static unsigned char* getSTBImage(const std::string& filepath, int* x, int* y, int* comp, int req_comp);
+        static void freeSTBImage(void* pixels);
         static std::unique_ptr<EngineTexture> createTextureFromFile(
             EngineDevice& device, const std::string& filepath);
 

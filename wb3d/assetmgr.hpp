@@ -16,16 +16,20 @@ namespace Shard3D {
 				Invisible = -1
 			};
 		public:
-			//inline static std::vector<std::unordered_map<LOD_Level, EngineModel>> modelAssets;
-			//inline static std::unordered_map<uint64_t, EngineTexture> textureAssets;
-
-			//inline static std::unordered_map<MaterialSystem::MaterialList, EngineModel> materialAssets;
-
-			void loadLevelAssets(std::shared_ptr<Level>& level) {
-				MaterialSystem::MaterialList meshMatLst;
-				meshMatLst.list.push_back(MaterialSystem::Material());
-				//materialAssets.emplace(meshMatLst, nullptr);
-			}
+			/* Clears all of the asset maps
+*/
+			static void clearLevelAssets();
+			/* Loads all of the materials in use by the level into the asset maps.
+			Make sure to clear before loading, since you dont want to waste resources pointing to unused assets!
+			*/
+			static void loadLevelAssets();
+			static void loadMaterialsFromList(MaterialSystem::MaterialList);
+			static void emplaceMaterial(MaterialSystem::Material material);
+			MaterialSystem::Material retrieveMaterialByGUID(uint64_t guid);
+		private:
+			inline static std::unordered_map<std::string, EngineTexture> textureAssets;
+			inline static std::unordered_map<uint64_t, MaterialSystem::Material> materialAssets;
+			inline static std::unordered_map<uint64_t, MaterialSystem::MaterialList> materialListAssets;
 		};
 	}
 }

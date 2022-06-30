@@ -118,7 +118,12 @@ namespace Shard3D {
         mDescriptor.imageView = mTextureImageView;
         mDescriptor.imageLayout = mTextureLayout;
     }
-
+    unsigned char* EngineTexture::getSTBImage(const std::string& filepath, int* x, int* y, int* comp, int req_comp) {
+        return stbi_load(filepath.c_str(), x, y, comp, req_comp);
+    }
+    void EngineTexture::freeSTBImage(void* pixels) {
+        stbi_image_free(pixels);
+    }
     void EngineTexture::createTextureImage(const std::string& filepath) {
         int texWidth, texHeight, texChannels;
         // stbi_set_flip_vertically_on_load(1);  // todo determine why texture coordinates are flipped

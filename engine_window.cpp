@@ -7,6 +7,7 @@
 
 #include "engine_logger.hpp"
 #include "cheat_codes.hpp"
+#include "texture.hpp"
 
 namespace Shard3D {
 
@@ -49,10 +50,10 @@ namespace Shard3D {
 
 		Shard3D::CheatCodes::init(window);
 
-	//	GLFWimage images[1];
-	//	images[0].pixels = stbi_load(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
-	//	glfwSetWindowIcon(window, 1, images);
-	//	stbi_image_free(images[0].pixels);
+		GLFWimage images[1];
+		images[0].pixels = EngineTexture::getSTBImage(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		glfwSetWindowIcon(window, 1, images);
+		EngineTexture::freeSTBImage(images[0].pixels);
 
 		ini.LoadFile(GAME_SETTINGS_PATH);
 

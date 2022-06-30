@@ -95,6 +95,7 @@ namespace Shard3D {
 			std::shared_ptr<EngineModel> model{};
 			std::string file{};
 			ModelType type = ModelType::MODEL_TYPE_NULL;
+			MaterialSystem::MaterialList materialList;
 			bool isIndexed = true;
 
 			std::shared_ptr<EngineModel> newModel{};
