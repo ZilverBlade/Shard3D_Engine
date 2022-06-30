@@ -8,21 +8,18 @@ namespace Shard3D {
 	class LOGGER {
 	public:
 		static void init();
-		static void logFatal(std::shared_ptr<spdlog::logger>& lgr, const std::string& message);
+		static void logFatal(const std::string& message);
 
 		inline static std::shared_ptr<spdlog::logger>& getDebugLogger() { return debugLogger; }
-
 		inline static std::shared_ptr<spdlog::logger>& getInfoLogger() { return infoLogger; }
 		inline static std::shared_ptr<spdlog::logger>& getWarnLogger() { return warnLogger; }
 		inline static std::shared_ptr<spdlog::logger>& getErrorLogger() { return errorLogger; }
 
 	private:
 		inline static std::shared_ptr<spdlog::logger> debugLogger;
-
 		inline static std::shared_ptr<spdlog::logger> infoLogger;
 		inline static std::shared_ptr<spdlog::logger> warnLogger;
 		inline static std::shared_ptr<spdlog::logger> errorLogger;
-
 	};
 }
 
@@ -38,4 +35,4 @@ namespace Shard3D {
 (only use for a critical that will cause undefined behaviour).
 Unlike the other logging macros, this only takes a string value.
 */ 
-#define SHARD3D_FATAL(...)	Shard3D::LOGGER::logFatal(Shard3D::LOGGER::getErrorLogger(), __VA_ARGS__);
+#define SHARD3D_FATAL(...)	Shard3D::LOGGER::logFatal(__VA_ARGS__)

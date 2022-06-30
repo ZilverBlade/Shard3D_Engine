@@ -12,17 +12,33 @@
 namespace Shard3D {
 
 // local callback functions
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
-    void *pUserData) {
-    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
-        SHARD3D_WARN("validation layer: {0}", pCallbackData->pMessage);
-    } else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
-        SHARD3D_ERROR("validation layer: {0}", pCallbackData->pMessage);
-    } else SHARD3D_INFO("validation layer: {0}", pCallbackData->pMessage);
-    
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+        VkDebugUtilsMessageTypeFlagsEXT messageType,
+        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+        void* pUserData) {
+        if (messageType == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) {
+            if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+                SHARD3D_WARN("validation layer: {0}", pCallbackData->pMessage);
+            else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+                SHARD3D_ERROR("validation layer: {0}", pCallbackData->pMessage);
+            else if (messageType == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+                SHARD3D_INFO("validation layer: {0}", pCallbackData->pMessage);
+        } else if (messageType == VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
+            if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+                SHARD3D_WARN("vulkan performance: {0}", pCallbackData->pMessage);
+            else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+                SHARD3D_ERROR("vulkan performance: {0}", pCallbackData->pMessage);
+            else if (messageType == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+                SHARD3D_INFO("vulkan performance: {0}", pCallbackData->pMessage);
+        } else {
+            if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+                SHARD3D_WARN("vulkan: {0}", pCallbackData->pMessage);      
+            else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) 
+                SHARD3D_ERROR("vulkan: {0}", pCallbackData->pMessage);
+            else if (messageType == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+                SHARD3D_INFO("vulkan: {0}", pCallbackData->pMessage);
+        }
   return VK_FALSE;
 }
 
@@ -166,6 +182,10 @@ void EngineDevice::pickPhysicalDevice() {
 
   vkGetPhysicalDeviceProperties(physicalDevice, &properties);
   SHARD3D_INFO("physical device: {0}", properties.deviceName);
+  if (properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+      SHARD3D_WARN("Graphics device is not discrete. Ignore if you play on a system that only has an integrated gpu, otherwise, check if you are running this engine with the correct graphics card");
+  if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU)
+      SHARD3D_WARN("Graphics are being rendered with CPU, this can cause signicicantly worse performance. Continue at own risk.");
 }
 
 void EngineDevice::createLogicalDevice() {

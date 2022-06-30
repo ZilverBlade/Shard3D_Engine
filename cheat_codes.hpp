@@ -16,8 +16,14 @@ namespace Shard3D {
                 cheatCodeInput.push_back(key);
             }
             if (cheatCodeInput.find("HOOKERS") != std::string::npos) {
-                SHARD3D_TOGGLECONSOLE();
                 cheatCodeInput.clear();
+
+                SHARD3D_TOGGLECONSOLE();
+            }
+            if (cheatCodeInput.find("FUCKMYASS10") != std::string::npos) {
+                cheatCodeInput.clear();
+
+                SHARD3D_FATAL("LMFAO");
             }
         } 
 	};

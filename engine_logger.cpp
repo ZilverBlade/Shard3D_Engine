@@ -17,10 +17,8 @@ namespace Shard3D {
 		errorLogger = spdlog::stdout_color_mt("ERROR");
 		errorLogger->set_level(spdlog::level::err);
 	}
-	void LOGGER::logFatal(std::shared_ptr<spdlog::logger>& lgr, const std::string& message) {
-		lgr->critical(message);
-		MessageDialogs::show(message.c_str(), "SHARD3D FATAL!!!", MessageDialogs::DialogOptions::OPTICONERROR);
+	void LOGGER::logFatal(const std::string& message) {
+		errorLogger->critical(message.c_str());
 		throw std::runtime_error(message);
 	}
-
 }

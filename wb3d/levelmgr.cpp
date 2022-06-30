@@ -257,8 +257,6 @@ namespace Shard3D {
 					}
 				}
 			}
-			AssetManager::clearLevelAssets();
-			AssetManager::loadLevelAssets();
 			return LevelMgrResults::SuccessResult;
 		}
 
