@@ -31,7 +31,7 @@ namespace Shard3D {
 				float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
 
 				// up down rotation
-				orientation = glm::rotate(orientation, glm::radians(-rotX), upVec);
+				orientation = glm::rotate(orientation, glm::radians(rotX), upVec);
 				// to make sure it doesnt over-rotate			
 				orientation.x = glm::clamp(orientation.x, -1.57079632679f, 1.57079632679f);
 

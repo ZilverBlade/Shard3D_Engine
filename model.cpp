@@ -352,7 +352,7 @@ namespace Shard3D {
 				if (index.vertex_index >= 0) {
 					vertex.position = {
 						attrib.vertices[3 * index.vertex_index],		//X
-						-attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually -Y
+						attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually Y
 						attrib.vertices[3 * index.vertex_index + 1], 	//Y, but is actually Z		
 					};													
 					vertex.color = {
@@ -405,7 +405,7 @@ namespace Shard3D {
 					if (index.vertex_index >= 0) {
 						vertex.position = {
 							attrib.vertices[3 * index.vertex_index],		//X
-							-attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually -Y
+							attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually Y
 							attrib.vertices[3 * index.vertex_index + 1], 	//Y, but is actually Z		
 						};
 						vertex.color = {

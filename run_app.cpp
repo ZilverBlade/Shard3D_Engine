@@ -117,7 +117,7 @@ namespace Shard3D {
 		SHARD3D_INFO("Loading editor camera actor");
 		wb3d::Actor cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
 		cameraActor.addComponent<Components::CameraComponent>();
-		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, -1.f, -1.f);
+		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, 1.f, -1.f);
 
 		activeLevel->setPossessedCameraActor(cameraActor);
 

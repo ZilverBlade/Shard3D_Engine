@@ -19,8 +19,8 @@ namespace Shard3D {
 			if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS) moveDir -= forwardDir;
 			if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) moveDir += rightDir;
 			if (glfwGetKey(window, keys.moveLeft) == GLFW_PRESS) moveDir -= rightDir;
-			if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir += upDir;
-			if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir -= upDir;
+			if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir -= upDir;
+			if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir += upDir;
 
 			if (glfwGetKey(window, keys.slowDown) == GLFW_PRESS) speedModifier = 0.25f;
 			else speedModifier = 1.f;
