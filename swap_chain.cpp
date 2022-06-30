@@ -113,7 +113,7 @@ VkResult EngineSwapChain::submitCommandBuffers(
   vkResetFences(device.device(), 1, &inFlightFences[currentFrame]);
   if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
       VK_SUCCESS) {
-    throw std::runtime_error("failed to submit draw command buffer!");
+    SHARD3D_FATAL("failed to submit draw command buffer!");
   }
 
   VkPresentInfoKHR presentInfo = {};
@@ -185,7 +185,7 @@ void EngineSwapChain::createSwapChain() {
   createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain -> swapChain;
 
   if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create swap chain!");
+    SHARD3D_FATAL("failed to create swap chain!");
   }
 
   // we only specified a minimum number of images in the swap chain, so the implementation is
@@ -218,7 +218,7 @@ void EngineSwapChain::createImageViews() {
 
     if (vkCreateImageView(device.device(), &viewInfo, nullptr, &swapChainImageViews[i]) !=
         VK_SUCCESS) {
-      throw std::runtime_error("failed to create texture image view!");
+      SHARD3D_FATAL("failed to create texture image view!");
     }
   }
 }
@@ -277,7 +277,7 @@ void EngineSwapChain::createRenderPass() {
   renderPassInfo.pDependencies = &dependency;
 
   if (vkCreateRenderPass(device.device(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create render pass!");
+    SHARD3D_FATAL("failed to create render pass!");
   }
 
 }
@@ -302,7 +302,7 @@ void EngineSwapChain::createFramebuffers() {
             &framebufferInfo,
             nullptr,
             &swapChainFramebuffers[i]) != VK_SUCCESS) {
-      throw std::runtime_error("failed to create framebuffer!");
+      SHARD3D_FATAL("failed to create framebuffer!");
     }
   }
 }
@@ -351,7 +351,7 @@ for (int i = 0; i < depthImages.size(); i++) {
     viewInfo.subresourceRange.layerCount = 1;
 
     if (vkCreateImageView(device.device(), &viewInfo, nullptr, &depthImageViews[i]) != VK_SUCCESS) {
-      throw std::runtime_error("failed to create texture image view!");
+      SHARD3D_FATAL("failed to create texture image view!");
     }
   }
 }
@@ -375,7 +375,7 @@ void EngineSwapChain::createSyncObjects() {
         vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) !=
             VK_SUCCESS ||
         vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
-      throw std::runtime_error("failed to create synchronization objects for a frame!");
+      SHARD3D_FATAL("failed to create synchronization objects for a frame!");
     }
   }
 }

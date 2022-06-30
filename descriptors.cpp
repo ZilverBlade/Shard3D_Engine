@@ -3,6 +3,7 @@
 // std
 #include <cassert>
 #include <stdexcept>
+#include "engine_logger.hpp"
 
 namespace Shard3D {
 
@@ -47,7 +48,7 @@ namespace Shard3D {
             &descriptorSetLayoutInfo,
             nullptr,
             &descriptorSetLayout) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor set layout!");
+            SHARD3D_FATAL("failed to create descriptor set layout!");
         }
     }
 
@@ -94,7 +95,7 @@ namespace Shard3D {
 
         if (vkCreateDescriptorPool(engineDevice.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
             VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor pool!");
+            SHARD3D_FATAL("failed to create descriptor pool!");
         }
 
     }

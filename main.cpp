@@ -20,12 +20,6 @@ int main() {
     ShowWindow(GetConsoleWindow(), SW_SHOW);
 #endif
 #ifndef NDEBUG
-    SHARD3D_LOG("Test debug");
-    SHARD3D_INFO("Test info");
-    SHARD3D_WARN("Test warn");
-    SHARD3D_ERROR("Test error");
-    SHARD3D_FATAL("Test fatal");
-
     SHARD3D_INFO("Validation layers enabled");
 #endif
     Shard3D::RunApp app{};

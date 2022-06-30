@@ -284,8 +284,10 @@
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="systems\compute_system.cpp" />
     <ClCompile Include="systems\material_system.cpp" />
+    <ClCompile Include="texture.cpp" />
     <ClCompile Include="UI\level_gizmo.cpp" />
     <ClCompile Include="video\video_decode.cpp" />
+    <ClCompile Include="wb3d\assetmgr.cpp" />
     <ClCompile Include="wb3d\blueprint.cpp" />
     <ClCompile Include="wb3d\bpmgr.cpp" />
     <ClCompile Include="wb3d\master_manager.cpp" />
@@ -338,6 +340,7 @@
     <ClInclude Include="scripts\script_handler.hpp" />
     <ClInclude Include="scripts\script_link.h" />
     <ClInclude Include="systems\compute_system.hpp" />
+    <ClInclude Include="texture.hpp" />
     <ClInclude Include="utils\def_dynamic.hpp" />
     <ClInclude Include="utils\dialogs.h" />
     <ClInclude Include="engine_logger.hpp" />
@@ -349,6 +352,7 @@
     <ClInclude Include="version.h" />
     <ClInclude Include="video\video_decode.hpp" />
     <ClInclude Include="wb3d\acting_actor.hpp" />
+    <ClInclude Include="wb3d\assetmgr.hpp" />
     <ClInclude Include="wb3d\blueprint.hpp" />
     <ClInclude Include="wb3d\bpmgr.hpp" />
     <ClInclude Include="wb3d\levelmgr.hpp" />

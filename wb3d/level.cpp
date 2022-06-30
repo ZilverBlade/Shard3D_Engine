@@ -118,7 +118,7 @@ namespace Shard3D {
 
 		void Level::setPossessedCameraActor(Actor actor) {
 			if (!actor.hasComponent<Components::CameraComponent>()) {
-				throw std::runtime_error("Can't possess a non camera actor!!");
+				SHARD3D_FATAL("Can't possess a non camera actor!!");
 			}
 			possessedCameraActorGUID = actor.getGUID();
 		}

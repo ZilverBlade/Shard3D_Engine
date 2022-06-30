@@ -32,7 +32,7 @@ namespace Shard3D {
 		static GLFWwindow* getGLFWwindow() { return window; }
 
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
-		inline void setWindowMode(WindowMode winType);
+		void setWindowMode(WindowMode winType);
 
 		void toggleFullscreen();
 	private:

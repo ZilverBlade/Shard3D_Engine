@@ -224,6 +224,12 @@
     <ClCompile Include="engine_logger.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="wb3d\assetmgr.cpp">
+      <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine_window.hpp">
@@ -405,6 +411,12 @@
     </ClInclude>
     <ClInclude Include="cheat_codes.hpp">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="wb3d\assetmgr.hpp">
+      <Filter>Header Files\wb3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

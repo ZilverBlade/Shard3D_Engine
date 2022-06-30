@@ -4,6 +4,8 @@
 #include "components.hpp"
 #include <vulkan/vulkan.h>
 #include "utils/definitions.hpp"
+#include "descriptors.hpp"
+#include "texture.hpp"
 
 namespace Shard3D {
 
@@ -87,5 +89,6 @@ namespace Shard3D {
 		VkCommandBuffer commandBuffer;
 		EngineCamera& camera;
 		VkDescriptorSet globalDescriptorSet;
+		EngineDescriptorPool& perDrawDescriptorPool;  // pool of descriptors that is cleared each frame
 	};
 }

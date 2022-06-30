@@ -45,7 +45,7 @@ namespace Shard3D {
 			engineSwapChain = std::make_unique<EngineSwapChain>(engineDevice, extent, std::move(engineSwapChain));
 
 			if (!oldSwapChain->compareSwapFormats(*engineSwapChain.get())) {
-				throw std::runtime_error("Swap chain image (or depth) format has changed!");
+				SHARD3D_FATAL("Swap chain image (or depth) format has changed!");
 			}
 		}
 	}
@@ -60,7 +60,7 @@ namespace Shard3D {
 		allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
 		if (vkAllocateCommandBuffers(engineDevice.device(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate command buffers!");
+			SHARD3D_FATAL("failed to allocate command buffers!");
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace Shard3D {
 			return nullptr;
 		}
 		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-			throw std::runtime_error("failed to acquire swap chain image!");
+			SHARD3D_FATAL("failed to acquire swap chain image!");
 		}
 
 		isFrameStarted = true;
@@ -97,7 +97,7 @@ namespace Shard3D {
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
 		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-			throw std::runtime_error("failed to begin recording command buffer!");
+			SHARD3D_FATAL("failed to begin recording command buffer!");
 		}
 
 		return commandBuffer;
@@ -109,7 +109,7 @@ namespace Shard3D {
 		auto commandBuffer = getCurrentCommandBuffer();
 
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-			throw std::runtime_error("failed to record command buffer!");
+			SHARD3D_FATAL("failed to record command buffer!");
 		}
 
 		auto result = engineSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
@@ -117,7 +117,7 @@ namespace Shard3D {
 			engineWindow.resetWindowResizedFlag();
 			recreateSwapchain();
 		} else if (result != VK_SUCCESS) {
-			throw std::runtime_error("failed to present swap chain image!");
+			SHARD3D_FATAL("failed to present swap chain image!");
 		}
 
 		isFrameStarted = false;

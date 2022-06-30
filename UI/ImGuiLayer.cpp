@@ -12,6 +12,7 @@
 
 #include "../wb3d/levelmgr.hpp"
 #include "../wb3d/master_manager.hpp"
+#include "../texture.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -262,7 +263,6 @@ namespace Shard3D {
 
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
-
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel, currentDevice);
         //levelGizmo.render(level, levelTreePanel);
@@ -410,9 +410,9 @@ namespace Shard3D {
                     videoEngine.createVideoSession(window, "assets/mediadata/video.wmw");
                 }
                 if (ImGui::MenuItem("Save test material", NULL /*make sure to add some sort of shardcut */)) {
-                    MaterialSystem::SurfaceMaterialData surfaceMat;
-                    surfaceMat.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
-                    surfaceMat.roughnessTex.path = "assets/texturedata/coolroughness.png";
+                    MaterialSystem::Material surfaceMat;
+                    surfaceMat.surfaceMaterial.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
+                    surfaceMat.surfaceMaterial.roughnessTex.path = "assets/texturedata/coolroughness.png";
 
                     MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
                 }

@@ -23,7 +23,7 @@ namespace Shard3D {
 			T& addComponent(Args&&... args) {
 				if (hasComponent<T>()) {	// is error, not because it's likely to cause a crash, but because idk how to handle the return
 					SHARD3D_ERROR("Actor {0} already has component {1}!", this->getGUID(), typeid(T).name());
-					throw std::runtime_error("Incorrect component!");
+					SHARD3D_FATAL("Tried to add component when component already is present!");
 				}
 				SHARD3D_LOG("Added component {0}", typeid(T).name());
 				return eLevel->registry.emplace<T>(actorHandle, std::forward<Args>(args)...);
@@ -33,7 +33,7 @@ namespace Shard3D {
 			T& getComponent() {
 				if (!hasComponent<T>()) { // is error since it will very likely cause a crash
 					SHARD3D_ERROR("Actor {0} does not have component '{1}'!", this->getGUID(), typeid(T).name());
-					throw std::runtime_error("Incorrect component!");
+					SHARD3D_FATAL("Tried to get a component that does not exist!");
 				}
 				return eLevel->registry.get<T>(actorHandle);
 			}

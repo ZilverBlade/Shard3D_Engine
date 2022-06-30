@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <json.hpp>
+#include "systems/material_system.hpp"
 
 using json = nlohmann::json;
 
@@ -69,6 +70,8 @@ namespace Shard3D {
 		ModelType getType() { return mType; }
 		bool getIndexedState() { return isIndexed; }
 	private:
+		std::unordered_map<std::string, MaterialSystem::Material> primitivesMaterialList; // <primitive material name, material>
+
 		void createVertexBuffers(const std::vector<Vertex> &vertices);
 		void createIndexBuffers(const std::vector<uint32_t> &indices);
 

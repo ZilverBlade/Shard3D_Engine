@@ -6,11 +6,6 @@
 #include <commdlg.h>
 #endif
 
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-#include "../engine_window.hpp"
-
 namespace Shard3D {
 	class MessageDialogs {
 	public:
@@ -79,7 +74,7 @@ namespace Shard3D {
 		static DialogResult show(const char* text, const char* caption = "", UINT options = OPTOKCANCEL | OPTDEFBUTTON1) {
 #ifdef _WIN32
 			return (DialogResult)(UINT)(MessageBoxA(
-				glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow()), 
+				nullptr,//glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow()), 
 				text, caption, options
 			));
 #endif
@@ -98,7 +93,7 @@ namespace Shard3D {
 			CHAR szFile[256] = { 0 };
 			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
-			ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow());
+			ofn.hwndOwner = nullptr; //glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow());
 			ofn.lpstrFile = szFile;
 			ofn.nMaxFile = sizeof(szFile);
 			ofn.lpstrFilter = filter;
@@ -120,7 +115,7 @@ namespace Shard3D {
 			CHAR szFile[256] = { 0 };
 			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
-			ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow());
+			ofn.hwndOwner = nullptr; //glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow());
 			ofn.lpstrFile = szFile;
 			ofn.nMaxFile = sizeof(szFile);
 			ofn.lpstrFilter = filter;

@@ -155,7 +155,7 @@ namespace Shard3D {
 		std::ifstream file{ filepath, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
-			throw std::runtime_error("failed to open file: " + filepath);
+			SHARD3D_FATAL("failed to open file: " + filepath);
 		}
 
 		size_t fileSize = static_cast<size_t>(file.tellg());
@@ -183,7 +183,7 @@ namespace Shard3D {
 		std::ifstream file{ fileDir + uri, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
-			throw std::runtime_error("failed to open file: " + filepath);
+			SHARD3D_FATAL("failed to open file: " + filepath);
 		}
 
 		size_t fileSize = static_cast<size_t>(file.tellg());
@@ -339,7 +339,7 @@ namespace Shard3D {
 		std::string warn, err;
 
 		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-			throw std::runtime_error(warn + err);
+			SHARD3D_FATAL(warn + err);
 		}
 
 		vertices.clear();
@@ -392,7 +392,7 @@ namespace Shard3D {
 			std::string warn, err;
 
 			if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-				throw std::runtime_error(warn + err);
+				SHARD3D_FATAL(warn + err);
 			}
 
 			vertices.clear();

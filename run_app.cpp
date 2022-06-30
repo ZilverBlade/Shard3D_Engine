@@ -43,18 +43,14 @@
 
 namespace Shard3D {
 	RunApp::RunApp() {
-		setupDescriptors();
-		SHARD3D_INFO("attempting to construct Level Pointer");
+		SharedPools::constructPools(engineDevice);
+		SHARD3D_INFO("Constructing Level Pointer");
 		activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
 	RunApp::~RunApp() {
 		SharedPools::destructPools();
 	}
 	void RunApp::setupDescriptors() {
-		SharedPools::globalPool = EngineDescriptorPool::Builder(engineDevice)
-			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.build();
 #if ENABLE_COMPUTE_SHADERS == true
 		SharedPools::computePool = EngineDescriptorPool::Builder(engineDevice)
 			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -84,6 +80,7 @@ namespace Shard3D {
 				.writeBuffer(0, &bufferInfo)
 				.build(globalDescriptorSets[i]);
 		}
+
 #if ENABLE_COMPUTE_SHADERS == true
 		VkDescriptorImageInfo computeImageInfo;
 		ComputeUbo cUbo{};
@@ -187,8 +184,9 @@ namespace Shard3D {
 					frameIndex,
 					frameTime,
 					commandBuffer,
-				    activeLevel->getPossessedCamera(),
-					globalDescriptorSets[frameIndex]
+					activeLevel->getPossessedCamera(),
+					globalDescriptorSets[frameIndex],
+					*SharedPools::drawPools[frameIndex],
 				};
 
 				//	update

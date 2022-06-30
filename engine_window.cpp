@@ -4,8 +4,7 @@
 #include "utils/definitions.hpp"
 #include <iostream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+
 #include "engine_logger.hpp"
 #include "cheat_codes.hpp"
 
@@ -50,10 +49,10 @@ namespace Shard3D {
 
 		Shard3D::CheatCodes::init(window);
 
-		GLFWimage images[1];
-		images[0].pixels = stbi_load(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
-		glfwSetWindowIcon(window, 1, images);
-		stbi_image_free(images[0].pixels);
+	//	GLFWimage images[1];
+	//	images[0].pixels = stbi_load(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
+	//	glfwSetWindowIcon(window, 1, images);
+	//	stbi_image_free(images[0].pixels);
 
 		ini.LoadFile(GAME_SETTINGS_PATH);
 
@@ -67,7 +66,7 @@ namespace Shard3D {
 	}
 	void EngineWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) {
 		if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
-			throw std::runtime_error("Failed to create window surface!");
+			SHARD3D_FATAL("Failed to create window surface!");
 		}
 	}
 

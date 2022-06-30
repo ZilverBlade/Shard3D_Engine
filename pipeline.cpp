@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <cassert>
+#include "engine_logger.hpp"
 namespace Shard3D {
 
 	EnginePipeline::EnginePipeline(
@@ -54,7 +55,7 @@ namespace Shard3D {
 		std::ifstream file{ filePath, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
-			throw std::runtime_error("failed to open file: " + filePath);
+			SHARD3D_FATAL("failed to open file: " + filePath);
 		}
 
 		size_t fileSize = static_cast<size_t>(file.tellg());
@@ -132,7 +133,7 @@ namespace Shard3D {
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 		if (vkCreateGraphicsPipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create graphics pipeline!");
+			SHARD3D_FATAL("failed to create graphics pipeline!");
 		}
 	}
 
@@ -169,7 +170,7 @@ namespace Shard3D {
 		computePipelineCreateInfo.flags = 0;
 
 		if (vkCreateComputePipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create graphics pipeline!");
+			SHARD3D_FATAL("failed to create graphics pipeline!");
 		}
 	}
 
@@ -189,7 +190,7 @@ namespace Shard3D {
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
 		if (vkCreateShaderModule(engineDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create shader module!");
+			SHARD3D_FATAL("failed to create shader module!");
 		}
 	}
 

@@ -17,8 +17,12 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageTypeFlagsEXT messageType,
     const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
     void *pUserData) {
-    SHARD3D_ERROR("validation layer: {0}", pCallbackData->pMessage);
-
+    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+        SHARD3D_WARN("validation layer: {0}", pCallbackData->pMessage);
+    } else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+        SHARD3D_ERROR("validation layer: {0}", pCallbackData->pMessage);
+    } else SHARD3D_INFO("validation layer: {0}", pCallbackData->pMessage);
+    
   return VK_FALSE;
 }
 
@@ -87,15 +91,15 @@ EngineDevice::~EngineDevice() {
 
 void EngineDevice::createInstance() {
   if (enableValidationLayers && !checkValidationLayerSupport()) {
-    throw std::runtime_error("validation layers requested, but not available!");
+      SHARD3D_FATAL("Validation errors not available!");
   }
 
   VkApplicationInfo appInfo = {};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pApplicationName = "Shard3D (Vulkan)";
   appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-  appInfo.pEngineName = "Shard3D";
-  appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 3);
+  appInfo.pEngineName = "Shard3D Gearbox";
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 1, 0);
   appInfo.apiVersion = VK_API_VERSION_1_0;
 
   VkInstanceCreateInfo createInfo = {};
@@ -121,7 +125,7 @@ void EngineDevice::createInstance() {
 
 
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create instance!");
+      SHARD3D_FATAL("Failed to create instance!");
   }
   init_info.Instance = instance;
   hasGflwRequiredInstanceExtensions();
@@ -131,7 +135,7 @@ void EngineDevice::pickPhysicalDevice() {
   uint32_t deviceCount = 0;
   vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
   if (deviceCount == 0) {
-    throw std::runtime_error("failed to find GPUs with Vulkan support!");
+    SHARD3D_FATAL("Failed to find GPUs with Vulkan support!");
   }
   SHARD3D_INFO("Device count: {0}", deviceCount);
   std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -155,7 +159,7 @@ void EngineDevice::pickPhysicalDevice() {
   }
 
   if (physicalDevice == VK_NULL_HANDLE) {
-    throw std::runtime_error("failed to find a suitable GPU!");
+    SHARD3D_FATAL("Failed to find a suitable GPU!");
   }
 
   init_info.PhysicalDevice = physicalDevice;
@@ -203,7 +207,7 @@ void EngineDevice::createLogicalDevice() {
   }
 
   if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create logical device!");
+      SHARD3D_FATAL("Failed to create logical device!");
   }
 
   vkGetDeviceQueue(device_, indices.graphicsFamily, 0, &graphicsQueue_);
@@ -220,7 +224,7 @@ void EngineDevice::createCommandPool() {
       VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
   if (vkCreateCommandPool(device_, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create command pool!");
+      SHARD3D_FATAL("Failed to create command pool!");
   }
 }
 
@@ -262,7 +266,7 @@ void EngineDevice::setupDebugMessenger() {
   VkDebugUtilsMessengerCreateInfoEXT createInfo;
   populateDebugMessengerCreateInfo(createInfo);
   if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
-    throw std::runtime_error("failed to set up debug messenger!");
+      SHARD3D_FATAL("Failed to set up debug messenger!");
   }
 }
 
@@ -323,7 +327,7 @@ void EngineDevice::hasGflwRequiredInstanceExtensions() {
   for (const auto &required : requiredExtensions) {
     std::cout << "\t" << required << std::endl;
     if (available.find(required) == available.end()) {
-      throw std::runtime_error("Missing required glfw extension");
+        SHARD3D_FATAL("Missing required GLFW extension!");
     }
   }
 }
@@ -418,7 +422,7 @@ VkFormat EngineDevice::findSupportedFormat(
       return format;
     }
   }
-  throw std::runtime_error("failed to find supported format!");
+  SHARD3D_FATAL("Failed to find supported format!");
 }
 
 uint32_t EngineDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
@@ -430,8 +434,7 @@ uint32_t EngineDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags
       return i;
     }
   }
-
-  throw std::runtime_error("failed to find suitable memory type!");
+  SHARD3D_FATAL("Failed to find suitable memory type!");
 }
 
 void EngineDevice::createBuffer(
@@ -447,7 +450,7 @@ void EngineDevice::createBuffer(
   bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
   if (vkCreateBuffer(device_, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create vertex buffer!");
+      SHARD3D_FATAL("Failed to create vertex buffer!");
   }
 
   VkMemoryRequirements memRequirements;
@@ -459,7 +462,7 @@ void EngineDevice::createBuffer(
   allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
   if (vkAllocateMemory(device_, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-    throw std::runtime_error("failed to allocate vertex buffer memory!");
+      SHARD3D_FATAL("Failed to allocate vertex buffer memory!");
   }
 
   vkBindBufferMemory(device_, buffer, bufferMemory, 0);
@@ -536,6 +539,97 @@ void EngineDevice::copyBufferToImage(
   endSingleTimeCommands(commandBuffer);
 }
 
+void EngineDevice::transitionImageLayout(
+    VkImage image,
+    VkFormat format,
+    VkImageLayout oldLayout,
+    VkImageLayout newLayout,
+    uint32_t mipLevels,
+    uint32_t layerCount) {
+    // uses an image memory barrier transition image layouts and transfer queue
+    // family ownership when VK_SHARING_MODE_EXCLUSIVE is used. There is an
+    // equivalent buffer memory barrier to do this for buffers
+    VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = oldLayout;
+    barrier.newLayout = newLayout;
+
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+    barrier.image = image;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = mipLevels;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = layerCount;
+
+    if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        if (format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT) {
+            barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+        }
+    }
+    else {
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+
+    VkPipelineStageFlags sourceStage;
+    VkPipelineStageFlags destinationStage;
+
+    if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (
+        oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (
+        oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+        newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    else if (
+        oldLayout == VK_IMAGE_LAYOUT_UNDEFINED &&
+        newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask =
+            VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    }
+    else {
+        SHARD3D_FATAL("Unsupported layout transition!");
+    }
+    vkCmdPipelineBarrier(
+        commandBuffer,
+        sourceStage,
+        destinationStage,
+        0,
+        0,
+        nullptr,
+        0,
+        nullptr,
+        1,
+        &barrier);
+
+    endSingleTimeCommands(commandBuffer);
+}
+
 void EngineDevice::createImageWithInfo(
     const VkImageCreateInfo &imageInfo,
     VkMemoryPropertyFlags properties,
@@ -543,7 +637,7 @@ void EngineDevice::createImageWithInfo(
     VkImage &image,
     VkDeviceMemory &imageMemory) {
   if (vkCreateImage(device_, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-    throw std::runtime_error("failed to create image!");
+      SHARD3D_FATAL("Failed to create image!");
   }
 
   //imageInfo.samples = numSamples;
@@ -557,11 +651,11 @@ void EngineDevice::createImageWithInfo(
   allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
   if (vkAllocateMemory(device_, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-    throw std::runtime_error("failed to allocate image memory!");
+      SHARD3D_FATAL("Failed to allocate image memory!");
   }
 
   if (vkBindImageMemory(device_, image, imageMemory, 0) != VK_SUCCESS) {
-    throw std::runtime_error("failed to bind image memory!");
+      SHARD3D_FATAL("Failed to bind image memory!");
   }
 }
 

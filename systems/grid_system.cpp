@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <array>
 #include <map>
+#include "../engine_logger.hpp"
 
 namespace Shard3D {
 
@@ -30,7 +31,7 @@ namespace Shard3D {
         pipelineLayoutInfo.pPushConstantRanges = nullptr;
         if (vkCreatePipelineLayout(engineDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
             VK_SUCCESS) {
-            throw std::runtime_error("failed to create pipeline layout!");
+            SHARD3D_FATAL("failed to create pipeline layout!");
         }
     }
 
