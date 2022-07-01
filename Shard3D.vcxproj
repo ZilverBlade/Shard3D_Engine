@@ -281,12 +281,13 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="engine_logger.cpp" />
+    <ClCompile Include="graphics_settings.cpp" />
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="systems\compute_system.cpp" />
     <ClCompile Include="systems\material_system.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="UI\level_gizmo.cpp" />
-    <ClCompile Include="UI\level_peakers.cpp" />
+    <ClCompile Include="UI\level_peekers.cpp" />
     <ClCompile Include="video\video_decode.cpp" />
     <ClCompile Include="wb3d\assetmgr.cpp" />
     <ClCompile Include="wb3d\blueprint.cpp" />
@@ -332,6 +333,7 @@
     <ClInclude Include="events\events.hpp" />
     <ClInclude Include="events\event_handler.hpp" />
     <ClInclude Include="events\key_events.hpp" />
+    <ClInclude Include="graphics_settings.hpp" />
     <ClInclude Include="systems\material_system.hpp" />
     <ClInclude Include="plugins\example_component.hpp" />
     <ClInclude Include="plugins\plugin_link.h" />
@@ -342,7 +344,7 @@
     <ClInclude Include="scripts\script_link.h" />
     <ClInclude Include="systems\compute_system.hpp" />
     <ClInclude Include="texture.hpp" />
-    <ClInclude Include="UI\level_peakers.hpp" />
+    <ClInclude Include="UI\level_peekers.hpp" />
     <ClInclude Include="utils\def_dynamic.hpp" />
     <ClInclude Include="utils\dialogs.h" />
     <ClInclude Include="engine_logger.hpp" />

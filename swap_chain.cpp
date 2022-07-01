@@ -9,9 +9,9 @@
 #include <stdexcept>
 #include <sstream>
 #include <typeinfo>
-#include "simpleini/simple_ini.h"
 #include "utils/definitions.hpp"
 #include "engine_logger.hpp"
+#include "graphics_settings.hpp"
 
 namespace Shard3D {
 
@@ -383,47 +383,18 @@ void EngineSwapChain::createSyncObjects() {
 VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
 
-    CSimpleIniA ini;
-
-    ini.SetUnicode();
-    ini.LoadFile(GAME_SETTINGS_PATH);
-
-    std::string colormode = ini.GetValue("DISPLAY", "ColorFormat");
-  for (const auto &availableFormat : availableFormats) {
-
-      if (colormode == "8BIT_SRGB") {
-          if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-              return availableFormat;
-          }
-      }
-      else if (colormode == "8BIT_UNORM") {
-          if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-              return availableFormat;
-          }
-      }
-      else if (colormode == "10BIT_UFLOAT") {
-          if (availableFormat.format == VK_FORMAT_B10G11R11_UFLOAT_PACK32 && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-              return availableFormat;
-          }
-      }
-      else {
-          SHARD3D_WARN("Invalid color format chosen: {0}", ini.GetValue("DISPLAY", "ColorFormat"));
+  for (const auto &availableFormat : availableFormats) {  
+      if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+          return availableFormat;
       }
   }
-
+  SHARD3D_WARN("VK_FORMAT_B8G8R8A8_SRGB and or VK_COLOR_SPACE_SRGB_NONLINEAR_KHR not available colour modes!");
   return availableFormats[0];
 }
 
 VkPresentModeKHR EngineSwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     
-    CSimpleIniA ini;
-
-    ini.SetUnicode();
-    ini.LoadFile(GAME_SETTINGS_PATH);
-
-    std::string vsync = ini.GetValue("DISPLAY", "V-Sync");
-
-    if (vsync == "false") {
+    if (GraphicsSettings::get().VSync == false) {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
                 SHARD3D_INFO("Present mode: Mailbox");
@@ -435,14 +406,11 @@ VkPresentModeKHR EngineSwapChain::chooseSwapPresentMode(const std::vector<VkPres
             }
         }
     }
-    else if (vsync == "true") {
+    else {
         SHARD3D_INFO("Present mode: V-Sync");
         return VK_PRESENT_MODE_FIFO_KHR;
-    } else {
-        SHARD3D_WARN("Invalid present mode chosen: {0}", ini.GetValue("DISPLAY", "V-Sync"));
-        return VK_PRESENT_MODE_FIFO_KHR;
     }
-
+    SHARD3D_WARN("No present mode chosen!");
 }
 
 VkExtent2D EngineSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) {

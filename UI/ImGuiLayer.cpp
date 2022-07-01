@@ -36,6 +36,7 @@ namespace Shard3D {
         nodeEditorContext = ax::NodeEditor::CreateEditor();
         levelTreePanel.setContext(level);
         levelPropertiesPanel.setContext(level);
+        levelPeekPanel.setContext(level);
         //levelGizmo.setContext(level);
 
         ImGui::CreateContext();
@@ -240,7 +241,7 @@ namespace Shard3D {
         ax::NodeEditor::DestroyEditor(nodeEditorContext);
         levelTreePanel.destroyContext();
         levelPropertiesPanel.destroyContext();
-
+        levelPeekPanel.destroyContext();
         hasBeenDetached = true;
 	}
 
@@ -265,6 +266,7 @@ namespace Shard3D {
         //ImGuizmo::BeginFrame();
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel, currentDevice);
+        levelPeekPanel.render();
         //levelGizmo.render(level, levelTreePanel);
 
         ax::NodeEditor::SetCurrentEditor(nodeEditorContext);

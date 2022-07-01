@@ -71,13 +71,11 @@ namespace Shard3D {
 		}
 	}
 
-	void EngineWindow::setWindowMode(WindowMode winMode) {
+	void EngineWindow::setWindowMode(WindowType winType) {
 		CSimpleIniA ini;
-
-		ini.SetUnicode();
 		ini.LoadFile(GAME_SETTINGS_PATH);
 
-		if (winMode == Windowed){
+		if (winType == Windowed) {
 			glfwDestroyWindow(window);
 			glfwWindowHint(GLFW_DECORATED, true);
 			window = glfwCreateWindow(
@@ -88,9 +86,8 @@ namespace Shard3D {
 				nullptr
 			);
 			SHARD3D_INFO("Set Windowed");
-			windowType = Windowed;
-			return;
-		} else if (winMode == Borderless) {
+		}
+		else if (winType == Borderless) {
 			glfwDestroyWindow(window);
 			glfwWindowHint(GLFW_DECORATED, false);
 			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -103,37 +100,15 @@ namespace Shard3D {
 			);
 			glfwSetWindowPos(window, 0, 0);
 			SHARD3D_INFO("Set Borderless Fullscreen");
-			windowType = Borderless;
-		} else if (winMode == Fullscreen) {
+		}
+		else if (winType == Fullscreen) {
 			// get resolution of monitor
 			const GLFWvidmode* videoMode = glfwGetVideoMode(monitor);
 			// switch to full screen
 			glfwSetWindowMonitor(window, monitor, 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
 			SHARD3D_INFO("Set Fullscreen");
-			windowType = Fullscreen;
 		}
 	}
-
-	void EngineWindow::toggleFullscreen() {
-		if (borderlessFullscreen == false && windowType == 2) {
-			setWindowMode(Windowed);
-		}
-		else {
-			CSimpleIniA ini;
-			ini.SetUnicode();
-			ini.LoadFile(GAME_SETTINGS_PATH);
-
-			// backup window position and window size
-			glfwGetWindowPos(window, &windowPosX, &windowPosY);
-			glfwGetWindowSize(window, &windowWidth, &windowHeight);
-			ini.SetLongValue("WINDOW", "WIDTH", (long)windowWidth);
-			ini.SetLongValue("WINDOW", "HEIGHT", (long)windowHeight);
-			ini.SaveFile(GAME_SETTINGS_PATH);
-
-			setWindowMode(Borderless);
-		}
-	}
-
 
 	void EngineWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
 		auto engineWindow = reinterpret_cast<EngineWindow*>(glfwGetWindowUserPointer(window));

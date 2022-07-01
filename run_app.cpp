@@ -39,11 +39,13 @@
 
 //scripts
 #include "scripts/script_link.h"
+#include "graphics_settings.hpp"
 
 
 namespace Shard3D {
 	RunApp::RunApp() {
 		SharedPools::constructPools(engineDevice);
+		GraphicsSettings::init(&engineWindow);
 		SHARD3D_INFO("Constructing Level Pointer");
 		activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
@@ -142,7 +144,8 @@ namespace Shard3D {
 		while (!engineWindow.shouldClose()) {
 			glfwPollEvents();
 
-			auto possessedCamera = activeLevel->getPossessedCameraActor();
+			auto possessedCameraActor = activeLevel->getPossessedCameraActor();
+			auto possessedCamera = activeLevel->getPossessedCamera();
 
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
@@ -153,28 +156,31 @@ namespace Shard3D {
 			activeLevel->tick(frameTime);
 
 			if (activeLevel->simulationState != PlayState::Simulating) {
-				editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCamera);
-				editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCamera);
+				editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
+				editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
 			}
 
 			cameraActor.getComponent<Components::CameraComponent>().ar = engineRenderer.getAspectRatio();
 
-			activeLevel->getPossessedCamera().setViewYXZ(possessedCamera.getComponent<Components::TransformComponent>().translation, possessedCamera.getComponent<Components::TransformComponent>().rotation);
+			possessedCamera.setViewYXZ(
+				possessedCameraActor.getComponent<Components::TransformComponent>().translation, 
+				possessedCameraActor.getComponent<Components::TransformComponent>().rotation
+			);
 			
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
-				possessedCamera.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
-				possessedCamera.getComponent<Components::CameraComponent>().setProjection();
+				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
+				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 			} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
-				possessedCamera.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
-				possessedCamera.getComponent<Components::CameraComponent>().setProjection();
+				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
+				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 			}
 			
 			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
 #ifndef NDEBUG
 				MessageDialogs::show("No fullscreen in Debug Mode allowed!", "Debug", MessageDialogs::OPTICONERROR);
 #endif
-#ifdef NDEBUG
-				engineWindow.toggleFullscreen();
+#ifndef NDEBUG
+				GraphicsSettings::toggleFullscreen();
 #endif
 			}
 
@@ -184,16 +190,16 @@ namespace Shard3D {
 					frameIndex,
 					frameTime,
 					commandBuffer,
-					activeLevel->getPossessedCamera(),
+					possessedCamera,
 					globalDescriptorSets[frameIndex],
 					*SharedPools::drawPools[frameIndex],
 				};
 
 				//	update
 				GlobalUbo ubo{};
-				ubo.projection = activeLevel->getPossessedCamera().getProjection();
-				ubo.view = activeLevel->getPossessedCamera().getView();
-				ubo.inverseView = activeLevel->getPossessedCamera().getInverseView();
+				ubo.projection = possessedCamera.getProjection();
+				ubo.view = possessedCamera.getView();
+				ubo.inverseView = possessedCamera.getInverseView();
 
 				pointlightSystem.update(frameInfo, ubo, activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);

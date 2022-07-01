@@ -107,9 +107,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine_window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="run_app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -230,14 +227,17 @@
     <ClCompile Include="wb3d\assetmgr.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
-    <ClCompile Include="UI\level_peakers.cpp">
+    <ClCompile Include="UI\level_peekers.cpp">
       <Filter>Source Files\UI\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics_settings.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="engine_window.cpp">
+      <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine_window.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="run_app.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -421,8 +421,14 @@
     <ClInclude Include="wb3d\assetmgr.hpp">
       <Filter>Header Files\wb3d</Filter>
     </ClInclude>
-    <ClInclude Include="UI\level_peakers.hpp">
+    <ClInclude Include="UI\level_peekers.hpp">
       <Filter>Header Files\UI\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics_settings.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="engine_window.hpp">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -237,7 +237,7 @@ namespace Shard3D {
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
         samplerInfo.anisotropyEnable = VK_TRUE;
-        samplerInfo.maxAnisotropy = GraphicsSettings::getGraphicsSettings().AnisotropicFiltering;
+        samplerInfo.maxAnisotropy = (float)GraphicsSettings::get().AnisotropicFiltering;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
         samplerInfo.unnormalizedCoordinates = VK_FALSE;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
