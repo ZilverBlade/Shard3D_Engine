@@ -8,6 +8,7 @@
 #include <cmath>
 #include <stdexcept>
 #include "engine_logger.hpp"
+#include "graphics_settings.hpp"
 
 namespace Shard3D {
     EngineTexture::EngineTexture(EngineDevice& device, const std::string& textureFilepath) : mDevice{ device } {
@@ -236,7 +237,7 @@ namespace Shard3D {
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
         samplerInfo.anisotropyEnable = VK_TRUE;
-        samplerInfo.maxAnisotropy = 16.0f;
+        samplerInfo.maxAnisotropy = GraphicsSettings::getGraphicsSettings().AnisotropicFiltering;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
         samplerInfo.unnormalizedCoordinates = VK_FALSE;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;

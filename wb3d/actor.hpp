@@ -52,6 +52,13 @@ namespace Shard3D {
 				eLevel->registry.remove<T>(actorHandle);
 			}
 			
+			bool isInvalid() {
+				if (getGUID() == 0 || getGUID() == UINT64_MAX) // dont display these actors as they are engine reserved
+					return true;
+				if (!hasComponent<Components::TagComponent>())
+					return true;
+				return false;
+			}
 			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
 			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
 			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };

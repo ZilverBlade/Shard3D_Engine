@@ -9,12 +9,6 @@
     Shard3D 1.0 (2022) created by ZilverBlade
 */
 int main() {
-    /*
-    std::ifstream infile(ENGINE_SETTINGS_PATH);
-    if (infile.good() == false) throw std::runtime_error("Critical error! Engine settings config file not found!");
-    std::ifstream infile2(GAME_SETTINGS_PATH);
-    if (infile2.good() == false) throw std::runtime_error("Critical error! Game settings config file not found!");
-    */
     Shard3D::LOGGER::init();
 #ifdef _WIN32
     ShowWindow(GetConsoleWindow(), SW_SHOW);

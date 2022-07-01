@@ -86,9 +86,9 @@ namespace Shard3D {
 
 #pragma region GLTF
 		json JSON;
-		std::vector<UCHAR> data;
+		std::vector<unsigned char> data;
 		void gltfInitialiseShit(const std::string& filepath);
-		std::vector<UCHAR> gltfGetData(const std::string& filepath);
+		std::vector<unsigned char> gltfGetData(const std::string& filepath);
 		std::vector<float> gltfGetFloats(json accessor);
 		std::vector<GLuint> gltfGetIndices(json accessor);
 		

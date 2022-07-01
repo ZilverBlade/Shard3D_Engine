@@ -196,7 +196,7 @@ namespace Shard3D {
 
 
 		bytesText = sstr.str();
-		std::vector<UCHAR> data(bytesText.begin(), bytesText.end());
+		std::vector<unsigned char> data(bytesText.begin(), bytesText.end());
 		return data;
 	}
 
@@ -222,7 +222,7 @@ namespace Shard3D {
 		uint32_t lengthOfData = count * 4 * numPerVert;
 
 		for (uint32_t i = beginningOfData; i < beginningOfData + lengthOfData; i++) {
-			UCHAR bytes[] = { data[i++],data[i++] ,data[i++] ,data[i++] };
+			unsigned char bytes[] = { data[i++],data[i++] ,data[i++] ,data[i++] };
 			float value;
 			memcpy(&value, bytes, sizeof(float));
 			floatVec.push_back(value);
@@ -245,7 +245,7 @@ namespace Shard3D {
 		uint32_t beginningOfData = byteOffset + accByteOffset;
 		if (componentType == 5125) {
 			for (uint32_t i = beginningOfData; i < byteOffset + accByteOffset + count * 4; i) {
-				UCHAR bytes[] = { data[i++],data[i++] ,data[i++] ,data[i++] };
+				unsigned char bytes[] = { data[i++],data[i++] ,data[i++] ,data[i++] };
 				uint32_t value;
 				memcpy(&value, bytes, sizeof(uint32_t));
 				indices.push_back((GLuint)value);
@@ -253,7 +253,7 @@ namespace Shard3D {
 		}
 		else if (componentType == 5123) {
 			for (uint32_t i = beginningOfData; i < byteOffset + accByteOffset + count * 2; i) {
-				UCHAR bytes[] = { data[i++],data[i++] };
+				unsigned char bytes[] = { data[i++],data[i++] };
 				uint16_t value;
 				memcpy(&value, bytes, sizeof(uint16_t));
 				indices.push_back((GLuint)value);
@@ -261,7 +261,7 @@ namespace Shard3D {
 		}
 		else if (componentType == 5123) {
 			for (uint32_t i = beginningOfData; i < byteOffset + accByteOffset + count * 2; i) {
-				UCHAR bytes[] = { data[i++],data[i++] };
+				unsigned char bytes[] = { data[i++],data[i++] };
 				short value;
 				memcpy(&value, bytes, sizeof(short));
 				indices.push_back((GLuint)value);
@@ -364,7 +364,7 @@ namespace Shard3D {
 				if (index.normal_index >= 0) {
 					vertex.normal = {
 						attrib.normals[3 * index.normal_index],			//X
-						-attrib.normals[3 * index.normal_index + 2],	//Z, but is actually -Y
+						attrib.normals[3 * index.normal_index + 2],		//Z, but is actually Y
 						attrib.normals[3 * index.normal_index + 1],		//Y, but is actually Z
 					};
 				}
@@ -417,7 +417,7 @@ namespace Shard3D {
 					if (index.normal_index >= 0) {
 						vertex.normal = {
 							attrib.normals[3 * index.normal_index],			//X
-							-attrib.normals[3 * index.normal_index + 2],	//Z, but is actually -Y
+							attrib.normals[3 * index.normal_index + 2],		//Z, but is actually Y
 							attrib.normals[3 * index.normal_index + 1],		//Y, but is actually Z
 						};
 					}

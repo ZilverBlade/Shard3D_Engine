@@ -25,8 +25,7 @@ namespace Shard3D {
         EngineTexture(const EngineTexture&) = delete;
         EngineTexture& operator=(const EngineTexture&) = delete;
 
-        VkImageView imageView() const { return mTextureImageView; }
-        VkSampler sampler() const { return mTextureSampler; }
+        VkSampler getSampler() const { return mTextureSampler; }
         VkImage getImage() const { return mTextureImage; }
         VkImageView getImageView() const { return mTextureImageView; }
         VkDescriptorImageInfo getImageInfo() const { return mDescriptor; }

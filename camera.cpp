@@ -110,5 +110,4 @@ namespace Shard3D {
 		inverseViewMatrix[3][1] = position.y;
 		inverseViewMatrix[3][2] = position.z;
 	}
-
 }

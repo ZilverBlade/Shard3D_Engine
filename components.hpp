@@ -62,7 +62,7 @@ namespace Shard3D {
 */
 			ProjectType projectionType = ProjectType::Perspective;
 			/* *
-* Field of view (degrees)
+* Vertical Field of view (degrees)
 */
 			float fov = 70.f;
 			/* *

@@ -19,7 +19,7 @@ namespace Shard3D {
 		noEditBgColor[0] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorR");
 		noEditBgColor[1] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorG");
 		noEditBgColor[2] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorB");
-
+	
 		clearValues[0].color = { noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.f };
 
 		clearValues[1].depthStencil = { 1.0f, 0 };
@@ -30,24 +30,15 @@ namespace Shard3D {
 	
 	void EngineRenderer::recreateSwapchain() {
 		auto extent = engineWindow.getExtent();
+
 		while (extent.width == 0 || extent.height == 0) {
 			extent = engineWindow.getExtent();
 			glfwWaitEvents();
 		}
-
 		vkDeviceWaitIdle(engineDevice.device());
-		engineSwapChain = nullptr; //for some reason validation fails when new swap chain is created
-		if (engineSwapChain == nullptr) {
-			engineSwapChain = std::make_unique<EngineSwapChain>(engineDevice, extent);
-		}
-		else {
-			std::shared_ptr<EngineSwapChain> oldSwapChain = std::move(engineSwapChain);
-			engineSwapChain = std::make_unique<EngineSwapChain>(engineDevice, extent, std::move(engineSwapChain));
-
-			if (!oldSwapChain->compareSwapFormats(*engineSwapChain.get())) {
-				SHARD3D_FATAL("Swap chain image (or depth) format has changed!");
-			}
-		}
+		engineSwapChain = nullptr;
+		engineSwapChain = std::make_unique<EngineSwapChain>(engineDevice, extent);		
+		
 	}
 
 	void EngineRenderer::createCommandBuffers() {
@@ -151,7 +142,6 @@ namespace Shard3D {
 		VkRect2D scissor{ {0, 0}, engineSwapChain->getSwapChainExtent() };
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-
 	}
 	void EngineRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 #ifndef NDEBUG
