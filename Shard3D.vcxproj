@@ -334,11 +334,12 @@
     <ClInclude Include="events\event_handler.hpp" />
     <ClInclude Include="events\key_events.hpp" />
     <ClInclude Include="graphics_settings.hpp" />
+    <ClInclude Include="scripts\carcontroller.hpp" />
     <ClInclude Include="systems\material_system.hpp" />
     <ClInclude Include="plugins\example_component.hpp" />
     <ClInclude Include="plugins\plugin_link.h" />
     <ClInclude Include="scripts\example_script.hpp">
-      <FileType>CppCode</FileType>
+      <FileType>CppHeader</FileType>
     </ClInclude>
     <ClInclude Include="scripts\script_handler.hpp" />
     <ClInclude Include="scripts\script_link.h" />

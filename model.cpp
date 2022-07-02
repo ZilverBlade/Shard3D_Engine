@@ -17,6 +17,7 @@
 #include "simpleini/simple_ini.h"
 #include "utils/definitions.hpp"
 #include "engine_logger.hpp"
+#include "wb3d/assetmgr.hpp"
 
 namespace std {
 	template <>
@@ -37,14 +38,13 @@ namespace Shard3D {
 	}
 	EngineModel::~EngineModel() {}
 
-	std::unique_ptr<EngineModel> EngineModel::createModelFromFile(EngineDevice& device, const std::string& filepath, ModelType modelType, bool indexModel) {
+	std::unique_ptr<EngineModel> EngineModel::createModelFromFile(EngineDevice& device, const std::string& filepath, ModelType modelType) {
 		Builder builder{};	
 		CSimpleIniA ini;
 
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
-		isIndexed = indexModel;
 		mType = modelType;
 		fpath = filepath;
 		
@@ -341,7 +341,7 @@ namespace Shard3D {
 		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
 			SHARD3D_FATAL(warn + err);
 		}
-
+		
 		vertices.clear();
 		indices.clear();
 
@@ -381,58 +381,6 @@ namespace Shard3D {
 				}
 				indices.push_back(uniqueVertices[vertex]);
 			}
-		}
-	}
-
-	void EngineModel::Builder::loadModel(const std::string& filepath, ModelType modelType) {
-		if (modelType == ModelType::MODEL_TYPE_OBJ){
-			tinyobj::attrib_t attrib;
-			std::vector<tinyobj::shape_t> shapes;
-			std::vector<tinyobj::material_t> materials;
-			std::string warn, err;
-
-			if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-				SHARD3D_FATAL(warn + err);
-			}
-
-			vertices.clear();
-			indices.clear();
-
-			for (const auto& shape : shapes) {
-				for (const auto& index : shape.mesh.indices) {
-					Vertex vertex{};
-
-					if (index.vertex_index >= 0) {
-						vertex.position = {
-							attrib.vertices[3 * index.vertex_index],		//X
-							attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually Y
-							attrib.vertices[3 * index.vertex_index + 1], 	//Y, but is actually Z		
-						};
-						vertex.color = {
-							attrib.colors[3 * index.vertex_index],
-							attrib.colors[3 * index.vertex_index + 1],
-							attrib.colors[3 * index.vertex_index + 2],
-						};
-					}
-					if (index.normal_index >= 0) {
-						vertex.normal = {
-							attrib.normals[3 * index.normal_index],			//X
-							attrib.normals[3 * index.normal_index + 2],		//Z, but is actually Y
-							attrib.normals[3 * index.normal_index + 1],		//Y, but is actually Z
-						};
-					}
-					if (index.texcoord_index >= 0) {
-						vertex.uv = {
-							attrib.texcoords[2 * index.texcoord_index],
-							attrib.texcoords[2 * index.texcoord_index + 1],
-						};
-					}
-					vertices.push_back(vertex);
-				}
-			}
-		}
-		else if (modelType == ModelType::MODEL_TYPE_GLTF) {
-			//assert(indMesh != NULL && "Mesh index may not be 0 (GLTF loader)");
 		}
 	}
 }

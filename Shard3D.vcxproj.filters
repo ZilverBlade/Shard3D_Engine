@@ -430,6 +430,9 @@
     <ClInclude Include="engine_window.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\carcontroller.hpp">
+      <Filter>scripts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />

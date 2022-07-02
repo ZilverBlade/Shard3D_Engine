@@ -260,10 +260,10 @@ namespace Shard3D {
 
 		/*
 			NOTE:
-			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, -Y up.
-			That means that in the editor, the level must save object transform values as (X, -Z, Y), otherwise it will be incorrect
+			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, Y up.
+			That means that in the editor, the level must save object transform values as (X, Z, Y), otherwise it will be incorrect
 		*/
-
+		/*
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
 
 		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ);
@@ -275,8 +275,16 @@ namespace Shard3D {
 		wb3d::Actor epic = activeLevel->createActor("camerabeamer");
 		epic.addComponent<Components::CameraComponent>().setProjection();
 		epic.getComponent<Components::TransformComponent>().translation = {2.f, -2.f, 0.f};
+		*/
+		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ); //dont index because model breaks
+		wb3d::LevelManager levelman(activeLevel);
+		levelman.load("assets/scenedata/drivecartest.wbl", engineDevice, true);
 		
-		
+		wb3d::Actor car = activeLevel->createActor("Car");
+		car.addComponent<Components::MeshComponent>(model);
+		car.getComponent<Components::TransformComponent>().rotation = { 0.f, glm::radians(90.f), 0.f };
+		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
+
 		//activeLevel->possessedCam = epic.getComponent<Components::CameraComponent>().camera;
 	}
 }

@@ -149,7 +149,7 @@ namespace Shard3D {
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				if (!csc.Inst) {
 					csc.Inst = csc.InstScript();
-					csc.Inst->aActor = Actor{ actor, this };
+					csc.Inst->thisActor = Actor{ actor, this };
 					csc.Inst->beginEvent();
 					csc.Inst->spawnEvent();
 				}

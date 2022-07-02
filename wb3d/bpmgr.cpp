@@ -145,8 +145,8 @@ namespace Shard3D {
 				fout.flush();
 				fout.close();
 			}
-			removeAllComponents(actor);
-			blueprint.assetFile = newPath.substr(newPath.rfind("assets\\blueprintdata")); // this is strictly a local path, which means all blueprints must be in this folder
+			removeAllComponents(actor);// this is strictly a local path, which means all blueprints must be in this folder
+			blueprint.assetFile = newPath.substr(newPath.rfind("assets\\blueprintdata")); 
 			SHARD3D_LOG("Saved blueprint '{0}'", newPath);
 		}
 
@@ -217,8 +217,7 @@ namespace Shard3D {
 						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(
 							device,
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),
-				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>(),
-							true
+				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>()
 						);
 						loadedActor.addComponent<Components::MeshComponent>(model);
 					}

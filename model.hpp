@@ -47,13 +47,10 @@ namespace Shard3D {
 			std::vector<uint32_t> indices{};
 
 			void loadIndexedModel(const std::string& filepath, ModelType modelType);
-			void loadModel(const std::string& filepath, ModelType modelType);
-
 		};
 
 		inline static std::string fpath;
 		inline static ModelType mType;
-		inline static bool isIndexed;
 
 		EngineModel(EngineDevice &device, const EngineModel::Builder &builder);
 		~EngineModel();
@@ -61,14 +58,16 @@ namespace Shard3D {
 		EngineModel(const EngineModel&) = delete;
 		EngineModel& operator=(const EngineModel&) = delete;
 		
-		static std::unique_ptr<EngineModel> createModelFromFile(EngineDevice& device, const std::string& filepath, ModelType modelType, bool indexModel = true);
+		static std::unique_ptr<EngineModel> createModelFromFile(EngineDevice& device, 
+			const std::string& filepath, 
+			ModelType modelType
+		);
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
 
 		std::string getFile() { return fpath; }
 		ModelType getType() { return mType; }
-		bool getIndexedState() { return isIndexed; }
 	private:
 		std::unordered_map<std::string, MaterialSystem::Material> primitivesMaterialList; // <primitive material name, material>
 

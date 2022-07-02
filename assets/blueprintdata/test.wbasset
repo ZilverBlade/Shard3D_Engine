@@ -1,7 +1,7 @@
-Shard3D: 1.0.9.r1
+Shard3D: 1.1.1.r0-alpha
 WorldBuilder3D: 0.1
 WBASSET_Blueprint: Some kind of blueprint
-BlueprintID: 10060580331453714625
+BlueprintID: 12649665440001991680
 Container:
   - TransformComponent:
       Translation: [0, 0, 0]

@@ -8,17 +8,11 @@ namespace Shard3D {
 
 			virtual ~ActingActor() {}
 
-			template<typename T>
-			T& getComponent() {
-				return aActor.getComponent<T>();
-			}
-
 			void posessCameraActor(Actor actor) {
-				aActor.eLevel->setPossessedCameraActor(actor);
+				thisActor.eLevel->setPossessedCameraActor(actor);
 			}
-			
 			Level* getActiveLevel() {
-				return aActor.eLevel;
+				return thisActor.eLevel;
 			}
 
 		protected:
@@ -43,8 +37,9 @@ namespace Shard3D {
   Gets called upon destruction of the actor
  */
 			virtual void killEvent() {}
+		
+			Actor thisActor;
 		private:
-			Actor aActor;
 			friend class Level;
 		};
 	}

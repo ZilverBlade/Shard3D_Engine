@@ -103,6 +103,10 @@ namespace Shard3D {
 		fout << out.c_str();
 		fout.flush();
 		fout.close();
+
+		// this is strictly a local path, which means all materials must be in this folder
+		materialData.path = newPath;//.substr(newPath.rfind("assets\\materialdata"));
+		wb3d::AssetManager::emplaceMaterial(materialData);
 	}
 
 	MaterialSystem::Material MaterialSystem::loadMaterial(const std::string& loadLoc, bool ignoreWarns) {
@@ -161,6 +165,8 @@ namespace Shard3D {
 			loadedMaterial.surfaceMaterial.roughnessTex.path = container["Data"]["roughnessTex"].as<std::string>();
 			loadedMaterial.surfaceMaterial.metallicTex.path = container["Data"]["metallicTex"].as<std::string>();
 
+			// this is strictly a local path, which means all materials must be in this folder
+			loadedMaterial.path = loadLoc;//.substr(loadLoc.rfind("assets\\materialdata"));
 			wb3d::AssetManager::emplaceMaterial(loadedMaterial);
 			return loadedMaterial;
 		}

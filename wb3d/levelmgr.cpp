@@ -222,8 +222,7 @@ namespace Shard3D {
 						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(
 							device,
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),
-				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>(),
-							true
+				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>()
 						);
 						loadedActor.addComponent<Components::MeshComponent>(model);
 					}

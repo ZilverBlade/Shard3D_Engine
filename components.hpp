@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <entt.hpp>
+#include "texture.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -43,8 +44,6 @@ namespace Shard3D {
 
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
-
-			glm::mat4 transformMatrix_cache = mat4();
 
 			glm::mat4 mat4();
 			glm::mat3 normalMatrix();
@@ -90,13 +89,27 @@ namespace Shard3D {
 				return camera;
 			}
 		};
+		struct BillboardComponent {
+			std::shared_ptr<EngineTexture> texture{};
+			std::string file{};
+			enum class BillboardOrientation {
+				BILLBOARD_ORIENTATION_NULL = 0,
+				BILLBOARD_ORIENTATION_AXIAL = 1,
+				BILLBOARD_ORIENTATION_POINT = 2
+			};
+			BillboardOrientation orientation = BillboardOrientation::BILLBOARD_ORIENTATION_AXIAL;
 
+			std::shared_ptr<EngineTexture> newTexture{};
+
+			BillboardComponent() = default;
+			BillboardComponent(const BillboardComponent&) = default;
+			
+		};
 		struct MeshComponent {
 			std::shared_ptr<EngineModel> model{};
 			std::string file{};
 			ModelType type = ModelType::MODEL_TYPE_NULL;
 			MaterialSystem::MaterialList materialList;
-			bool isIndexed = true;
 
 			std::shared_ptr<EngineModel> newModel{};
 
@@ -105,14 +118,12 @@ namespace Shard3D {
 			MeshComponent(const std::shared_ptr<EngineModel>& mdl) {
 				model = mdl; 
 				file = mdl->getFile(); 
-				type = mdl->getType();
-				isIndexed = mdl->getIndexedState();
+				type = mdl->getType();			
 			}
 			void reapplyModel(const std::shared_ptr<EngineModel>& mdl) {
 				model = mdl;
 				file = mdl->getFile();
 				type = mdl->getType();
-				isIndexed = mdl->getIndexedState();
 			}
 		};
 

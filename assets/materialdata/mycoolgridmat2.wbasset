@@ -1,7 +1,7 @@
-Shard3D: 1.1.0.r1-alpha
+Shard3D: 1.1.1.r0-alpha
 WorldBuilder3D: 0.1
 WBASSET_Material: Some kind of material
-MaterialID: 5126301698680123513
+MaterialID: 14675877409135636390
 Material:
   - Container:
       Physics:
