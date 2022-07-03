@@ -1,6 +1,6 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include "run_app.hpp"
+#include "Project.hpp"
 //lib stuff
 #include <iostream>
 #include <chrono>
@@ -43,16 +43,16 @@
 
 
 namespace Shard3D {
-	RunApp::RunApp() {
+	ProjectApp::ProjectApp() {
 		SharedPools::constructPools(engineDevice);
 		GraphicsSettings::init(&engineWindow);
 		SHARD3D_INFO("Constructing Level Pointer");
 		activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
-	RunApp::~RunApp() {
+	ProjectApp::~ProjectApp() {
 		SharedPools::destructPools();
 	}
-	void RunApp::setupDescriptors() {
+	void ProjectApp::setupDescriptors() {
 #if ENABLE_COMPUTE_SHADERS == true
 		SharedPools::computePool = EngineDescriptorPool::Builder(engineDevice)
 			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -60,7 +60,7 @@ namespace Shard3D {
 			.build();
 #endif
 	}
-	void RunApp::run() {
+	void ProjectApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
 			uboBuffers[i] = std::make_unique<EngineBuffer>(
@@ -74,7 +74,7 @@ namespace Shard3D {
 		}
 		auto globalSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-			.build();	
+			.build();
 		std::vector<VkDescriptorSet> globalDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < globalDescriptorSets.size(); i++) {
 			auto bufferInfo = uboBuffers[i]->descriptorInfo();
@@ -86,7 +86,7 @@ namespace Shard3D {
 #if ENABLE_COMPUTE_SHADERS == true
 		VkDescriptorImageInfo computeImageInfo;
 		ComputeUbo cUbo{};
-	
+
 		computeImageInfo.sampler = cUbo.inputImage;
 		computeImageInfo.imageView = engineRenderer.getSwapchainImageView(0);
 		computeImageInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -101,13 +101,7 @@ namespace Shard3D {
 				.build(computeDescriptorSets[i]);
 		}
 #endif
-
-		layerStack.pushLayer(new TestLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow(), activeLevel);
-#if ENABLE_WORLDBUILDER3D
-		layerStack.pushOverlay(new ImGuiLayer(), engineRenderer.getSwapChainRenderPass(), &engineDevice, engineWindow.getGLFWwindow(), activeLevel);
-#endif
-		GridSystem gridSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-#if ENABLE_COMPUTE_SHADERS == true
+		#if ENABLE_COMPUTE_SHADERS == true
 		ComputeSystem computeSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), computeSetLayout->getDescriptorSetLayout() };
 #endif
 		BasicRenderSystem basicRenderSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -119,26 +113,13 @@ namespace Shard3D {
 		SHARD3D_INFO("Loading editor camera actor");
 		wb3d::Actor cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
 		cameraActor.addComponent<Components::CameraComponent>();
-		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, 1.f, -1.f);
-
-		activeLevel->setPossessedCameraActor(cameraActor);
+		activeLevel->setPossessedCameraActor(cameraActor); // need default camera actor to prevent the engine dying
 
 		loadGameObjects();
-
-		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
-		controller::EditorMouseMovementController editorCameraControllerMouse{};
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
-
-		CSimpleIniA gini;
-		gini.SetUnicode();
-		gini.LoadFile(GAME_SETTINGS_PATH);
-
-		float fov = ini.GetDoubleValue("RENDERING", "FOV");
-		SHARD3D_INFO("Default FOV set to {0} degrees", fov);
-		cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!engineWindow.shouldClose()) {
@@ -155,26 +136,22 @@ namespace Shard3D {
 			wb3d::MasterManager::executeQueue(activeLevel, engineDevice);
 			activeLevel->tick(frameTime);
 
-			if (activeLevel->simulationState != PlayState::Simulating) {
-				editorCameraControllerKeyboard.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
-				editorCameraControllerMouse.moveInPlaneXZ(engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
-			}
-
-			cameraActor.getComponent<Components::CameraComponent>().ar = engineRenderer.getAspectRatio();
+			possessedCameraActor.getComponent<Components::CameraComponent>().ar = engineRenderer.getAspectRatio();
 
 			possessedCamera.setViewYXZ(
-				possessedCameraActor.getComponent<Components::TransformComponent>().translation, 
+				possessedCameraActor.getComponent<Components::TransformComponent>().translation,
 				possessedCameraActor.getComponent<Components::TransformComponent>().rotation
 			);
-			
+
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
 				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
 				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
-			} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
+			}
+			else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
 				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
 				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 			}
-			
+
 			if (glfwGetKey(engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
 #ifndef NDEBUG
 				MessageDialogs::show("No fullscreen in Debug Mode allowed!", "Debug", MessageDialogs::OPTICONERROR);
@@ -228,7 +205,7 @@ namespace Shard3D {
 
 					Also order absolutely matters, post processing for example must go last
 				*/
-				
+
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 
 				basicRenderSystem.renderGameObjects(frameInfo, activeLevel);
@@ -237,10 +214,6 @@ namespace Shard3D {
 				spotlightSystem.render(frameInfo, activeLevel);
 				directionalLightSystem.render(frameInfo, activeLevel);
 
-				gridSystem.render(frameInfo);
-#if ENABLE_COMPUTE_SHADERS == true
-				computeSystem.render(frameInfo);
-#endif
 				// Layer overlays
 				for (Layer* layer : layerStack) {
 					layer->update(commandBuffer, engineWindow.getGLFWwindow(), frameTime, activeLevel);
@@ -250,41 +223,19 @@ namespace Shard3D {
 			}
 		}
 		if (activeLevel->simulationState != PlayState::Stopped) activeLevel->end();
-		for (Layer* layer : layerStack) {
-			layer->detach();
-		}
 		vkDeviceWaitIdle(engineDevice.device());
 	}
 
-	void RunApp::loadGameObjects() {
-
-		/*
-			NOTE:
-			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, Y up.
-			That means that in the editor, the level must save object transform values as (X, Z, Y), otherwise it will be incorrect
-		*/
-		/*
-		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ, false); //dont index because model breaks
-
-		model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/cone.obj", ModelType::MODEL_TYPE_OBJ);
-
-		wb3d::Actor cool = activeLevel->createActor("parent actor test");
-		cool.addComponent<Components::MeshComponent>(model);
-		cool.addComponent<Components::CppScriptComponent>().bind<CppScripts::ExampleCppScript>();
-
-		wb3d::Actor epic = activeLevel->createActor("camerabeamer");
-		epic.addComponent<Components::CameraComponent>().setProjection();
-		epic.getComponent<Components::TransformComponent>().translation = {2.f, -2.f, 0.f};
-		*/
+	void ProjectApp::loadGameObjects() {
 		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ); //dont index because model breaks
 		wb3d::LevelManager levelman(activeLevel);
-		levelman.load("assets/scenedata/drivecartest.wbl", engineDevice, true);
-		
+		levelman.load("assets/scenedata/drivecartest.encr.wbl", engineDevice, true);
+
 		wb3d::Actor car = activeLevel->createActor("Car");
 		car.addComponent<Components::MeshComponent>(model);
+
 		car.getComponent<Components::TransformComponent>().rotation = { 0.f, glm::radians(90.f), 0.f };
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-
-		//activeLevel->possessedCam = epic.getComponent<Components::CameraComponent>().camera;
+		activeLevel->begin();
 	}
 }

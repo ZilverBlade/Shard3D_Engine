@@ -19,18 +19,18 @@
 using namespace Shard3D::wb3d;
 
 namespace Shard3D {
-	class RunApp {
+	class EditorApp {
 	public:
 		static constexpr int WIDTH = 1280; //800
 		static constexpr int HEIGHT = 720; //600
 		const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
 
-		RunApp();
-		~RunApp();
+		EditorApp();
+		~EditorApp();
 
 
-		RunApp(const RunApp&) = delete;
-		RunApp& operator=(const RunApp&) = delete;
+		EditorApp(const EditorApp&) = delete;
+		EditorApp& operator=(const EditorApp&) = delete;
 
 		void run();
 	private:

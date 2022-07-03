@@ -1,5 +1,5 @@
 #include "renderer.hpp"
-#include "run_app.hpp"
+#include "editor_app.hpp"
 #include "utils/definitions.hpp"
 #include "simpleini/simple_ini.h"
 

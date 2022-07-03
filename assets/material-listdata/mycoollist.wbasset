@@ -1,11 +1,11 @@
 Shard3D: 1.1.1.r0-alpha
 WorldBuilder3D: 0.1
 WBASSET_MaterialList: Some kind of material list
-MaterialListID: 16724275673234657499
+MaterialListID: 700221693583932059
 List:
-  - Material: 5415818514396194148
+  - Material: 13108949341632691334
     Location: ""
     Pointer: Placeholder
-  - Material: 14675877409135636390
+  - Material: 7662987766436615652
     Location: ""
     Pointer: Placeholder

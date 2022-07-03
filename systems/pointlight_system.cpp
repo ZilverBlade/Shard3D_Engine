@@ -67,6 +67,11 @@ namespace Shard3D {
 	}
 
 	void PointlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo, std::shared_ptr<wb3d::Level>& level) {
+#ifndef GAME_RELEASE_READY
+		if (ubo.numPointlights > MAX_POINTLIGHTS) {
+			SHARD3D_FATAL("Too many pointlights in level!!!!");
+		}
+#endif
 		int lightIndex = 0;
 		level->registry.view<Components::PointlightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
 			ubo.pointlights[lightIndex].position = glm::vec4(transform.translation, 1.f);

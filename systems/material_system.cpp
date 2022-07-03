@@ -114,17 +114,8 @@ namespace Shard3D {
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
 
-#ifdef GAME_RELEASE_READY
-		YAML::Node data = YAML::Load(decrypt(strStream.str()));
-#if BETA_DEBUG_TOOLS
-		std::ofstream fout(sourcePath + ".dcr");
-		fout << decrypt(strStream.str());
-		fout.flush();
-		fout.close();
-#endif
-#else
 		YAML::Node data = YAML::Load(strStream.str());
-#endif
+
 		if (!data["WBASSET_Material"]) return Material();
 
 
@@ -176,17 +167,8 @@ namespace Shard3D {
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
 
-#ifdef GAME_RELEASE_READY
-		YAML::Node data = YAML::Load(decrypt(strStream.str()));
-#if BETA_DEBUG_TOOLS
-		std::ofstream fout(sourcePath + ".dcr");
-		fout << decrypt(strStream.str());
-		fout.flush();
-		fout.close();
-#endif
-#else
 		YAML::Node data = YAML::Load(strStream.str());
-#endif
+
 		if (!data["WBASSET_MaterialList"]) return MaterialList();
 
 

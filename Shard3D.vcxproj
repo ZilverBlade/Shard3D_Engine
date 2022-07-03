@@ -283,6 +283,7 @@
     <ClCompile Include="engine_logger.cpp" />
     <ClCompile Include="graphics_settings.cpp" />
     <ClCompile Include="GUID.cpp" />
+    <ClCompile Include="Project.cpp" />
     <ClCompile Include="systems\compute_system.cpp" />
     <ClCompile Include="systems\material_system.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -309,7 +310,7 @@
     <ClCompile Include="swap_chain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="device.cpp" />
-    <ClCompile Include="run_app.cpp" />
+    <ClCompile Include="editor_app.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="engine_window.cpp" />
@@ -334,6 +335,7 @@
     <ClInclude Include="events\event_handler.hpp" />
     <ClInclude Include="events\key_events.hpp" />
     <ClInclude Include="graphics_settings.hpp" />
+    <ClInclude Include="Project.hpp" />
     <ClInclude Include="scripts\carcontroller.hpp" />
     <ClInclude Include="systems\material_system.hpp" />
     <ClInclude Include="plugins\example_component.hpp" />
@@ -399,7 +401,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="device.hpp" />
-    <ClInclude Include="run_app.hpp" />
+    <ClInclude Include="editor_app.hpp" />
     <ClInclude Include="components.hpp" />
     <ClInclude Include="model.hpp" />
     <ClInclude Include="pipeline.hpp" />
