@@ -52,10 +52,8 @@ namespace Shard3D {
 
 		void EditorMouseMovementController::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 			float fov = cachedActor.getComponent<Components::CameraComponent>().fov;
-			if (fov < 20.0f)
-				fov = 30.0f;
-			if (fov > 170.0f)
-				fov = 170.0f;
+			
+			//glm::clamp(fov, 30.f, 170.f);
 			fov -= yoffset * 4;
 			cachedActor.getComponent<Components::CameraComponent>().fov = fov;
 		}

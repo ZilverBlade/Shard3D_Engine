@@ -445,6 +445,9 @@
     <ClInclude Include="singleton.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="UI\imgui_initter.hpp">
+      <Filter>Header Files\UI\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />

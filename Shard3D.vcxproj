@@ -350,6 +350,7 @@
     <ClInclude Include="scripts\script_link.h" />
     <ClInclude Include="systems\compute_system.hpp" />
     <ClInclude Include="texture.hpp" />
+    <ClInclude Include="UI\imgui_initter.hpp" />
     <ClInclude Include="UI\level_peekers.hpp" />
     <ClInclude Include="utils\def_dynamic.hpp" />
     <ClInclude Include="utils\dialogs.h" />

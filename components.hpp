@@ -106,25 +106,16 @@ namespace Shard3D {
 			
 		};
 		struct MeshComponent {
-			std::shared_ptr<EngineModel> model{};
 			std::string file{};
 			ModelType type = ModelType::MODEL_TYPE_NULL;
 			MaterialSystem::MaterialList materialList;
 
-			std::shared_ptr<EngineModel> newModel{};
+			std::string cacheFile{};
 
 			MeshComponent() = default;
 			MeshComponent(const MeshComponent&) = default;
-			MeshComponent(const std::shared_ptr<EngineModel>& mdl) {
-				model = mdl; 
-				file = mdl->getFile(); 
-				type = mdl->getType();			
-			}
-			void reapplyModel(const std::shared_ptr<EngineModel>& mdl) {
-				model = mdl;
-				file = mdl->getFile();
-				type = mdl->getType();
-			}
+			MeshComponent(const std::string& mdl);
+			void reapplyModel(const std::string& mdl);
 		};
 
 		struct PointlightComponent {

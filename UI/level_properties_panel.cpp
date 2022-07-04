@@ -3,6 +3,7 @@
 #include "../engine_window.hpp"
 #include <fstream>
 #include <imgui_internal.h>
+#include "../wb3d/assetmgr.hpp"
 namespace Shard3D {
 	LevelPropertiesPanel::LevelPropertiesPanel(const std::shared_ptr<Level>& levelContext) {
 		setContext(levelContext);
@@ -40,13 +41,15 @@ namespace Shard3D {
 					}
 					if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
 						//add a default obj
-						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(DEFAULT_MODEL_FILE, ModelType::MODEL_TYPE_OBJ));
+						AssetManager::emplaceModel(DEFAULT_MODEL_FILE);
+						tree.selectedActor.addComponent<Components::MeshComponent>(DEFAULT_MODEL_FILE);
 
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
 						tree.selectedActor.addComponent<Components::CameraComponent>();
-						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile("assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ));
+						AssetManager::emplaceModel("assets/modeldata/engineModels/camcord.obj");
+						tree.selectedActor.addComponent<Components::MeshComponent>("assets/modeldata/engineModels/camcord.obj");
 
 						ImGui::CloseCurrentPopup();
 					}
@@ -175,20 +178,19 @@ namespace Shard3D {
 				ImGui::EndPopup();
 			}
 			if (open) {
-				auto& file = actor.getComponent<Components::MeshComponent>().file;
+				auto& rfile = actor.getComponent<Components::MeshComponent>().cacheFile;
+				
 				char fileBuffer[256];
 				memset(fileBuffer, 0, 256);
-				strncpy(fileBuffer, file.c_str(), 256);
+				strncpy(fileBuffer, rfile.c_str(), 256);
 				if (ImGui::InputText("Mesh File", fileBuffer, 256)) {
-					file = std::string(fileBuffer);
+					rfile = std::string(fileBuffer);
 				}
 				if (ImGui::Button("(Re)Load Mesh")) {
-					std::ifstream ifile(file);
+					std::ifstream ifile(fileBuffer);
 					if (ifile.good()) {
-						actor.getComponent<Components::MeshComponent>().newModel = EngineModel::createModelFromFile(
-							actor.getComponent<Components::MeshComponent>().file,
-							actor.getComponent<Components::MeshComponent>().type
-						);
+						SHARD3D_LOG("Reloading mesh '{0}'", rfile);
+						actor.getComponent<Components::MeshComponent>().cacheFile = rfile;
 						context->reloadMesh(actor);
 					} else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
 				}

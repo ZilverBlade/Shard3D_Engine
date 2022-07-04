@@ -52,11 +52,14 @@ namespace Shard3D {
 
 	void LevelPeekingPanel::peekLODInspector() {
 		ImGui::Begin("Model & LOD Inspector");
-		context->registry.view<Components::MeshComponent>().each([&](auto mesh) {
-			if (ImGui::CollapsingHeader(mesh.file.c_str(), ImGuiTreeNodeFlags_None)) {
-
+		ImGui::Text((std::string("Model count: " + std::to_string(AssetManager::getModelAssets().size())).c_str()));
+		if (ImGui::Button("Force delete all assets (dangerous)")) {
+			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous when assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
+				AssetManager::clearLevelAssets();
 			}
-		});
+		}
+		for (const auto& model : AssetManager::getModelAssets()) 
+			if (ImGui::TreeNodeEx(std::string(model.first + "##" + model.first).c_str(), ImGuiTreeNodeFlags_None)) {}
 		ImGui::End();
 	}
 	

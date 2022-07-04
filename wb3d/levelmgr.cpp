@@ -155,7 +155,7 @@ namespace Shard3D {
 		}
 
 		LevelMgrResults LevelManager::load(const std::string& sourcePath, bool ignoreWarns) {
-			//mLevel->killEverything();
+			AssetManager::clearLevelAssets(); // remove since new stuff will be loaded into memory
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
@@ -219,11 +219,12 @@ namespace Shard3D {
 					}
 
 					if (actor["MeshComponent"]) {
-						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(
+						AssetManager::emplaceModel(
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),
-				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>()
+							(ModelType)actor["MeshComponent"]["MeshFormat"].as<int>()
 						);
-						loadedActor.addComponent<Components::MeshComponent>(model);
+						loadedActor.addComponent<Components::MeshComponent>(
+							actor["MeshComponent"]["MeshPath"].as<std::string>());
 					}
 					
 					if (actor["PointlightComponent"]) {

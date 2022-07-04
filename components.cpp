@@ -1,6 +1,7 @@
 #include "components.hpp"
 #include <iostream>
 #include "utils/definitions.hpp"
+#include "wb3d/assetmgr.hpp"
 namespace Shard3D {
 	namespace Components {
 		glm::mat4 TransformComponent::mat4() {
@@ -62,6 +63,17 @@ namespace Shard3D {
 					invScale.z * (-s2),
 					invScale.z * (c1 * c2),
 				}, };
+		}
+
+		MeshComponent::MeshComponent(const std::string& mdl) {
+			cacheFile = mdl; // cacheFile is to be used to store future possible model
+			file = mdl;
+			type = wb3d::AssetManager::retrieveModel(mdl)->getType();
+		}
+		void MeshComponent::reapplyModel(const std::string& mdl) {
+			file = cacheFile;
+			wb3d::AssetManager::emplaceModel(cacheFile);
+			//type = wb3d::AssetManager::retrieveModel(mdl)->getType();
 		}
 	}
 }

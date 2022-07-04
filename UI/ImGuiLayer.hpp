@@ -25,11 +25,10 @@ namespace Shard3D {
 
         void pushError(const char* message);
 	private:
+		void renderMenuBar();
 		int width;
 		int height;
 		VkDescriptorPool descriptorPool;
-
-		std::shared_ptr<Level> level;
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 

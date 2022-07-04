@@ -30,7 +30,7 @@ namespace Shard3D {
 			static std::unordered_map<std::string, std::shared_ptr<EngineModel>>& getModelAssets() { return modelAssets; }
 			static std::unordered_map<std::string, EngineTexture>& getTextureAssets() { return textureAssets; }
 
-			static void emplaceModel(const std::shared_ptr<EngineModel>& model);
+			static void emplaceModel(const std::string& modelPath, ModelType modelType = ModelType::MODEL_TYPE_OBJ);
 			static std::shared_ptr<EngineModel>& retrieveModel(const std::string& path);
 
 			static void emplaceTexture(EngineTexture& model);

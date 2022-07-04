@@ -4,10 +4,13 @@
 
 #include "master_manager.hpp"
 #include "bpmgr.hpp"
+#include "assetmgr.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
-		Level::Level(std::string lvlName) {}
+		Level::Level(std::string lvlName) {
+
+		}
 		Level::~Level() {
 			SHARD3D_INFO("Destroying level");
 			registry.clear();
@@ -102,7 +105,7 @@ namespace Shard3D {
 			if (actorReloadMeshQueue.size() != 0) {
 				for (int i = 0; i < actorReloadMeshQueue.size(); i++) {
 					vkDeviceWaitIdle(device);
-					actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().reapplyModel(actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().newModel);
+					actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().reapplyModel(actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().cacheFile);
 				}
 				actorReloadMeshQueue.clear();
 				return;

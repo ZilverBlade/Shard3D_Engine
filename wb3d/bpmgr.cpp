@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include "level.hpp" // for the killMesh function
+#include "assetmgr.hpp"
 
 namespace Shard3D {
 	namespace wb3d {
@@ -214,11 +215,8 @@ namespace Shard3D {
 					}
 
 					if (actor["MeshComponent"]) {
-						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(
-							actor["MeshComponent"]["MeshPath"].as<std::string>(),
-				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>()
-						);
-						loadedActor.addComponent<Components::MeshComponent>(model);
+						loadedActor.addComponent<Components::MeshComponent>(
+							actor["MeshComponent"]["MeshPath"].as<std::string>());
 					}
 					
 					if (actor["PointlightComponent"]) {

@@ -26,6 +26,9 @@ namespace Shard3D {
     };
 
     class OffScreen {
+    private:
+        std::array<VkClearValue, 2> clearValues{};
+        VkDeviceSize offsets[1] = { 0 };
     public:
         OffScreen(EngineDevice &device);
         //void Init(Device device);

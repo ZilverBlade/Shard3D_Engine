@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <array>
 
+#include "../wb3d/assetmgr.hpp"
 namespace Shard3D {
 
 	struct SimplePushConstantData {
@@ -94,10 +95,9 @@ namespace Shard3D {
 				&push
 			);
 
-			auto model = mesh.model ;
+			auto& model = wb3d::AssetManager::retrieveModel(mesh.file);
 			model->bind(frameInfo.commandBuffer);
-			model->draw(frameInfo.commandBuffer);
-			
+			model->draw(frameInfo.commandBuffer);	
 		});
 	}
 

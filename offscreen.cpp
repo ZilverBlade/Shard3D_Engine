@@ -16,6 +16,17 @@ namespace Shard3D {
 
         createImages();
         after = true;
+
+        CSimpleIniA ini;
+        ini.SetUnicode();
+        ini.LoadFile(ENGINE_SETTINGS_PATH);
+        float noEditBgColor[3];
+        noEditBgColor[0] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorR");
+        noEditBgColor[1] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorG");
+        noEditBgColor[2] = (float)ini.GetDoubleValue("RENDERING", "DefaultBGColorB");
+
+        clearValues[0].color = { noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.f };
+        clearValues[1].depthStencil = { 1.0f, 0 };
     }
 
     void OffScreen::createImages() {
@@ -229,11 +240,6 @@ namespace Shard3D {
     };
 
     void OffScreen::start(FrameInfo frameInfo) {
-        std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = {0.01f, 0.01f, 0.01f, 1.0f};
-        clearValues[1].depthStencil = {1.0f, 0};
-        VkDeviceSize offsets[1] = {0};
-
         VkRenderPassBeginInfo renderPassBeginInfo{};
         renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassBeginInfo.renderPass = pass.renderPass;
@@ -246,8 +252,10 @@ namespace Shard3D {
         vkCmdBeginRenderPass(frameInfo.commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         VkViewport viewport = {};
-        viewport.width = (float) pass.width;
-        viewport.height = (float) pass.height;
+        viewport.x = 0.0f;
+        viewport.y = (float)pass.height;
+        viewport.width = (float)pass.width;
+        viewport.height = -(float)pass.height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
         vkCmdSetViewport(frameInfo.commandBuffer, 0, 1, &viewport);
