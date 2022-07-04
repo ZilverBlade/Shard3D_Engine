@@ -34,14 +34,13 @@
 #include "systems/compute_system.hpp" //mostly post processing prob
 
 //UI stuff
-#include "UI/TestLayer.hpp"
 #include "UI/ImGuiLayer.hpp"
 
 //scripts
 #include "scripts/script_link.h"
 #include "graphics_settings.hpp"
 
-
+/*
 namespace Shard3D {
 	ProjectApp::ProjectApp() {
 		SharedPools::constructPools(engineDevice);
@@ -204,7 +203,7 @@ namespace Shard3D {
 					LAYERS MUST BE LOADED LAST!
 
 					Also order absolutely matters, post processing for example must go last
-				*/
+				
 
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 
@@ -227,9 +226,9 @@ namespace Shard3D {
 	}
 
 	void ProjectApp::loadGameObjects() {
-		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(engineDevice, "assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ); //dont index because model breaks
+		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile("assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ); //dont index because model breaks
 		wb3d::LevelManager levelman(activeLevel);
-		levelman.load("assets/scenedata/drivecartest.encr.wbl", engineDevice, true);
+		levelman.load("assets/scenedata/drivecartest.encr.wbl", true);
 
 		wb3d::Actor car = activeLevel->createActor("Car");
 		car.addComponent<Components::MeshComponent>(model);
@@ -239,3 +238,4 @@ namespace Shard3D {
 		activeLevel->begin();
 	}
 }
+*/

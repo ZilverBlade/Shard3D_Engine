@@ -31,7 +31,7 @@ namespace Shard3D {
 			void convert(const std::string& destinationPath, Blueprint blueprint, bool encryptLevel = false);
 			void convertRuntime(const std::string& destinationPath);
 
-			BlueprintMgrResults load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns = false);
+			BlueprintMgrResults load(const std::string& sourcePath, bool ignoreWarns = false);
 			BlueprintMgrResults loadRuntime(const std::string& sourcePath);
 			
 		private:

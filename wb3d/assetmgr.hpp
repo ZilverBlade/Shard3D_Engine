@@ -27,7 +27,7 @@ namespace Shard3D {
 			//unlike other assets, textures and models should use a path as a key, 
 			//since they directly load from there, rather than load into a wrapper/struct
 
-			static std::unordered_map<std::string, std::shared_ptr<EngineModel>&>& getModelAssets() { return modelAssets; }
+			static std::unordered_map<std::string, std::shared_ptr<EngineModel>>& getModelAssets() { return modelAssets; }
 			static std::unordered_map<std::string, EngineTexture>& getTextureAssets() { return textureAssets; }
 
 			static void emplaceModel(const std::shared_ptr<EngineModel>& model);
@@ -45,7 +45,7 @@ namespace Shard3D {
 			static std::unordered_map<uint64_t, MaterialSystem::MaterialList>& getMaterialListAssets() { return materialListAssets; }
 #pragma endregion	
 		private:
-			inline static std::unordered_map<std::string, std::shared_ptr<EngineModel>&> modelAssets;
+			inline static std::unordered_map<std::string, std::shared_ptr<EngineModel>> modelAssets;
 			inline static std::unordered_map<std::string, EngineTexture> textureAssets;
 			inline static std::unordered_map<uint64_t, MaterialSystem::Material> materialAssets;
 			inline static std::unordered_map<uint64_t, MaterialSystem::MaterialList> materialListAssets;

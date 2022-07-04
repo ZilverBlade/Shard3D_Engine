@@ -16,10 +16,10 @@ namespace Shard3D {
 		void MasterManager::executeQueue(std::shared_ptr<Level>& level, EngineDevice& engineDevice) {
 			if (levelPath != "wb3d_nullpath") {
 				LevelManager levelMan(level);
-				LevelMgrResults result = levelMan.load(levelPath, engineDevice, false);
+				LevelMgrResults result = levelMan.load(levelPath, false);
 				if (result == LevelMgrResults::OldEngineVersionResult) {
 					if (MessageBoxA(NULL, "This level was created in an different version of Shard3D, results may be unexpected.\nWould you like to try and load the level anyway?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
-						levelMan.load(levelPath, engineDevice, true);
+						levelMan.load(levelPath, true);
 					}
 					else {
 						//std::cout << "you fucked up :)\n";

@@ -12,6 +12,7 @@
 #include "utils/definitions.hpp"
 #include "engine_logger.hpp"
 #include "graphics_settings.hpp"
+#include "singleton.hpp"
 
 namespace Shard3D {
 
@@ -153,7 +154,7 @@ void EngineSwapChain::createSwapChain() {
   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
   createInfo.surface = device.surface();
 
-  device.init_info.MinImageCount = imageCount;
+  Singleton::imgui_init_info.MinImageCount = imageCount;
   createInfo.minImageCount = imageCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -199,7 +200,7 @@ void EngineSwapChain::createSwapChain() {
   swapChainImageFormat = surfaceFormat.format;
   swapChainExtent = extent;
 
-  device.init_info.ImageCount = imageCount;
+  Singleton::imgui_init_info.ImageCount = imageCount;
 }
 
 void EngineSwapChain::createImageViews() {

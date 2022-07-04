@@ -283,7 +283,9 @@
     <ClCompile Include="engine_logger.cpp" />
     <ClCompile Include="graphics_settings.cpp" />
     <ClCompile Include="GUID.cpp" />
+    <ClCompile Include="offscreen.cpp" />
     <ClCompile Include="Project.cpp" />
+    <ClCompile Include="singleton.cpp" />
     <ClCompile Include="systems\compute_system.cpp" />
     <ClCompile Include="systems\material_system.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -320,7 +322,6 @@
     <ClCompile Include="UI\imgui_implementation.cpp" />
     <ClCompile Include="UI\Layer.cpp" />
     <ClCompile Include="UI\LayerStack.cpp" />
-    <ClCompile Include="UI\TestLayer.cpp" />
     <ClCompile Include="wb3d\levelmgr.cpp" />
     <ClCompile Include="wb3d\wb3d_imgui_frame.hpp" />
   </ItemGroup>
@@ -335,8 +336,10 @@
     <ClInclude Include="events\event_handler.hpp" />
     <ClInclude Include="events\key_events.hpp" />
     <ClInclude Include="graphics_settings.hpp" />
+    <ClInclude Include="offscreen.hpp" />
     <ClInclude Include="Project.hpp" />
     <ClInclude Include="scripts\carcontroller.hpp" />
+    <ClInclude Include="singleton.hpp" />
     <ClInclude Include="systems\material_system.hpp" />
     <ClInclude Include="plugins\example_component.hpp" />
     <ClInclude Include="plugins\plugin_link.h" />
@@ -370,7 +373,6 @@
     <ClInclude Include="wb3d\level.hpp" />
     <ClInclude Include="UI\imgui_glfw_implementation.hpp" />
     <ClInclude Include="UI\imgui_implementation.hpp" />
-    <ClInclude Include="UI\TestLayer.hpp" />
     <ClInclude Include="UI\ImGuiLayer.hpp" />
     <ClInclude Include="systems\grid_system.hpp" />
     <ClInclude Include="UI\Layer.hpp" />

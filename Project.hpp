@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 using namespace Shard3D::wb3d;
-
+/*
 namespace Shard3D {
 	class ProjectApp {
 	public:
@@ -47,4 +47,4 @@ namespace Shard3D {
 		std::shared_ptr<Level> activeLevel{};
 	};
 
-}
+}*/

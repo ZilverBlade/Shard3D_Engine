@@ -12,13 +12,11 @@ namespace Shard3D {
 		Layer(const char* name = "Layer");
 		virtual ~Layer();
 
-		virtual void attach();
-		virtual void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level);
+		virtual void attach(VkRenderPass renderPass);
 
 		virtual void detach();
 
-		virtual void update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level);
-		//virtual void event();
+		virtual void update(VkCommandBuffer buffer, float dt);
 
 	private:
 

@@ -1,7 +1,7 @@
 #include "level_gizmo.hpp"
 
 namespace Shard3D {
-
+	/*
 	Gizmo::Gizmo(){}
 	Gizmo::~Gizmo(){}
 	void Gizmo::setContext(const std::shared_ptr<Level>& levelContext) {
@@ -17,5 +17,5 @@ namespace Shard3D {
 			//auto cameraActor = level->getEditorCameraActor();
 		}
 	}
-
+	*/
 }

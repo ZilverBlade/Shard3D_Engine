@@ -13,11 +13,11 @@ namespace Shard3D {
 	void LevelPropertiesPanel::setContext(const std::shared_ptr<Level>& levelContext) { context = levelContext; }
 	void LevelPropertiesPanel::destroyContext() { context = {}; }
 
-	void LevelPropertiesPanel::render(LevelTreePanel tree, EngineDevice* device) {
+	void LevelPropertiesPanel::render(LevelTreePanel tree) {
 		ImGui::Begin("Properties"); ImGui::BeginDisabled(context->simulationState == PlayState::Simulating/*&& ini.canEditDuringSimulation*/);
 		if (tree.selectedActor){ 
 			if (!tree.selectedActor.hasComponent<Components::BlueprintComponent>()) {
-				drawActorProperties(tree.selectedActor, *device);
+				drawActorProperties(tree.selectedActor);
 				if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
 				if (ImGui::BeginPopup("AddComponent")) {
 #if !ACTOR_FORCE_TRANSFORM_COMPONENT
@@ -40,13 +40,13 @@ namespace Shard3D {
 					}
 					if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
 						//add a default obj
-						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, DEFAULT_MODEL_FILE, ModelType::MODEL_TYPE_OBJ));
+						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(DEFAULT_MODEL_FILE, ModelType::MODEL_TYPE_OBJ));
 
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
 						tree.selectedActor.addComponent<Components::CameraComponent>();
-						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(*device, "assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ));
+						tree.selectedActor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile("assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ));
 
 						ImGui::CloseCurrentPopup();
 					}
@@ -140,7 +140,7 @@ namespace Shard3D {
 			}
 		}	
 	}
-	void LevelPropertiesPanel::drawActorProperties(Actor actor, EngineDevice& device) {
+	void LevelPropertiesPanel::drawActorProperties(Actor actor) {
 		if (actor.hasComponent<Components::TagComponent>()) {
 			auto& tag = actor.getComponent<Components::TagComponent>().tag;
 			char tagBuffer[256];
@@ -185,7 +185,7 @@ namespace Shard3D {
 				if (ImGui::Button("(Re)Load Mesh")) {
 					std::ifstream ifile(file);
 					if (ifile.good()) {
-						actor.getComponent<Components::MeshComponent>().newModel = EngineModel::createModelFromFile(device,
+						actor.getComponent<Components::MeshComponent>().newModel = EngineModel::createModelFromFile(
 							actor.getComponent<Components::MeshComponent>().file,
 							actor.getComponent<Components::MeshComponent>().type
 						);

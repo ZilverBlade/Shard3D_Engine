@@ -4,6 +4,7 @@
 #include <WinUser.h>
 #include <consoleapi3.h>
 #endif
+#include "definitions.hpp"
 namespace Shard3D {
 	class DYNAMICDEF {
 	public:

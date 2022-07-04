@@ -154,7 +154,7 @@ namespace Shard3D {
 			assert(false);
 		}
 
-		BlueprintMgrResults BlueprintManager::load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns) {
+		BlueprintMgrResults BlueprintManager::load(const std::string& sourcePath, bool ignoreWarns) {
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
@@ -215,7 +215,6 @@ namespace Shard3D {
 
 					if (actor["MeshComponent"]) {
 						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(
-							device,
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),
 				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>()
 						);

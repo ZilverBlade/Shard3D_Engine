@@ -8,6 +8,8 @@
 #include <cassert>
 #include "utils/definitions.hpp"
 #include "engine_logger.hpp"
+#include "singleton.hpp"
+#include "graphics_settings.hpp"
 
 namespace Shard3D {
 
@@ -143,7 +145,7 @@ void EngineDevice::createInstance() {
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
       SHARD3D_FATAL("Failed to create instance!");
   }
-  init_info.Instance = instance;
+  Singleton::imgui_init_info.Instance = instance;
   hasGflwRequiredInstanceExtensions();
 }
 
@@ -178,7 +180,7 @@ void EngineDevice::pickPhysicalDevice() {
     SHARD3D_FATAL("Failed to find a suitable GPU!");
   }
 
-  init_info.PhysicalDevice = physicalDevice;
+  Singleton::imgui_init_info.PhysicalDevice = physicalDevice;
 
   vkGetPhysicalDeviceProperties(physicalDevice, &properties);
   SHARD3D_INFO("physical device: {0}", properties.deviceName);

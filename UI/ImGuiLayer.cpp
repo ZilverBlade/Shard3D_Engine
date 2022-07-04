@@ -19,24 +19,23 @@
 #include "../utils/dialogs.h"
 #include "../video/video_decode.hpp"
 #include "../systems/material_system.hpp"
+#include "../singleton.hpp"
+
 namespace Shard3D {
-
-
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
 	ImGuiLayer::~ImGuiLayer() {}
 
-    void ImGuiLayer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
-        currentDevice = device;
+    void ImGuiLayer::attach(VkRenderPass renderPass) {
         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
-        glfwSetWindowTitle(window, title.c_str());
+        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
         hasBeenDetached = false;
 
         // Load any panels
         nodeEditorContext = ax::NodeEditor::CreateEditor();
-        levelTreePanel.setContext(level);
-        levelPropertiesPanel.setContext(level);
-        levelPeekPanel.setContext(level);
+        levelTreePanel.setContext(Singleton::activeLevel);
+        levelPropertiesPanel.setContext(Singleton::activeLevel);
+        levelPeekPanel.setContext(Singleton::activeLevel);
         //levelGizmo.setContext(level);
 
         ImGui::CreateContext();
@@ -95,20 +94,21 @@ namespace Shard3D {
         pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
         pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
         pool_info.pPoolSizes = pool_sizes;
-        vkCreateDescriptorPool(device->device(), &pool_info, nullptr, &descriptorPool);
+        vkCreateDescriptorPool(Singleton::engineDevice.device(), &pool_info, nullptr, &descriptorPool);
 
-        device->init_info.DescriptorPool = descriptorPool;
-        device->init_info.Device = device->device();
-        device->init_info.Queue = device->graphicsQueue();
-        device->init_info.QueueFamily = device->findPhysicalQueueFamilies().graphicsFamily;
+        Singleton::imgui_init_info.DescriptorPool = descriptorPool;
+        Singleton::imgui_init_info.Device = Singleton::engineDevice.device();
+        Singleton::imgui_init_info.Queue = Singleton::engineDevice.graphicsQueue();
+        Singleton::imgui_init_info.QueueFamily = Singleton::engineDevice.findPhysicalQueueFamilies().graphicsFamily;
 
-        device->init_info.MSAASamples = device->msaaSamples;
-        ImGui_ImplGlfw_InitForVulkan(window, true);
-        ImGui_ImplVulkan_Init(&device->init_info, renderPass);
+        Singleton::imgui_init_info.MSAASamples = Singleton::engineDevice.msaaSamples;
+        ImGui_ImplGlfw_InitForVulkan(Singleton::engineWindow.getGLFWwindow(), true);
+        ImGui_ImplVulkan_Init(&Singleton::imgui_init_info, Singleton::engineRenderer.getSwapChainRenderPass());
 
-        auto commandBuffer = device->beginSingleTimeCommands();
+
+        auto commandBuffer = Singleton::engineDevice.beginSingleTimeCommands();
         ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-        device->endSingleTimeCommands(commandBuffer);
+        Singleton::engineDevice.endSingleTimeCommands(commandBuffer);
         ImGui_ImplVulkan_DestroyFontUploadObjects();
 
         ImGuiStyle& style = ImGui::GetStyle();
@@ -189,8 +189,8 @@ namespace Shard3D {
         style.ScrollbarRounding = 2;
         style.GrabRounding = 3;
 
-        style.AntiAliasedFill = edpref.antiAliasedUI;
-        style.AntiAliasedLines = edpref.antiAliasedUI;
+        style.AntiAliasedFill = true;
+        style.AntiAliasedLines = true;
 
 #ifdef IMGUI_HAS_DOCK 
         style.TabBorderSize = 1;
@@ -234,7 +234,7 @@ namespace Shard3D {
 	void ImGuiLayer::detach() {
      // check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
         if (hasBeenDetached) return;
-        vkDestroyDescriptorPool(currentDevice->device(), descriptorPool, nullptr);
+        vkDestroyDescriptorPool(Singleton::engineDevice.device(), descriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -245,7 +245,7 @@ namespace Shard3D {
         hasBeenDetached = true;
 	}
 
-    void ImGuiLayer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level) {
+    void ImGuiLayer::update(VkCommandBuffer buffer, float dt) {
         if (hasBeenDetached) return;
 
         CSimpleIniA ini;
@@ -255,7 +255,7 @@ namespace Shard3D {
         ImGuiIO& io = ImGui::GetIO();
         io.DeltaTime = dt;
 
-        glfwGetWindowSize(window, &width, &height);
+        glfwGetWindowSize(Singleton::engineWindow.getGLFWwindow(), &width, &height);
         io.DisplaySize = ImVec2(width, height);
 
         ImGui_ImplVulkan_NewFrame();
@@ -265,7 +265,7 @@ namespace Shard3D {
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
         levelTreePanel.render();
-        levelPropertiesPanel.render(levelTreePanel, currentDevice);
+        levelPropertiesPanel.render(levelTreePanel);
         levelPeekPanel.render();
         //levelGizmo.render(level, levelTreePanel);
 
@@ -275,7 +275,7 @@ namespace Shard3D {
         //ImGui::ShowDemoWindow(&visible);
 
 #pragma region DOCKSPACE    
-        static bool opt_fullscreen = false;
+        static bool opt_fullscreen = true;
         static bool opt_padding = false;
 
         static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -309,7 +309,7 @@ namespace Shard3D {
           ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
            // ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
        }
-
+       ImGui::Image(Singleton::viewportImage, { 1280, 720 });
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
@@ -369,19 +369,19 @@ namespace Shard3D {
                         wb3d::MasterManager::captureLevel(level);
                         level->begin();
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
-                        glfwSetWindowTitle(window, title.c_str());
+                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();   
                     if (level->simulationState != PlayState::Paused) {
                         ImGui::BeginDisabled(level->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
                         level->simulationState = PlayState::Paused;
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused)";
-                        glfwSetWindowTitle(window, title.c_str());
+                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();  }
                     else {
                         ImGui::BeginDisabled(level->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
                         level->simulationState = PlayState::Simulating;
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
-                        glfwSetWindowTitle(window, title.c_str());
+                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
                     }
                     
@@ -389,8 +389,11 @@ namespace Shard3D {
                     if (ImGui::MenuItem("End")) {
                         levelTreePanel.clearSelectedActor();
                         level->end(); 
+                        levelTreePanel.setContext(Singleton::activeLevel);
+                        levelPropertiesPanel.setContext(Singleton::activeLevel);
+                        levelPeekPanel.setContext(Singleton::activeLevel);
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
-                        glfwSetWindowTitle(window, title.c_str());
+                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
                     ImGui::EndMenu();
                 }
@@ -409,7 +412,7 @@ namespace Shard3D {
                 }
                 if (ImGui::MenuItem("Play test video")) {
                     VideoPlaybackEngine::EngineH264Video videoEngine;
-                    videoEngine.createVideoSession(window, "assets/mediadata/video.wmw");
+                    videoEngine.createVideoSession(Singleton::engineWindow.getGLFWwindow(), "assets/mediadata/video.wmw");
                 }
                 if (ImGui::MenuItem("Save test material")) {
                     MaterialSystem::Material surfaceMat;
@@ -623,8 +626,6 @@ namespace Shard3D {
             if (ImGui::Button("Revert Changes")) {}
             ImGui::End();
         }
-
-        console.Draw("Dev Console", &visible);
 
         ImGui::End();
 #pragma endregion

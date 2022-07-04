@@ -11,8 +11,6 @@
     Shard3D 1.0 (2022) created by ZilverBlade
 */
 int main() {
-    Shard3D::LOGGER::init();
-    Shard3D::GraphicsSettings::init(nullptr);
 #ifdef _WIN32
     ShowWindow(GetConsoleWindow(), SW_SHOW);
 #endif

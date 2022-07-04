@@ -15,15 +15,15 @@ namespace Shard3D::wb3d {
 
 	void AssetManager::emplaceModel(const std::shared_ptr<EngineModel>& model) {
 // cant get this piece of shit to work lmao
-		//  for (const auto& i : modelAssets) 
-		//	if (i.second->fpath == model->fpath) {
-		//		SHARD3D_WARN("Model at path '{0}' already exists! Model will be overwritten.", model->fpath);
-		//		modelAssets.erase(i.first);
-		//		modelAssets[model->fpath] = model;
-		//		return; //prevent entries in unordered map with same path
-		//	}
-		//SHARD3D_LOG("Loaded model to asset map '{0}'", model->fpath);
-		//modelAssets.try_emplace(model->fpath, &model);
+		for (const auto& i : modelAssets) 
+			if (i.second->fpath == model->fpath) {
+				SHARD3D_WARN("Model at path '{0}' already exists! Model will be overwritten.", model->fpath);
+				modelAssets.erase(i.first);
+				modelAssets[model->fpath] = model;
+				return; //prevent entries in unordered map with same path
+			}
+		SHARD3D_LOG("Loaded model to asset map '{0}'", model->fpath);
+		modelAssets[model->fpath] = model;
 	}
 	std::shared_ptr<EngineModel>& AssetManager::retrieveModel(const std::string& path) {
 		return modelAssets.at(path);

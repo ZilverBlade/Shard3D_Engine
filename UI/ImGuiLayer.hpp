@@ -19,9 +19,9 @@ namespace Shard3D {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) override;
+		void attach(VkRenderPass renderPass) override;
 		void detach() override;
-		void update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level) override;
+		void update(VkCommandBuffer buffer, float dt) override;
 
         void pushError(const char* message);
 	private:
@@ -29,9 +29,9 @@ namespace Shard3D {
 		int height;
 		VkDescriptorPool descriptorPool;
 
-		ax::NodeEditor::EditorContext* nodeEditorContext;
+		std::shared_ptr<Level> level;
 
-		EngineDevice* currentDevice;
+		ax::NodeEditor::EditorContext* nodeEditorContext;
 
 		bool hasBeenDetached = false;
 		float timeSinceLastSecond;
@@ -70,7 +70,7 @@ namespace Shard3D {
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
 
-		Gizmo levelGizmo;
+//Gizmo levelGizmo;
 	};
 
 }

@@ -158,9 +158,6 @@
     <ClCompile Include="UI\LayerStack.cpp">
       <Filter>Source Files\UI\Layers</Filter>
     </ClCompile>
-    <ClCompile Include="UI\TestLayer.cpp">
-      <Filter>Source Files\UI\Layers</Filter>
-    </ClCompile>
     <ClCompile Include="UI\imgui_implementation.cpp">
       <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
@@ -239,6 +236,12 @@
     <ClCompile Include="Project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="offscreen.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="singleton.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -311,9 +314,6 @@
       <Filter>Header Files\UI\Layers</Filter>
     </ClInclude>
     <ClInclude Include="UI\LayerStack.hpp">
-      <Filter>Header Files\UI\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\TestLayer.hpp">
       <Filter>Header Files\UI\Layers</Filter>
     </ClInclude>
     <ClInclude Include="UI\imgui_implementation.hpp">
@@ -438,6 +438,12 @@
     </ClInclude>
     <ClInclude Include="Project.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="offscreen.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="singleton.hpp">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

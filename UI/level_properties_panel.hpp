@@ -2,6 +2,7 @@
 #include "../wb3d/level.hpp"
 #include "../wb3d/actor.hpp"
 #include "level_tree_panel.hpp"
+#include <imgui.h>
 
 using namespace Shard3D::wb3d;
 namespace Shard3D {
@@ -13,14 +14,12 @@ namespace Shard3D {
 
 		void setContext(const std::shared_ptr<Level>&levelContext);
 		void destroyContext();
-		void render(LevelTreePanel tree, EngineDevice* device);
+		void render(LevelTreePanel tree);
 	private:
-		void drawActorProperties(Actor actor, EngineDevice& device);
+		void drawActorProperties(Actor actor);
 		void drawBlueprintInfo(Actor actor);
 		std::shared_ptr<Level> context;
 
-
 		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
-
 	};
 }

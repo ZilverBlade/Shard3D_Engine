@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include "simpleini/simple_ini.h"
-#include "UI/imgui_implementation.hpp"
 
 namespace Shard3D {
 
@@ -25,6 +24,8 @@ struct QueueFamilyIndices {
 };
 
 class EngineDevice {
+ private:
+    CSimpleIniA ini;
  public:
 #ifdef NDEBUG
   const bool enableValidationLayers = false;
@@ -41,7 +42,6 @@ class EngineDevice {
   EngineDevice(EngineDevice &&) = delete;
   EngineDevice &operator=(EngineDevice &&) = delete;
 
-  CSimpleIniA ini;
   VkSampleCountFlagBits msaaSamples = (VkSampleCountFlagBits)1;
 
   int getMaxUsableSampleCount();
@@ -87,8 +87,6 @@ class EngineDevice {
       VkDeviceMemory &imageMemory);
 
   VkPhysicalDeviceProperties properties;
-
-  ImGui_ImplVulkan_InitInfo init_info{};
  private:
   void createInstance();
   void setupDebugMessenger();

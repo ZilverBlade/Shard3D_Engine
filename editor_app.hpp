@@ -13,7 +13,7 @@
 #include "renderer.hpp"
 
 #include "UI/LayerStack.hpp"
-
+#include "singleton.hpp"
 #include <memory>
 #include <vector>
 using namespace Shard3D::wb3d;
@@ -21,13 +21,8 @@ using namespace Shard3D::wb3d;
 namespace Shard3D {
 	class EditorApp {
 	public:
-		static constexpr int WIDTH = 1280; //800
-		static constexpr int HEIGHT = 720; //600
-		const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
-
 		EditorApp();
 		~EditorApp();
-
 
 		EditorApp(const EditorApp&) = delete;
 		EditorApp& operator=(const EditorApp&) = delete;
@@ -38,11 +33,7 @@ namespace Shard3D {
 		void loadGameObjects();
 		LayerStack layerStack;
 
-		EngineWindow engineWindow { WIDTH, HEIGHT, WINDOW_NAME };//{ (int)getValFromGameConfig("WINDOW", "WIDTH"), (int)getValFromGameConfig("WINDOW", "HEIGHT"), WINDOW_NAME};
-		EngineDevice engineDevice{ engineWindow };
-		EngineRenderer engineRenderer{ engineWindow, engineDevice };
-
-		std::shared_ptr<Level> activeLevel{};
+		VkDescriptorPool imGuiDescriptorPool;
 };
 
 }

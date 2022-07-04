@@ -6,12 +6,10 @@ namespace Shard3D {
 
 	Layer::~Layer() {}
 
-	void Layer::attach(){}
-
-	void Layer::attach(VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {}
+	void Layer::attach(VkRenderPass renderPass) {}
 
 	void Layer::detach(){}
 
-	void Layer::update(VkCommandBuffer buffer, GLFWwindow* window, float dt, std::shared_ptr<wb3d::Level>& level) {}
+	void Layer::update(VkCommandBuffer buffer, float dt) {}
 
 }

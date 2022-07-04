@@ -52,13 +52,13 @@ namespace Shard3D {
 		inline static std::string fpath;
 		inline static ModelType mType;
 
-		EngineModel(EngineDevice &device, const EngineModel::Builder &builder);
+		EngineModel(const EngineModel::Builder &builder);
 		~EngineModel();
 
 		EngineModel(const EngineModel&) = delete;
 		EngineModel& operator=(const EngineModel&) = delete;
 		
-		static std::unique_ptr<EngineModel> createModelFromFile(EngineDevice& device, 
+		static std::unique_ptr<EngineModel> createModelFromFile(
 			const std::string& filepath, 
 			ModelType modelType
 		);

@@ -1,5 +1,5 @@
 #include "LayerStack.hpp"
-
+#include "../singleton.hpp"
 namespace Shard3D {
 
 	LayerStack::LayerStack() {
@@ -12,19 +12,18 @@ namespace Shard3D {
 		}
 	}
 
-	void LayerStack::pushLayer(Layer* layer, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
+	void LayerStack::pushLayer(Layer* layer) {
 		layerInsert = layers.emplace(layerInsert, layer);
-		layer->attach(renderPass, device, window, level);
+		layer->attach(Singleton::engineRenderer.getSwapChainRenderPass());
 	}
 
-	void LayerStack::pushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice *device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
+	void LayerStack::pushOverlay(Layer* overlay) {
 		layers.emplace_back(overlay);
-		overlay->attach(renderPass, device, window, level);
+		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
 	}
 
-	void LayerStack::repushOverlay(Layer* overlay, VkRenderPass renderPass, EngineDevice* device, GLFWwindow* window, std::shared_ptr<wb3d::Level>& level) {
-		//layers.emplace_back(overlay);
-		overlay->attach(renderPass, device, window, level);
+	void LayerStack::repushOverlay(Layer* overlay) {
+		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
 	}
 
 	void LayerStack::popLayer(Layer* layer) {

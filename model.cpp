@@ -18,7 +18,7 @@
 #include "utils/definitions.hpp"
 #include "engine_logger.hpp"
 #include "wb3d/assetmgr.hpp"
-
+#include "singleton.hpp"
 namespace std {
 	template <>
 	struct hash<Shard3D::EngineModel::Vertex> {
@@ -32,13 +32,13 @@ namespace std {
 
 namespace Shard3D {
 
-	EngineModel::EngineModel(EngineDevice& device, const EngineModel::Builder &builder) : engineDevice{device} {
+	EngineModel::EngineModel(const EngineModel::Builder &builder) : engineDevice{Singleton::engineDevice} {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
 	}
 	EngineModel::~EngineModel() {}
 
-	std::unique_ptr<EngineModel> EngineModel::createModelFromFile(EngineDevice& device, const std::string& filepath, ModelType modelType) {
+	std::unique_ptr<EngineModel> EngineModel::createModelFromFile(const std::string& filepath, ModelType modelType) {
 		Builder builder{};	
 		CSimpleIniA ini;
 
@@ -55,7 +55,7 @@ namespace Shard3D {
 		if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
 			SHARD3D_INFO("Loaded model: '{0}'\n\t\tModel vertex count: {1}", filepath, builder.vertices.size());
 		}	
-		return std::make_unique<EngineModel>(device, builder);
+		return std::make_unique<EngineModel>(builder);
 	}
 
 	void EngineModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
@@ -94,7 +94,7 @@ namespace Shard3D {
 		uint32_t indexSize = sizeof(indices[0]);
 
 		EngineBuffer stagingBuffer{
-			engineDevice,
+			Singleton::engineDevice,
 			indexSize,
 			indexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,

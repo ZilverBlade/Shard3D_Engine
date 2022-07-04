@@ -154,7 +154,7 @@ namespace Shard3D {
 			assert(false);
 		}
 
-		LevelMgrResults LevelManager::load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns) {
+		LevelMgrResults LevelManager::load(const std::string& sourcePath, bool ignoreWarns) {
 			//mLevel->killEverything();
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
@@ -220,7 +220,6 @@ namespace Shard3D {
 
 					if (actor["MeshComponent"]) {
 						std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(
-							device,
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),
 				(ModelType) actor["MeshComponent"]["MeshFormat"].as<int>()
 						);

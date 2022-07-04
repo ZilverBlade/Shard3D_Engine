@@ -27,7 +27,7 @@ namespace Shard3D {
 			void save(const std::string& destinationPath, bool encryptLevel = false);
 			void saveRuntime(const std::string& destinationPath);
 
-			LevelMgrResults load(const std::string& sourcePath, EngineDevice& device, bool ignoreWarns = false);
+			LevelMgrResults load(const std::string& sourcePath, bool ignoreWarns = false);
 			LevelMgrResults loadRuntime(const std::string& sourcePath);
 
 		private:

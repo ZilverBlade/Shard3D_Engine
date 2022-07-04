@@ -1,9 +1,10 @@
 #pragma once
 #include "level_tree_panel.hpp"
-#include <../imguizmo/ImGuizmo.h>
+//#include <../imguizmo/ImGuizmo.h>
 #include "..\wb3d\level.hpp"
 
 namespace Shard3D {
+	/*
 	class Gizmo {
 	public:
 		Gizmo();
@@ -13,4 +14,5 @@ namespace Shard3D {
 	private:
 		std::shared_ptr<Level> level;
 	};
+	*/
 }
