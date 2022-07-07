@@ -296,6 +296,7 @@
     <ClCompile Include="s3dtpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="singleton.cpp" />
     <ClCompile Include="systems\billboard_system.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
@@ -464,12 +465,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="wb3d\levelmgr.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="wb3d\wb3d_imgui_frame.hpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>

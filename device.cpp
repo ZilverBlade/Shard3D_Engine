@@ -112,7 +112,7 @@ void EngineDevice::createInstance() {
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   appInfo.pApplicationName = "Shard3D (Vulkan)";
   appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-  appInfo.pEngineName = "Shard3D Gearbox";
+  appInfo.pEngineName = "Shard3D Torque";
   appInfo.engineVersion = VK_MAKE_VERSION(1, 1, 0);
   appInfo.apiVersion = VK_API_VERSION_1_0;
 
@@ -141,7 +141,7 @@ void EngineDevice::createInstance() {
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
       SHARD3D_FATAL("Failed to create instance!");
   }
-  Globals::imgui_init_info.Instance = instance;
+  Singleton::imgui_init_info.Instance = instance;
   hasGflwRequiredInstanceExtensions();
 }
 
@@ -176,7 +176,7 @@ void EngineDevice::pickPhysicalDevice() {
     SHARD3D_FATAL("Failed to find a suitable GPU!");
   }
 
-  Globals::imgui_init_info.PhysicalDevice = physicalDevice;
+  Singleton::imgui_init_info.PhysicalDevice = physicalDevice;
 
   vkGetPhysicalDeviceProperties(physicalDevice, &properties);
   SHARD3D_INFO("physical device: {0}", properties.deviceName);

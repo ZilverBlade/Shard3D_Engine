@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace shadercompmgr
 {
     class Program {
-        static string compiler = "glslc.exe";
+        readonly static string compiler = "glslc.exe";
         static string inShaderLoc = "shaders/";
         static string outShaderLoc = "shaders/";
 

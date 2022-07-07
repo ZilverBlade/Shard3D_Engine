@@ -15,16 +15,16 @@ namespace Shard3D {
 
 	void LayerStack::pushLayer(Layer* layer) {
 		layerInsert = layers.emplace(layerInsert, layer);
-		layer->attach(Globals::engineRenderer.getSwapChainRenderPass());
+		layer->attach(Singleton::engineRenderer.getSwapChainRenderPass());
 	}
 
 	void LayerStack::pushOverlay(Layer* overlay) {
 		layers.emplace_back(overlay);
-		overlay->attach(Globals::engineRenderer.getSwapChainRenderPass());
+		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
 	}
 
 	void LayerStack::repushOverlay(Layer* overlay) {
-		overlay->attach(Globals::engineRenderer.getSwapChainRenderPass());
+		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
 	}
 
 	void LayerStack::popLayer(Layer* layer) {

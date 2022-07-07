@@ -146,6 +146,7 @@ namespace Shard3D {
 			"Cannot create graphics pipeline:: no renderPass provided in configInfo");
 		auto shaderCode = readFile(shaderFilePath);
 
+
 		VkPipelineShaderStageCreateInfo shaderStages[1];
 		createShaderModule(shaderCode, &computeShaderModule);
 		shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -166,7 +167,7 @@ namespace Shard3D {
 		computePipelineCreateInfo.flags = 0;
 
 		if (vkCreateComputePipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
-			SHARD3D_FATAL("failed to create graphics pipeline!");
+			SHARD3D_FATAL("failed to create compute pipeline!");
 		}
 	}
 
@@ -268,11 +269,11 @@ namespace Shard3D {
 		configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
 		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
 		configInfo.dynamicStateInfo.flags = 0;	
-
-		configInfo.bindingDescriptions = EngineModel::Vertex::getBindingDescriptions();
-		configInfo.attributeDescriptions = EngineModel::Vertex::getAttributeDescriptions();
-	 }
-
+	}
+	void EnginePipeline::enableVertexDescriptions(PipelineConfigInfo& configInfo) {
+		configInfo.bindingDescriptions = EngineMesh::Vertex::getBindingDescriptions();
+		configInfo.attributeDescriptions = EngineMesh::Vertex::getAttributeDescriptions();
+	}
 	void EnginePipeline::enableAlphaBlending(PipelineConfigInfo& configInfo, VkBlendOp blendOp) {
 		configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 		configInfo.colorBlendAttachment.colorWriteMask =

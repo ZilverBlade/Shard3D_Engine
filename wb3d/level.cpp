@@ -46,7 +46,7 @@ namespace Shard3D {
 
 			copyComponent<Components::BlueprintComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::TransformComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
-			copyComponent<Components::MeshComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::BillboardComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CameraComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::DirectionalLightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
@@ -106,7 +106,7 @@ namespace Shard3D {
 			if (actorReloadMeshQueue.size() != 0) {
 				for (int i = 0; i < actorReloadMeshQueue.size(); i++) {
 					vkDeviceWaitIdle(device);
-					actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().reapplyModel(actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().cacheFile);
+					actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().reapplyMesh(actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().cacheFile);
 				}
 				actorReloadMeshQueue.clear();
 				return;

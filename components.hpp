@@ -39,7 +39,6 @@ namespace Shard3D {
 			glm::vec3 translation{ 0.f, 0.f, 0.f };
 			glm::vec3 scale{ 1.f, 1.f, 1.f };
 			glm::vec3 rotation{ 0.f, 0.f, 0.f };
-
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
 
@@ -106,13 +105,14 @@ namespace Shard3D {
 		struct MeshComponent {
 			std::string file{};
 			std::string cacheFile{};
-			ModelType type = ModelType::MODEL_TYPE_NULL;
+			MeshType type = MeshType::MESH_TYPE_NULL;
 			MaterialSystem::MaterialList materialList;
+			bool hideInGame = false;
 
 			MeshComponent() = default;
 			MeshComponent(const MeshComponent&) = default;
 			MeshComponent(const std::string& mdl);
-			void reapplyModel(const std::string& mdl);
+			void reapplyMesh(const std::string& mdl);
 		};
 
 		struct PointlightComponent {

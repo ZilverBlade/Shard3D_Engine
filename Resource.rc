@@ -83,7 +83,7 @@ BEGIN
             VALUE "InternalName", "EngineEng.exe"
             VALUE "LegalCopyright", "Copyright (C) 2022"
             VALUE "OriginalFilename", "EngineEng.exe"
-            VALUE "ProductName", "Shard3D Engine (Gearbox Edition)"
+            VALUE "ProductName", "Shard3D Engine (Torque Edition)"
             VALUE "ProductVersion", "1.0.0.0"
         END
     END

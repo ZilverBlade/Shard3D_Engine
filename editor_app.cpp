@@ -34,28 +34,24 @@ namespace Shard3D {
 	EditorApp::
 
 	EditorApp::EditorApp() {
-		SharedPools::constructPools(Globals::engineDevice);
-		GraphicsSettings::init(&Globals::engineWindow);
+		SharedPools::constructPools(Singleton::engineDevice);
+		GraphicsSettings::init(&Singleton::engineWindow);
 		SHARD3D_INFO("Constructing Level Pointer");
-		Globals::activeLevel = std::make_shared<Level>("runtime test lvl");
+		Singleton::activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
 	EditorApp::~EditorApp() {
-		//SharedPools::destructPools();
-		//Globals::viewportImage == nullptr;
+
 	}
 	void EditorApp::setupDescriptors() {
-#if ENABLE_COMPUTE_SHADERS == true
-		SharedPools::computePool = EngineDescriptorPool::Builder(engineDevice)
-			.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
-			.build();
+#if ENABLE_COMPUTE_SHADERS
+
 #endif
 	}
 	void EditorApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
 			uboBuffers[i] = std::make_unique<EngineBuffer>(
-				Globals::engineDevice,
+				Singleton::engineDevice,
 				sizeof(GlobalUbo),
 				1,
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -63,7 +59,7 @@ namespace Shard3D {
 				);
 			uboBuffers[i]->map();
 		}
-		auto globalSetLayout = EngineDescriptorSetLayout::Builder(Globals::engineDevice)
+		auto globalSetLayout = EngineDescriptorSetLayout::Builder(Singleton::engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 			.build();	
 		std::vector<VkDescriptorSet> globalDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -73,63 +69,44 @@ namespace Shard3D {
 				.writeBuffer(0, &bufferInfo)
 				.build(globalDescriptorSets[i]);
 		}
-
-#if ENABLE_COMPUTE_SHADERS == true
-		VkDescriptorImageInfo computeImageInfo;
-		ComputeUbo cUbo{};
-	
-		computeImageInfo.sampler = cUbo.inputImage;
-		computeImageInfo.imageView = engineRenderer.getSwapchainImageView(0);
-		computeImageInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		auto computeSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
-			.addBinding(0, VK_DESCRIPTOR_TYPE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT)
-			.build();
-		std::vector<VkDescriptorSet> computeDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
-		for (int i = 0; i < computeDescriptorSets.size(); i++) {
-			EngineDescriptorWriter(*computeSetLayout, *computePool)
-				.writeImage(0, &computeImageInfo)
-				.build(computeDescriptorSets[i]);
-		}
-#endif
 		ImGuiInitter::init();
 #if ENABLE_WORLDBUILDER3D
 		layerStack.pushOverlay(new ImGuiLayer());
 #endif
-		GridSystem gridSystem{ Globals::engineDevice, Globals::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		GridSystem gridSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #if ENABLE_COMPUTE_SHADERS == true
-		ComputeSystem computeSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), computeSetLayout->getDescriptorSetLayout() };
+		ComputeSystem computeSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
-		BasicRenderSystem basicRenderSystem{ Globals::engineDevice, Globals::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		BillboardRenderSystem billboardRenderSystem{ Globals::engineDevice, Globals::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		BasicRenderSystem basicRenderSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		BillboardRenderSystem billboardRenderSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		PointlightSystem pointlightSystem{ Globals::engineDevice,Globals::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		SpotlightSystem spotlightSystem{ Globals::engineDevice, Globals::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		DirectionalLightSystem directionalLightSystem{ Globals::engineDevice, Globals::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		PointlightSystem pointlightSystem{ Singleton::engineDevice,Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		SpotlightSystem spotlightSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		DirectionalLightSystem directionalLightSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 #if ALLOW_PREVIEW_CAMERA
-		GridSystem pgridSystem{ Globals::engineDevice, Globals::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		GridSystem pgridSystem{ Singleton::engineDevice, Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		BasicRenderSystem pbasicRenderSystem{ Globals::engineDevice, Globals::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		BasicRenderSystem pbasicRenderSystem{ Singleton::engineDevice, Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		PointlightSystem ppointlightSystem{ Globals::engineDevice,Globals::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		SpotlightSystem pspotlightSystem{ Globals::engineDevice, Globals::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		DirectionalLightSystem pdirectionalLightSystem{ Globals::engineDevice, Globals::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		PointlightSystem ppointlightSystem{ Singleton::engineDevice,Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		SpotlightSystem pspotlightSystem{ Singleton::engineDevice, Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		DirectionalLightSystem pdirectionalLightSystem{ Singleton::engineDevice, Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
 
 
 		SHARD3D_INFO("Loading editor camera actor");
-		wb3d::Actor cameraActor = Globals::activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
+		wb3d::Actor cameraActor = Singleton::activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
 		cameraActor.addComponent<Components::CameraComponent>();
 		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, 1.f, -1.f);
 
-		Globals::activeLevel->setPossessedCameraActor(cameraActor);
+		Singleton::activeLevel->setPossessedCameraActor(cameraActor);
 
 		SHARD3D_INFO("Loading dummy actor");
-		wb3d::Actor dummy = Globals::activeLevel->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
+		wb3d::Actor dummy = Singleton::activeLevel->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
 #if ALLOW_PREVIEW_CAMERA
 		dummy.addComponent<Components::CameraComponent>();
-		Globals::activeLevel->setPossessedPreviewCameraActor(dummy); //dummy
+		Singleton::activeLevel->setPossessedPreviewCameraActor(dummy); //dummy
 #endif // !_DEPLOY
 
 		loadGameObjects();
@@ -150,35 +127,35 @@ namespace Shard3D {
 		cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
-		while (!Globals::engineWindow.shouldClose()) {
+		while (!Singleton::engineWindow.shouldClose()) {
 			glfwPollEvents();
 
-			auto possessedCameraActor = Globals::activeLevel->getPossessedCameraActor();
-			auto possessedCamera = Globals::activeLevel->getPossessedCamera();
+			auto possessedCameraActor = Singleton::activeLevel->getPossessedCameraActor();
+			auto possessedCamera = Singleton::activeLevel->getPossessedCamera();
 #if ALLOW_PREVIEW_CAMERA
-			auto possessedPreviewCameraActor = Globals::activeLevel->getPossessedPreviewCameraActor();
-			auto possessedPreviewCamera = Globals::activeLevel->getPossessedPreviewCamera();
+			auto possessedPreviewCameraActor = Singleton::activeLevel->getPossessedPreviewCameraActor();
+			auto possessedPreviewCamera = Singleton::activeLevel->getPossessedPreviewCamera();
 #endif
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
 
-			Globals::activeLevel->runGarbageCollector(Globals::engineDevice.device());
-			wb3d::MasterManager::executeQueue(Globals::activeLevel, Globals::engineDevice);
-			Globals::activeLevel->tick(frameTime);
+			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice.device());
+			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
+			Singleton::activeLevel->tick(frameTime);
 
-			if (Globals::activeLevel->simulationState != PlayState::Simulating) {
-				editorCameraControllerKeyboard.moveInPlaneXZ(Globals::engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
-				editorCameraControllerMouse.moveInPlaneXZ(Globals::engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
+			if (Singleton::activeLevel->simulationState != PlayState::Simulating) {
+				editorCameraControllerKeyboard.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
+				editorCameraControllerMouse.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
 			}
 
-			possessedCameraActor.getComponent<Components::CameraComponent>().ar = Globals::engineRenderer.getAspectRatio();
+			possessedCameraActor.getComponent<Components::CameraComponent>().ar = Singleton::engineRenderer.getAspectRatio();
 			possessedCamera.setViewYXZ(
 				possessedCameraActor.getComponent<Components::TransformComponent>().translation, 
 				possessedCameraActor.getComponent<Components::TransformComponent>().rotation
 			);
 #if ALLOW_PREVIEW_CAMERA
-			possessedPreviewCameraActor.getComponent<Components::CameraComponent>().ar = Globals::engineRenderer.getAspectRatio();
+			possessedPreviewCameraActor.getComponent<Components::CameraComponent>().ar = Singleton::engineRenderer.getAspectRatio();
 			possessedPreviewCamera.setViewYXZ(
 				possessedPreviewCameraActor.getComponent<Components::TransformComponent>().translation,
 				possessedPreviewCameraActor.getComponent<Components::TransformComponent>().rotation
@@ -194,7 +171,7 @@ namespace Shard3D {
 				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 			}
 			
-			if (glfwGetKey(Globals::engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
+			if (glfwGetKey(Singleton::engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
 #ifndef NDEBUG
 				MessageDialogs::show("No fullscreen in Debug Mode allowed!", "Debug", MessageDialogs::OPTICONERROR);
 #endif
@@ -203,8 +180,8 @@ namespace Shard3D {
 #endif
 			}
 
-			if (auto commandBuffer = Globals::engineRenderer.beginFrame()) {
-				int frameIndex = Globals::engineRenderer.getFrameIndex();
+			if (auto commandBuffer = Singleton::engineRenderer.beginFrame()) {
+				int frameIndex = Singleton::engineRenderer.getFrameIndex();
 				SharedPools::drawPools[frameIndex]->resetPool();
 				FrameInfo frameInfo{
 					frameIndex,
@@ -220,9 +197,9 @@ namespace Shard3D {
 				ubo.view = possessedCamera.getView();
 				ubo.inverseView = possessedCamera.getInverseView();
 
-				pointlightSystem.update(frameInfo, ubo, Globals::activeLevel);
-				spotlightSystem.update(frameInfo, ubo, Globals::activeLevel);
-				directionalLightSystem.update(frameInfo, ubo, Globals::activeLevel);
+				pointlightSystem.update(frameInfo, ubo, Singleton::activeLevel);
+				spotlightSystem.update(frameInfo, ubo, Singleton::activeLevel);
+				directionalLightSystem.update(frameInfo, ubo, Singleton::activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 		
@@ -241,19 +218,20 @@ namespace Shard3D {
 				*/
 
 				//	render
-				Globals::mainOffScreen.start(frameInfo);
-				basicRenderSystem.renderGameObjects(frameInfo, Globals::activeLevel);
-				billboardRenderSystem.render(frameInfo, Globals::activeLevel);
+				Singleton::mainOffScreen.start(frameInfo);
+				basicRenderSystem.renderGameObjects(frameInfo, Singleton::activeLevel);
+				billboardRenderSystem.render(frameInfo, Singleton::activeLevel);
 
-				pointlightSystem.render(frameInfo, Globals::activeLevel);
-				spotlightSystem.render(frameInfo, Globals::activeLevel);
-				directionalLightSystem.render(frameInfo, Globals::activeLevel);
+				pointlightSystem.render(frameInfo, Singleton::activeLevel);
+				spotlightSystem.render(frameInfo, Singleton::activeLevel);
+				directionalLightSystem.render(frameInfo, Singleton::activeLevel);
 
-				gridSystem.render(frameInfo);
 #if ENABLE_COMPUTE_SHADERS == true
 				computeSystem.render(frameInfo);
 #endif
-				Globals::mainOffScreen.end(frameInfo);
+				gridSystem.render(frameInfo);
+
+				Singleton::mainOffScreen.end(frameInfo);
 
 #if ALLOW_PREVIEW_CAMERA
 				GlobalUbo pubo{};
@@ -262,41 +240,41 @@ namespace Shard3D {
 				pubo.inverseView = possessedPreviewCamera.getInverseView();
 				frameInfo.camera = possessedPreviewCamera;
 
-				ppointlightSystem.update(frameInfo, pubo, Globals::activeLevel);
-				pspotlightSystem.update(frameInfo, pubo, Globals::activeLevel);
-				pdirectionalLightSystem.update(frameInfo, pubo, Globals::activeLevel);
+				ppointlightSystem.update(frameInfo, pubo, Singleton::activeLevel);
+				pspotlightSystem.update(frameInfo, pubo, Singleton::activeLevel);
+				pdirectionalLightSystem.update(frameInfo, pubo, Singleton::activeLevel);
 
 				uboBuffers[frameIndex]->writeToBuffer(&pubo);
 				uboBuffers[frameIndex]->flush();
 
-				Globals::previewCamOffScreen.start(frameInfo);
-				pbasicRenderSystem.renderGameObjects(frameInfo, Globals::activeLevel);
+				Singleton::previewCamOffScreen.start(frameInfo);
+				pbasicRenderSystem.renderGameObjects(frameInfo, Singleton::activeLevel);
 
-				ppointlightSystem.render(frameInfo, Globals::activeLevel);
-				pspotlightSystem.render(frameInfo, Globals::activeLevel);
-				pdirectionalLightSystem.render(frameInfo, Globals::activeLevel);
+				ppointlightSystem.render(frameInfo, Singleton::activeLevel);
+				pspotlightSystem.render(frameInfo, Singleton::activeLevel);
+				pdirectionalLightSystem.render(frameInfo, Singleton::activeLevel);
 
 				//pgridSystem.render(frameInfo);
-				Globals::previewCamOffScreen.end(frameInfo);
+				Singleton::previewCamOffScreen.end(frameInfo);
 #endif
-				Globals::engineRenderer.beginSwapChainRenderPass(commandBuffer);
+				Singleton::engineRenderer.beginSwapChainRenderPass(commandBuffer);
 				// Layer overlays (use UI here)
 				for (Layer* layer : layerStack) {
 					layer->update(commandBuffer, frameTime);
 				}
 
-				Globals::engineRenderer.endSwapChainRenderPass(commandBuffer);
-				Globals::engineRenderer.endFrame();
+				Singleton::engineRenderer.endSwapChainRenderPass(commandBuffer);
+				Singleton::engineRenderer.endFrame();
 			}
 			
 		}
-		if (Globals::activeLevel->simulationState != PlayState::Stopped) Globals::activeLevel->end();
+		if (Singleton::activeLevel->simulationState != PlayState::Stopped) Singleton::activeLevel->end();
 		for (Layer* layer : layerStack) {
 			layer->detach();
 		}
-		vkDeviceWaitIdle(Globals::engineDevice.device());
+		vkDeviceWaitIdle(Singleton::engineDevice.device());
 		SharedPools::destructPools();
-		Globals::viewportImage == nullptr;
+		Singleton::viewportImage == nullptr;
 	}
 
 	void EditorApp::loadGameObjects() {
@@ -308,19 +286,26 @@ namespace Shard3D {
 		*/
 		
 		
-		wb3d::LevelManager levelman(Globals::activeLevel);
+		wb3d::LevelManager levelman(Singleton::activeLevel);
 		levelman.load("assets/scenedata/drivecartest.wbl", true);
 		
-		wb3d::Actor car = Globals::activeLevel->createActor("Car");
-		wb3d::AssetManager::emplaceModel("assets/modeldata/FART.obj");
+		wb3d::Actor car = Singleton::activeLevel->createActor("Car");
+		wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
 		car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
 
 		car.getComponent<Components::TransformComponent>().rotation = { 0.f, glm::radians(90.f), 0.f };
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-
-		wb3d::Actor billboard = Globals::activeLevel->createActor("Billboard");
-		wb3d::AssetManager::emplaceTexture("assets/texturedata/null_tex.png");
-		billboard.addComponent<Components::BillboardComponent>("assets/texturedata/null_tex.png");
-		billboard.getTransform().translation = { 1.f, 0.f, 2.f };
+		{
+		wb3d::Actor billboard = Singleton::activeLevel->createActor("Billboard");
+		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/null_tex.png", VK_FILTER_NEAREST);
+		billboard.addComponent<Components::BillboardComponent>("assets/_engine/tex/null_tex.png");
+		billboard.getTransform().translation = { 1.f, 2.f, 0.f };
+		}
+		{
+		wb3d::Actor billboard = Singleton::activeLevel->createActor("Billboard");
+		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/axis2d.png");
+		billboard.addComponent<Components::BillboardComponent>("assets/_engine/tex/axis2d.png");
+		billboard.getTransform().translation = { 1.f, 2.f, 6.f };
+		}
 	}
 }

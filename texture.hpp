@@ -5,7 +5,7 @@
 namespace Shard3D {
     class EngineTexture {
     public:
-        EngineTexture(EngineDevice& device, const std::string& textureFilepath);
+        EngineTexture(EngineDevice& device, const std::string& textureFilepath, VkFilter filter);
         EngineTexture(
             EngineDevice& device,
             VkFormat format,
@@ -34,7 +34,7 @@ namespace Shard3D {
         static unsigned char* getSTBImage(const std::string& filepath, int* x, int* y, int* comp, int req_comp);
         static void freeSTBImage(void* pixels);
         static std::unique_ptr<EngineTexture> createTextureFromFile(
-            EngineDevice& device, const std::string& filepath);
+            EngineDevice& device, const std::string& filepath, VkFilter filter);
 
     private:
         void createTextureImage(const std::string& filepath);
@@ -50,6 +50,7 @@ namespace Shard3D {
         VkImageView mTextureImageView = nullptr;
         VkSampler mTextureSampler = nullptr;
         VkFormat mFormat;
+        VkFilter mFilter;
         VkImageLayout mTextureLayout;
         uint32_t mMipLevels{ 1 };
         uint32_t mLayerCount{ 1 };

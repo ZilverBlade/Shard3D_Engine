@@ -3,7 +3,6 @@
 
 #include "actor.hpp" 
 #include "../components.hpp"
-#include "../wb3d/wb3d_imgui_frame.hpp"
 #include "../utils/definitions.hpp"
 #include "assetmgr.hpp"
 
@@ -153,7 +152,7 @@ namespace Shard3D {
 		}
 
 		LevelMgrResults LevelManager::load(const std::string& sourcePath, bool ignoreWarns) {
-			AssetManager::clearLevelAssets(); // remove since new stuff will be loaded into memory
+			AssetManager::clearAllAssets(); // remove since new stuff will be loaded into memory
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
@@ -217,9 +216,9 @@ namespace Shard3D {
 					}
 
 					if (actor["MeshComponent"]) {
-						AssetManager::emplaceModel(
+						AssetManager::emplaceMesh(
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),
-							(ModelType)actor["MeshComponent"]["MeshFormat"].as<int>()
+							(MeshType)actor["MeshComponent"]["MeshFormat"].as<int>()
 						);
 						loadedActor.addComponent<Components::MeshComponent>(
 							actor["MeshComponent"]["MeshPath"].as<std::string>());

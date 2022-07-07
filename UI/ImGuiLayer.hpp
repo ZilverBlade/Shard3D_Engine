@@ -4,7 +4,6 @@
 #include "../pipeline.hpp"
 
 #include <imgui_node_editor.h>
-#include "../wb3d/wb3d_imgui_frame.hpp"
 
 // panels
 #include "level_tree_panel.hpp"
@@ -21,8 +20,6 @@ namespace Shard3D {
 		void attach(VkRenderPass renderPass) override;
 		void detach() override;
 		void update(VkCommandBuffer buffer, float dt) override;
-
-        void pushError(const char* message);
 	private:
 		void renderMenuBar();
 		int width;
@@ -62,7 +59,6 @@ namespace Shard3D {
 
 		EditorPreferences edpref;
 		EngineSettings enset;
-		wb3d::Console console;
 
 		LevelTreePanel levelTreePanel;
 		LevelPropertiesPanel levelPropertiesPanel;

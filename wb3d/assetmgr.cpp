@@ -3,12 +3,26 @@
 
 #include "../singleton.hpp"
 namespace Shard3D::wb3d {
-	void AssetManager::clearLevelAssets() {
-		SHARD3D_WARN("Clearing all stored assets, may cause unexpected crash!");
-		vkDeviceWaitIdle(Globals::engineDevice.device());
+	void AssetManager::clearTextureAssets() {
+		SHARD3D_WARN("Clearing all texture assets, may cause unexpected crash!");
+		vkDeviceWaitIdle(Singleton::engineDevice.device());
 		textureAssets.clear();
+		emplaceTexture(ENGINE_ERRTEX, VK_FILTER_NEAREST);
+		emplaceTexture(ENGINE_ERRMAT, VK_FILTER_NEAREST);
+	}
+
+	void AssetManager::clearMeshAssets() {
+		SHARD3D_WARN("Clearing all mesh assets, may cause unexpected crash!");
+		vkDeviceWaitIdle(Singleton::engineDevice.device());
+		meshAssets.clear();
+		emplaceMesh(ENGINE_ERRMSH);
+		emplaceMesh(ENGINE_DEFAULT_MODEL_FILE);
+	}
+
+	void AssetManager::clearAllAssets() {
+		clearTextureAssets();
+		clearMeshAssets();
 		materialAssets.clear();
-		modelAssets.clear();
 	}
 	void AssetManager::loadLevelAssets() {
 		for (const auto& file : std::filesystem::recursive_directory_iterator("assets/materialdata")) { 
@@ -16,40 +30,46 @@ namespace Shard3D::wb3d {
 			materialAssets[material.guid] = material;
 		}
 	}
-#pragma region Model
-	void AssetManager::emplaceModel(const std::string& modelPath, ModelType modelType) {		
-		for (const auto& i : modelAssets) 
-			if (i.first.find(modelPath) != std::string::npos && modelPath.find(i.first) != std::string::npos) {
-				SHARD3D_WARN("Model at path '{0}' already exists! Model will be ignored...", modelPath);
+#pragma region Mesh
+	void AssetManager::emplaceMesh(const std::string& meshPath, MeshType meshType) {	
+		//cast to lowercase, otherwise upper case paths (which are the same as lowercase) will get treated as diff
+		for (const auto& i : meshAssets) 
+			if (i.first.find(meshPath) != std::string::npos && meshPath.find(i.first) != std::string::npos) {
+				SHARD3D_WARN("Mesh at path '{0}' already exists! Mesh will be ignored...", meshPath);
 				return;		
-			/*	modelAssets.erase(i.first);
-				modelAssets[model->fpath] = model;
+			/*	meshAssets.erase(i.first);
+				meshAssets[mesh->fpath] = mesh;
 				return; //prevent entries in unordered map with same path */			
 			}
-		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile(modelPath, modelType);
-		SHARD3D_LOG("Loaded model to asset map '{0}'", modelPath);
-		modelAssets[modelPath] = model;
+		std::shared_ptr<EngineMesh> mesh = EngineMesh::createMeshFromFile(meshPath, meshType);
+		SHARD3D_LOG("Loaded mesh to asset map '{0}'", meshPath);
+		meshAssets[meshPath] = mesh;
 	}
-	std::shared_ptr<EngineModel>& AssetManager::retrieveModel(const std::string& path) {
-		return modelAssets.at(path);
+	std::shared_ptr<EngineMesh>& AssetManager::retrieveMesh(const std::string& path) {
+		//check if exists, otherwise send back some default texture
+			return meshAssets.at(path);
+		// return meshAssets.at(ENGINE_ERRMSH);
 	}
 #pragma endregion
 #pragma region Texture
-	void AssetManager::emplaceTexture(const std::string& texturePath) {
+	void AssetManager::emplaceTexture(const std::string& texturePath, VkFilter filter) {
+		//cast to lowercase, otherwise upper case paths (which are the same as lowercase) will get treated as diff
 		for (const auto& i : textureAssets)
 			if (i.first.find(texturePath) != std::string::npos && texturePath.find(i.first) != std::string::npos) {
-				SHARD3D_WARN("Model at path '{0}' already exists! Model will be ignored...", texturePath);
+				SHARD3D_WARN("Texture at path '{0}' already exists! Texture will be ignored...", texturePath);
 				return;
-				/*	modelAssets.erase(i.first);
-					modelAssets[model->fpath] = model;
+				/*	meshAssets.erase(i.first);
+					meshAssets[mesh->fpath] = mesh;
 					return; //prevent entries in unordered map with same path */
 			}
-		std::shared_ptr<EngineTexture> texture = EngineTexture::createTextureFromFile(Globals::engineDevice, texturePath);
+		std::shared_ptr<EngineTexture> texture = EngineTexture::createTextureFromFile(Singleton::engineDevice, texturePath, filter);
 		SHARD3D_LOG("Loaded texture to asset map '{0}'", texturePath);
 		textureAssets[texturePath] = texture;
 	}
 	std::shared_ptr<EngineTexture>& AssetManager::retrieveTexture(const std::string& path) {
+		//check if exists, otherwise send back some default texture
 		return textureAssets.at(path);
+		//return textureAssets.at(ENGINE_ERRTEX);
 	}
 #pragma endregion
 	void AssetManager::loadMaterialsFromList(MaterialSystem::MaterialList& matlist) {

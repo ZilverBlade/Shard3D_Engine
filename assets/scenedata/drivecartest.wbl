@@ -10,7 +10,7 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [1, 0.180000007, 24.7999992]
     MeshComponent:
-      MeshPath: assets/modeldata/engineModels/cube.obj
+      MeshPath: assets/_engine/msh/cube.obj
       MeshFormat: 1
   - Actor: 2483818142968549181
     TagComponent:
@@ -20,7 +20,7 @@ Actors:
       Rotation: [0, -0.771435559, 0]
       Scale: [4.76000023, 0.180000007, 1]
     MeshComponent:
-      MeshPath: assets/modeldata/engineModels/cube.obj
+      MeshPath: assets/_engine/msh/cube.obj
       MeshFormat: 1
   - Actor: 6892523644857338036
     TagComponent:
@@ -30,7 +30,7 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [2, 0.180000007, 2400]
     MeshComponent:
-      MeshPath: assets/modeldata/engineModels/cube.obj
+      MeshPath: assets/_engine/msh/cube.obj
       MeshFormat: 1
   - Actor: 7150228180825533700
     TagComponent:

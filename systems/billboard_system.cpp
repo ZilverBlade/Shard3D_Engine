@@ -53,8 +53,7 @@ namespace Shard3D {
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
 		EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
-		pipelineConfig.attributeDescriptions.clear();
-		pipelineConfig.bindingDescriptions.clear();
+
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout; // support only axial atm
 		enginePipeline = std::make_unique<EnginePipeline>(

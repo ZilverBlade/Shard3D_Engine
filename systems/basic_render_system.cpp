@@ -44,6 +44,7 @@ namespace Shard3D {
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
+		EnginePipeline::enableVertexDescriptions(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 #if USE_PBR
@@ -91,7 +92,7 @@ namespace Shard3D {
 				&push
 			);
 
-			auto& model = wb3d::AssetManager::retrieveModel(mesh.file);
+			auto& model = wb3d::AssetManager::retrieveMesh(mesh.file);
 			model->bind(frameInfo.commandBuffer);
 			model->draw(frameInfo.commandBuffer);	
 		});

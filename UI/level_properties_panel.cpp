@@ -43,16 +43,16 @@ namespace Shard3D {
 					}
 					if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
 						//add a default obj
-						AssetManager::emplaceModel(DEFAULT_MODEL_FILE);
-						tree.selectedActor.addComponent<Components::MeshComponent>(DEFAULT_MODEL_FILE);
+						AssetManager::emplaceMesh(ENGINE_DEFAULT_MODEL_FILE);
+						tree.selectedActor.addComponent<Components::MeshComponent>(ENGINE_DEFAULT_MODEL_FILE);
 
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
 						tree.selectedActor.addComponent<Components::CameraComponent>();
-						AssetManager::emplaceModel("assets/modeldata/engineModels/camcord.obj");
-						tree.selectedActor.addComponent<Components::MeshComponent>("assets/modeldata/engineModels/camcord.obj");
-
+						AssetManager::emplaceMesh("assets/_engine/msh/camcord.obj");
+						tree.selectedActor.addComponent<Components::MeshComponent>("assets/_engine/msh/camcord.obj");
+						tree.selectedActor.getComponent<Components::MeshComponent>().hideInGame = true;
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
@@ -150,7 +150,7 @@ namespace Shard3D {
 	void LevelPropertiesPanel::displayPreviewCamera(Actor actor) {
 		ImGui::Begin("PREVIEW (viewport)");
 #if ALLOW_PREVIEW_CAMERA
-		ImGui::Image(Globals::previewViewportImage, { 800, 600 });
+		ImGui::Image(Singleton::previewViewportImage, { 800, 600 });
 #endif
 		ImGui::End();
 	}
@@ -209,6 +209,40 @@ namespace Shard3D {
 			}
 			if (killComponent) context->killMesh(actor);
 		}
+		if (actor.hasComponent<Components::BillboardComponent>()) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::BillboardComponent).hash_code(), nodeFlags, "Billboard");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
+				auto& rfile = actor.getComponent<Components::BillboardComponent>().cacheFile;
+
+				char fileBuffer[256];
+				memset(fileBuffer, 0, 256);
+				strncpy(fileBuffer, rfile.c_str(), 256);
+				if (ImGui::InputText("Texture File", fileBuffer, 256)) {
+					rfile = std::string(fileBuffer);
+				}
+				if (ImGui::Button("Load Texture")) {
+					std::ifstream ifile(fileBuffer);
+					if (ifile.good()) {
+						SHARD3D_ERROR("not implemented");
+						//SHARD3D_LOG("Reloading texture '{0}'", rfile);
+						//actor.getComponent<Components::BillboardComponent>().cacheFile = rfile;
+						//context->reloadTex(actor);
+					}
+					else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
+				}
+				ImGui::TreePop();
+			}
+			if (killComponent) context->killMesh(actor);
+		}
 		if (actor.hasComponent<Components::CameraComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::CameraComponent).hash_code(), nodeFlags, "Camera");
 			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
@@ -232,7 +266,7 @@ namespace Shard3D {
 				ImGui::DragFloat("Far Clip Plane", &actor.getComponent<Components::CameraComponent>().farClip, 1.f, 16.f, 8192.f);
 #if ALLOW_PREVIEW_CAMERA
 				if (ImGui::Button("Preview", { 150, 50 })) {
-				//	Globals::activeLevel->setPossessedPreviewCameraActor(actor);
+				//	Singleton::activeLevel->setPossessedPreviewCameraActor(actor);
 					context->setPossessedPreviewCameraActor(actor);
 					showPreviewCamera = true;
 				}

@@ -187,7 +187,7 @@ namespace Shard3D {
 	}
 
 	void ProjectApp::loadGameObjects() {
-		std::shared_ptr<EngineModel> model = EngineModel::createModelFromFile("assets/modeldata/FART.obj", ModelType::MODEL_TYPE_OBJ); //dont index because model breaks
+		std::shared_ptr<EngineMesh> model = EngineMesh::createMeshFromFile("assets/modeldata/FART.obj", MeshType::MESH_TYPE_OBJ); //dont index because model breaks
 		wb3d::LevelManager levelman(activeLevel);
 		levelman.load("assets/scenedata/drivecartest.encr.wbl", true);
 

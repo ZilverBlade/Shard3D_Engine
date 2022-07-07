@@ -4,6 +4,7 @@
 #include "../wb3d/bpmgr.hpp"
 
 #include <imgui.h>
+#include "../wb3d/assetmgr.hpp"
 namespace Shard3D {
 
 	LevelTreePanel::LevelTreePanel(const std::shared_ptr<Level>& levelContext) {
@@ -32,7 +33,23 @@ namespace Shard3D {
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Camera Actor")) { auto actor = context->createActor("Camera Actor"); actor.addComponent<Components::CameraComponent>(); selectedActor = actor; }//actor.addComponent<Components::MeshComponent>(EngineModel::createModelFromFile(EngineDevice::getDevice(), "assets/modeldata/engineModels/camcord.obj", ModelType::MODEL_TYPE_OBJ, true));
+			if (ImGui::MenuItem("New Camera Actor")) { 
+				auto actor = context->createActor("Camera Actor"); 
+				actor.addComponent<Components::CameraComponent>(); 
+				if (!actor.hasComponent<Components::MeshComponent>()) {
+					AssetManager::emplaceMesh("assets/_engine/msh/camcord.obj");
+					actor.addComponent<Components::MeshComponent>("assets/_engine/msh/camcord.obj");
+				}
+				selectedActor = actor;
+			}
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::MenuItem("New Billboard Actor")) { auto actor = context->createActor("Billboard"); actor.addComponent<Components::PointlightComponent>(); selectedActor = actor; }
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
+			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); actor.addComponent<Components::PointlightComponent>(); selectedActor = actor; }
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {

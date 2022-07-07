@@ -11,7 +11,7 @@ namespace Shard3D {
 	// ignore
 	class Initializer {
 	private:
-		friend class Globals;
+		friend class Singleton;
 		Initializer() {
 			LOGGER::init();
 			GraphicsSettings::init(nullptr);
@@ -19,20 +19,18 @@ namespace Shard3D {
 	};
 	class Destructor {
 	private:
-		friend class Globals;
+		friend class Singleton;
 		Destructor() {}
-		~Destructor() {
-			
-		}
+		~Destructor();
 	};
-	class Globals {
+	class Singleton {
 	private:
 		inline static constexpr int WIDTH = 1280; //800
 		inline static constexpr int HEIGHT = 720; //600
 		inline static const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
 	public:
-		Globals() {}
-		~Globals() {}
+		Singleton() {}
+		~Singleton() {}
 		inline static Initializer _ignore_init;
 
 		inline static EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };

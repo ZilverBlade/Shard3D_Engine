@@ -68,7 +68,7 @@ void main(){
 	fragUV= UV[gl_VertexIndex];
 	
 	vec4 texInCameraSpace = ubo.view * push.translation;
-	vec4 positionInCameraSpace = texInCameraSpace + push.scale * vec4(fragOffset, 0.0, 0.0);
+	vec4 positionInCameraSpace = texInCameraSpace + vec4(-push.scale.x, push.scale.y, 0.0, 0.0) * vec4(fragOffset, 0.0, 0.0);
 
 	gl_Position = ubo.projection * positionInCameraSpace;
 }

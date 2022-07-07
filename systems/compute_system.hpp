@@ -24,10 +24,11 @@ namespace Shard3D {
 		void createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
 		EngineDevice& engineDevice;
-
+		VkDescriptorImageInfo srcImageInfo{};
+		VkDescriptorImageInfo dstImageInfo{};
 		std::unique_ptr<EnginePipeline> enginePipeline;
 		VkPipelineLayout pipelineLayout;
-		std::unique_ptr<EngineDescriptorSetLayout> renderSystemLayout;
+		std::unique_ptr<EngineDescriptorSetLayout> computeSystemLayout;
 	};
 
 }

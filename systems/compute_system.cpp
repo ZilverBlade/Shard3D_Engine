@@ -1,7 +1,9 @@
 #include "../s3dtpch.h"
 #include <glm/gtc/constants.hpp>
 
+#include "../singleton.hpp"
 #include "compute_system.hpp"
+#include "../texture.hpp" 
 
 namespace Shard3D {
 
@@ -15,14 +17,15 @@ namespace Shard3D {
 
     void ComputeSystem::createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) {
         //pipeline layout
-        renderSystemLayout =
+        computeSystemLayout =
             EngineDescriptorSetLayout::Builder(engineDevice)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
         std::vector<VkDescriptorSetLayout> descriptorSetLayouts{
             globalSetLayout,
-            renderSystemLayout->getDescriptorSetLayout() };
+            computeSystemLayout->getDescriptorSetLayout() 
+        };
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -40,12 +43,8 @@ namespace Shard3D {
 
         PipelineConfigInfo pipelineConfig{};
         EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
-
-        pipelineConfig.attributeDescriptions.clear();
-        pipelineConfig.bindingDescriptions.clear();
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-
 
         enginePipeline = std::make_unique<EnginePipeline>(
             "had to add this because std::make_unique gets the wrong overload",
@@ -55,16 +54,33 @@ namespace Shard3D {
             "assets/shaders/test.comp.spv",
             pipelineConfig
         );
+
+        srcImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     }
 
 
     void ComputeSystem::render(FrameInfo& frameInfo) {
-        enginePipeline->bindCompute(frameInfo.commandBuffer);    
+        enginePipeline->bindCompute(frameInfo.commandBuffer);
+
+        srcImageInfo.imageView = Singleton::mainOffScreen.getImageView();
+        srcImageInfo.sampler = Singleton::mainOffScreen.getSampler();
+
+        VkDescriptorImageInfo computeImageInfo;
+
+        computeImageInfo.sampler = Singleton::mainOffScreen.getSampler();
+        computeImageInfo.imageView = Singleton::mainOffScreen.getImageView();
+        computeImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        auto computeSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
+            .build();
 
         VkDescriptorSet descriptorSet1;
-        EngineDescriptorWriter(*renderSystemLayout, frameInfo.perDrawDescriptorPool)
-            .writeImage(0, nullptr /*help*/)
+        EngineDescriptorWriter(*computeSystemLayout, frameInfo.perDrawDescriptorPool)
+            .writeImage(1, &srcImageInfo)
+            //.writeImage(2, &dstImageInfo)
             .build(descriptorSet1);
+
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
             VK_PIPELINE_BIND_POINT_COMPUTE,
@@ -73,8 +89,6 @@ namespace Shard3D {
             1,  // set count
             &descriptorSet1,
             0,
-            nullptr);
-
-        
+            nullptr);  
     }
 }

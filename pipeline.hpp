@@ -53,6 +53,7 @@ namespace Shard3D {
 		void bindCompute(VkCommandBuffer commandBuffer);
 
 		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+		static void enableVertexDescriptions(PipelineConfigInfo& configInfo);
 		static void enableAlphaBlending(PipelineConfigInfo& configInfo, VkBlendOp blendOp);
 
 		void destroyGraphicsPipeline();

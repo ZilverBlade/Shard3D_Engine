@@ -49,6 +49,7 @@ namespace Shard3D {
         VkSampler getSampler() { return pass.sampler; }
         VkImageView getImageView() { return pass.color.view; }
         VkRenderPass getRenderPass() { return pass.renderPass; }
+        const OffscreenPass getPass() { return pass; }
         void setViewportSize(const glm::vec2& size) {
             pass.width = size.x;
             pass.height = size.y;

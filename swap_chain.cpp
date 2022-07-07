@@ -147,7 +147,7 @@ void EngineSwapChain::createSwapChain() {
   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
   createInfo.surface = device.surface();
 
-  Globals::imgui_init_info.MinImageCount = imageCount;
+  Singleton::imgui_init_info.MinImageCount = imageCount;
   createInfo.minImageCount = imageCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -193,7 +193,7 @@ void EngineSwapChain::createSwapChain() {
   swapChainImageFormat = surfaceFormat.format;
   swapChainExtent = extent;
 
-  Globals::imgui_init_info.ImageCount = imageCount;
+  Singleton::imgui_init_info.ImageCount = imageCount;
 }
 
 void EngineSwapChain::createImageViews() {

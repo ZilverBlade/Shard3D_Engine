@@ -5,7 +5,10 @@
 #include "../utils/definitions.hpp"
 #include "../camera.hpp"
 
+
+
 namespace Shard3D {
+	class EditorApp;
 	namespace wb3d {
 		class Actor;
 		class Blueprint;
@@ -28,8 +31,7 @@ namespace Shard3D {
 			Blueprint createBlueprint(Actor actor, std::string path, std::string name = "Some kind of blueprint");
 
 			Actor createActor(std::string name= "Some kind of actor");
-			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
-
+			
 			void killEverything();
 			void killActor(Actor actor);
 			void killMesh(Actor actor);
@@ -41,14 +43,6 @@ namespace Shard3D {
 			void setPossessedCameraActor(GUID guid);
 			Actor getPossessedCameraActor();
 			EngineCamera& getPossessedCamera();
-
-#if ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
-			void setPossessedPreviewCameraActor(Actor actor);
-			void setPossessedPreviewCameraActor(GUID guid);
-			Actor getPossessedPreviewCameraActor();
-			EngineCamera& getPossessedPreviewCamera();
-#endif
-
 
 			/* *
 * Call when level events must begin
@@ -73,6 +67,15 @@ namespace Shard3D {
 			GUID possessedPreviewCameraActorGUID;
 #endif  
 		private:
+			//should only be called by system processes
+			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
+#if ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
+			void setPossessedPreviewCameraActor(Actor actor);
+			void setPossessedPreviewCameraActor(GUID guid);
+			Actor getPossessedPreviewCameraActor();
+			EngineCamera& getPossessedPreviewCamera();
+#endif
+
 			std::string name = "Some kind of level";
 			bool loadRegistryCapture = false;
 
@@ -81,11 +84,14 @@ namespace Shard3D {
 			std::vector<Actor> actorKillMeshQueue;
 			std::vector<Actor> actorReloadMeshQueue;
 
+			friend class Shard3D::EditorApp;
 			friend class Actor;
 			friend class MasterManager;
 
 			friend class LevelManager;
 			friend class LevelTreePanel;
+			friend class LevelPropertiesPanel;
+			friend class LevelPeekingPanel;
 		};
 	}
 }

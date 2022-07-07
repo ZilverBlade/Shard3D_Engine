@@ -16,8 +16,8 @@
 #include "singleton.hpp"
 namespace std {
 	template <>
-	struct hash<Shard3D::EngineModel::Vertex> {
-		size_t operator()(Shard3D::EngineModel::Vertex const& vertex) const {
+	struct hash<Shard3D::EngineMesh::Vertex> {
+		size_t operator()(Shard3D::EngineMesh::Vertex const& vertex) const {
 			size_t seed = 0;
 			Shard3D::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
 			return seed;
@@ -27,13 +27,13 @@ namespace std {
 
 namespace Shard3D {
 
-	EngineModel::EngineModel(const EngineModel::Builder &builder) : engineDevice{Globals::engineDevice} {
+	EngineMesh::EngineMesh(const EngineMesh::Builder &builder) : engineDevice{Singleton::engineDevice} {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
 	}
-	EngineModel::~EngineModel() {}
+	EngineMesh::~EngineMesh() {}
 
-	std::unique_ptr<EngineModel> EngineModel::createModelFromFile(const std::string& filepath, ModelType modelType) {
+	std::unique_ptr<EngineMesh> EngineMesh::createMeshFromFile(const std::string& filepath, MeshType modelType) {
 		Builder builder{};	
 		CSimpleIniA ini;
 
@@ -46,14 +46,14 @@ namespace Shard3D {
 		std::ifstream f(filepath.c_str());
 		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", filepath); return nullptr; };
 
-		builder.loadIndexedModel(filepath, modelType);
-		if (ini.GetBoolValue("LOGGING", "log.ModelLoadInfo") == true) {
-			SHARD3D_INFO("Loaded model: '{0}'\n\t\tModel vertex count: {1}", filepath, builder.vertices.size());
+		builder.loadIndexedMesh(filepath, modelType);
+		if (ini.GetBoolValue("LOGGING", "log.MeshLoadInfo") == true) {
+			SHARD3D_INFO("Loaded model: '{0}'\n\t\tMesh vertex count: {1}", filepath, builder.vertices.size());
 		}	
-		return std::make_unique<EngineModel>(builder);
+		return std::make_unique<EngineMesh>(builder);
 	}
 
-	void EngineModel::createVertexBuffers(const std::vector<Vertex>& vertices) {
+	void EngineMesh::createVertexBuffers(const std::vector<Vertex>& vertices) {
 		vertexCount = (uint32_t)(vertices.size());
 		assert(vertexCount >= 3 && "Vertex count must be at least 3");
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
@@ -80,7 +80,7 @@ namespace Shard3D {
 		engineDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
 	}
 
-	void EngineModel::createIndexBuffers(const std::vector<uint32_t> &indices) {
+	void EngineMesh::createIndexBuffers(const std::vector<uint32_t> &indices) {
 		indexCount = (uint32_t)(indices.size());
 		hasIndexBuffer = indexCount > 0;
 
@@ -89,7 +89,7 @@ namespace Shard3D {
 		uint32_t indexSize = sizeof(indices[0]);
 
 		EngineBuffer stagingBuffer{
-			Globals::engineDevice,
+			Singleton::engineDevice,
 			indexSize,
 			indexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -110,7 +110,7 @@ namespace Shard3D {
 		engineDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 	}
 
-	void EngineModel::bind(VkCommandBuffer commandBuffer) {
+	void EngineMesh::bind(VkCommandBuffer commandBuffer) {
 		VkBuffer buffers[] = { vertexBuffer->getBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
@@ -120,7 +120,7 @@ namespace Shard3D {
 		}
 	}
 
-	void EngineModel::draw(VkCommandBuffer commandBuffer) {
+	void EngineMesh::draw(VkCommandBuffer commandBuffer) {
 		if (hasIndexBuffer) {
 			vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 		} else {
@@ -128,11 +128,11 @@ namespace Shard3D {
 		}
 	}
 
-	std::vector<VkVertexInputBindingDescription> EngineModel::Vertex::getBindingDescriptions() {
+	std::vector<VkVertexInputBindingDescription> EngineMesh::Vertex::getBindingDescriptions() {
 		return { {0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX} };
 	}
 	
-	std::vector<VkVertexInputAttributeDescription> EngineModel::Vertex::getAttributeDescriptions() {
+	std::vector<VkVertexInputAttributeDescription> EngineMesh::Vertex::getAttributeDescriptions() {
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 		attributeDescriptions.reserve(4); //preallocate
 		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)	});
@@ -142,7 +142,7 @@ namespace Shard3D {
 		return attributeDescriptions;
 	}
 #pragma region GLTF
-	void EngineModel::gltfInitialiseShit(const std::string& filepath) {
+	void EngineMesh::gltfInitialiseShit(const std::string& filepath) {
 
 		std::ostringstream sstr;
 
@@ -164,7 +164,7 @@ namespace Shard3D {
 		data = gltfGetData(filepath);
 	}
 
-	std::vector<unsigned char> EngineModel::gltfGetData(const std::string& filepath) {
+	std::vector<unsigned char> EngineMesh::gltfGetData(const std::string& filepath) {
 
 		std::string bytesText;
 		std::string uri = JSON["buffers"][0]["uri"];
@@ -194,7 +194,7 @@ namespace Shard3D {
 		return data;
 	}
 
-	std::vector<float> EngineModel::gltfGetFloats(json accessor) {
+	std::vector<float> EngineMesh::gltfGetFloats(json accessor) {
 		std::vector<float> floatVec;
 
 		uint32_t buffViewInd = accessor.value("bufferView", 1);
@@ -225,7 +225,7 @@ namespace Shard3D {
 		return floatVec;
 	}
 
-	std::vector<GLuint> EngineModel::gltfGetIndices(json accessor) {
+	std::vector<GLuint> EngineMesh::gltfGetIndices(json accessor) {
 		std::vector<GLuint> indices;
 
 		uint32_t buffViewInd = accessor.value("bufferView", 0);
@@ -264,28 +264,28 @@ namespace Shard3D {
 		return indices;
 	}
 
-	std::vector<glm::vec2> EngineModel::gltfGroupFloatsVec2(std::vector<float> floatVec) {
+	std::vector<glm::vec2> EngineMesh::gltfGroupFloatsVec2(std::vector<float> floatVec) {
 		std::vector<glm::vec2> vectors;
 		for (int i = 0; i < floatVec.size(); i) {
 			vectors.push_back(glm::vec2(floatVec[i++],floatVec[i++]));
 		}
 		return vectors;
 	}
-	std::vector<glm::vec3> EngineModel::gltfGroupFloatsVec3(std::vector<float> floatVec) {
+	std::vector<glm::vec3> EngineMesh::gltfGroupFloatsVec3(std::vector<float> floatVec) {
 		std::vector<glm::vec3> vectors;
 		for (int i = 0; i < floatVec.size(); i) {
 			vectors.push_back(glm::vec3(floatVec[i++], floatVec[i++], floatVec[i++]));
 		}
 		return vectors;
 	}
-	std::vector<glm::vec4> EngineModel::gltfGroupFloatsVec4(std::vector<float> floatVec) {
+	std::vector<glm::vec4> EngineMesh::gltfGroupFloatsVec4(std::vector<float> floatVec) {
 		std::vector<glm::vec4> vectors;
 		for (int i = 0; i < floatVec.size(); i) {
 			vectors.push_back(glm::vec4(floatVec[i++], floatVec[i++], floatVec[i++], floatVec[i++]));
 		}
 		return vectors;
 	}
-	std::vector<EngineModel::Vertex> EngineModel::assembleVertices(
+	std::vector<EngineMesh::Vertex> EngineMesh::assembleVertices(
 		std::vector<glm::vec3> positions,
 		std::vector<glm::vec3> normals,
 		//std::vector<glm::vec3> colors,
@@ -305,7 +305,7 @@ namespace Shard3D {
 		return vertices;
 	}
 
-	void EngineModel::loadGLTFMesh(uint32_t indMesh) {
+	void EngineMesh::loadGLTFMesh(uint32_t indMesh) {
 
 		uint32_t posAccInd = JSON["meshes"][indMesh]["primitives"][0]["attributes"]["POSITION"];
 		uint32_t normalAccInd = JSON["meshes"][indMesh]["primitives"][0]["attributes"]["NORMAL"];
@@ -326,7 +326,7 @@ namespace Shard3D {
 #pragma endregion
 
 	
-	void EngineModel::Builder::loadIndexedModel(const std::string& filepath, ModelType modelType) {
+	void EngineMesh::Builder::loadIndexedMesh(const std::string& filepath, MeshType modelType) {
 		auto newTime = std::chrono::high_resolution_clock::now();
 
 		tinyobj::attrib_t attrib;

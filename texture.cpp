@@ -10,7 +10,8 @@
 #include "graphics_settings.hpp"
 
 namespace Shard3D {
-    EngineTexture::EngineTexture(EngineDevice& device, const std::string& textureFilepath) : mDevice{ device } {
+    EngineTexture::EngineTexture(EngineDevice& device, const std::string& textureFilepath, VkFilter filter) : mDevice{ device } {
+        mFilter = filter;
         createTextureImage(textureFilepath);
         createTextureImageView(VK_IMAGE_VIEW_TYPE_2D);
         createTextureSampler();
@@ -109,8 +110,8 @@ namespace Shard3D {
     }
 
     std::unique_ptr<EngineTexture> EngineTexture::createTextureFromFile(
-        EngineDevice& device, const std::string& filepath) {
-        return std::make_unique<EngineTexture>(device, filepath);
+        EngineDevice& device, const std::string& filepath, VkFilter filter) {
+        return std::make_unique<EngineTexture>(device, filepath, filter);
     }
 
     void EngineTexture::updateDescriptor() {
@@ -228,8 +229,8 @@ namespace Shard3D {
     void EngineTexture::createTextureSampler() {
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.magFilter = VK_FILTER_LINEAR;
-        samplerInfo.minFilter = VK_FILTER_LINEAR;
+        samplerInfo.magFilter = mFilter;
+        samplerInfo.minFilter = mFilter;
 
         samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;

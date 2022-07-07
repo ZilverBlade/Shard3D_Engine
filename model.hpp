@@ -11,16 +11,16 @@ using json = nlohmann::json;
 
 namespace Shard3D {
 
-	enum class ModelType {
-		MODEL_TYPE_NULL = 0,
-
-		MODEL_TYPE_OBJ = 1,
-		MODEL_TYPE_COLLADA = 2,
-		MODEL_TYPE_GLTF = 3,
-		MODEL_TYPE_FBX = 4
+	enum class MeshType {
+		MESH_TYPE_NULL = 0,
+		
+		MESH_TYPE_OBJ = 1,
+		MESH_TYPE_COLLADA = 2,
+		MESH_TYPE_GLTF = 3,
+		MESH_TYPE_FBX = 4
 	};
 
-	class EngineModel {
+	class EngineMesh {
 
 	public:
 
@@ -42,28 +42,28 @@ namespace Shard3D {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
 
-			void loadIndexedModel(const std::string& filepath, ModelType modelType);
+			void loadIndexedMesh(const std::string& filepath, MeshType modelType);
 		};
 
 		inline static std::string fpath;
-		inline static ModelType mType;
+		inline static MeshType mType;
 
-		EngineModel(const EngineModel::Builder &builder);
-		~EngineModel();
+		EngineMesh(const EngineMesh::Builder &builder);
+		~EngineMesh();
 
-		EngineModel(const EngineModel&) = delete;
-		EngineModel& operator=(const EngineModel&) = delete;
+		EngineMesh(const EngineMesh&) = delete;
+		EngineMesh& operator=(const EngineMesh&) = delete;
 		
-		static std::unique_ptr<EngineModel> createModelFromFile(
+		static std::unique_ptr<EngineMesh> createMeshFromFile(
 			const std::string& filepath, 
-			ModelType modelType
+			MeshType modelType
 		);
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
 
 		std::string getFile() { return fpath; }
-		ModelType getType() { return mType; }
+		MeshType getType() { return mType; }
 	private:
 		std::unordered_map<std::string, MaterialSystem::Material> primitivesMaterialList; // <primitive material name, material>
 

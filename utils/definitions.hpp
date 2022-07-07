@@ -6,7 +6,7 @@ namespace Shard3D {
 #define ENABLE_WORLDBUILDER3D		true
 #endif
 #define BETA_DEBUG_TOOLS			true
-const static std::string ENGINE_VERSION = "1.1.2.r0-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string ENGINE_VERSION = "1.1.3.r0-alpha";	// Shard3D {major, minor, patch, revision}-state
 const static std::string EDITOR_VERSION = "1.1.r0-alpha";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/settings/engine_settings.ini"
@@ -14,13 +14,15 @@ const static std::string EDITOR_VERSION = "1.1.r0-alpha";	// WorldEditor3D {majo
 #define GAME_SETTINGS_PATH			"assets/settings/game_settings.ini"	
 
 // DONT TOUCH
+#define ENGINE_ERRTEX				"assets/_engine/tex/null_tex.png" // png texture
+#define ENGINE_ERRMAT				"assets/_engine/tex/null_mat.png" // png texture
+#define ENGINE_ERRMSH				"assets/_engine/msh/null_mdl.obj" // obj model
 #define ASSETS_PATH					"assets/"
 #define SHADER_FILES_PATH			"assets/shaders/"			//Shader files (SPIR-V)
-#define DEFAULT_MODEL_FILE			"assets/modeldata/engineModels/cube.obj"
-#define DEFAULT_MODEL_PATH			"assets/engine-assets/modeldata/"	//Default engine models
-#define ENGINE_ASSETS_PATH			"assets/engine-assets/"	
-#define FONT_PATH					"assets/engine-assets/fonts/"		//Fonts
-#define DEFAULT_ENGINE_FONT			"assets/engine-assets/fonts/sui-generis-free.rg-regular.ttf"		//Default engine font
+#define ENGINE_DEFAULT_MODEL_FILE	"assets/_engine/msh/cube.obj"
+#define ENGINE_ASSETS_PATH			"assets/_engine/"	
+#define FONT_PATH					"assets/_engine/fnt/"		//Fonts
+#define DEFAULT_ENGINE_FONT			"assets/_engine/fnt/sui-generis-free.rg-regular.ttf"		//Default engine font
 #define ENGINE_FONT_SIZE			16		//size in px
 
 // experimentals

@@ -68,21 +68,21 @@ namespace Shard3D {
 			pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
 			pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
 			pool_info.pPoolSizes = pool_sizes;
-			vkCreateDescriptorPool(Globals::engineDevice.device(), &pool_info, nullptr, &imGuiDescriptorPool);
+			vkCreateDescriptorPool(Singleton::engineDevice.device(), &pool_info, nullptr, &imGuiDescriptorPool);
 
-			Globals::imgui_init_info.DescriptorPool = imGuiDescriptorPool;
-			Globals::imgui_init_info.Device = Globals::engineDevice.device();
-			Globals::imgui_init_info.Queue = Globals::engineDevice.graphicsQueue();
-			Globals::imgui_init_info.QueueFamily = Globals::engineDevice.findPhysicalQueueFamilies().graphicsFamily;
+			Singleton::imgui_init_info.DescriptorPool = imGuiDescriptorPool;
+			Singleton::imgui_init_info.Device = Singleton::engineDevice.device();
+			Singleton::imgui_init_info.Queue = Singleton::engineDevice.graphicsQueue();
+			Singleton::imgui_init_info.QueueFamily = Singleton::engineDevice.findPhysicalQueueFamilies().graphicsFamily;
 
-			Globals::imgui_init_info.MSAASamples = Globals::engineDevice.msaaSamples;
-			ImGui_ImplGlfw_InitForVulkan(Globals::engineWindow.getGLFWwindow(), true);
-			ImGui_ImplVulkan_Init(&Globals::imgui_init_info, Globals::engineRenderer.getSwapChainRenderPass());
+			Singleton::imgui_init_info.MSAASamples = Singleton::engineDevice.msaaSamples;
+			ImGui_ImplGlfw_InitForVulkan(Singleton::engineWindow.getGLFWwindow(), true);
+			ImGui_ImplVulkan_Init(&Singleton::imgui_init_info, Singleton::engineRenderer.getSwapChainRenderPass());
 
 
-			auto commandBuffer = Globals::engineDevice.beginSingleTimeCommands();
+			auto commandBuffer = Singleton::engineDevice.beginSingleTimeCommands();
 			ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-			Globals::engineDevice.endSingleTimeCommands(commandBuffer);
+			Singleton::engineDevice.endSingleTimeCommands(commandBuffer);
 			ImGui_ImplVulkan_DestroyFontUploadObjects();
 
 			ImGuiStyle& style = ImGui::GetStyle();
@@ -185,9 +185,9 @@ namespace Shard3D {
 			}
 #endif
 				
-			Globals::viewportImage = ImGui_ImplVulkan_AddTexture(Globals::mainOffScreen.getSampler(), Globals::mainOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+			Singleton::viewportImage = ImGui_ImplVulkan_AddTexture(Singleton::mainOffScreen.getSampler(), Singleton::mainOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 #if ALLOW_PREVIEW_CAMERA
-			Globals::previewViewportImage = ImGui_ImplVulkan_AddTexture(Globals::previewCamOffScreen.getSampler(), Globals::previewCamOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+			Singleton::previewViewportImage = ImGui_ImplVulkan_AddTexture(Singleton::previewCamOffScreen.getSampler(), Singleton::previewCamOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 #endif // !_DEPLOY
 		}
 	};

@@ -1,6 +1,5 @@
 #pragma once
 #include "s3dtpch.h"
-#include <xhash>
 
 namespace Shard3D {
 	class GUID {
@@ -17,10 +16,11 @@ namespace Shard3D {
 }
 
 namespace std {
+	template <typename T> struct hash;
 	template<>
 	struct hash<Shard3D::GUID> {
 		std::size_t operator()(const Shard3D::GUID& guid)const {
-			return hash<uint64_t>()((uint64_t)guid);
+			return (uint64_t)guid;
 		}
 	};
 }

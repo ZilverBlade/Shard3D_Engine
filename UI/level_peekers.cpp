@@ -31,6 +31,7 @@ namespace Shard3D {
 
 		if (actorInspector) peekActorInspector();
 		if (lodInspector) peekLODInspector();
+		if (textureInspector) peekTextureInspector();
 		if (materialInspector) peekMaterialInspector();
 		if (miscInspector) peekMisc();
 	}
@@ -58,24 +59,36 @@ namespace Shard3D {
 		ImGui::End();
 	}
 
-	void LevelPeekingPanel::peekLODInspector() {
-		ImGui::Begin("Model & LOD Inspector");
-		ImGui::Text((std::string("Model count: " + std::to_string(AssetManager::getModelAssets().size())).c_str()));
-		if (ImGui::Button("Force delete all assets (dangerous)")) {
-			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous when assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
-				AssetManager::clearLevelAssets();
+	void LevelPeekingPanel::peekTextureInspector() {
+		ImGui::Begin("Texture Inspector");
+		ImGui::Text((std::string("Texture count: " + std::to_string(AssetManager::getTextureAssets().size())).c_str()));
+		if (ImGui::Button("Force delete all textures (dangerous)")) {
+			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous if assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
+				AssetManager::clearTextureAssets();
 			}
 		}
-		for (const auto& model : AssetManager::getModelAssets()) 
+		for (const auto& tex : AssetManager::getTextureAssets())
+			if (ImGui::TreeNodeEx(std::string(tex.first + "##" + tex.first).c_str(), ImGuiTreeNodeFlags_None)) {}
+		ImGui::End();
+	}
+	void LevelPeekingPanel::peekLODInspector() {
+		ImGui::Begin("Mesh & LOD Inspector");
+		ImGui::Text((std::string("Mesh count: " + std::to_string(AssetManager::getMeshAssets().size())).c_str()));
+		if (ImGui::Button("Force delete all models (dangerous)")) {
+			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous if assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
+				AssetManager::clearMeshAssets();
+			}
+		}
+		for (const auto& model : AssetManager::getMeshAssets()) 
 			if (ImGui::TreeNodeEx(std::string(model.first + "##" + model.first).c_str(), ImGuiTreeNodeFlags_None)) {}
 		ImGui::End();
 	}
 
 	void LevelPeekingPanel::peekMisc() {
 		ImGui::Begin("Misc Inspector");
-		ImGui::Text(std::string("Possessed camera actor: " + Globals::activeLevel->getPossessedCameraActor().getTag() + " (0x" + std::to_string((int)&Globals::activeLevel->getPossessedCamera()) + ")").c_str());
+		ImGui::Text(std::string("Possessed camera actor: " + Singleton::activeLevel->getPossessedCameraActor().getTag() + " (0x" + std::to_string((int)&Singleton::activeLevel->getPossessedCamera()) + ")").c_str());
 #if ALLOW_PREVIEW_CAMERA
-		ImGui::Text(std::string("Previewing camera: " + Globals::activeLevel->getPossessedPreviewCameraActor().getTag() + " (0x" + std::to_string((int)&Globals::activeLevel->getPossessedPreviewCamera()) + ")").c_str());
+		ImGui::Text(std::string("Previewing camera: " + Singleton::activeLevel->getPossessedPreviewCameraActor().getTag() + " (0x" + std::to_string((int)&Singleton::activeLevel->getPossessedPreviewCamera()) + ")").c_str());
 #endif
 		ImGui::End();
 	}

@@ -69,12 +69,12 @@ namespace Shard3D {
 		MeshComponent::MeshComponent(const std::string& mdl) {
 			cacheFile = mdl; // cacheFile is to be used to store future possible model
 			file = mdl;
-			type = wb3d::AssetManager::retrieveModel(mdl)->getType();
+			type = wb3d::AssetManager::retrieveMesh(mdl)->getType();
 		}
-		void MeshComponent::reapplyModel(const std::string& mdl) {
+		void MeshComponent::reapplyMesh(const std::string& mdl) {
 			file = mdl;
-			wb3d::AssetManager::emplaceModel(cacheFile);
-			//type = wb3d::AssetManager::retrieveModel(mdl)->getType();
+			wb3d::AssetManager::emplaceMesh(cacheFile);
+			//type = wb3d::AssetManager::retrieveMesh(mdl)->getType();
 		}
 		BillboardComponent::BillboardComponent(const std::string& tex) {
 			cacheFile = tex; // cacheFile is to be used to store future possible model

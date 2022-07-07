@@ -3,7 +3,6 @@
 
 #include "actor.hpp" 
 #include "../components.hpp"
-#include "../wb3d/wb3d_imgui_frame.hpp"
 #include "../utils/definitions.hpp"
 
 #include "level.hpp" // for the killMesh function
@@ -66,7 +65,7 @@ namespace Shard3D {
 				out << YAML::EndMap;
 			}
 
-			// MODEL
+			// MESH
 			if (actor.hasComponent<Components::MeshComponent>()) {
 				out << YAML::Key << "MeshComponent";
 				out << YAML::BeginMap;
