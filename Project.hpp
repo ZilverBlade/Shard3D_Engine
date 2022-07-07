@@ -1,7 +1,6 @@
 #pragma once
-
-#pragma once
-
+#include "s3dtpch.h"
+/*
 #include "engine_window.hpp"
 #include "pipeline.hpp"
 #include "device.hpp"
@@ -19,6 +18,7 @@
 #include <memory>
 #include <vector>
 using namespace Shard3D::wb3d;
+*/
 /*
 namespace Shard3D {
 	class ProjectApp {

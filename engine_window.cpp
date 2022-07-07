@@ -1,11 +1,8 @@
+#include "s3dtpch.h"  
 #include "engine_window.hpp"
-#include <stdexcept>
 #include "simpleini/simple_ini.h"
 #include "utils/definitions.hpp"
-#include <iostream>
 
-
-#include "engine_logger.hpp"
 #include "cheat_codes.hpp"
 #include "texture.hpp"
 

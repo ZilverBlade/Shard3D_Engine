@@ -1,13 +1,6 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "device.hpp"
-
-// libs
-#include <vulkan/vulkan.h>
-
-// std
-#include <memory>
-#include <string>
 
 namespace Shard3D {
     class EngineTexture {

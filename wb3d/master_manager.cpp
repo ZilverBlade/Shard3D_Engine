@@ -1,6 +1,5 @@
+#include "../s3dtpch.h"  
 #include "master_manager.hpp"
-#include <iostream>
-#include "../engine_logger.hpp"
 
 namespace Shard3D {
 	namespace wb3d {

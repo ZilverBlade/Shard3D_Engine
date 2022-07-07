@@ -1,13 +1,9 @@
 #pragma once
+#include "s3dtpch.h"
 
 #include "device.hpp"
 #include "buffer.hpp"
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <memory>
-#include <vector>
 #include <json.hpp>
 #include "systems/material_system.hpp"
 

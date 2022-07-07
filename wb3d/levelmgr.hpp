@@ -1,4 +1,5 @@
 #pragma once
+#include "../s3dtpch.h"
 #include "../device.hpp"
 #include "level.hpp"
 namespace Shard3D {

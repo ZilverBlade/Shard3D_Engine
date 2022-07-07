@@ -1,7 +1,8 @@
+#include "../s3dtpch.h"  
 #include "level_tree_panel.hpp"
 #include "../components.hpp"
 #include "../wb3d/bpmgr.hpp"
-#include "../utils/dialogs.h"
+
 #include <imgui.h>
 namespace Shard3D {
 
@@ -20,8 +21,7 @@ namespace Shard3D {
 		
 		context->registry.each([&](auto actorGUID) {
 			wb3d::Actor actor{ actorGUID, context.get() };	
-			if (!actor.hasComponent<Components::TagComponent>()) return;
-			if (actor.getGUID() == 0 || actor.getGUID() == UINT64_MAX) return;	 // dont display these actors as they are engine reserved
+			if (actor.isInvalid()) return;
 			drawActorEntry(actor);
 		});
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) selectedActor = {};

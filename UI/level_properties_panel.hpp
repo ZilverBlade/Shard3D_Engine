@@ -1,4 +1,5 @@
 #pragma once
+#include "../s3dtpch.h"
 #include "../wb3d/level.hpp"
 #include "../wb3d/actor.hpp"
 #include "level_tree_panel.hpp"
@@ -18,7 +19,10 @@ namespace Shard3D {
 	private:
 		void drawActorProperties(Actor actor);
 		void drawBlueprintInfo(Actor actor);
+		void displayPreviewCamera(Actor actor);
 		std::shared_ptr<Level> context;
+
+		bool showPreviewCamera;
 
 		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
 	};

@@ -8,10 +8,10 @@ namespace Shard3D {
 			wb3d::Actor camAct;
 			float exponent;
 			glm::vec3 moveVector;
-			void beginEvent() {}
-			void endEvent() {}
+			void beginEvent() override {}
+			void endEvent() override {}
 
-			void tickEvent(float dt) {	
+			void tickEvent(float dt) override {
 				float yaw = thisActor.getComponent<Components::TransformComponent>().rotation.y + glm::radians(-90.f);
 				const glm::vec3 forwardDir{ sin(yaw), -sin(0), cos(yaw) };
 				if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_D) == GLFW_PRESS)
@@ -47,7 +47,7 @@ namespace Shard3D {
 						glm::max(1.0f, (1.f / glm::dot(moveVector, moveVector))) * 10, 60.f, 90.f);
 			}
 
-			void spawnEvent() {
+			void spawnEvent() override {
 				thisActor.getComponent<Components::TransformComponent>().translation = { 0.f, 0.2f, 0.f };
 				camAct = getActiveLevel()->createActor("cambeam");
 				camAct.addComponent<Components::CameraComponent>();
@@ -72,11 +72,10 @@ namespace Shard3D {
 					light.getComponent<Components::TransformComponent>().translation = { 5.f,
 																						4.1f,
 																						25.f + 17.f*15.f + i * 15.f };
-
 				}
 			}
 
-			void killEvent() {
+			void killEvent() override {
 			}
 		};
 	}

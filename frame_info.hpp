@@ -1,8 +1,8 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "camera.hpp"
 #include "components.hpp"
-#include <vulkan/vulkan.h>
+
 #include "utils/definitions.hpp"
 #include "descriptors.hpp"
 #include "texture.hpp"

@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../engine_logger.hpp"
+#include "../s3dtpch.h"
 #include "../components.hpp"
 #include "actor.hpp"
 

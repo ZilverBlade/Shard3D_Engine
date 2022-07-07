@@ -1,10 +1,9 @@
 #pragma once
-
+#include "../s3dtpch.h"
 #include <imgui.h>
-#include <memory>
-#include <vector>
+
 #include "../utils/definitions.hpp"
-#include <string>
+
 
 namespace Shard3D {
 	namespace wb3d {

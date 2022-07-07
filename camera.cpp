@@ -1,8 +1,8 @@
+#include "s3dtpch.h"
 #include "camera.hpp"
 
-#include <cassert>
-#include <limits>
-
+#undef near
+#undef far
 namespace Shard3D {
 
 	void EngineCamera::setOrthographicProjection(

@@ -1,13 +1,11 @@
+#include "../../s3dtpch.h"
 #include "editor_mouse_movement_controller.hpp"
-#include <limits>
-#include <iostream>
-#include <glm/glm.hpp>
+
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
 namespace Shard3D {
 	namespace controller {
-
 		void EditorMouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
 			adjustFOV(window, dt, actor);
 			if (glfwGetMouseButton(window, buttons.canRotate) == GLFW_PRESS) {
@@ -53,8 +51,8 @@ namespace Shard3D {
 		void EditorMouseMovementController::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 			float fov = cachedActor.getComponent<Components::CameraComponent>().fov;
 			
-			//glm::clamp(fov, 30.f, 170.f);
 			fov -= yoffset * 4;
+			fov = glm::clamp(fov, 30.f, 170.f);
 			cachedActor.getComponent<Components::CameraComponent>().fov = fov;
 		}
 		

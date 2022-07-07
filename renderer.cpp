@@ -1,10 +1,8 @@
+#include "s3dtpch.h"  
 #include "renderer.hpp"
-#include "editor_app.hpp"
+
 #include "utils/definitions.hpp"
 #include "simpleini/simple_ini.h"
-
-#include <cassert>
-#include <stdexcept>
 
 namespace Shard3D {
 

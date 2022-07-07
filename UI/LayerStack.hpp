@@ -1,7 +1,6 @@
 #pragma once
-
+#include "../s3dtpch.h"
 #include "Layer.hpp"
-#include <vector>
 
 namespace Shard3D {
 	class LayerStack {

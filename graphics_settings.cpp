@@ -1,7 +1,7 @@
+#include "s3dtpch.h" 
 #include "graphics_settings.hpp"
 #include "utils/definitions.hpp"
-#include "engine_logger.hpp"
-#include <fstream>
+
 namespace Shard3D {
 	void GraphicsSettings::init(EngineWindow* window) {
 		// might as well check engine settings here, even tho it's prob too late lol
@@ -28,10 +28,14 @@ namespace Shard3D {
 
 		graphics.VSync = ini.GetBoolValue("DISPLAY", "V-Sync");
 
-		graphics.AnisotropicFiltering = ini.GetBoolValue("TEXTURES", "AnisotropicFiltering");
+		graphics.maxAnisotropy = ini.GetBoolValue("TEXTURES", "maxAnisotropy");
+		if (graphics.maxAnisotropy < 1 || graphics.maxAnisotropy > 16)
+			SHARD3D_FATAL("maxAnisotropy read is invalid!!");
 
 		graphics.FramerateCap = ini.GetLongValue("GRAPHICS", "FramerateCap");
 		graphics.MSAASamples = ini.GetLongValue("GRAPHICS", "MSAASamples");
+		if (graphics.MSAASamples < 1) 
+			SHARD3D_FATAL("MSAASamples read is invalid!!");
 
 		graphics.LODCoef = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "LODCoef");
 		graphics.ShadowQuality = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "ShadowQuality");
@@ -51,7 +55,7 @@ namespace Shard3D {
 
 		ini.SetBoolValue("DISPLAY", "V-Sync", graphics.VSync);
 
-		ini.SetLongValue("TEXTURES", "AnisotropicFiltering", graphics.AnisotropicFiltering);
+		ini.SetLongValue("TEXTURES", "maxAnisotropy", graphics.maxAnisotropy);
 
 		ini.SetLongValue("GRAPHICS", "FramerateCap", graphics.FramerateCap);
 		ini.SetLongValue("GRAPHICS", "MSAASamples", graphics.MSAASamples);

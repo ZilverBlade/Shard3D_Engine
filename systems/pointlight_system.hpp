@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../s3dtpch.h"
 #include "../engine_window.hpp"
 #include "../pipeline.hpp"
 #include "../device.hpp"
@@ -10,11 +10,7 @@
 #include "../wb3d/actor.hpp"
 
 #include "../components.hpp"
-#include <string>
 #include "../renderer.hpp"
-
-#include <memory>
-#include <vector>
 
 namespace Shard3D {
 	class PointlightSystem {

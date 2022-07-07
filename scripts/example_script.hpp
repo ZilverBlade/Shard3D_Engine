@@ -1,22 +1,23 @@
 #pragma once
+#include "../s3dtpch.h"
 #include "../wb3d/acting_actor.hpp"
 
 namespace Shard3D {
 	namespace CppScripts {
 		class ExampleCppScript : public wb3d::ActingActor {
 		public:
-			void beginEvent() {}
-			void endEvent()	{}
+			void beginEvent() override {}
+			void endEvent()	override  {}
 
-			void tickEvent(float dt) {
+			void tickEvent(float dt) override {
 				// float dt = frametime
 			}
 
-			void spawnEvent() {
+			void spawnEvent() override {
 				std::cout << "Example script!\n";			
 			}
 			
-			void killEvent() {
+			void killEvent() override {
 				std::cout << "Example script ended!\n";
 			}
 		};

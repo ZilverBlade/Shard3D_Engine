@@ -1,44 +1,5 @@
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include "s3dtpch.h" 
 #include "Project.hpp"
-//lib stuff
-#include <iostream>
-#include <chrono>
-#include <stdexcept>
-#include <array>
-#include <thread>
-//glm
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-
-//engine
-#include "input/editor/editor_keyboard_movement_controller.hpp"
-#include "input/editor/editor_mouse_movement_controller.hpp"
-#include "camera.hpp"
-#include "utils/definitions.hpp"
-#include "wb3d/master_manager.hpp"
-
-#include "simpleini/simple_ini.h"
-#include "buffer.hpp"
-#include "utils/dialogs.h"
-
-//systems
-#include "systems/basic_render_system.hpp"
-
-#include "systems/pointlight_system.hpp"
-#include "systems/spotlight_system.hpp"
-#include "systems/directional_light_system.hpp"
-
-#include "systems/grid_system.hpp"
-
-#include "systems/compute_system.hpp" //mostly post processing prob
-
-//UI stuff
-#include "UI/ImGuiLayer.hpp"
-
-//scripts
-#include "scripts/script_link.h"
-#include "graphics_settings.hpp"
 
 /*
 namespace Shard3D {

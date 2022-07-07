@@ -1,10 +1,9 @@
 #pragma once
-
+#include "../../s3dtpch.h"
 #include "../../wb3d/actor.hpp"
 #include "../../components.hpp"
 #include "../../engine_window.hpp"
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 namespace Shard3D {
 	namespace controller {
 		class EditorMouseMovementController {

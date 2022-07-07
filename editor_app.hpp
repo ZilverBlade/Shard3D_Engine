@@ -1,21 +1,20 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "engine_window.hpp"
 #include "pipeline.hpp"
 #include "device.hpp"
 #include "descriptor_pools.hpp"
-#include "utils/engine_utils.hpp"
+
 #include "wb3d/actor.hpp"
 #include "wb3d/level.hpp"
 
 #include "components.hpp"
-#include <string>
+
 #include "renderer.hpp"
 
 #include "UI/LayerStack.hpp"
 #include "singleton.hpp"
-#include <memory>
-#include <vector>
+
 using namespace Shard3D::wb3d;
 
 namespace Shard3D {
@@ -27,7 +26,7 @@ namespace Shard3D {
 		EditorApp(const EditorApp&) = delete;
 		EditorApp& operator=(const EditorApp&) = delete;
 
-		void run();
+		void run();	
 	private:
 		void setupDescriptors();
 		void loadGameObjects();

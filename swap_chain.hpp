@@ -1,16 +1,6 @@
 #pragma once
+#include "s3dtpch.h"
 #include "device.hpp"
-
-// vulkan headers
-#include <vulkan/vulkan.h>
-
-// std lib headers
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <fstream>
-
 
 namespace Shard3D {
 

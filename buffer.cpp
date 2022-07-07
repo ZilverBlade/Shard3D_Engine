@@ -4,12 +4,8 @@
  * Initially based off VulkanBuffer by Sascha Willems -
  * https://github.com/SaschaWillems/Vulkan/blob/master/base/VulkanBuffer.h
  */
-
+#include "s3dtpch.h" 
 #include "buffer.hpp"
-
- // std
-#include <cassert>
-#include <cstring>
 
 namespace Shard3D {
 

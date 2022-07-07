@@ -1,5 +1,5 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include <xhash>
 
 namespace Shard3D {

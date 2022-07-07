@@ -1,9 +1,5 @@
+#include "s3dtpch.h"
 #include "descriptors.hpp"
-
-// std
-#include <cassert>
-#include <stdexcept>
-#include "engine_logger.hpp"
 
 namespace Shard3D {
 

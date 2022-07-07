@@ -1,3 +1,4 @@
+#include "../s3dtpch.h" 
 #include "ImGuiLayer.hpp"
 #include "imgui_implementation.hpp"
 
@@ -5,8 +6,7 @@
 #include <../imguizmo/ImGuizmo.h>
 
 #include "imgui_glfw_implementation.hpp"
-#include <stdexcept>
-#include <iostream>
+
 #include "..\engine_logger.hpp"
 #include <miniaudio.h>
 
@@ -14,7 +14,6 @@
 #include "../wb3d/master_manager.hpp"
 #include "../texture.hpp"
 
-#define GLFW_INCLUDE_VULKAN
 
 #include "../utils/dialogs.h"
 #include "../video/video_decode.hpp"
@@ -28,14 +27,14 @@ namespace Shard3D {
 
     void ImGuiLayer::attach(VkRenderPass renderPass) {
         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
-        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+        glfwSetWindowTitle(Globals::engineWindow.getGLFWwindow(), title.c_str());
         hasBeenDetached = false;
         
         // Load any panels
         nodeEditorContext = ax::NodeEditor::CreateEditor();
-        levelTreePanel.setContext(Singleton::activeLevel);
-        levelPropertiesPanel.setContext(Singleton::activeLevel);
-        levelPeekPanel.setContext(Singleton::activeLevel);
+        levelTreePanel.setContext(Globals::activeLevel);
+        levelPropertiesPanel.setContext(Globals::activeLevel);
+        levelPeekPanel.setContext(Globals::activeLevel);
         //levelGizmo.setContext(level);
 
         // set the default values for the structure from ini file so that you can actually modify them
@@ -61,7 +60,7 @@ namespace Shard3D {
 	void ImGuiLayer::detach() {
      // check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
         if (hasBeenDetached) return;
-        vkDestroyDescriptorPool(Singleton::engineDevice.device(), descriptorPool, nullptr);
+        vkDestroyDescriptorPool(Globals::engineDevice.device(), descriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -82,7 +81,7 @@ namespace Shard3D {
         ImGuiIO& io = ImGui::GetIO();
         io.DeltaTime = dt;
 
-        glfwGetWindowSize(Singleton::engineWindow.getGLFWwindow(), &width, &height);
+        glfwGetWindowSize(Globals::engineWindow.getGLFWwindow(), &width, &height);
         io.DisplaySize = ImVec2(width, height);
 
         ImGui_ImplVulkan_NewFrame();
@@ -134,7 +133,7 @@ namespace Shard3D {
         }
 
         ImGui::Begin("Viewport", (bool*)(true));
-        ImGui::Image(Singleton::viewportImage, ImGui::GetWindowViewport()->Size);
+        ImGui::Image(Globals::viewportImage, ImGui::GetWindowViewport()->Size);
         ImGui::End();
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
@@ -265,11 +264,11 @@ namespace Shard3D {
         if (ImGui::BeginMenu("File")) {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
-                ImGui::BeginDisabled(Singleton::activeLevel->simulationState != PlayState::Stopped);
+                ImGui::BeginDisabled(Globals::activeLevel->simulationState != PlayState::Stopped);
                 if (ImGui::MenuItem("New Level", "Ctrl+N")) {
                     if (MessageDialogs::show("This will destroy the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {                   
                         levelTreePanel.clearSelectedActor();
-                        Singleton::activeLevel->killEverything();
+                        Globals::activeLevel->killEverything();
                     }
 
                 }
@@ -278,7 +277,7 @@ namespace Shard3D {
                         std::string filepath = FileDialogs::openFile(WORLDBUILDER3D_FILE_OPTIONS);
                         if (!filepath.empty()) {
                             levelTreePanel.clearSelectedActor();
-                            Singleton::activeLevel->killEverything();
+                            Globals::activeLevel->killEverything();
                             wb3d::MasterManager::loadLevel(filepath);
                         }
                     }
@@ -286,21 +285,21 @@ namespace Shard3D {
                 if (ImGui::MenuItem("Save Level...", "Ctrl+S")) {
                     std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
                     if (!filepath.empty()) {
-                        wb3d::LevelManager levelMan(Singleton::activeLevel);
+                        wb3d::LevelManager levelMan(Globals::activeLevel);
                         levelMan.save(filepath, false);
                     }
                 }
                 if (ImGui::MenuItem("Save Level... (Encrypted)", NULL)) {
                     std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
                     if (!filepath.empty()) {
-                        wb3d::LevelManager levelMan(Singleton::activeLevel);
+                        wb3d::LevelManager levelMan(Globals::activeLevel);
                         levelMan.save(filepath, true);
                     }
                 }
                 if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
                     std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
                     if (!filepath.empty()) {
-                        wb3d::LevelManager levelMan(Singleton::activeLevel);
+                        wb3d::LevelManager levelMan(Globals::activeLevel);
                         levelMan.save(filepath, false);
                     }
                 }
@@ -315,36 +314,36 @@ namespace Shard3D {
                 ImGui::TextDisabled("WorldBuilder3D 0.1");
                 ImGui::Separator();
                 if (ImGui::BeginMenu("Level Simulation")) {
-                    ImGui::BeginDisabled(Singleton::activeLevel->simulationState != PlayState::Stopped || Singleton::activeLevel->simulationState == PlayState::Paused);
+                    ImGui::BeginDisabled(Globals::activeLevel->simulationState != PlayState::Stopped || Globals::activeLevel->simulationState == PlayState::Paused);
                     if (ImGui::MenuItem("Begin")) {
-                        wb3d::MasterManager::captureLevel(Singleton::activeLevel);
-                        Singleton::activeLevel->begin();
+                        wb3d::MasterManager::captureLevel(Globals::activeLevel);
+                        Globals::activeLevel->begin();
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
-                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+                        glfwSetWindowTitle(Globals::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();   
-                    if (Singleton::activeLevel->simulationState != PlayState::Paused) {
-                        ImGui::BeginDisabled(Singleton::activeLevel->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
-                            Singleton::activeLevel->simulationState = PlayState::Paused;
+                    if (Globals::activeLevel->simulationState != PlayState::Paused) {
+                        ImGui::BeginDisabled(Globals::activeLevel->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
+                            Globals::activeLevel->simulationState = PlayState::Paused;
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused)";
-                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+                        glfwSetWindowTitle(Globals::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();  }
                     else {
-                        ImGui::BeginDisabled(Singleton::activeLevel->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
-                            Singleton::activeLevel->simulationState = PlayState::Simulating;
+                        ImGui::BeginDisabled(Globals::activeLevel->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
+                            Globals::activeLevel->simulationState = PlayState::Simulating;
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
-                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+                        glfwSetWindowTitle(Globals::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
                     }
                     
-                    ImGui::BeginDisabled(Singleton::activeLevel->simulationState == PlayState::Stopped);
+                    ImGui::BeginDisabled(Globals::activeLevel->simulationState == PlayState::Stopped);
                     if (ImGui::MenuItem("End")) {
                         levelTreePanel.clearSelectedActor();
-                        Singleton::activeLevel->end();
-                        levelTreePanel.setContext(Singleton::activeLevel);
-                        levelPropertiesPanel.setContext(Singleton::activeLevel);
-                        levelPeekPanel.setContext(Singleton::activeLevel);
+                        Globals::activeLevel->end();
+                        levelTreePanel.setContext(Globals::activeLevel);
+                        levelPropertiesPanel.setContext(Globals::activeLevel);
+                        levelPeekPanel.setContext(Globals::activeLevel);
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
-                        glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+                        glfwSetWindowTitle(Globals::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
                     ImGui::EndMenu();
                 }
@@ -363,7 +362,7 @@ namespace Shard3D {
                 }
                 if (ImGui::MenuItem("Play test video")) {
                     VideoPlaybackEngine::EngineH264Video videoEngine;
-                    videoEngine.createVideoSession(Singleton::engineWindow.getGLFWwindow(), "assets/mediadata/video.wmw");
+                    videoEngine.createVideoSession(Globals::engineWindow.getGLFWwindow(), "assets/mediadata/video.wmw");
                 }
                 if (ImGui::MenuItem("Save test material")) {
                     MaterialSystem::Material surfaceMat;

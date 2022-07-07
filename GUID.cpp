@@ -1,3 +1,4 @@
+#include "s3dtpch.h" 
 #include "GUID.hpp"
 
 #include <random>

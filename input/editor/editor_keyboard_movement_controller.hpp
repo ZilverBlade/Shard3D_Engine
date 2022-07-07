@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../../s3dtpch.h"
 #include "../../wb3d/actor.hpp"
 #include "../../components.hpp"
 #include "../../engine_window.hpp"

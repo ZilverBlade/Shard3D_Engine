@@ -1,16 +1,9 @@
+#include "s3dtpch.h" 
 #include "swap_chain.hpp"
 #include "device.hpp"
-#include <array>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <limits>
-#include <set>
-#include <stdexcept>
-#include <sstream>
-#include <typeinfo>
+
 #include "utils/definitions.hpp"
-#include "engine_logger.hpp"
+
 #include "graphics_settings.hpp"
 #include "singleton.hpp"
 
@@ -154,7 +147,7 @@ void EngineSwapChain::createSwapChain() {
   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
   createInfo.surface = device.surface();
 
-  Singleton::imgui_init_info.MinImageCount = imageCount;
+  Globals::imgui_init_info.MinImageCount = imageCount;
   createInfo.minImageCount = imageCount;
   createInfo.imageFormat = surfaceFormat.format;
   createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -200,7 +193,7 @@ void EngineSwapChain::createSwapChain() {
   swapChainImageFormat = surfaceFormat.format;
   swapChainExtent = extent;
 
-  Singleton::imgui_init_info.ImageCount = imageCount;
+  Globals::imgui_init_info.ImageCount = imageCount;
 }
 
 void EngineSwapChain::createImageViews() {

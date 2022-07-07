@@ -1,3 +1,4 @@
+#include "../s3dtpch.h"
 #include "blueprint.hpp"
 
 namespace Shard3D {

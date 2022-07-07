@@ -1,9 +1,8 @@
 #pragma once
-
+#include "../s3dtpch.h"
 #include <entt.hpp>
 #include "../GUID.hpp"
 #include "../utils/definitions.hpp"
-#include <vulkan/vulkan.h>
 #include "../camera.hpp"
 
 namespace Shard3D {
@@ -43,6 +42,14 @@ namespace Shard3D {
 			Actor getPossessedCameraActor();
 			EngineCamera& getPossessedCamera();
 
+#if ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
+			void setPossessedPreviewCameraActor(Actor actor);
+			void setPossessedPreviewCameraActor(GUID guid);
+			Actor getPossessedPreviewCameraActor();
+			EngineCamera& getPossessedPreviewCamera();
+#endif
+
+
 			/* *
 * Call when level events must begin
 */
@@ -59,9 +66,12 @@ namespace Shard3D {
 
 			PlayState simulationState = PlayState::Stopped;
 
-			entt::registry registry;	
+			entt::registry registry;
 		protected:
 			GUID possessedCameraActorGUID;
+#if ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
+			GUID possessedPreviewCameraActorGUID;
+#endif  
 		private:
 			std::string name = "Some kind of level";
 			bool loadRegistryCapture = false;

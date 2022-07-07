@@ -1,9 +1,7 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "device.hpp"
 
-#include <string>
-#include <vector>
 namespace Shard3D {
 
 	struct PipelineConfigInfo {

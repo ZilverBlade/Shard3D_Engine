@@ -78,7 +78,7 @@ BEGIN
         BLOCK "200004b0"
         BEGIN
             VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "Shard3D Engine (Gearbox Edition)"
+            VALUE "FileDescription", "Shard3D Torque"
             VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "EngineEng.exe"
             VALUE "LegalCopyright", "Copyright (C) 2022"

@@ -1,10 +1,9 @@
 #pragma once
+#include "../s3dtpch.h"
 #include "Layer.hpp"
 #include "../pipeline.hpp"
 
 #include <imgui_node_editor.h>
-#include <memory>
-#include <vector>
 #include "../wb3d/wb3d_imgui_frame.hpp"
 
 // panels

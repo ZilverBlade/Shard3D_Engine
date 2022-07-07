@@ -1,5 +1,6 @@
+#include "s3dtpch.h" 
 #include "components.hpp"
-#include <iostream>
+
 #include "utils/definitions.hpp"
 #include "wb3d/assetmgr.hpp"
 namespace Shard3D {
@@ -71,9 +72,17 @@ namespace Shard3D {
 			type = wb3d::AssetManager::retrieveModel(mdl)->getType();
 		}
 		void MeshComponent::reapplyModel(const std::string& mdl) {
-			file = cacheFile;
+			file = mdl;
 			wb3d::AssetManager::emplaceModel(cacheFile);
 			//type = wb3d::AssetManager::retrieveModel(mdl)->getType();
+		}
+		BillboardComponent::BillboardComponent(const std::string& tex) {
+			cacheFile = tex; // cacheFile is to be used to store future possible model
+			file = tex;
+		}
+		void BillboardComponent::reapplyTexture(const std::string& tex) {
+			file = tex;
+			wb3d::AssetManager::emplaceTexture(cacheFile);
 		}
 	}
 }

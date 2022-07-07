@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../s3dtpch.h"
 #ifdef NDEBUG
 #define ENTT_ASSERT(...) ((void)1)
 #endif
@@ -53,7 +53,7 @@ namespace Shard3D {
 			}
 			
 			bool isInvalid() {
-				if (getGUID() == 0 || getGUID() == UINT64_MAX) // dont display these actors as they are engine reserved
+				if (getGUID() == 0 || getGUID() == 1 || getGUID() == UINT64_MAX) // dont display these actors as they are engine reserved
 					return true;
 				if (!hasComponent<Components::TagComponent>())
 					return true;
@@ -62,6 +62,10 @@ namespace Shard3D {
 			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
 			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
 			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
+
+#if ACTOR_FORCE_TRANSFORM_COMPONENT
+			Components::TransformComponent getTransform() { return getComponent<Components::TransformComponent>(); }
+#endif
 
 			operator bool() const { return actorHandle != entt::null; }
 			operator entt::entity() const { return actorHandle; };

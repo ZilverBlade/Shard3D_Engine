@@ -5,24 +5,23 @@
 #include "../device.hpp"
 #include "../camera.hpp"
 #include "../frame_info.hpp"
-		  
 
-#include "../components.hpp"
 #include "../wb3d/level.hpp"
 #include "../wb3d/actor.hpp"
 
+#include "../components.hpp"
 #include "../renderer.hpp"
 
 namespace Shard3D {
-	class BasicRenderSystem {
+	class BillboardRenderSystem {
 	public:
-		BasicRenderSystem(EngineDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-		~BasicRenderSystem();
+		BillboardRenderSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		~BillboardRenderSystem();
 
-		BasicRenderSystem(const BasicRenderSystem&) = delete;
-		BasicRenderSystem& operator=(const BasicRenderSystem&) = delete;
+		BillboardRenderSystem(const BillboardRenderSystem&) = delete;
+		BillboardRenderSystem& operator=(const BillboardRenderSystem&) = delete;
 
-		void renderGameObjects(FrameInfo &frameInfo, std::shared_ptr<wb3d::Level>& level);
+		void render(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level);
 
 	private:
 
@@ -33,6 +32,7 @@ namespace Shard3D {
 
 		std::unique_ptr<EnginePipeline> enginePipeline;
 		VkPipelineLayout pipelineLayout;
+		std::unique_ptr<EngineDescriptorSetLayout> billboardSystemLayout;
 	};
 
 }

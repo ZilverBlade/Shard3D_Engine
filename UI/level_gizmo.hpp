@@ -1,4 +1,5 @@
 #pragma once
+#include "../s3dtpch.h"
 #include "level_tree_panel.hpp"
 //#include <../imguizmo/ImGuizmo.h>
 #include "..\wb3d\level.hpp"

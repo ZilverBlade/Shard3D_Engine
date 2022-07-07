@@ -1,3 +1,4 @@
+#include "s3dtpch.h" 
 #include "texture.hpp"
 
 // libs
@@ -6,8 +7,6 @@
 
 // std
 #include <cmath>
-#include <stdexcept>
-#include "engine_logger.hpp"
 #include "graphics_settings.hpp"
 
 namespace Shard3D {
@@ -237,7 +236,7 @@ namespace Shard3D {
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
         samplerInfo.anisotropyEnable = VK_TRUE;
-        samplerInfo.maxAnisotropy = (float)GraphicsSettings::get().AnisotropicFiltering;
+        samplerInfo.maxAnisotropy = static_cast<float>(GraphicsSettings::get().maxAnisotropy);
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
         samplerInfo.unnormalizedCoordinates = VK_FALSE;
         samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;

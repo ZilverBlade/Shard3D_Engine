@@ -1,11 +1,9 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "model.hpp"
 #include "GUID.hpp"
 
 #include "../../camera.hpp"
-#include <memory>
-#include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <entt.hpp>
@@ -90,27 +88,26 @@ namespace Shard3D {
 			}
 		};
 		struct BillboardComponent {
-			std::shared_ptr<EngineTexture> texture{};
 			std::string file{};
+			std::string cacheFile{};
 			enum class BillboardOrientation {
 				BILLBOARD_ORIENTATION_NULL = 0,
 				BILLBOARD_ORIENTATION_AXIAL = 1,
 				BILLBOARD_ORIENTATION_POINT = 2
 			};
+			// BILLBOARD_ORIENTATION_AXIAL is the only supported orientation at the moment
 			BillboardOrientation orientation = BillboardOrientation::BILLBOARD_ORIENTATION_AXIAL;
-
-			std::shared_ptr<EngineTexture> newTexture{};
 
 			BillboardComponent() = default;
 			BillboardComponent(const BillboardComponent&) = default;
-			
+			BillboardComponent(const std::string& tex);
+			void reapplyTexture(const std::string& tex);
 		};
 		struct MeshComponent {
 			std::string file{};
+			std::string cacheFile{};
 			ModelType type = ModelType::MODEL_TYPE_NULL;
 			MaterialSystem::MaterialList materialList;
-
-			std::string cacheFile{};
 
 			MeshComponent() = default;
 			MeshComponent(const MeshComponent&) = default;

@@ -1,10 +1,11 @@
+#include "../s3dtpch.h" 
 #include "assetmgr.hpp"
-#include "../engine_logger.hpp"
+
 #include "../singleton.hpp"
 namespace Shard3D::wb3d {
 	void AssetManager::clearLevelAssets() {
 		SHARD3D_WARN("Clearing all stored assets, may cause unexpected crash!");
-		vkDeviceWaitIdle(Singleton::engineDevice.device());
+		vkDeviceWaitIdle(Globals::engineDevice.device());
 		textureAssets.clear();
 		materialAssets.clear();
 		modelAssets.clear();
@@ -15,7 +16,7 @@ namespace Shard3D::wb3d {
 			materialAssets[material.guid] = material;
 		}
 	}
-
+#pragma region Model
 	void AssetManager::emplaceModel(const std::string& modelPath, ModelType modelType) {		
 		for (const auto& i : modelAssets) 
 			if (i.first.find(modelPath) != std::string::npos && modelPath.find(i.first) != std::string::npos) {
@@ -32,12 +33,25 @@ namespace Shard3D::wb3d {
 	std::shared_ptr<EngineModel>& AssetManager::retrieveModel(const std::string& path) {
 		return modelAssets.at(path);
 	}
-	void AssetManager::emplaceTexture(EngineTexture& model) {
-
+#pragma endregion
+#pragma region Texture
+	void AssetManager::emplaceTexture(const std::string& texturePath) {
+		for (const auto& i : textureAssets)
+			if (i.first.find(texturePath) != std::string::npos && texturePath.find(i.first) != std::string::npos) {
+				SHARD3D_WARN("Model at path '{0}' already exists! Model will be ignored...", texturePath);
+				return;
+				/*	modelAssets.erase(i.first);
+					modelAssets[model->fpath] = model;
+					return; //prevent entries in unordered map with same path */
+			}
+		std::shared_ptr<EngineTexture> texture = EngineTexture::createTextureFromFile(Globals::engineDevice, texturePath);
+		SHARD3D_LOG("Loaded texture to asset map '{0}'", texturePath);
+		textureAssets[texturePath] = texture;
 	}
-	EngineTexture& AssetManager::retrieveTexture(const std::string& path) {
+	std::shared_ptr<EngineTexture>& AssetManager::retrieveTexture(const std::string& path) {
 		return textureAssets.at(path);
 	}
+#pragma endregion
 	void AssetManager::loadMaterialsFromList(MaterialSystem::MaterialList& matlist) {
 		for (MaterialSystem::Material material : matlist.list) {
 			materialAssets.emplace(material.guid, material);

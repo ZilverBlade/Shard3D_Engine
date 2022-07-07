@@ -1,9 +1,11 @@
+#include "../s3dtpch.h"
 #include "level_peekers.hpp"
 #include "../components.hpp"
 #include "../wb3d/bpmgr.hpp"
-#include "../utils/dialogs.h"
+
 #include <imgui.h>
 #include "../wb3d/assetmgr.hpp"
+#include "../singleton.hpp"
 namespace Shard3D {
 
 	LevelPeekingPanel::LevelPeekingPanel(const std::shared_ptr<Level>& levelContext) {
@@ -23,11 +25,14 @@ namespace Shard3D {
 		ImGui::Checkbox("Texture Inspector", &textureInspector);
 		ImGui::Separator();
 		ImGui::Checkbox("Material Inspector", &materialInspector);
+		ImGui::Separator();
+		ImGui::Checkbox("Miscellaneous Inspector", &miscInspector);
 		ImGui::End();
 
 		if (actorInspector) peekActorInspector();
 		if (lodInspector) peekLODInspector();
 		if (materialInspector) peekMaterialInspector();
+		if (miscInspector) peekMisc();
 	}
 
 	void LevelPeekingPanel::peekMaterialInspector() {
@@ -43,9 +48,12 @@ namespace Shard3D {
 		ImGui::Begin("Actor Inspector");
 		context->registry.each([&](auto actorGUID) {
 			wb3d::Actor actor{ actorGUID, context.get() };
-			if (actor.isInvalid()) return;
+			
 			std::string text = actor.getTag() + " (" + std::to_string((uint64_t)actor.getGUID()) + ")";
-			ImGui::Text(text.c_str());
+			if (actor.isInvalid())
+				ImGui::TextColored({1.f, 0.f, 1.f, 1.f}, text.c_str());
+			else
+				ImGui::Text(text.c_str());
 		});
 		ImGui::End();
 	}
@@ -60,6 +68,15 @@ namespace Shard3D {
 		}
 		for (const auto& model : AssetManager::getModelAssets()) 
 			if (ImGui::TreeNodeEx(std::string(model.first + "##" + model.first).c_str(), ImGuiTreeNodeFlags_None)) {}
+		ImGui::End();
+	}
+
+	void LevelPeekingPanel::peekMisc() {
+		ImGui::Begin("Misc Inspector");
+		ImGui::Text(std::string("Possessed camera actor: " + Globals::activeLevel->getPossessedCameraActor().getTag() + " (0x" + std::to_string((int)&Globals::activeLevel->getPossessedCamera()) + ")").c_str());
+#if ALLOW_PREVIEW_CAMERA
+		ImGui::Text(std::string("Previewing camera: " + Globals::activeLevel->getPossessedPreviewCameraActor().getTag() + " (0x" + std::to_string((int)&Globals::activeLevel->getPossessedPreviewCamera()) + ")").c_str());
+#endif
 		ImGui::End();
 	}
 	

@@ -1,3 +1,4 @@
+#include "../s3dtpch.h" 
 #include "level_gizmo.hpp"
 
 namespace Shard3D {

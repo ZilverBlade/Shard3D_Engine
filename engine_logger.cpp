@@ -1,6 +1,5 @@
-#include "engine_logger.hpp"
-#include <iostream>
-#include "utils/dialogs.h"
+#include "s3dtpch.h" 
+
 namespace Shard3D {
 	void LOGGER::init() {
 		spdlog::set_pattern("%^[%T] %n: %v%$");

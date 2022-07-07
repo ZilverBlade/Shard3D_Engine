@@ -1,10 +1,7 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "engine_window.hpp"
 
-// std lib headers
-#include <string>
-#include <vector>
 #include "simpleini/simple_ini.h"
 
 namespace Shard3D {

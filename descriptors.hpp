@@ -1,10 +1,6 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "device.hpp"
-// std
-#include <memory>
-#include <unordered_map>
-#include <vector>
 
 namespace Shard3D {
 

@@ -1,9 +1,8 @@
 #pragma once
-#include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>
+#include "../s3dtpch.h"
 #include "../device.hpp"
 #include "../utils/definitions.hpp"
-#include <memory>
+
 #include "../wb3d/level.hpp"
 
 namespace Shard3D {

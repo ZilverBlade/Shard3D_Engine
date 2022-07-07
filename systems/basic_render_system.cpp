@@ -1,11 +1,7 @@
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
+#include "../s3dtpch.h" 
 #include <glm/gtc/constants.hpp>
 
 #include "basic_render_system.hpp"
-#include <stdexcept>
-#include <array>
 
 #include "../wb3d/assetmgr.hpp"
 namespace Shard3D {

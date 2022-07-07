@@ -1,8 +1,7 @@
 #pragma once
-#include <vector>
+#include "../s3dtpch.h"
 #include "../utils/definitions.hpp"
-#include <vulkan/vulkan.h>
-#include <string>
+
 #include "level.hpp"
 #include "../device.hpp"
 #include "levelmgr.hpp"

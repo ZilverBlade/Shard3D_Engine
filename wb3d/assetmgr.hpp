@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include "../s3dtpch.h"
 #include "../systems/material_system.hpp"
 #include "level.hpp"
 #include "../texture.hpp"
@@ -28,13 +28,13 @@ namespace Shard3D {
 			//since they directly load from there, rather than load into a wrapper/struct
 
 			static std::unordered_map<std::string, std::shared_ptr<EngineModel>>& getModelAssets() { return modelAssets; }
-			static std::unordered_map<std::string, EngineTexture>& getTextureAssets() { return textureAssets; }
+			static std::unordered_map<std::string, std::shared_ptr<EngineTexture>>& getTextureAssets() { return textureAssets; }
 
 			static void emplaceModel(const std::string& modelPath, ModelType modelType = ModelType::MODEL_TYPE_OBJ);
 			static std::shared_ptr<EngineModel>& retrieveModel(const std::string& path);
 
-			static void emplaceTexture(EngineTexture& model);
-			static EngineTexture& retrieveTexture(const std::string& path);
+			static void emplaceTexture(const std::string& texturePath);
+			static std::shared_ptr<EngineTexture>& retrieveTexture(const std::string& path);
 
 #pragma region Material shenanigans
 			static void loadMaterialsFromList(MaterialSystem::MaterialList& matlist);
@@ -46,7 +46,7 @@ namespace Shard3D {
 #pragma endregion	
 		private:
 			inline static std::unordered_map<std::string, std::shared_ptr<EngineModel>> modelAssets;
-			inline static std::unordered_map<std::string, EngineTexture> textureAssets;
+			inline static std::unordered_map<std::string, std::shared_ptr<EngineTexture>> textureAssets;
 			inline static std::unordered_map<uint64_t, MaterialSystem::Material> materialAssets;
 			inline static std::unordered_map<uint64_t, MaterialSystem::MaterialList> materialListAssets;
 		};

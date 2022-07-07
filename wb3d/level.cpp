@@ -1,3 +1,4 @@
+#include "../s3dtpch.h" 
 #include "level.hpp"
 #include "acting_actor.hpp" // also includes "actor.hpp"
 #include "blueprint.hpp"
@@ -138,14 +139,40 @@ namespace Shard3D {
 					return Actor{actor, this}; 
 				}
 			}
-			SHARD3D_FATAL("No possessed camera found!!!!");
-			SHARD3D_ERROR("Attempted to find GUID: {0}", possessedCameraActorGUID);
+			SHARD3D_FATAL("No possessed camera found!!!!\nAttempted to find GUID: " + possessedCameraActorGUID);
 		}
 
 		 EngineCamera& Level::getPossessedCamera() {
 			return getPossessedCameraActor().getComponent<Components::CameraComponent>().camera;
 		 }
+#if ALLOW_PREVIEW_CAMERA// ONLY FOR DEBUGGING PURPOSES
+		 void Level::setPossessedPreviewCameraActor(Actor actor) {
+			 if (!actor.hasComponent<Components::CameraComponent>()) {
+				 SHARD3D_ERROR("Can't possess a non camera actor!!");
+				 return;
+			 }
+			 possessedPreviewCameraActorGUID = actor.getGUID();
+		 }
 
+		 void Level::setPossessedPreviewCameraActor(GUID guid)  {
+			 possessedPreviewCameraActorGUID = guid;
+		 }
+
+		 Actor Level::getPossessedPreviewCameraActor() {
+			 auto guidView = registry.view<Components::GUIDComponent>();
+			 for (auto actor : guidView) {
+				 if (guidView.get<Components::GUIDComponent>(actor).id == possessedPreviewCameraActorGUID) {
+					 //std::cout << "Using possessed: 0x" << &camView.get<Components::CameraComponent>(actor).camera << "\n";
+					 return Actor{ actor, this };
+				 }
+			 }
+			 SHARD3D_FATAL("No possessed camera found!!!!\nAttempted to find GUID: " + possessedPreviewCameraActorGUID);
+		 }
+
+		 EngineCamera& Level::getPossessedPreviewCamera() {
+			 return getPossessedPreviewCameraActor().getComponent<Components::CameraComponent>().camera;
+		 }
+#endif
 		void Level::begin() {
 			SHARD3D_LOG("Beginning simulation");
 			simulationState = PlayState::Simulating;
@@ -161,12 +188,13 @@ namespace Shard3D {
 
 		void Level::tick(float dt) {
 			// update scripts	
-			if (simulationState == PlayState::Simulating)
-				registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
-				csc.Inst->tickEvent(dt);
-			});
-			//else std::cout << "CANNOT EXECUTE LEVEL TICK EVENT WHEN PLAYSTATE NOT PLAYING!!!\n";
-			//update actor positions
+			{ // scoped because if tickevent does something else then it doesnt need to keep stack allocated memory
+				if (simulationState == PlayState::Simulating)
+					registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+					csc.Inst->tickEvent(dt);
+				});
+			}
+			
 		}
 
 		void Level::end() {

@@ -1,8 +1,6 @@
 #pragma once
-
-#include <string>
-#include <functional>
-
+#include "../s3dtpch.h"
+ 
 namespace Shard3D {
 
 	namespace wb3d {

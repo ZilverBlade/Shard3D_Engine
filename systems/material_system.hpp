@@ -1,6 +1,5 @@
 #pragma once
-#include <glm/glm.hpp>
-#include <string>
+#include "../s3dtpch.h"
 
 #include "../utils/definitions.hpp"
 #include "../pipeline.hpp"

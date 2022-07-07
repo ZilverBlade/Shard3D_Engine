@@ -2,11 +2,10 @@
 //
 // Created by lukas on 27.11.21.
 //
-
-#include <vulkan/vulkan.h>
+#include "s3dtpch.h"
+ 
 #include "device.hpp"
 
-#include <memory>
 #include "frame_info.hpp"
 
 namespace Shard3D {

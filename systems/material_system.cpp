@@ -1,7 +1,5 @@
+#include "../s3dtpch.h" 
 #include "material_system.hpp"
-#include "../utils/engine_utils.hpp"
-#include "../utils/yaml_ext.hpp"
-#include "../engine_logger.hpp"
 #include "../wb3d/assetmgr.hpp"
 namespace Shard3D {
 	MaterialSystem::MaterialSystem(SurfaceMaterialData materialData, EngineDevice& device, VkDescriptorSetLayout matSetLayout) : surfaceMaterialData{materialData}, engineDevice { device }, materialSetLayout(matSetLayout) {

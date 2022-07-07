@@ -1,12 +1,7 @@
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
+#include "../s3dtpch.h" 
 #include <glm/gtc/constants.hpp>
 
 #include "directional_light_system.hpp"
-#include <stdexcept>
-#include <array>
-#include <map>
 
 namespace Shard3D {
 

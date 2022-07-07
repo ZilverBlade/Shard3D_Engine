@@ -1,14 +1,9 @@
 #pragma once
-
+#include "s3dtpch.h"
 #include "engine_window.hpp"
 #include "device.hpp"
-#include <cassert>
-#include <string>
-#include "swap_chain.hpp"
 
-#include <memory>
-#include <vector>
-#include <array>
+#include "swap_chain.hpp"
 
 namespace Shard3D {
 	class EngineRenderer {

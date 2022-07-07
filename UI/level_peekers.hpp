@@ -1,4 +1,5 @@
 #pragma once
+#include "../s3dtpch.h"
 #include "../wb3d/level.hpp"
 #include "../wb3d/actor.hpp"
 using namespace Shard3D::wb3d;
@@ -15,12 +16,14 @@ namespace Shard3D {
 		void render();
 
 	private:
-		inline static bool textureInspector, materialInspector, actorInspector, lodInspector;
+		inline static bool textureInspector, materialInspector, actorInspector, lodInspector, miscInspector;
 
 		void peekTextureInspector();
 		void peekMaterialInspector();
 		void peekActorInspector();
 		void peekLODInspector();
+
+		void peekMisc();
 
 		std::shared_ptr<Level> context;
 		

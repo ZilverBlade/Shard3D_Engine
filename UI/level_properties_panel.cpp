@@ -1,9 +1,11 @@
+#include "../s3dtpch.h" 
 #include "level_properties_panel.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include "../engine_window.hpp"
-#include <fstream>
+
 #include <imgui_internal.h>
 #include "../wb3d/assetmgr.hpp"
+#include "../singleton.hpp"
 namespace Shard3D {
 	LevelPropertiesPanel::LevelPropertiesPanel(const std::shared_ptr<Level>& levelContext) {
 		setContext(levelContext);
@@ -67,6 +69,7 @@ namespace Shard3D {
 				SHARD3D_INFO("copied {0} to clipboard", std::to_string(tree.selectedActor.getGUID()).c_str());
 			}
 		}
+		if (showPreviewCamera) displayPreviewCamera(tree.selectedActor);
 		ImGui::EndDisabled(); ImGui::End();
 	}
 
@@ -143,6 +146,14 @@ namespace Shard3D {
 			}
 		}	
 	}
+
+	void LevelPropertiesPanel::displayPreviewCamera(Actor actor) {
+		ImGui::Begin("PREVIEW (viewport)");
+#if ALLOW_PREVIEW_CAMERA
+		ImGui::Image(Globals::previewViewportImage, { 800, 600 });
+#endif
+		ImGui::End();
+	}
 	void LevelPropertiesPanel::drawActorProperties(Actor actor) {
 		if (actor.hasComponent<Components::TagComponent>()) {
 			auto& tag = actor.getComponent<Components::TagComponent>().tag;
@@ -186,7 +197,7 @@ namespace Shard3D {
 				if (ImGui::InputText("Mesh File", fileBuffer, 256)) {
 					rfile = std::string(fileBuffer);
 				}
-				if (ImGui::Button("(Re)Load Mesh")) {
+				if (ImGui::Button("Load Mesh")) {
 					std::ifstream ifile(fileBuffer);
 					if (ifile.good()) {
 						SHARD3D_LOG("Reloading mesh '{0}'", rfile);
@@ -219,8 +230,13 @@ namespace Shard3D {
 				ImGui::BeginDisabled(!enableFov); ImGui::DragFloat("FOV", &actor.getComponent<Components::CameraComponent>().fov, 0.1f, 10.f, 180.f); ImGui::EndDisabled();
 				ImGui::DragFloat("Near Clip Plane", &actor.getComponent<Components::CameraComponent>().nearClip, 0.001f, 0.05f, 1.f);
 				ImGui::DragFloat("Far Clip Plane", &actor.getComponent<Components::CameraComponent>().farClip, 1.f, 16.f, 8192.f);
-				ImGui::DragFloat("Aspect ratio", &actor.getComponent<Components::CameraComponent>().ar, 0.001f, 0.f, 4.f);
-
+#if ALLOW_PREVIEW_CAMERA
+				if (ImGui::Button("Preview", { 150, 50 })) {
+				//	Globals::activeLevel->setPossessedPreviewCameraActor(actor);
+					context->setPossessedPreviewCameraActor(actor);
+					showPreviewCamera = true;
+				}
+#endif // !DEPLOY
 				ImGui::TreePop();
 			}
 			if (killComponent) actor.killComponent<Components::CameraComponent>();

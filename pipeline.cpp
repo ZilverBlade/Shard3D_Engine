@@ -1,11 +1,7 @@
+#include "s3dtpch.h"  
+
 #include "pipeline.hpp"
 #include "model.hpp"
-//std
-#include <fstream>
-#include <stdexcept>
-#include <iostream>
-#include <cassert>
-#include "engine_logger.hpp"
 namespace Shard3D {
 
 	EnginePipeline::EnginePipeline(

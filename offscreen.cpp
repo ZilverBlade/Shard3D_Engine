@@ -1,13 +1,8 @@
 //
 // Created by lukas on 27.11.21.
 //
-
+#include "s3dtpch.h"
 #include "offscreen.hpp"
-
-#include <array>
-#include <iostream>
-#include <glm/glm.hpp>
-#include <memory>
 
 namespace Shard3D {
     OffScreen::OffScreen(EngineDevice &device) : m_Device{device} {

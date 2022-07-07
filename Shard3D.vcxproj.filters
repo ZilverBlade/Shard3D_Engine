@@ -239,8 +239,11 @@
     <ClCompile Include="offscreen.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="singleton.cpp">
-      <Filter>Source Files\core</Filter>
+    <ClCompile Include="s3dtpch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\billboard_system.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -264,9 +267,6 @@
     </ClInclude>
     <ClInclude Include="simpleini\simple_ini.h">
       <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="frame_info.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="systems\basic_render_system.hpp">
       <Filter>Header Files\systems</Filter>
@@ -364,9 +364,6 @@
     <ClInclude Include="scripts\example_script.hpp">
       <Filter>scripts</Filter>
     </ClInclude>
-    <ClInclude Include="editor_camera_script.hpp">
-      <Filter>Header Files\camera</Filter>
-    </ClInclude>
     <ClInclude Include="scripts\script_handler.hpp">
       <Filter>scripts</Filter>
     </ClInclude>
@@ -448,6 +445,18 @@
     <ClInclude Include="UI\imgui_initter.hpp">
       <Filter>Header Files\UI\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="frame_info.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="s3dtpch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\billboard_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\systems.h">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
@@ -490,6 +499,12 @@
     <None Include="cpp.hint" />
     <None Include="shaders\test.comp">
       <Filter>shaders\compute</Filter>
+    </None>
+    <None Include="shaders\billboard_axial.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\billboard_axial.frag">
+      <Filter>shaders\fragment</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

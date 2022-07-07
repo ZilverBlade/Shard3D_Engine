@@ -1,5 +1,5 @@
 #pragma once
-#include <GLFW/glfw3.h>
+#include "s3dtpch.h"
 #include "simpleini/simple_ini.h"
 #include "engine_window.hpp"
 namespace Shard3D {
@@ -44,7 +44,7 @@ namespace Shard3D {
 			//	[TEXTURES]
 //Level of anisotropic filtering used by the texture system.
 			//@return (requires restart)
-			int AnisotropicFiltering = 16;
+			int maxAnisotropy = 16;
 
 			//	[GRAPHICS]
 //Amount of frames per second to limit the renderer.

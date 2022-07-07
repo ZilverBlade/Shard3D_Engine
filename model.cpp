@@ -1,13 +1,8 @@
+#include "s3dtpch.h" 
 #include "model.hpp"
-#include "utils/engine_utils.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
-#include <cassert>
-#include <cstring>
-#include <iostream>
-#include <unordered_map>
 
 //object loaders
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -16,7 +11,7 @@
 
 #include "simpleini/simple_ini.h"
 #include "utils/definitions.hpp"
-#include "engine_logger.hpp"
+
 #include "wb3d/assetmgr.hpp"
 #include "singleton.hpp"
 namespace std {
@@ -32,7 +27,7 @@ namespace std {
 
 namespace Shard3D {
 
-	EngineModel::EngineModel(const EngineModel::Builder &builder) : engineDevice{Singleton::engineDevice} {
+	EngineModel::EngineModel(const EngineModel::Builder &builder) : engineDevice{Globals::engineDevice} {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
 	}
@@ -94,7 +89,7 @@ namespace Shard3D {
 		uint32_t indexSize = sizeof(indices[0]);
 
 		EngineBuffer stagingBuffer{
-			Singleton::engineDevice,
+			Globals::engineDevice,
 			indexSize,
 			indexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -136,15 +131,14 @@ namespace Shard3D {
 	std::vector<VkVertexInputBindingDescription> EngineModel::Vertex::getBindingDescriptions() {
 		return { {0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX} };
 	}
-
+	
 	std::vector<VkVertexInputAttributeDescription> EngineModel::Vertex::getAttributeDescriptions() {
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
-		
-		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)});
-		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)});
-		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal) });
-		attributeDescriptions.push_back({ 3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv) });
-
+		attributeDescriptions.reserve(4); //preallocate
+		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)	});
+		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)		});
+		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)	});
+		attributeDescriptions.push_back({ 3, 0, VK_FORMAT_R32G32_SFLOAT,	offsetof(Vertex, uv)		});
 		return attributeDescriptions;
 	}
 #pragma region GLTF
@@ -333,6 +327,8 @@ namespace Shard3D {
 
 	
 	void EngineModel::Builder::loadIndexedModel(const std::string& filepath, ModelType modelType) {
+		auto newTime = std::chrono::high_resolution_clock::now();
+
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
 		std::vector<tinyobj::material_t> materials;
@@ -347,6 +343,7 @@ namespace Shard3D {
 
 		std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 		for (const auto &shape : shapes) {
+			indices.reserve(shape.mesh.indices.size()); //preallocate
 			for (const auto &index : shape.mesh.indices) {
 				Vertex vertex{};
 				if (index.vertex_index >= 0) {
@@ -382,5 +379,8 @@ namespace Shard3D {
 				indices.push_back(uniqueVertices[vertex]);
 			}
 		}
+		SHARD3D_LOG("Duration of loading vertices: {0} ms", 
+			std::chrono::duration<float, std::chrono::seconds::period>
+			(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
 	}
 }

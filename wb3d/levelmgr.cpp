@@ -1,13 +1,11 @@
+#include "../s3dtpch.h"  
 #include "levelmgr.hpp"
 
 #include "actor.hpp" 
 #include "../components.hpp"
 #include "../wb3d/wb3d_imgui_frame.hpp"
 #include "../utils/definitions.hpp"
-#include "../utils/engine_utils.hpp"
-#include "../utils/yaml_ext.hpp"
 #include "assetmgr.hpp"
-#include <fstream>
 
 namespace Shard3D {
 	namespace wb3d {
@@ -160,7 +158,7 @@ namespace Shard3D {
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
 
-#ifdef GAME_RELEASE_READY
+#ifdef _DEPLOY
 			YAML::Node data = YAML::Load(decrypt(strStream.str()));
 #if BETA_DEBUG_TOOLS
 			std::ofstream fout(sourcePath + ".dcr");

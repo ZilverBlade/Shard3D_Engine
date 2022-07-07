@@ -115,6 +115,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,6 +166,8 @@
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -210,6 +214,8 @@
       <SupportJustMyCode>true</SupportJustMyCode>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -241,7 +247,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;GAME_RELEASE_READY;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_DEPLOY;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
       <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\spdlog;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
@@ -252,6 +258,8 @@
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -285,28 +293,136 @@
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="offscreen.cpp" />
     <ClCompile Include="Project.cpp" />
-    <ClCompile Include="singleton.cpp" />
-    <ClCompile Include="systems\compute_system.cpp" />
-    <ClCompile Include="systems\material_system.cpp" />
+    <ClCompile Include="s3dtpch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="systems\billboard_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="systems\compute_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="systems\material_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="texture.cpp" />
-    <ClCompile Include="UI\level_gizmo.cpp" />
-    <ClCompile Include="UI\level_peekers.cpp" />
-    <ClCompile Include="video\video_decode.cpp" />
-    <ClCompile Include="wb3d\assetmgr.cpp" />
-    <ClCompile Include="wb3d\blueprint.cpp" />
-    <ClCompile Include="wb3d\bpmgr.cpp" />
-    <ClCompile Include="wb3d\master_manager.cpp" />
-    <ClCompile Include="systems\directional_light_system.cpp" />
-    <ClCompile Include="systems\pointlight_system.cpp" />
-    <ClCompile Include="systems\spotlight_system.cpp" />
-    <ClCompile Include="UI\level_properties_panel.cpp" />
-    <ClCompile Include="UI\level_tree_panel.cpp" />
-    <ClCompile Include="wb3d\actor.cpp" />
-    <ClCompile Include="wb3d\level.cpp" />
-    <ClCompile Include="UI\ImGuiLayer.cpp" />
-    <ClCompile Include="systems\basic_render_system.cpp" />
-    <ClCompile Include="input\editor\editor_keyboard_movement_controller.cpp" />
-    <ClCompile Include="input\editor\editor_mouse_movement_controller.cpp" />
+    <ClCompile Include="UI\level_gizmo.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\level_peekers.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="video\video_decode.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\assetmgr.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\blueprint.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\bpmgr.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\master_manager.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="systems\directional_light_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="systems\pointlight_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="systems\spotlight_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\level_properties_panel.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\level_tree_panel.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\actor.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\level.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\ImGuiLayer.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="systems\basic_render_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="input\editor\editor_keyboard_movement_controller.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="input\editor\editor_mouse_movement_controller.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="buffer.cpp" />
     <ClCompile Include="components.cpp" />
     <ClCompile Include="swap_chain.cpp" />
@@ -317,29 +433,63 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="engine_window.cpp" />
     <ClCompile Include="pipeline.cpp" />
-    <ClCompile Include="systems\grid_system.cpp" />
-    <ClCompile Include="UI\imgui_glfw_implementation.cpp" />
-    <ClCompile Include="UI\imgui_implementation.cpp" />
-    <ClCompile Include="UI\Layer.cpp" />
-    <ClCompile Include="UI\LayerStack.cpp" />
-    <ClCompile Include="wb3d\levelmgr.cpp" />
-    <ClCompile Include="wb3d\wb3d_imgui_frame.hpp" />
+    <ClCompile Include="systems\grid_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\imgui_glfw_implementation.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\imgui_implementation.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\Layer.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="UI\LayerStack.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\levelmgr.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\wb3d_imgui_frame.hpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="cheat_codes.hpp" />
     <ClInclude Include="descriptor_pools.hpp" />
-    <ClInclude Include="editor_camera_script.hpp">
-      <FileType>CppHeader</FileType>
-    </ClInclude>
     <ClInclude Include="events\events.hpp" />
     <ClInclude Include="events\event_handler.hpp" />
     <ClInclude Include="events\key_events.hpp" />
     <ClInclude Include="graphics_settings.hpp" />
     <ClInclude Include="offscreen.hpp" />
     <ClInclude Include="Project.hpp" />
+    <ClInclude Include="s3dtpch.h" />
     <ClInclude Include="scripts\carcontroller.hpp" />
     <ClInclude Include="singleton.hpp" />
+    <ClInclude Include="systems\billboard_system.hpp" />
     <ClInclude Include="systems\material_system.hpp" />
     <ClInclude Include="plugins\example_component.hpp" />
     <ClInclude Include="plugins\plugin_link.h" />
@@ -349,6 +499,7 @@
     <ClInclude Include="scripts\script_handler.hpp" />
     <ClInclude Include="scripts\script_link.h" />
     <ClInclude Include="systems\compute_system.hpp" />
+    <ClInclude Include="systems\systems.h" />
     <ClInclude Include="texture.hpp" />
     <ClInclude Include="UI\imgui_initter.hpp" />
     <ClInclude Include="UI\level_peekers.hpp" />
@@ -417,6 +568,8 @@
   <ItemGroup>
     <None Include="compile.bat" />
     <None Include="cpp.hint" />
+    <None Include="shaders\billboard_axial.frag" />
+    <None Include="shaders\billboard_axial.vert" />
     <None Include="shaders\directional_light.frag" />
     <None Include="shaders\directional_light.vert" />
     <None Include="shaders\basic_shader.frag" />

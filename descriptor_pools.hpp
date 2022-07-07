@@ -1,4 +1,5 @@
 #pragma once
+#include "s3dtpch.h"
 #include "descriptors.hpp"
 #include "swap_chain.hpp"
 namespace Shard3D {

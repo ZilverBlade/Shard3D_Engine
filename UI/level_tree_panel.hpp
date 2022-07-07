@@ -1,4 +1,5 @@
 #pragma once
+#include "../s3dtpch.h"
 #include "../wb3d/level.hpp"
 #include "../wb3d/actor.hpp"
 using namespace Shard3D::wb3d;

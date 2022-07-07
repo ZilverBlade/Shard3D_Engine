@@ -1,12 +1,7 @@
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
+#include "../s3dtpch.h" 
 #include <glm/gtc/constants.hpp>
 
 #include "pointlight_system.hpp"
-#include <stdexcept>
-#include <array>
-#include <map>
 
 namespace Shard3D {
 
@@ -67,7 +62,7 @@ namespace Shard3D {
 	}
 
 	void PointlightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo, std::shared_ptr<wb3d::Level>& level) {
-#ifndef GAME_RELEASE_READY
+#ifndef _DEPLOY
 		if (ubo.numPointlights > MAX_POINTLIGHTS) {
 			SHARD3D_FATAL("Too many pointlights in level!!!!");
 		}

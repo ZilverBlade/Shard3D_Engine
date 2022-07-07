@@ -1,3 +1,4 @@
+#include "../s3dtpch.h"  
 #include "LayerStack.hpp"
 #include "../singleton.hpp"
 namespace Shard3D {
@@ -14,16 +15,16 @@ namespace Shard3D {
 
 	void LayerStack::pushLayer(Layer* layer) {
 		layerInsert = layers.emplace(layerInsert, layer);
-		layer->attach(Singleton::engineRenderer.getSwapChainRenderPass());
+		layer->attach(Globals::engineRenderer.getSwapChainRenderPass());
 	}
 
 	void LayerStack::pushOverlay(Layer* overlay) {
 		layers.emplace_back(overlay);
-		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
+		overlay->attach(Globals::engineRenderer.getSwapChainRenderPass());
 	}
 
 	void LayerStack::repushOverlay(Layer* overlay) {
-		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
+		overlay->attach(Globals::engineRenderer.getSwapChainRenderPass());
 	}
 
 	void LayerStack::popLayer(Layer* layer) {
