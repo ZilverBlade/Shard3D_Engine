@@ -3,6 +3,7 @@
 namespace Shard3D {
 	Destructor::~Destructor() { 
 		wb3d::AssetManager::clearAllAssets(); 
+		Singleton::activeLevel = nullptr;
 		SharedPools::destructPools();
 		Singleton::viewportImage = nullptr;
 	}

@@ -47,8 +47,8 @@ namespace Shard3D {
 
 	void LevelPeekingPanel::peekActorInspector() {
 		ImGui::Begin("Actor Inspector");
-		context->registry.each([&](auto actorGUID) {
-			wb3d::Actor actor{ actorGUID, context.get() };
+		Singleton::activeLevel->registry.each([&](auto actorGUID) {
+			wb3d::Actor actor{ actorGUID, Singleton::activeLevel.get() };
 			
 			std::string text = actor.getTag() + " (" + std::to_string((uint64_t)actor.getGUID()) + ")";
 			if (actor.isInvalid())
@@ -86,6 +86,8 @@ namespace Shard3D {
 
 	void LevelPeekingPanel::peekMisc() {
 		ImGui::Begin("Misc Inspector");
+		ImGui::Text(std::string("Active level ptr: 0x" + std::to_string((int)Singleton::activeLevel.get())).c_str());
+
 		ImGui::Text(std::string("Possessed camera actor: " + Singleton::activeLevel->getPossessedCameraActor().getTag() + " (0x" + std::to_string((int)&Singleton::activeLevel->getPossessedCamera()) + ")").c_str());
 #if ALLOW_PREVIEW_CAMERA
 		ImGui::Text(std::string("Previewing camera: " + Singleton::activeLevel->getPossessedPreviewCameraActor().getTag() + " (0x" + std::to_string((int)&Singleton::activeLevel->getPossessedPreviewCamera()) + ")").c_str());

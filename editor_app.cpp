@@ -274,7 +274,7 @@ namespace Shard3D {
 		}
 		vkDeviceWaitIdle(Singleton::engineDevice.device());
 		SharedPools::destructPools();
-		Singleton::viewportImage == nullptr;
+		Singleton::viewportImage = nullptr;
 	}
 
 	void EditorApp::loadGameObjects() {
@@ -305,7 +305,7 @@ namespace Shard3D {
 		wb3d::Actor billboard = Singleton::activeLevel->createActor("Billboard");
 		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/axis2d.png");
 		billboard.addComponent<Components::BillboardComponent>("assets/_engine/tex/axis2d.png");
-		billboard.getTransform().translation = { 1.f, 2.f, 6.f };
+		billboard.getComponent<Components::TransformComponent>().translation = { 1.f, 2.f, 6.f };
 		}
 	}
 }

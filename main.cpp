@@ -12,9 +12,6 @@ int main() {
 #ifdef _WIN32
     ShowWindow(GetConsoleWindow(), SW_SHOW);
 #endif
-#ifndef NDEBUG
-    SHARD3D_INFO("Validation layers enabled");
-#endif
 #ifndef _DEPLOY
     Shard3D::EditorApp app{};
 #endif

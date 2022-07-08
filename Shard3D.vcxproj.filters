@@ -245,6 +245,9 @@
     <ClCompile Include="singleton.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="systems\physics_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -439,9 +442,6 @@
     <ClInclude Include="offscreen.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="singleton.hpp">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="UI\imgui_initter.hpp">
       <Filter>Header Files\UI\ImGui</Filter>
     </ClInclude>
@@ -456,6 +456,12 @@
     </ClInclude>
     <ClInclude Include="systems\systems.h">
       <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\physics_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="singleton.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -336,10 +336,7 @@ namespace Shard3D {
                     if (ImGui::MenuItem("End")) {
                         levelTreePanel.clearSelectedActor();
                         Singleton::activeLevel->end();
-                        levelTreePanel.setContext(Singleton::activeLevel);
-                        levelPropertiesPanel.setContext(Singleton::activeLevel);
-                        levelPeekPanel.setContext(Singleton::activeLevel);
-                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
+                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
                         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
                     ImGui::EndMenu();
@@ -354,6 +351,11 @@ namespace Shard3D {
 #ifndef NDEBUG
             if (ImGui::BeginMenu("Debug")) {
                 ImGui::TextDisabled("Shard3D Debug menu");
+                if (ImGui::MenuItem("Force refresh std::shared_ptr activeLevel")) {
+                    levelTreePanel.setContext(Singleton::activeLevel);
+                    levelPropertiesPanel.setContext(Singleton::activeLevel);
+                    levelPeekPanel.setContext(Singleton::activeLevel);
+                }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Play test audio")) {
                 }

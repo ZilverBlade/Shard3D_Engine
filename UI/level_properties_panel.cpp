@@ -232,7 +232,7 @@ namespace Shard3D {
 				if (ImGui::Button("Load Texture")) {
 					std::ifstream ifile(fileBuffer);
 					if (ifile.good()) {
-						SHARD3D_ERROR("not implemented");
+						SHARD3D_NOIMPL;
 						//SHARD3D_LOG("Reloading texture '{0}'", rfile);
 						//actor.getComponent<Components::BillboardComponent>().cacheFile = rfile;
 						//context->reloadTex(actor);
@@ -360,13 +360,7 @@ namespace Shard3D {
 				ImGui::EndPopup();
 			}
 			if (open) {
-				auto& className = actor.getComponent<Components::CppScriptComponent>().className;
-				char classNameBuffer[256];
-				memset(classNameBuffer, 0, 256);
-				strncpy(classNameBuffer, className.c_str(), 256);
 				ImGui::Text(typeid(&actor.getComponent<Components::CppScriptComponent>().Inst).name());
-				ImGui::Text("Script class:");
-				ImGui::Text("Script::"); ImGui::SameLine; ImGui::InputText("", classNameBuffer, 256);
 				ImGui::TreePop();
 			}
 			if (killComponent) actor.killComponent<Components::CppScriptComponent>();

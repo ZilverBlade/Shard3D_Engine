@@ -21,9 +21,10 @@ namespace Shard3D {
 
 			template<typename T, typename... Args>
 			T& addComponent(Args&&... args) {
-				if (hasComponent<T>()) {	// is error, not because it's likely to cause a crash, but because idk how to handle the return
+				if (hasComponent<T>()) {	// return getComponent if component exists
 					SHARD3D_ERROR("Actor {0} already has component {1}!", this->getGUID(), typeid(T).name());
-					SHARD3D_FATAL("Tried to add component when component already is present!");
+					return getComponent<T>();
+					//SHARD3D_FATAL("Tried to add component when component already is present!");
 				}
 				SHARD3D_LOG("Added component {0}", typeid(T).name());
 				return eLevel->registry.emplace<T>(actorHandle, std::forward<Args>(args)...);
@@ -56,6 +57,8 @@ namespace Shard3D {
 				if (getGUID() == 0 || getGUID() == 1 || getGUID() == UINT64_MAX) // dont display these actors as they are engine reserved
 					return true;
 				if (!hasComponent<Components::TagComponent>())
+					return true;
+				if (actorHandle == entt::null)
 					return true;
 				return false;
 			}

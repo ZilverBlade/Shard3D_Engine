@@ -7,7 +7,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <entt.hpp>
+
 #include "texture.hpp"
+#include <Jolt.h>
+#include <Physics/Body/Body.h>
+#include <Physics/Collision/Shape/Shape.h>
 
 namespace Shard3D {
 	namespace wb3d {
@@ -90,12 +94,12 @@ namespace Shard3D {
 			std::string file{};
 			std::string cacheFile{};
 			enum class BillboardOrientation {
-				BILLBOARD_ORIENTATION_NULL = 0,
-				BILLBOARD_ORIENTATION_AXIAL = 1,
-				BILLBOARD_ORIENTATION_POINT = 2
+				NONE = 0,
+				AXIAL = 1,
+				POINT = 2
 			};
 			// BILLBOARD_ORIENTATION_AXIAL is the only supported orientation at the moment
-			BillboardOrientation orientation = BillboardOrientation::BILLBOARD_ORIENTATION_AXIAL;
+			BillboardOrientation orientation = BillboardOrientation::AXIAL;
 
 			BillboardComponent() = default;
 			BillboardComponent(const BillboardComponent&) = default;
@@ -137,6 +141,22 @@ namespace Shard3D {
 			glm::vec3 color = { 1.f, 1.f, 1.f };
 			float lightIntensity = 1.0f;
 			float specularMod = 1.0f;
+		};
+
+		struct RigidbodyComponent {
+			enum class PhysicsState {
+				NONE = 0,
+				STATIC = 1,
+				DYNAMIC = 2,
+				KINEMATIC = 3
+			};
+
+			float mass;
+			float friction;
+			float restitution;
+
+			PhysicsState state = PhysicsState::STATIC;
+			std::shared_ptr<JPH::Shape> shape;
 		};
 	}
 }

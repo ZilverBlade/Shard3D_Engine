@@ -42,7 +42,7 @@ namespace Shard3D {
 		inline static OffScreen previewCamOffScreen{ engineDevice };
 		inline static VkDescriptorSet previewViewportImage{};
 #endif
-		inline static std::shared_ptr<wb3d::Level> activeLevel{};
+		inline static std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
 
 		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
 

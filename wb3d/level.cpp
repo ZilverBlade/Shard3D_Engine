@@ -22,6 +22,9 @@ namespace Shard3D {
 			auto view = src.view<Component>();
 			for (auto e : view) {
 				GUID guid = src.get<Components::GUIDComponent>(e).id;
+
+				if (map.find(guid) == map.end()) SHARD3D_FATAL("enttMap.find(guid) == enttMap.end()");
+
 				entt::entity dstEnttID = map.at(guid);
 				
 				auto& component = src.get<Component>(e);
@@ -47,6 +50,7 @@ namespace Shard3D {
 			copyComponent<Components::BlueprintComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::TransformComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::BillboardComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::MeshComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CameraComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::DirectionalLightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
@@ -227,9 +231,7 @@ namespace Shard3D {
 
 		void Level::killEverything() {
 			registry.each([&](auto actorGUID) { wb3d::Actor actor = { actorGUID, this };
-				if (!actor) return;
-				if (!actor.hasComponent<Components::TagComponent>()) return;
-				if (actor.getGUID() == 0 || actor.getGUID() == UINT64_MAX) return;
+				if (actor.isInvalid()) return;
 				killActor(actor);
 			});
 		}

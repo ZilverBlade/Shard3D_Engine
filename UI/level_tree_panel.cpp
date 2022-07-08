@@ -19,7 +19,7 @@ namespace Shard3D {
 
 	void LevelTreePanel::render() {
 		ImGui::Begin("Level Tree");
-		
+		ImGui::Text(std::string("Context (Level) ptr: 0x" + std::to_string((int)context.get())).c_str());
 		context->registry.each([&](auto actorGUID) {
 			wb3d::Actor actor{ actorGUID, context.get() };	
 			if (actor.isInvalid()) return;

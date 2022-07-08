@@ -22,8 +22,14 @@ namespace Shard3D {
 		inline static std::shared_ptr<spdlog::logger> errorLogger;
 	};
 }
-
+/* Throw a message notifying that a function has not been implemented.
+*/
+#define SHARD3D_NOIMPL		Shard3D::LOGGER::getErrorLogger()->error("function not implemented!")
+/* Log for debugging, doesnt log in release/deploy mode, so use conservatively.
+*/
 #define SHARD3D_LOG(...)	Shard3D::LOGGER::getDebugLogger()->trace(__VA_ARGS__)
+/* Log information, for notifying what may happen, like asset loading.
+*/
 #define SHARD3D_INFO(...)	Shard3D::LOGGER::getInfoLogger()->trace(__VA_ARGS__)
 /* Log a warning, such as for when something unexpected happens, and might cause undefined behaviour, but might function normally.
 */
