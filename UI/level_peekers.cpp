@@ -79,6 +79,7 @@ namespace Shard3D {
 				AssetManager::clearMeshAssets();
 			}
 		}
+
 		for (const auto& model : AssetManager::getMeshAssets()) 
 			if (ImGui::TreeNodeEx(std::string(model.first + "##" + model.first).c_str(), ImGuiTreeNodeFlags_None)) {}
 		ImGui::End();
@@ -86,10 +87,10 @@ namespace Shard3D {
 
 	void LevelPeekingPanel::peekMisc() {
 		ImGui::Begin("Misc Inspector");
-		ImGui::Text(std::string("Active level ptr: 0x" + std::to_string((int)Singleton::activeLevel.get())).c_str());
+		ImGui::Text(std::string("Active level ("+ Singleton::activeLevel ->name+") ptr: 0x" + std::to_string((int)Singleton::activeLevel.get())).c_str());
 
 		ImGui::Text(std::string("Possessed camera actor: " + Singleton::activeLevel->getPossessedCameraActor().getTag() + " (0x" + std::to_string((int)&Singleton::activeLevel->getPossessedCamera()) + ")").c_str());
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 		ImGui::Text(std::string("Previewing camera: " + Singleton::activeLevel->getPossessedPreviewCameraActor().getTag() + " (0x" + std::to_string((int)&Singleton::activeLevel->getPossessedPreviewCamera()) + ")").c_str());
 #endif
 		ImGui::End();

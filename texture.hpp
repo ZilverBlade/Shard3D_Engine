@@ -28,15 +28,15 @@ namespace Shard3D {
 
         void updateDescriptor();
         
-        void transitionLayout(
-            VkCommandBuffer commandBuffer, VkImageLayout oldLayout, VkImageLayout newLayout);
-
         static unsigned char* getSTBImage(const std::string& filepath, int* x, int* y, int* comp, int req_comp);
         static void freeSTBImage(void* pixels);
         static std::unique_ptr<EngineTexture> createTextureFromFile(
             EngineDevice& device, const std::string& filepath, VkFilter filter);
 
     private:
+        void transitionLayout(
+            VkCommandBuffer commandBuffer, VkImageLayout oldLayout, VkImageLayout newLayout);
+
         void createTextureImage(const std::string& filepath);
 
         void createTextureImageView(VkImageViewType viewType);

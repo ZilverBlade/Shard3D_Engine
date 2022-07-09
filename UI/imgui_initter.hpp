@@ -5,10 +5,13 @@
 #include "imgui_implementation.hpp"
 #include "../singleton.hpp"
 namespace Shard3D {
+	namespace wb3d {
+		class ImGuiLayer;
+	}
 	class ImGuiInitter {
-	private:
-		friend class EditorApp;
 		inline static VkDescriptorPool imGuiDescriptorPool;
+		friend class ImGuiLayer;
+		friend class EditorApp;
 		static void init() {
 			//imgui hell
 
@@ -45,7 +48,7 @@ namespace Shard3D {
 			io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
 			io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-			io.Fonts->AddFontFromFileTTF(DEFAULT_ENGINE_FONT, ENGINE_FONT_SIZE);
+			io.Fonts->AddFontFromFileTTF(ENGINE_DEFAULT_ENGINE_FONT, ENGINE_FONT_SIZE);
 			io.Fonts->Build();
 
 			VkDescriptorPoolSize pool_sizes[] =
@@ -89,18 +92,18 @@ namespace Shard3D {
 			ImVec4* colors = ImGui::GetStyle().Colors;
 			colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 			colors[ImGuiCol_TextDisabled] = ImVec4(1.00f, 1.00f, 1.00f, 0.30f);
-			colors[ImGuiCol_WindowBg] = ImVec4(0.07f, 0.07f, 0.07f, 1.00f);
-			colors[ImGuiCol_ChildBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+			colors[ImGuiCol_WindowBg] = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
+			colors[ImGuiCol_ChildBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
 			colors[ImGuiCol_PopupBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
 			colors[ImGuiCol_Border] = ImVec4(0.12f, 0.12f, 0.12f, 0.71f);
 			colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
 			colors[ImGuiCol_FrameBg] = ImVec4(0.42f, 0.42f, 0.42f, 0.54f);
 			colors[ImGuiCol_FrameBgHovered] = ImVec4(0.42f, 0.42f, 0.42f, 0.40f);
 			colors[ImGuiCol_FrameBgActive] = ImVec4(0.36f, 0.16f, 0.96f, 1.00f);
-			colors[ImGuiCol_TitleBg] = ImVec4(0.01f, 0.01f, 0.04f, 1.00f);
-			colors[ImGuiCol_TitleBgActive] = ImVec4(0.01f, 0.01f, 0.04f, 1.00f);
+			colors[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+			colors[ImGuiCol_TitleBgActive] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
 			colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.17f, 0.17f, 0.17f, 0.90f);
-			colors[ImGuiCol_MenuBarBg] = ImVec4(0.04f, 0.04f, 0.04f, 0.90f);
+			colors[ImGuiCol_MenuBarBg] = ImVec4(0.12f, 0.12f, 0.12f, 0.90f);
 			colors[ImGuiCol_ScrollbarBg] = ImVec4(0.24f, 0.24f, 0.24f, 0.53f);
 			colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
 			colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.52f, 0.52f, 0.52f, 1.00f);
@@ -111,20 +114,20 @@ namespace Shard3D {
 			colors[ImGuiCol_Button] = ImVec4(0.17f, 0.17f, 0.17f, 0.35f);
 			colors[ImGuiCol_ButtonHovered] = ImVec4(0.32f, 0.32f, 0.32f, 0.59f);
 			colors[ImGuiCol_ButtonActive] = ImVec4(0.36f, 0.16f, 0.96f, 1.00f);
-			colors[ImGuiCol_Header] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+			colors[ImGuiCol_Header] = ImVec4(0.12f, 0.12f, 0.12f, 0.00f);
 			colors[ImGuiCol_HeaderHovered] = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
 			colors[ImGuiCol_HeaderActive] = ImVec4(0.36f, 0.36f, 0.36f, 0.77f);
-			colors[ImGuiCol_Separator] = ImVec4(0.00f, 0.00f, 0.00f, 0.54f);
+			colors[ImGuiCol_Separator] = ImVec4(0.47f, 0.47f, 0.47f, 1.00f);
 			colors[ImGuiCol_SeparatorHovered] = ImVec4(0.70f, 0.67f, 0.60f, 0.29f);
 			colors[ImGuiCol_SeparatorActive] = ImVec4(0.36f, 0.16f, 0.96f, 1.00f);
 			colors[ImGuiCol_ResizeGrip] = ImVec4(0.46f, 0.24f, 1.00f, 0.25f);
 			colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.69f, 0.30f, 1.00f, 0.67f);
 			colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 0.00f, 0.96f, 1.00f);
-			colors[ImGuiCol_Tab] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-			colors[ImGuiCol_TabHovered] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
-			colors[ImGuiCol_TabActive] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
-			colors[ImGuiCol_TabUnfocused] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-			colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
+			colors[ImGuiCol_Tab] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+			colors[ImGuiCol_TabHovered] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+			colors[ImGuiCol_TabActive] = ImVec4(0.27f, 0.27f, 0.27f, 1.00f);
+			colors[ImGuiCol_TabUnfocused] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+			colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 			colors[ImGuiCol_DockingPreview] = ImVec4(0.85f, 0.85f, 0.85f, 0.28f);
 			colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
 			colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
@@ -142,9 +145,10 @@ namespace Shard3D {
 			colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
 			colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
 			colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+
 			style.DisabledAlpha = 0.3f;
 
-			style.PopupRounding = 3;
+			style.PopupRounding = 2;
 
 			style.WindowPadding = ImVec2(4, 4);
 			style.FramePadding = ImVec2(6, 4);
@@ -157,11 +161,11 @@ namespace Shard3D {
 			style.PopupBorderSize = 1;
 			style.FrameBorderSize = 1;
 
-			style.WindowRounding = 3;
-			style.ChildRounding = 3;
-			style.FrameRounding = 3;
+			style.WindowRounding = 2;
+			style.ChildRounding = 2;
+			style.FrameRounding = 2;
 			style.ScrollbarRounding = 2;
-			style.GrabRounding = 3;
+			style.GrabRounding = 2;
 
 			style.AntiAliasedFill = true;
 			style.AntiAliasedLines = true;
@@ -186,7 +190,7 @@ namespace Shard3D {
 #endif
 				
 			Singleton::viewportImage = ImGui_ImplVulkan_AddTexture(Singleton::mainOffScreen.getSampler(), Singleton::mainOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 			Singleton::previewViewportImage = ImGui_ImplVulkan_AddTexture(Singleton::previewCamOffScreen.getSampler(), Singleton::previewCamOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 #endif // !_DEPLOY
 		}

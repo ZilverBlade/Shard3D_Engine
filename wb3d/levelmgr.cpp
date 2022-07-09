@@ -19,7 +19,7 @@ namespace Shard3D {
 			for (int i = 0; i < input.length(); i++) {
 				c = input.at(i);
 				encryptedString.push_back((char)
-					((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
+					((((c + ENSET_WB3DLEVEL_CIPHER_KEY) * 2) - ENSET_WB3DLEVEL_CIPHER_KEY) / 2));
 			}
 
 			SHARD3D_LOG("Duration of Level encryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
@@ -32,7 +32,7 @@ namespace Shard3D {
 			for (int i = 0; i < input.length(); i++) {
 				c = input.at(i);
 				decryptedString.push_back((char)
-					(((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
+					(((c * 2) + ENSET_WB3DLEVEL_CIPHER_KEY) / 2) - ENSET_WB3DLEVEL_CIPHER_KEY);
 			}
 
 			SHARD3D_LOG("Duration of Level decryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
@@ -159,7 +159,7 @@ namespace Shard3D {
 
 #ifdef _DEPLOY
 			YAML::Node data = YAML::Load(decrypt(strStream.str()));
-#if BETA_DEBUG_TOOLS
+#if ENSET_BETA_DEBUG_TOOLS
 			std::ofstream fout(sourcePath + ".dcr");
 			fout << decrypt(strStream.str());
 			fout.flush();
@@ -195,7 +195,7 @@ namespace Shard3D {
 					} // Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing
 
 					if (actor["TransformComponent"]) {
-#ifndef ACTOR_FORCE_TRANSFORM_COMPONENT		
+#ifndef ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT		
 						loadedActor.addComponent<Components::TransformComponent>();
 #endif
 						loadedActor.getComponent<Components::TransformComponent>().translation = actor["TransformComponent"]["Translation"].as<glm::vec3>();
@@ -253,6 +253,7 @@ namespace Shard3D {
 					}
 				}
 			}
+			mLevel->currentpath = sourcePath;
 			return LevelMgrResults::SuccessResult;
 		}
 

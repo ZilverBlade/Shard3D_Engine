@@ -22,7 +22,7 @@ namespace Shard3D {
 
 	void BillboardRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
 		VkPushConstantRange pushConstantRange{};
-		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(BillboardPushConstants);
 
@@ -55,11 +55,11 @@ namespace Shard3D {
 		EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
 
 		pipelineConfig.renderPass = renderPass;
-		pipelineConfig.pipelineLayout = pipelineLayout; // support only axial atm
+		pipelineConfig.pipelineLayout = pipelineLayout; // support only view plane aligned atm
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
-			"assets/shaders/billboard_axial.vert.spv",
-			"assets/shaders/billboard_axial.frag.spv",
+			"assets/shaders/billboard_sva.vert.spv",
+			"assets/shaders/billboard_sva.frag.spv",
 			pipelineConfig
 		);
 	}
@@ -77,8 +77,8 @@ namespace Shard3D {
 			0,
 			nullptr);
 
-		level->registry.view<Components::BillboardComponent, Components::TransformComponent>().each([=](auto light, auto transform) {
-			auto imageInfo = wb3d::AssetManager::retrieveTexture(light.file)->getImageInfo();
+		level->registry.view<Components::BillboardComponent, Components::TransformComponent>().each([&](auto billboard, auto transform) {
+			auto imageInfo = wb3d::AssetManager::retrieveTexture(billboard.file)->getImageInfo();
 			VkDescriptorSet descriptorSet1;
 			EngineDescriptorWriter(*billboardSystemLayout, frameInfo.perDrawDescriptorPool)
 				.writeImage(0, &imageInfo)
@@ -100,7 +100,7 @@ namespace Shard3D {
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
 				pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				VK_SHADER_STAGE_VERTEX_BIT,
 				0,
 				sizeof(BillboardPushConstants),
 				&push

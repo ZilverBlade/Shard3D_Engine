@@ -24,7 +24,6 @@ namespace Shard3D {
 		void renderMenuBar();
 		int width;
 		int height;
-		VkDescriptorPool descriptorPool;
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 
@@ -63,7 +62,7 @@ namespace Shard3D {
 		LevelTreePanel levelTreePanel;
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
-
+		bool refreshContext;
 //Gizmo levelGizmo;
 	};
 

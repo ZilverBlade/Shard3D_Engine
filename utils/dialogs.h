@@ -71,9 +71,9 @@ namespace Shard3D {
 		};
 		// wrapper exists to keep code clean when potentially dealing with other OS'es (future proofing)
 
-		static DialogResult show(const char* text, const char* caption = "", UINT options = OPTOKCANCEL | OPTDEFBUTTON1) {
+		static DialogResult show(const char* text, const char* caption = "", uint32_t options = OPTOKCANCEL | OPTDEFBUTTON1) {
 #ifdef _WIN32
-			return (DialogResult)(UINT)(MessageBoxA(
+			return (DialogResult)(uint32_t)(MessageBoxA(
 				nullptr,//glfwGetWin32Window((GLFWwindow*)EngineWindow::getGLFWwindow()), 
 				text, caption, options
 			));

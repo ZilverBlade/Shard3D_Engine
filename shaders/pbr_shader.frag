@@ -1,6 +1,6 @@
 #version 450
 
-layout(location = 0) in vec3 fragColor;
+layout(location = 0) in vec3 fragColour;
 layout(location = 1) in vec3 fragPosWorld;
 layout(location = 2) in vec3 fragNormalWorld;
 
@@ -49,10 +49,10 @@ layout(push_constant) uniform Push {
 
 float PI = 3.1415926;
 
-float roughness = 0.3;
-float metallic = 0.2;
-float specular = 0.5;
-vec3 baseRefl = vec3(0.0);
+float roughness = 0.2;
+float metallic = 0.3;
+
+vec3 F0 = vec3(0.0); // base reflectiveness
 
 float wrapDiffuse(vec3 normal, vec3 lightVector, float wrap) {
     return max(0.f, (dot(lightVector, normal) + wrap) / (1.0 + wrap));
@@ -68,40 +68,51 @@ float getFogFactor(float d) {
 	return 1 - (FogMax - d) / (FogMax - FogMin);
 }
 
-// phong (lambertian) diffuse term
-float lambertian_diffuse() {
-    return (1.0 / PI);
-}
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float a = roughness*roughness;
+    float a2 = a*a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
 
-vec3 F_schlick(in vec3 f0, in float NdH) {
-    return mix(f0, vec3(1.0), pow(1.01 - NdH, 5.0));
-}
+    float nom   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
 
-//GGX Trowbridge-Reitz
-float D_GGX(in float r, in float NdH) {
-    float alpha = r * r;
-    float alpha2 = alpha * alpha;
-    float d = (NdH * NdH) * (alpha2 - 1.0) + 1.0;
-    return alpha2 / (PI * d * d);
+    return nom / denom;
 }
-// Slick-GGX
-float G_schlick(in float r, in float NdV) {
-    float k = r * 0.25;
-	return NdV / (NdV * (1.0 - k) + k);
-}
-vec3 cooktorrance_specular(in float NdL, in float NdV, in float NdH, in vec3 s, in float r) {
-	float D = D_GGX(r, NdH);
-    float G = G_schlick(r, NdV);
-	vec3 F = F_schlick(baseRefl, NdV);
+// ----------------------------------------------------------------------------
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
 
-	float d = max(4.0 * NdV * NdL, 0.00001);
-	
-    return ((D * G * F) / d) * s * 2; 
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
 }
+// ----------------------------------------------------------------------------
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+// ----------------------------------------------------------------------------
+
+
 
 // shader code
 void main(){
-
 	vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
 
 	vec3 specularLight = vec3(0.0);
@@ -110,87 +121,52 @@ void main(){
 
 	vec3 cameraPosWorld = ubo.invView[3].xyz;
 	vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
-	
-	vec3 F = normalize(-fragPosWorld);
-	vec3 N = normalize(fragNormalWorld);
-	vec3 H = normalize(viewDirection + F);
-	float NdF = max(0.001, dot(N, F));
-	float NdV = max(0.001, dot(N, viewDirection));
-	float NdH = max(0.001, dot(N, H));
+    vec3 fragColor = fragColour;
+	vec3 N = fragNormalWorld;
 
-	float HdV = max(0.001, dot(H, viewDirection));
-	vec3 specfresnel = F_schlick(baseRefl, NdH);
+    F0 = mix(F0, fragColor, metallic);
 
-	//Pointlight
-	for (int i = 0; i < ubo.numPointlights; i++) {
-		Pointlight pointlight = ubo.pointlights[i];
 
-		vec3 lightDistance = pointlight.position.xyz - fragPosWorld;
+     vec3 V = normalize(cameraPosWorld - fragPosWorld);
+     vec3 specular = vec3(1.f);
+    // reflectance equation
+    vec3 Lo = vec3(0.0);
+    for (int i = 0; i < ubo.numPointlights; i++) {
+        Pointlight light = ubo.pointlights[i];
+        vec3 L = normalize(light.position.xyz - fragPosWorld);
+        vec3 H = normalize(V + L);
+        float distance = length(light.position.xyz - fragPosWorld);
+        float attenuation = 1.0 / (distance * distance);
+        vec3 radiance = light.color.xyz * light.color.w * attenuation;
 
-		float attenuation = 1.0 / (
-	/*				c		*/		pointlight.attenuationMod.x +																
-	/*				bx		*/		pointlight.attenuationMod.y * length(lightDistance) +  
-	/*				ax^2	*/		pointlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
-		lightDistance = normalize(lightDistance);
-		
-		float cosAngIndicence = max(dot(surfaceNormal, normalize(lightDistance)), 0);
-		vec3 color_intensity = pointlight.color.xyz * pointlight.color.w * attenuation;
+        // Cook-Torrance BRDF
+        float NDF = DistributionGGX(N, H, roughness);
+        float G   = GeometrySmith(N, V, L, roughness);
+        vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
 
-		float NdL = max(0.001, dot(N, lightDistance));	
-		vec3 specref = cooktorrance_specular(NdL, NdV, NdH, specfresnel, roughness);
+        vec3 numerator    = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+        specular = numerator / denominator;
 
-		vec3 diffref = (vec3(1.0) - specfresnel) * lambertian_diffuse() * NdL;
+        // kS is equal to Fresnel
+        vec3 kS = F;
+        // for energy conservation, the diffuse and specular light can't
+        // be above 1.0 (unless the surface emits light); to preserve this
+        // relationship the diffuse component (kD) should equal 1.0 - kS.
+        vec3 kD = vec3(1.0) - kS;
+        // multiply kD by the inverse metalness such that only non-metals
+        // have diffuse lighting, or a linear blend if partly metal (pure metals
+        // have no diffuse light).
+        kD *= 1.0 - metallic;
 
-		specularLight += specref * color_intensity * pointlight.specularMod;
-		diffuseLight += diffref * color_intensity;
-	}
+        // scale light by NdotL
+        float NdotL = max(dot(N, L), 0.0);
 
-	// Spotlight
-	for (int i = 0; i < ubo.numSpotlights; i++) {
-		Spotlight spotlight = ubo.spotlights[i];
+        // add to outgoing radiance Lo
+        Lo += (kD * fragColor / PI + specular) * radiance * NdotL * 100;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+    }
 
-		vec3 lightDistance = spotlight.position.xyz - fragPosWorld;
-
-			//attenuation mod is broken for spotlights
-		float attenuation = 1.0 / dot(lightDistance, lightDistance); //(
-	/*				c		*/		//spotlight.attenuationMod.x +																
-	/*				bx		*/		//spotlight.attenuationMod.y * length(lightDistance) +  
-	/*				ax^2	*/		//spotlight.attenuationMod.z * dot(lightDistance, lightDistance)) ;							
-		lightDistance = normalize(lightDistance);
-		float cosAngIndicence = max(dot(surfaceNormal, normalize(lightDistance)), 0);
-		vec3 color_intensity = spotlight.color.xyz * spotlight.color.w * attenuation;
-
-		float theta = dot(lightDistance, normalize(-spotlight.direction.xyz));
-		float epsilon  = spotlight.angle.y - spotlight.angle.x;
-		float intensity = clamp((theta - spotlight.angle.x) / epsilon, 0.0, 1.0); 
-
-		if(theta > sin(spotlight.angle.x)) { 
-
-			float NdL = max(0.001, dot(N, lightDistance));
-	
-			vec3 specref = cooktorrance_specular(NdL, NdV, NdH, specfresnel, roughness);
-
-			vec3 diffref = (vec3(1.0) - specfresnel) * lambertian_diffuse() * NdL;
-
-			specularLight += specref * color_intensity * spotlight.specularMod * intensity;
-			diffuseLight += diffref * color_intensity * intensity;
-		}		
-	}
-
-	// Directional light
-	for (int i = 0; i < ubo.numDirectionalLights; i++) {
-		DirectionalLight directionalLight = ubo.directionalLights[i];
-
-		float lightIntensity = max(dot(surfaceNormal, normalize(directionalLight.direction.xyz)), 0) * wrapDiffuse(surfaceNormal, normalize(directionalLight.direction.xyz), 1.f) ;
-		vec3 color_intensity = directionalLight.color.xyz * directionalLight.color.w ;
-
-		//basic directional light shader
-		diffuseLight += lightIntensity * color_intensity;
-	}
-
-	vec3 fogColor =  vec3(0.3f, 0.3f, 0.8f);
 		// multiply fragColor by specular only if material is metallic
-	vec3 BRDF = diffuseLight * fragColor + specularLight;
-	outColor = vec4(mix(BRDF, fogColor, getFogFactor(distance(cameraPosWorld, fragPosWorld))), 1.0); //RGBA
+	outColor = vec4(vec3(ubo.ambientLightColor.xyz + Lo) * ubo.ambientLightColor.w, 1.0); //RGBA
 	//outColor = vec4(diffuseLight * fragColor + specularLight, 1.0); //RGBA
 }

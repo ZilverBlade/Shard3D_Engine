@@ -18,8 +18,8 @@ namespace Shard3D {
 		 
 			template<typename T>
 			void bind() {
-				InstScript = []()							{return static_cast<wb3d::ActingActor*>(new T()); };
-				killScript = [](CppScriptComponent* csc)	{delete csc->Inst; csc->Inst = nullptr; };
+				InstScript = []()							{ return static_cast<wb3d::ActingActor*>(new T()); };
+				killScript = [](CppScriptComponent* csc)	{ delete csc->Inst; csc->Inst = nullptr; };
 			}
 		};
 	}

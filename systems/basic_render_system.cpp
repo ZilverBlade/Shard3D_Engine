@@ -47,7 +47,7 @@ namespace Shard3D {
 		EnginePipeline::enableVertexDescriptions(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-#if USE_PBR
+#if ENSET_USE_PBR
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
 			"assets/shaders/pbr_shader.vert.spv",
@@ -78,7 +78,7 @@ namespace Shard3D {
 			nullptr
 		);
 
-		level->registry.view<Components::MeshComponent, Components::TransformComponent>().each([=](auto mesh, auto transform){
+		level->registry.view<Components::MeshComponent, Components::TransformComponent>().each([&](auto mesh, auto transform){
 			SimplePushConstantData push{};
 			push.modelMatrix = transform.mat4();
 			push.normalMatrix = transform.normalMatrix();

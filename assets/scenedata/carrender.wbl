@@ -1,57 +1,26 @@
-Shard3D: 1.0.8.r4
-WorldBuilder3D: 0.1
+Shard3D: 1.1.4.r0-alpha
+WorldBuilder3D: 1.1.r0-alpha
 Level: Some kind of level
 Actors:
-  - Actor: 5524525380829968440
+  - Actor: 138341623167450539
     TagComponent:
-      Tag: Camera Actor
+      Tag: Some kind of actor
     TransformComponent:
-      Translation: [0, -1.91999996, 0]
-      Rotation: [-1.02101755, 0.17976892, 0]
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    CameraComponent:
-      ProjectionType: 1
-      FOV: 70
-      NearClipPlane: 0.0500000007
-      FarClipPlane: 1024
-      AspectRatio: 1
     MeshComponent:
-      MeshPath: assets/modeldata/engineModels/camcord.obj
+      MeshPath: assets/modeldata/fart.obj
       MeshFormat: 1
-      Indexed: true
-  - Actor: 3507349803338917749
+  - Actor: 6388668906524775874
     TagComponent:
       Tag: Pointlight
     TransformComponent:
-      Translation: [-4.82000017, 0, 0]
+      Translation: [0, 3.56999993, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     PointlightComponent:
-      Emission: [1, 1, 1, 1.78999996]
-      Radius: 1
-      Specularness: 1
-      AttenuationCLQ: [0, 0, 1]
-  - Actor: 15325191640819834102
-    TagComponent:
-      Tag: Pointlight
-    TransformComponent:
-      Translation: [4.61000013, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    PointlightComponent:
-      Emission: [1, 1, 1, 4.03000021]
-      Radius: 1
-      Specularness: 1
-      AttenuationCLQ: [0, 0, 1]
-  - Actor: 3372333949852840720
-    TagComponent:
-      Tag: Pointlight
-    TransformComponent:
-      Translation: [0, 0, 5.80000019]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    PointlightComponent:
-      Emission: [1, 1, 1, 1]
+      Emission: [1, 1, 1, 8.56000042]
       Radius: 1
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
@@ -67,26 +36,62 @@ Actors:
       Radius: 1
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
-  - Actor: 6388668906524775874
+  - Actor: 3372333949852840720
     TagComponent:
       Tag: Pointlight
     TransformComponent:
-      Translation: [0, -3.75, 0]
+      Translation: [0, 0, 5.80000019]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     PointlightComponent:
-      Emission: [1, 1, 1, 8.56000042]
+      Emission: [1, 1, 1, 1]
       Radius: 1
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
-  - Actor: 138341623167450539
+  - Actor: 15325191640819834102
     TagComponent:
-      Tag: Some kind of actor
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [4.61000013, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 4.03000021]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 3507349803338917749
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-4.82000017, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1.78999996]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 5524525380829968440
+    TagComponent:
+      Tag: Camera Actor
+    TransformComponent:
+      Translation: [-4.30999994, 1.21000004, -1.85000002]
+      Rotation: [0.373500437, 0.783652842, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      ProjectionType: 1
+      FOV: 70
+      NearClipPlane: 0.0500000007
+      FarClipPlane: 1024
+      AspectRatio: 1
+    MeshComponent:
+      MeshPath: assets/_engine/msh/camcord.obj
+      MeshFormat: 1
+  - Actor: 1
+    TagComponent:
+      Tag: Dummy Actor (SYSTEM RESERVED)
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
-      MeshPath: assets/modeldata/fart.obj
-      MeshFormat: 1
-      Indexed: false

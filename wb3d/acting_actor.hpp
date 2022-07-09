@@ -5,15 +5,7 @@ namespace Shard3D {
 	namespace wb3d {
 		class ActingActor {
 		public:
-
 			virtual ~ActingActor() {}
-
-			void posessCameraActor(Actor actor) {
-				thisActor.eLevel->setPossessedCameraActor(actor);
-			}
-			Level* const getActiveLevel() {
-				return thisActor.eLevel;
-			}
 
 		protected:
 /**
@@ -38,6 +30,13 @@ namespace Shard3D {
  */
 			virtual void killEvent() {}
 		
+
+			void posessCameraActor(Actor actor) {
+				thisActor.eLevel->setPossessedCameraActor(actor);
+			}
+			Level* const getActiveLevel() {
+				return thisActor.eLevel;
+			}
 			Actor thisActor;
 		private:
 			friend class Level;

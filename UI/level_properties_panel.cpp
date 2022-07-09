@@ -23,7 +23,7 @@ namespace Shard3D {
 				drawActorProperties(tree.selectedActor);
 				if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
 				if (ImGui::BeginPopup("AddComponent")) {
-#if !ACTOR_FORCE_TRANSFORM_COMPONENT
+#if !ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT
 					if (!tree.selectedActor.hasComponent<Components::TransformComponent>()) if (ImGui::MenuItem("Transform")) {
 						tree.selectedActor.addComponent<Components::TransformComponent>();
 						ImGui::CloseCurrentPopup();
@@ -42,10 +42,11 @@ namespace Shard3D {
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
-						//add a default obj
-						AssetManager::emplaceMesh(ENGINE_DEFAULT_MODEL_FILE);
 						tree.selectedActor.addComponent<Components::MeshComponent>(ENGINE_DEFAULT_MODEL_FILE);
-
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::BillboardComponent>()) if (ImGui::MenuItem("Billboard")) {
+						tree.selectedActor.addComponent<Components::BillboardComponent>(ENGINE_ERRTEX);
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
@@ -149,7 +150,7 @@ namespace Shard3D {
 
 	void LevelPropertiesPanel::displayPreviewCamera(Actor actor) {
 		ImGui::Begin("PREVIEW (viewport)");
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 		ImGui::Image(Singleton::previewViewportImage, { 800, 600 });
 #endif
 		ImGui::End();
@@ -232,16 +233,15 @@ namespace Shard3D {
 				if (ImGui::Button("Load Texture")) {
 					std::ifstream ifile(fileBuffer);
 					if (ifile.good()) {
-						SHARD3D_NOIMPL;
-						//SHARD3D_LOG("Reloading texture '{0}'", rfile);
-						//actor.getComponent<Components::BillboardComponent>().cacheFile = rfile;
-						//context->reloadTex(actor);
+						SHARD3D_LOG("Reloading texture '{0}'", rfile);
+						actor.getComponent<Components::BillboardComponent>().cacheFile = rfile;
+						context->reloadTexture(actor);
 					}
 					else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
 				}
 				ImGui::TreePop();
 			}
-			if (killComponent) context->killMesh(actor);
+			if (killComponent) context->killTexture(actor);
 		}
 		if (actor.hasComponent<Components::CameraComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::CameraComponent).hash_code(), nodeFlags, "Camera");
@@ -264,7 +264,7 @@ namespace Shard3D {
 				ImGui::BeginDisabled(!enableFov); ImGui::DragFloat("FOV", &actor.getComponent<Components::CameraComponent>().fov, 0.1f, 10.f, 180.f); ImGui::EndDisabled();
 				ImGui::DragFloat("Near Clip Plane", &actor.getComponent<Components::CameraComponent>().nearClip, 0.001f, 0.05f, 1.f);
 				ImGui::DragFloat("Far Clip Plane", &actor.getComponent<Components::CameraComponent>().farClip, 1.f, 16.f, 8192.f);
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 				if (ImGui::Button("Preview", { 150, 50 })) {
 				//	Singleton::activeLevel->setPossessedPreviewCameraActor(actor);
 					context->setPossessedPreviewCameraActor(actor);

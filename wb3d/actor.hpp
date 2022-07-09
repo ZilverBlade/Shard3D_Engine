@@ -54,20 +54,16 @@ namespace Shard3D {
 			}
 			
 			bool isInvalid() {
-				if (getGUID() == 0 || getGUID() == 1 || getGUID() == UINT64_MAX) // dont display these actors as they are engine reserved
-					return true;
-				if (!hasComponent<Components::TagComponent>())
-					return true;
-				if (actorHandle == entt::null)
-					return true;
-				return false;
+				return (getGUID() == 0 || getGUID() == 1 || getGUID() == UINT64_MAX)
+					|| !hasComponent<Components::TagComponent>()
+					|| actorHandle == entt::null;
 			}
 			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
 			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
 			void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
 
-#if ACTOR_FORCE_TRANSFORM_COMPONENT
-			Components::TransformComponent getTransform() { return getComponent<Components::TransformComponent>(); }
+#if ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT
+			Components::TransformComponent& getTransform() { return getComponent<Components::TransformComponent>(); }
 #endif
 
 			operator bool() const { return actorHandle != entt::null; }
@@ -80,15 +76,14 @@ namespace Shard3D {
 			bool operator!=(const Actor& other) const {
 				return !(*this == other);
 			}
-
 		private:
 			entt::entity actorHandle{entt::null};
-
 			Level *eLevel = nullptr; // 8 bytes (use it as much as needed)
 
 			friend class Level;
 			friend class ActingActor;
 			friend class BlueprintManager;
+			friend class LevelPeekingPanel;
 		};
 	}
 }

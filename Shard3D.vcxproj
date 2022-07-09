@@ -202,7 +202,7 @@
       <PreprocessorDefinitions>_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>
       </ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\spdlog;extern\joltphysics\include\Jolt;extern\imguizmo;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GameEngines\Vulkan-1.3.211.0\Include\glm;extern\glfw-3.3.7\include;D:\GameEngines\Vulkan-1.3.211.0\Include\;extern\object_loaders\tinyobjloader\include;extern\object_loaders\tinygltf\include;extern\imgui;extern\spdlog;extern\joltphysics\include\Jolt;extern\imgui-node-editor;extern\entt\1include;extern\jsonhpp\1include;extern\yaml\include;extern\stb\include;extern\miniaudio\1include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -292,6 +292,7 @@
     <ClCompile Include="graphics_settings.cpp" />
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="offscreen.cpp" />
+    <ClCompile Include="scripts\script_link.cpp" />
     <ClCompile Include="systems\physics_system.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="s3dtpch.cpp">
@@ -565,16 +566,18 @@
   <ItemGroup>
     <None Include="compile.bat" />
     <None Include="cpp.hint" />
-    <None Include="shaders\billboard_axial.frag" />
-    <None Include="shaders\billboard_axial.vert" />
+    <None Include="shaders\billboard_sva.frag" />
+    <None Include="shaders\billboard_sva.vert" />
     <None Include="shaders\directional_light.frag" />
     <None Include="shaders\directional_light.vert" />
     <None Include="shaders\basic_shader.frag" />
     <None Include="shaders\basic_shader.vert">
       <FileType>Document</FileType>
     </None>
-    <None Include="shaders\grid.frag" />
-    <None Include="shaders\grid.vert" />
+    <None Include="shaders\_editor\editor_svabill.frag" />
+    <None Include="shaders\_editor\editor_svabill.vert" />
+    <None Include="shaders\_editor\grid.frag" />
+    <None Include="shaders\_editor\grid.vert" />
     <None Include="shaders\pbr_shader.frag" />
     <None Include="shaders\pbr_shader.vert" />
     <None Include="shaders\pointlight.frag" />

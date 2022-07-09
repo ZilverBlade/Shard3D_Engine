@@ -18,8 +18,7 @@ namespace Shard3D {
 	void LevelTreePanel::clearSelectedActor() { selectedActor = {}; }
 
 	void LevelTreePanel::render() {
-		ImGui::Begin("Level Tree");
-		ImGui::Text(std::string("Context (Level) ptr: 0x" + std::to_string((int)context.get())).c_str());
+		ImGui::Begin(std::string("Level Tree (" + context->name + ")").c_str());
 		context->registry.each([&](auto actorGUID) {
 			wb3d::Actor actor{ actorGUID, context.get() };	
 			if (actor.isInvalid()) return;
@@ -45,11 +44,11 @@ namespace Shard3D {
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Billboard Actor")) { auto actor = context->createActor("Billboard"); actor.addComponent<Components::PointlightComponent>(); selectedActor = actor; }
+			if (ImGui::MenuItem("New Billboard Actor")) { auto actor = context->createActor("Billboard"); SHARD3D_NOIMPL; }
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); actor.addComponent<Components::PointlightComponent>(); selectedActor = actor; }
+			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); SHARD3D_NOIMPL; }
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
@@ -80,7 +79,7 @@ namespace Shard3D {
 			if (ImGui::MenuItem("Remove Actor")) actorExists = false;
 			if (!actor.hasComponent<Components::BlueprintComponent>())
 				if (ImGui::MenuItem("Convert to Blueprint")) {
-					std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_ASSETFILE_OPTIONS);
+					std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_ASSETFILE_OPTIONS);
 					if (!filepath.empty()) {
 						context->createBlueprint(selectedActor, filepath);
 					}
