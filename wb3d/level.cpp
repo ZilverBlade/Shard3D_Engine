@@ -9,7 +9,7 @@
 
 namespace Shard3D {
 	namespace wb3d {
-		Level::Level(std::string lvlName) {
+		Level::Level(const std::string &lvlName) : name(lvlName) {
 
 		}
 		Level::~Level() {
@@ -72,23 +72,23 @@ namespace Shard3D {
 			return blueprint;
 		}
 
-		Actor Level::createActor(std::string name) {
+		Actor Level::createActor(const std::string& name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { registry.create(), this };
 			actor.addComponent<Components::GUIDComponent>();
 			actor.addComponent<Components::TagComponent>().tag = name;
-#ifdef ACTOR_FORCE_TRANSFORM_COMPONENT
+#ifdef ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT
 			actor.addComponent<Components::TransformComponent>();
 #endif
 			return actor;
 		}
 
-		Actor Level::createActorWithGUID(GUID guid, std::string name) {
+		Actor Level::createActorWithGUID(GUID guid, const std::string& name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { registry.create(), this };
 			actor.addComponent<Components::GUIDComponent>(guid);
 			actor.addComponent<Components::TagComponent>().tag = name;
-#ifdef ACTOR_FORCE_TRANSFORM_COMPONENT
+#ifdef ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT
 			actor.addComponent<Components::TransformComponent>();
 #endif
 			return actor;
@@ -101,7 +101,9 @@ namespace Shard3D {
 			if (actorKillQueue.size() != 0) {
 				for (int i = 0; i < actorKillQueue.size(); i++) {
 					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
-					if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>()) vkDeviceWaitIdle(device);
+					if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
+						actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
+							vkDeviceWaitIdle(device);
 					registry.destroy(actorKillQueue.at(i));
 				}
 				actorKillQueue.clear();
@@ -119,6 +121,21 @@ namespace Shard3D {
 				for (int i = 0; i < actorKillMeshQueue.size(); i++) {
 					vkDeviceWaitIdle(device);
 					registry.remove<Components::MeshComponent>(actorKillMeshQueue.at(i));
+				}
+				actorKillMeshQueue.clear();
+			}
+			if (actorReloadTexQueue.size() != 0) {
+				for (int i = 0; i < actorReloadTexQueue.size(); i++) {
+					vkDeviceWaitIdle(device);
+					actorReloadTexQueue.at(i).getComponent<Components::BillboardComponent>().reapplyTexture(actorReloadTexQueue.at(i).getComponent<Components::BillboardComponent>().cacheFile);
+				}
+				actorReloadTexQueue.clear();
+				return;
+			}
+			if (actorKillTexQueue.size() != 0) {
+				for (int i = 0; i < actorKillTexQueue.size(); i++) {
+					vkDeviceWaitIdle(device);
+					registry.remove<Components::BillboardComponent>(actorKillMeshQueue.at(i));
 				}
 				actorKillMeshQueue.clear();
 			}
@@ -149,7 +166,7 @@ namespace Shard3D {
 		 EngineCamera& Level::getPossessedCamera() {
 			return getPossessedCameraActor().getComponent<Components::CameraComponent>().camera;
 		 }
-#if ALLOW_PREVIEW_CAMERA// ONLY FOR DEBUGGING PURPOSES
+#if ENSET_ALLOW_PREVIEW_CAMERA// ONLY FOR DEBUGGING PURPOSES
 		 void Level::setPossessedPreviewCameraActor(Actor actor) {
 			 if (!actor.hasComponent<Components::CameraComponent>()) {
 				 SHARD3D_ERROR("Can't possess a non camera actor!!");
@@ -225,8 +242,16 @@ namespace Shard3D {
 			actorKillMeshQueue.emplace_back(actor);
 		}
 
+		void Level::killTexture(Actor actor) {
+			actorKillTexQueue.emplace_back(actor);
+		}
+
 		void Level::reloadMesh(Actor actor) {
 			actorReloadMeshQueue.emplace_back(actor);
+		}
+
+		void Level::reloadTexture(Actor actor) {
+			actorReloadTexQueue.emplace_back(actor);
 		}
 
 		void Level::killEverything() {

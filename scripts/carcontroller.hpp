@@ -20,8 +20,8 @@ namespace Shard3D::CppScripts {
 			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_S) == GLFW_PRESS)
 				moveVector -= dt;
 			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_W) == GLFW_PRESS) {
-				moveVector += dt * exponent;
-				exponent += 0.005f * dt * glm::clamp(0.1f / moveVector.z, 0.f, 10.f);
+				moveVector += dt * 0.005f;
+				//exponent += 0.005f * dt * glm::clamp(0.1f / moveVector.z, 0.f, 10.f);
 			}
 			else {
 				moveVector.x -= dt * 0.0098f;

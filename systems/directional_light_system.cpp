@@ -72,8 +72,7 @@ namespace Shard3D {
 	void DirectionalLightSystem::render(FrameInfo &frameInfo, std::shared_ptr<wb3d::Level>& level) {
 		enginePipeline->bind(frameInfo.commandBuffer);
 
-		level->registry.view<Components::DirectionalLightComponent, Components::TransformComponent>().each([=](auto light, auto transform) {
-			enginePipeline->bind(frameInfo.commandBuffer);
+		level->registry.view<Components::DirectionalLightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
 			vkCmdBindDescriptorSets(
 				frameInfo.commandBuffer,
 				VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -84,7 +83,6 @@ namespace Shard3D {
 				0,
 				nullptr
 			);
-
 			DirectionalLightPushConstants push{};
 			push.position = glm::vec4(transform.translation, 1.f);
 			push.color = glm::vec4(light.color, light.lightIntensity);

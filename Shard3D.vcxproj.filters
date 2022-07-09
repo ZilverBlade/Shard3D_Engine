@@ -102,6 +102,12 @@
     <Filter Include="shaders\compute">
       <UniqueIdentifier>{9df61183-ed93-4d95-8497-aa5fe14ee3b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\vertex\editor">
+      <UniqueIdentifier>{c9a71c74-dcc8-4f4f-bbc1-80efa4e3d1de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\fragment\editor">
+      <UniqueIdentifier>{1da3f36a-9f08-408a-80ba-a9fed638a520}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -247,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="systems\physics_system.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\script_link.cpp">
+      <Filter>scripts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -490,12 +499,6 @@
     <None Include="shaders\spotlight.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="shaders\grid.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="shaders\grid.vert">
-      <Filter>shaders\vertex</Filter>
-    </None>
     <None Include="shaders\pbr_shader.frag">
       <Filter>shaders\fragment</Filter>
     </None>
@@ -506,11 +509,23 @@
     <None Include="shaders\test.comp">
       <Filter>shaders\compute</Filter>
     </None>
-    <None Include="shaders\billboard_axial.vert">
+    <None Include="shaders\billboard_sva.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="shaders\billboard_axial.frag">
+    <None Include="shaders\billboard_sva.frag">
       <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\_editor\editor_svabill.vert">
+      <Filter>shaders\vertex\editor</Filter>
+    </None>
+    <None Include="shaders\_editor\grid.vert">
+      <Filter>shaders\vertex\editor</Filter>
+    </None>
+    <None Include="shaders\_editor\editor_svabill.frag">
+      <Filter>shaders\fragment\editor</Filter>
+    </None>
+    <None Include="shaders\_editor\grid.frag">
+      <Filter>shaders\fragment\editor</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

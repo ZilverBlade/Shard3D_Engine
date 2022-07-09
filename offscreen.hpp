@@ -64,6 +64,5 @@ namespace Shard3D {
 
         OffscreenPass pass;
         EngineDevice &m_Device;
-        bool after = false;
     };
 }

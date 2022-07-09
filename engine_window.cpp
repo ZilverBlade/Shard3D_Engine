@@ -48,7 +48,7 @@ namespace Shard3D {
 		Shard3D::CheatCodes::init(window);
 
 		GLFWimage images[1];
-		images[0].pixels = EngineTexture::getSTBImage(WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		images[0].pixels = EngineTexture::getSTBImage(ENSET_WINDOW_ICON_PATH, &images[0].width, &images[0].height, 0, 4); //rgba channels 
 		glfwSetWindowIcon(window, 1, images);
 		EngineTexture::freeSTBImage(images[0].pixels);
 

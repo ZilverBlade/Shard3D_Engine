@@ -74,10 +74,9 @@ namespace Shard3D {
 	}
 
 	void SpotlightSystem::render(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level) {
-		level->registry.view<Components::SpotlightComponent, Components::TransformComponent>().each([=](auto light, auto transform) {
-		// copy light to ubo
-			enginePipeline->bind(frameInfo.commandBuffer);
+		enginePipeline->bind(frameInfo.commandBuffer);
 
+		level->registry.view<Components::SpotlightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
 			vkCmdBindDescriptorSets(
 				frameInfo.commandBuffer,
 				VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -88,16 +87,6 @@ namespace Shard3D {
 				0,
 				nullptr
 			);
-			CSimpleIniA ini;
-			ini.SetUnicode();
-			ini.LoadFile(ENGINE_SETTINGS_PATH);
-
-			if (light.attenuationMod != glm::vec3(0.f, 0.f, 1.f) && ini.GetBoolValue("WARNINGS", "warn.NotInverseSquareAttenuation")) {
-				SHARD3D_WARN("NotInverseSquareAttenuation: \"Spotlight in level does not obey inverse square law\"");
-			}
-			if (light.outerAngle > light.innerAngle && ini.GetBoolValue("WARNINGS", "warn.InvertedSpotlightAngle")) {
-				SHARD3D_WARN("InvertedSpotlightAngle: \"Spotlight in level that has inner angle greater than outer angle, spotlight won't render correctly\"");
-			}
 
 			SpotlightPushConstants push{};
 			push.position = glm::vec4(transform.translation, 1.f);

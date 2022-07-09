@@ -3,14 +3,12 @@
 //
 #include "s3dtpch.h"
 #include "offscreen.hpp"
-
 namespace Shard3D {
     OffScreen::OffScreen(EngineDevice &device) : m_Device{device} {
-        pass.width = 1280;
-        pass.height = 720;
+        pass.width = 1920;
+        pass.height = 1080;
 
         createImages();
-        after = true;
 
         CSimpleIniA ini;
         ini.SetUnicode();
@@ -25,21 +23,6 @@ namespace Shard3D {
     }
 
     void OffScreen::createImages() {
-        if(after) {
-            /*vkDestroyImageView(m_Device.device(), pass.color.view, nullptr);
-            vkDestroyImage(m_Device.device(), pass.color.image, nullptr);
-            vkFreeMemory(m_Device.device(), pass.color.mem, nullptr);
-
-            // Depth attachment
-            vkDestroyImageView(m_Device.device(), pass.depth.view, nullptr);
-            vkDestroyImage(m_Device.device(), pass.depth.image, nullptr);
-            vkFreeMemory(m_Device.device(), pass.depth.mem, nullptr);
-
-            vkDestroyRenderPass(m_Device.device(), pass.renderPass, nullptr);
-            vkDestroySampler(m_Device.device(), pass.sampler, nullptr);
-            vkDestroyFramebuffer(m_Device.device(), pass.frameBuffer, nullptr);*/
-        }
-
         // Find a suitable depth format
         VkFormat fbDepthFormat = m_Device.findSupportedFormat(
                 {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},

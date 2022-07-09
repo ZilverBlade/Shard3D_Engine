@@ -29,6 +29,13 @@ namespace Shard3D {
 		inline static constexpr int HEIGHT = 720; //600
 		inline static const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
 	public:
+		struct PreviewModes {
+			bool V_EDITOR_BILLBOARDS = true;
+			bool V_HIDDEN_MESHES = true;
+			bool V_HIDDEN_BILLBOARDS = true;
+			bool V_GRID = true;
+			bool ONLY_GAME;
+		};
 		Singleton() {}
 		~Singleton() {}
 		inline static Initializer _ignore_init;
@@ -36,8 +43,9 @@ namespace Shard3D {
 		inline static EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
 		inline static EngineDevice engineDevice{ engineWindow };
 		inline static EngineRenderer engineRenderer{ engineWindow, engineDevice };
-		inline static OffScreen mainOffScreen{ engineDevice };
 		inline static VkDescriptorSet viewportImage{};
+		inline static OffScreen mainOffScreen{ engineDevice };
+
 #if ALLOW_PREVIEW_CAMERA
 		inline static OffScreen previewCamOffScreen{ engineDevice };
 		inline static VkDescriptorSet previewViewportImage{};
@@ -45,6 +53,10 @@ namespace Shard3D {
 		inline static std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
 
 		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
+
+#ifndef _DEPLOY
+		inline static PreviewModes editorPreviewSettings;
+#endif
 
 		Destructor _ignore_destroy;
 	};

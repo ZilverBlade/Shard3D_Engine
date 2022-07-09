@@ -44,9 +44,9 @@ namespace Shard3D {
 		//reyleigh scattering fakery and/or indirect light
 		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.014f };
 
-		Pointlight pointlights[MAX_POINTLIGHTS];
-		Spotlight spotlights[MAX_SPOTLIGHTS];
-		DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
+		Pointlight pointlights[ENGINE_MAX_POINTLIGHTS];
+		Spotlight spotlights[ENGINE_MAX_SPOTLIGHTS];
+		DirectionalLight directionalLights[ENGINE_MAX_DIRECTIONAL_LIGHTS];
 		int numPointlights;
 		int numSpotlights;
 		int numDirectionalLights;

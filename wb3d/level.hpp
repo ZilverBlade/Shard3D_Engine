@@ -12,7 +12,7 @@ namespace Shard3D {
 	namespace wb3d {
 		class Actor;
 		class Blueprint;
-
+		class LevelTreePanel;
 		enum class PlayState {
 			Stopped = 0,
 			Playing = 2, // unused, for future when stuff like player controls can be properly integrated in game
@@ -23,19 +23,21 @@ namespace Shard3D {
 		class Level {
 		public:
 
-			Level(std::string lvlName = "Some kind of level");
+			Level(const std::string& lvlName = "Some kind of level");
 			~Level();
 
 			static std::shared_ptr<Level> copy(std::shared_ptr<Level> other);
 
 			Blueprint createBlueprint(Actor actor, std::string path, std::string name = "Some kind of blueprint");
 
-			Actor createActor(std::string name= "Some kind of actor");
+			Actor createActor(const std::string& name= "Some kind of actor");
 			
 			void killEverything();
 			void killActor(Actor actor);
 			void killMesh(Actor actor);
+			void killTexture(Actor actor);
 			void reloadMesh(Actor actor);
+			void reloadTexture(Actor actor);
 
 			void runGarbageCollector(VkDevice device);
 
@@ -61,26 +63,31 @@ namespace Shard3D {
 			PlayState simulationState = PlayState::Stopped;
 
 			entt::registry registry;
+			std::string name = "Some kind of level";
+			std::string currentpath;
 		protected:
 			GUID possessedCameraActorGUID;
-#if ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
+#if ENSET_ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
 			GUID possessedPreviewCameraActorGUID;
 #endif  
 		private:
 			//should only be called by system processes
-			Actor createActorWithGUID(GUID guid, std::string name = "Some kind of actor");
-#if ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
+			Actor createActorWithGUID(GUID guid, const std::string& name = "Some kind of actor");
+#if ENSET_ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
 			void setPossessedPreviewCameraActor(Actor actor);
 			void setPossessedPreviewCameraActor(GUID guid);
 			Actor getPossessedPreviewCameraActor();
 			EngineCamera& getPossessedPreviewCamera();
 #endif
 
-			std::string name = "Some kind of level";
+
 			bool loadRegistryCapture = false;
+
 
 			// queues 
 			std::vector<Actor> actorKillQueue;
+			std::vector<Actor> actorKillTexQueue;
+			std::vector<Actor> actorReloadTexQueue;
 			std::vector<Actor> actorKillMeshQueue;
 			std::vector<Actor> actorReloadMeshQueue;
 

@@ -3,14 +3,14 @@
 
 #include "../singleton.hpp"
 namespace Shard3D::wb3d {
+	void AssetManager::clearAllAssetsAndDontAddDefaults() { textureAssets.clear(); meshAssets.clear(); materialAssets.clear(); }
 	void AssetManager::clearTextureAssets() {
 		SHARD3D_WARN("Clearing all texture assets, may cause unexpected crash!");
 		vkDeviceWaitIdle(Singleton::engineDevice.device());
 		textureAssets.clear();
 		emplaceTexture(ENGINE_ERRTEX, VK_FILTER_NEAREST);
 		emplaceTexture(ENGINE_ERRMAT, VK_FILTER_NEAREST);
-	}
-
+	}	
 	void AssetManager::clearMeshAssets() {
 		SHARD3D_WARN("Clearing all mesh assets, may cause unexpected crash!");
 		vkDeviceWaitIdle(Singleton::engineDevice.device());
@@ -18,7 +18,6 @@ namespace Shard3D::wb3d {
 		emplaceMesh(ENGINE_ERRMSH);
 		emplaceMesh(ENGINE_DEFAULT_MODEL_FILE);
 	}
-
 	void AssetManager::clearAllAssets() {
 		clearTextureAssets();
 		clearMeshAssets();
@@ -37,18 +36,23 @@ namespace Shard3D::wb3d {
 			if (i.first.find(meshPath) != std::string::npos && meshPath.find(i.first) != std::string::npos) {
 				SHARD3D_WARN("Mesh at path '{0}' already exists! Mesh will be ignored...", meshPath);
 				return;		
-			/*	meshAssets.erase(i.first);
-				meshAssets[mesh->fpath] = mesh;
-				return; //prevent entries in unordered map with same path */			
+		/*	meshAssets.erase(i.first);
+			meshAssets[mesh->fpath] = mesh;
+			return; //prevent entries in unordered map with same path */			
 			}
+
 		std::shared_ptr<EngineMesh> mesh = EngineMesh::createMeshFromFile(meshPath, meshType);
 		SHARD3D_LOG("Loaded mesh to asset map '{0}'", meshPath);
 		meshAssets[meshPath] = mesh;
 	}
 	std::shared_ptr<EngineMesh>& AssetManager::retrieveMesh(const std::string& path) {
-		//check if exists, otherwise send back some default texture
-			return meshAssets.at(path);
-		// return meshAssets.at(ENGINE_ERRMSH);
+#if !ENSET_CONFIDENT_ASSETS
+			if (meshAssets.find(path) != meshAssets.cend())
+				return meshAssets.at(path);
+			return meshAssets.at(ENGINE_ERRTEX);
+#elif
+		return textureAssets.at(path);
+#endif
 	}
 #pragma endregion
 #pragma region Texture
@@ -67,9 +71,13 @@ namespace Shard3D::wb3d {
 		textureAssets[texturePath] = texture;
 	}
 	std::shared_ptr<EngineTexture>& AssetManager::retrieveTexture(const std::string& path) {
-		//check if exists, otherwise send back some default texture
+#if !ENSET_CONFIDENT_ASSETS
+		if (textureAssets.find(path) != textureAssets.cend())
+			return textureAssets.at(path);
+		return textureAssets.at(ENGINE_ERRTEX);
+#elif
 		return textureAssets.at(path);
-		//return textureAssets.at(ENGINE_ERRTEX);
+#endif
 	}
 #pragma endregion
 	void AssetManager::loadMaterialsFromList(MaterialSystem::MaterialList& matlist) {
@@ -99,3 +107,16 @@ namespace Shard3D::wb3d {
 		SHARD3D_ERROR("Couldn't find material from path '{0}'.", path);
 	}
 }
+
+#pragma region special
+void Shard3D::_special_assets::_editor_icons_load() {
+	for (auto icon : _editor_icons_array) {
+		std::shared_ptr<EngineTexture> tex = EngineTexture::createTextureFromFile(Singleton::engineDevice, icon[1], VK_FILTER_LINEAR);
+		_editor_icons[icon[0]] = tex;
+	}
+}
+
+void Shard3D::_special_assets::_editor_icons_destroy()
+{
+}
+#pragma endregion

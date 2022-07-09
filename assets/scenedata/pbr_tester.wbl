@@ -10,7 +10,7 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponent:
-      MeshPath: assets/modeldata/engineModels/cube.obj
+      MeshPath: assets/_engine/msh/cube.obj
       MeshFormat: 1
       Indexed: true
   - Actor: 10787711132245660282
@@ -43,6 +43,6 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponent:
-      MeshPath: assets/modeldata/axis.obj
+      MeshPath: assets/_engine/msh/axis.obj
       MeshFormat: 1
       Indexed: false

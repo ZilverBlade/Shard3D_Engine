@@ -94,12 +94,12 @@ namespace Shard3D {
 			std::string file{};
 			std::string cacheFile{};
 			enum class BillboardOrientation {
-				NONE = 0,
-				AXIAL = 1,
-				POINT = 2
+				SCREEN_VIEW_ALIGNED,
+				VIEW_POINT_ALIGNED,
+				AXIAL,
 			};
 			// BILLBOARD_ORIENTATION_AXIAL is the only supported orientation at the moment
-			BillboardOrientation orientation = BillboardOrientation::AXIAL;
+			BillboardOrientation orientation = BillboardOrientation::SCREEN_VIEW_ALIGNED;
 
 			BillboardComponent() = default;
 			BillboardComponent(const BillboardComponent&) = default;

@@ -40,8 +40,8 @@ namespace Shard3D {
         pipelineConfig.pipelineLayout = pipelineLayout;
         enginePipeline = std::make_unique<EnginePipeline>(
             engineDevice,
-            "assets/shaders/grid.vert.spv",
-            "assets/shaders/grid.frag.spv",
+            "assets/shaders/_editor/grid.vert.spv",
+            "assets/shaders/_editor/grid.frag.spv",
             pipelineConfig
             );
     }
@@ -49,7 +49,6 @@ namespace Shard3D {
     void GridSystem::recreatePipeline(VkRenderPass renderPass) {
         enginePipeline->destroyGraphicsPipeline();
        vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
-
 
 //assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
@@ -66,8 +65,7 @@ namespace Shard3D {
             engineDevice,
             "shaders/grid.vert.spv",
             "shaders/grid.frag.spv",
-            pipelineConfig,
-            true
+            pipelineConfig
        );
     }
 

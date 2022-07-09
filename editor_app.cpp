@@ -34,16 +34,17 @@ namespace Shard3D {
 	EditorApp::
 
 	EditorApp::EditorApp() {
+		_special_assets::_editor_icons_load();
 		SharedPools::constructPools(Singleton::engineDevice);
 		GraphicsSettings::init(&Singleton::engineWindow);
 		SHARD3D_INFO("Constructing Level Pointer");
 		Singleton::activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
 	EditorApp::~EditorApp() {
-
+		_special_assets::_editor_icons_destroy();
 	}
 	void EditorApp::setupDescriptors() {
-#if ENABLE_COMPUTE_SHADERS
+#if ENSET_ENABLE_COMPUTE_SHADERS
 
 #endif
 	}
@@ -70,11 +71,11 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 		ImGuiInitter::init();
-#if ENABLE_WORLDBUILDER3D
+#if ENSET_ENABLE_WORLDBUILDER3D
 		layerStack.pushOverlay(new ImGuiLayer());
 #endif
 		GridSystem gridSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-#if ENABLE_COMPUTE_SHADERS == true
+#if ENSET_ENABLE_COMPUTE_SHADERS == true
 		ComputeSystem computeSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
 		BasicRenderSystem basicRenderSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -84,7 +85,7 @@ namespace Shard3D {
 		SpotlightSystem spotlightSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		DirectionalLightSystem directionalLightSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 		GridSystem pgridSystem{ Singleton::engineDevice, Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		BasicRenderSystem pbasicRenderSystem{ Singleton::engineDevice, Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -104,7 +105,7 @@ namespace Shard3D {
 
 		SHARD3D_INFO("Loading dummy actor");
 		wb3d::Actor dummy = Singleton::activeLevel->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 		dummy.addComponent<Components::CameraComponent>();
 		Singleton::activeLevel->setPossessedPreviewCameraActor(dummy); //dummy
 #endif // !_DEPLOY
@@ -125,6 +126,12 @@ namespace Shard3D {
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		SHARD3D_INFO("Default FOV set to {0} degrees", fov);
 		cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
+		
+		if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
+			cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
+		} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
+			cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
+		}
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!Singleton::engineWindow.shouldClose()) {
@@ -132,7 +139,7 @@ namespace Shard3D {
 
 			auto possessedCameraActor = Singleton::activeLevel->getPossessedCameraActor();
 			auto possessedCamera = Singleton::activeLevel->getPossessedCamera();
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 			auto possessedPreviewCameraActor = Singleton::activeLevel->getPossessedPreviewCameraActor();
 			auto possessedPreviewCamera = Singleton::activeLevel->getPossessedPreviewCamera();
 #endif
@@ -154,7 +161,9 @@ namespace Shard3D {
 				possessedCameraActor.getComponent<Components::TransformComponent>().translation, 
 				possessedCameraActor.getComponent<Components::TransformComponent>().rotation
 			);
-#if ALLOW_PREVIEW_CAMERA
+
+			possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
+#if ENSET_ALLOW_PREVIEW_CAMERA
 			possessedPreviewCameraActor.getComponent<Components::CameraComponent>().ar = Singleton::engineRenderer.getAspectRatio();
 			possessedPreviewCamera.setViewYXZ(
 				possessedPreviewCameraActor.getComponent<Components::TransformComponent>().translation,
@@ -162,14 +171,6 @@ namespace Shard3D {
 			);
 			possessedPreviewCameraActor.getComponent<Components::CameraComponent>().setProjection();
 #endif
-
-			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
-				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
-				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
-			} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
-				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
-				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
-			}
 			
 			if (glfwGetKey(Singleton::engineWindow.getGLFWwindow(), GLFW_KEY_F11) == GLFW_PRESS) {
 #ifndef NDEBUG
@@ -222,18 +223,23 @@ namespace Shard3D {
 				basicRenderSystem.renderGameObjects(frameInfo, Singleton::activeLevel);
 				billboardRenderSystem.render(frameInfo, Singleton::activeLevel);
 
-				pointlightSystem.render(frameInfo, Singleton::activeLevel);
-				spotlightSystem.render(frameInfo, Singleton::activeLevel);
-				directionalLightSystem.render(frameInfo, Singleton::activeLevel);
-
-#if ENABLE_COMPUTE_SHADERS == true
+#if ENSET_ENABLE_COMPUTE_SHADERS
 				computeSystem.render(frameInfo);
 #endif
-				gridSystem.render(frameInfo);
-
+#ifndef _DEPLOY
+				if (Singleton::editorPreviewSettings.ONLY_GAME == false) {
+					if (Singleton::editorPreviewSettings.V_EDITOR_BILLBOARDS == true) {
+						pointlightSystem.render(frameInfo, Singleton::activeLevel);
+						spotlightSystem.render(frameInfo, Singleton::activeLevel);
+						directionalLightSystem.render(frameInfo, Singleton::activeLevel);
+					}
+					if (Singleton::editorPreviewSettings.V_GRID == true)
+						gridSystem.render(frameInfo);
+				}
+#endif
 				Singleton::mainOffScreen.end(frameInfo);
 
-#if ALLOW_PREVIEW_CAMERA
+#if ENSET_ALLOW_PREVIEW_CAMERA
 				GlobalUbo pubo{};
 				pubo.projection = possessedPreviewCamera.getProjection();
 				pubo.view = possessedPreviewCamera.getView();
@@ -275,6 +281,8 @@ namespace Shard3D {
 		vkDeviceWaitIdle(Singleton::engineDevice.device());
 		SharedPools::destructPools();
 		Singleton::viewportImage = nullptr;
+		wb3d::AssetManager::clearAllAssetsAndDontAddDefaults();
+		Singleton::activeLevel = nullptr;
 	}
 
 	void EditorApp::loadGameObjects() {
@@ -284,8 +292,7 @@ namespace Shard3D {
 			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, Y up.
 			That means that in the editor, the level must save object transform values as (X, Z, Y), otherwise it will be incorrect
 		*/
-		
-		
+
 		wb3d::LevelManager levelman(Singleton::activeLevel);
 		levelman.load("assets/scenedata/drivecartest.wbl", true);
 		
@@ -305,7 +312,7 @@ namespace Shard3D {
 		wb3d::Actor billboard = Singleton::activeLevel->createActor("Billboard");
 		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/axis2d.png");
 		billboard.addComponent<Components::BillboardComponent>("assets/_engine/tex/axis2d.png");
-		billboard.getComponent<Components::TransformComponent>().translation = { 1.f, 2.f, 6.f };
+		billboard.getTransform().translation = { 1.f, 2.f, 6.f };
 		}
 	}
 }

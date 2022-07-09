@@ -19,7 +19,7 @@
 #include "../video/video_decode.hpp"
 #include "../systems/material_system.hpp"
 #include "../singleton.hpp"
-
+#include "imgui_initter.hpp"
 namespace Shard3D {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
@@ -60,7 +60,8 @@ namespace Shard3D {
 	void ImGuiLayer::detach() {
      // check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
         if (hasBeenDetached) return;
-        vkDestroyDescriptorPool(Singleton::engineDevice.device(), descriptorPool, nullptr);
+        SHARD3D_LOG((void*)ImGuiInitter::imGuiDescriptorPool);
+        vkDestroyDescriptorPool(Singleton::engineDevice.device(), ImGuiInitter::imGuiDescriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -73,7 +74,12 @@ namespace Shard3D {
 
     void ImGuiLayer::update(VkCommandBuffer buffer, float dt) {
         if (hasBeenDetached) return;
-
+        if (refreshContext) {
+            levelTreePanel.setContext(Singleton::activeLevel);
+            levelPropertiesPanel.setContext(Singleton::activeLevel);
+            levelPeekPanel.setContext(Singleton::activeLevel);
+            refreshContext = false;
+        }
         CSimpleIniA ini;
         ini.SetUnicode();
         ini.LoadFile(ENGINE_SETTINGS_PATH);
@@ -271,7 +277,7 @@ namespace Shard3D {
                 }
                 if (ImGui::MenuItem("Load Level...", "Ctrl+O")) {
                     if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
-                        std::string filepath = FileDialogs::openFile(WORLDBUILDER3D_FILE_OPTIONS);
+                        std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_FILE_OPTIONS);
                         if (!filepath.empty()) {
                             levelTreePanel.clearSelectedActor();
                             Singleton::activeLevel->killEverything();
@@ -280,21 +286,15 @@ namespace Shard3D {
                     }
                 }
                 if (ImGui::MenuItem("Save Level...", "Ctrl+S")) {
-                    std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
-                    if (!filepath.empty()) {
-                        wb3d::LevelManager levelMan(Singleton::activeLevel);
-                        levelMan.save(filepath, false);
-                    }
+                    wb3d::LevelManager levelMan(Singleton::activeLevel);
+                    levelMan.save(Singleton::activeLevel->currentpath, false);
                 }
                 if (ImGui::MenuItem("Save Level... (Encrypted)", NULL)) {
-                    std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
-                    if (!filepath.empty()) {
-                        wb3d::LevelManager levelMan(Singleton::activeLevel);
-                        levelMan.save(filepath, true);
-                    }
+                    wb3d::LevelManager levelMan(Singleton::activeLevel);
+                    levelMan.save(Singleton::activeLevel->currentpath, true);
                 }
                 if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
-                    std::string filepath = FileDialogs::saveFile(WORLDBUILDER3D_FILE_OPTIONS);
+                    std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_FILE_OPTIONS);
                     if (!filepath.empty()) {
                         wb3d::LevelManager levelMan(Singleton::activeLevel);
                         levelMan.save(filepath, false);
@@ -315,19 +315,19 @@ namespace Shard3D {
                     if (ImGui::MenuItem("Begin")) {
                         wb3d::MasterManager::captureLevel(Singleton::activeLevel);
                         Singleton::activeLevel->begin();
-                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
+                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING) | " + Singleton::activeLevel->name;
                         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();   
                     if (Singleton::activeLevel->simulationState != PlayState::Paused) {
                         ImGui::BeginDisabled(Singleton::activeLevel->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
                             Singleton::activeLevel->simulationState = PlayState::Paused;
-                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused)";
+                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused) | " + Singleton::activeLevel->name;
                         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();  }
                     else {
                         ImGui::BeginDisabled(Singleton::activeLevel->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
                             Singleton::activeLevel->simulationState = PlayState::Simulating;
-                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING)";
+                        std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING) | " + Singleton::activeLevel->name;
                         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
                     }
@@ -336,8 +336,9 @@ namespace Shard3D {
                     if (ImGui::MenuItem("End")) {
                         levelTreePanel.clearSelectedActor();
                         Singleton::activeLevel->end();
-                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
+                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null) | " + Singleton::activeLevel->name;
                         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+                        refreshContext = true;
                     } ImGui::EndDisabled();
                     ImGui::EndMenu();
                 }
@@ -348,15 +349,21 @@ namespace Shard3D {
 
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("View")) {   
+#ifndef _DEPLOY
+                if (ImGui::BeginMenu("Rendering")) {
+                    ImGui::Checkbox("Preview Game", &Singleton::editorPreviewSettings.ONLY_GAME);
+                    ImGui::Separator();
+                    ImGui::Checkbox("Grid", &Singleton::editorPreviewSettings.V_GRID);
+                    ImGui::Checkbox("Billboards", &Singleton::editorPreviewSettings.V_EDITOR_BILLBOARDS);
+                    ImGui::EndMenu();
+                }
+#endif
+                ImGui::EndMenu();
+            }
 #ifndef NDEBUG
             if (ImGui::BeginMenu("Debug")) {
                 ImGui::TextDisabled("Shard3D Debug menu");
-                if (ImGui::MenuItem("Force refresh std::shared_ptr activeLevel")) {
-                    levelTreePanel.setContext(Singleton::activeLevel);
-                    levelPropertiesPanel.setContext(Singleton::activeLevel);
-                    levelPeekPanel.setContext(Singleton::activeLevel);
-                }
-                ImGui::Separator();
                 if (ImGui::MenuItem("Play test audio")) {
                 }
                 if (ImGui::MenuItem("Play test video")) {
@@ -401,14 +408,14 @@ namespace Shard3D {
                     for (int i = 0; i < originalString.length(); i++) {
                         c = originalString.at(i);
                         encryptedString.push_back((char)
-                            ((((c + LEVEL_CIPHER_KEY) * 2) - LEVEL_CIPHER_KEY) / 2));
+                            ((((c + ENSET_WB3DLEVEL_CIPHER_KEY) * 2) - ENSET_WB3DLEVEL_CIPHER_KEY) / 2));
                     }
                     std::string decryptedString;
 
                     for (int i = 0; i < encryptedString.length(); i++) {
                         c = encryptedString.at(i);
                         decryptedString.push_back((char)
-                            (((c * 2) + LEVEL_CIPHER_KEY) / 2) - LEVEL_CIPHER_KEY);
+                            (((c * 2) + ENSET_WB3DLEVEL_CIPHER_KEY) / 2) - ENSET_WB3DLEVEL_CIPHER_KEY);
                     }
             
                     if (decryptedString != originalString) SHARD3D_WARN("[WB3D] Encryption and decryption don't match! Are you using a cipher key that is a multiple of 2?");
@@ -420,14 +427,11 @@ namespace Shard3D {
                 ImGui::EndMenu();
              }
 #endif // DEBUG
-     
             if (ImGui::BeginMenu("Actions")) {
                 if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {
                     ShellExecuteA(nullptr, "open", "shadercompmgr.exe", "-o shaders/ shaders/", "/", false);
                 }
                 if (ImGui::MenuItem("Compile Shaders & Reupload Pipeline", NULL /*make sure to add some sort of shardcut */)) {}
-
-
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Window")) {

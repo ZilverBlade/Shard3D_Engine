@@ -22,6 +22,6 @@ namespace Shard3D {
 		void drawActorEntry(Actor actor);
 
 		std::shared_ptr<Level> context;
-		
+
 	};
 }

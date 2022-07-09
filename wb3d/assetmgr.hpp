@@ -6,6 +6,7 @@
 #include "../model.hpp"
 
 namespace Shard3D {
+	class EditorApp;
 	namespace wb3d {
 		class AssetManager {
 		protected:
@@ -52,6 +53,27 @@ namespace Shard3D {
 			inline static std::unordered_map<std::string, std::shared_ptr<EngineTexture>> textureAssets;
 			inline static std::unordered_map<uint64_t, MaterialSystem::Material> materialAssets;
 			inline static std::unordered_map<uint64_t, MaterialSystem::MaterialList> materialListAssets;
+
+			static void clearAllAssetsAndDontAddDefaults();
+			friend class Shard3D::EditorApp;	
 		};
 	}
+	class _special_assets {
+		inline static const std::string _editor_icons_array[6][2]{
+			{"editor.play",						"assets/_engine/tex/_editor/icon_null.png"},
+			{"editor.pause",					"assets/_engine/tex/_editor/icon_null.png"},
+			{"editor.pause",					"assets/_engine/tex/_editor/icon_null.png"},
+			{"editor.light.point",				"assets/_engine/tex/_editor/icon_null.png"},
+			{"editor.light.spot",				"assets/_engine/tex/_editor/icon_null.png"},
+			{"editor.light.directional",		"assets/_engine/tex/_editor/icon_null.png"}
+		};
+		// engine only function, do not call this
+		static void _editor_icons_load();
+		// engine only function, do not call this
+		static void _editor_icons_destroy();
+		// engine only function, do not call this
+		inline static std::unordered_map<std::string, std::shared_ptr<EngineTexture>> _editor_icons;
+		friend class EditorApp;
+		friend class PointlightSystem;
+	};
 }
