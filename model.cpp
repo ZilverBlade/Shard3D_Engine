@@ -44,7 +44,7 @@ namespace Shard3D {
 		fpath = filepath;
 		
 		std::ifstream f(filepath.c_str());
-		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", filepath); return nullptr; };
+		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", filepath); return std::unique_ptr<EngineMesh>(nullptr); };
 
 		builder.loadIndexedMesh(filepath, modelType);
 		if (ini.GetBoolValue("LOGGING", "log.MeshLoadInfo") == true) {

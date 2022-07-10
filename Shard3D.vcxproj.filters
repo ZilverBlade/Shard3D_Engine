@@ -108,6 +108,12 @@
     <Filter Include="shaders\fragment\editor">
       <UniqueIdentifier>{1da3f36a-9f08-408a-80ba-a9fed638a520}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UI\GUI">
+      <UniqueIdentifier>{19006134-43f1-46b7-b728-84981f89c326}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\GUI">
+      <UniqueIdentifier>{352accfe-5a96-4980-954b-e8d4c98ae8de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -259,6 +265,12 @@
     </ClCompile>
     <ClCompile Include="systems\particle_system.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\gui_system.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\GUILayer.cpp">
+      <Filter>Source Files\UI\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -477,6 +489,15 @@
     </ClInclude>
     <ClInclude Include="systems\particle_system.hpp">
       <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\gui_system.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\GUILayer.hpp">
+      <Filter>Header Files\UI\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -29,7 +29,6 @@ int main() {
         app.run();
     }
     catch (const std::exception& e) {
-        std::cerr << e.what() << '\n';
         SHARD3D_FATAL(e.what());
         return EXIT_FAILURE;
     }

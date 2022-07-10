@@ -22,7 +22,7 @@
 
 //UI stuff
 #include "UI/ImGuiLayer.hpp"
-
+#include "UI/GUILayer.hpp"
 //scripts
 #include "scripts/script_link.h"
 #include "graphics_settings.hpp"
@@ -71,8 +71,20 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 		ImGuiInitter::init();
+
+
 #if ENSET_ENABLE_WORLDBUILDER3D
 		layerStack.pushOverlay(new ImGuiLayer());
+#endif
+#ifdef NDEBUG
+		GUILayer* guiLayer0 = new GUILayer();
+		GUILayer* guiLayer1 = new GUILayer();
+		GUILayer* guiLayer2 = new GUILayer();
+		GUILayer* guiLayer3 = new GUILayer();
+		layerStack.pushOverlay(guiLayer0);
+		layerStack.pushOverlay(guiLayer1);
+		layerStack.pushOverlay(guiLayer2);
+		layerStack.pushOverlay(guiLayer3);
 #endif
 		GridSystem gridSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #if ENSET_ENABLE_COMPUTE_SHADERS == true
@@ -112,6 +124,24 @@ namespace Shard3D {
 
 		loadGameObjects();
 
+#ifdef NDEBUG
+		GUI::Element exampleGUIElement;
+
+		AssetManager::emplaceTexture("assets/texturedata/gui/button.png");
+		exampleGUIElement.texturePath = "assets/texturedata/gui/button.png";
+
+		exampleGUIElement.position = { 0.2f, 0.5f };
+		exampleGUIElement.scale = { 0.3, 0.3f };
+
+		GUI::Element exampleGUIElement2;
+		AssetManager::emplaceTexture("assets/texturedata/gui/text.png");
+		exampleGUIElement2.texturePath = "assets/texturedata/gui/text.png";
+		exampleGUIElement2.position = { 0.2f, 0.5f };
+		exampleGUIElement2.scale = { 0.3, 0.3f };
+
+		guiLayer0->addElement(exampleGUIElement);
+		guiLayer1->addElement(exampleGUIElement2);
+#endif
 		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
 		controller::EditorMouseMovementController editorCameraControllerMouse{};
 
@@ -266,7 +296,7 @@ namespace Shard3D {
 				Singleton::engineRenderer.beginSwapChainRenderPass(commandBuffer);
 				// Layer overlays (use UI here)
 				for (Layer* layer : layerStack) {
-					layer->update(commandBuffer, frameTime);
+					layer->update(frameInfo);
 				}
 
 				Singleton::engineRenderer.endSwapChainRenderPass(commandBuffer);
@@ -286,7 +316,7 @@ namespace Shard3D {
 	}
 
 	void EditorApp::loadGameObjects() {
-
+		
 		/*
 			NOTE:
 			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, Y up.

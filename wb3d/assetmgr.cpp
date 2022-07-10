@@ -42,6 +42,7 @@ namespace Shard3D::wb3d {
 			}
 
 		std::shared_ptr<EngineMesh> mesh = EngineMesh::createMeshFromFile(meshPath, meshType);
+		if (!mesh) return;
 		SHARD3D_LOG("Loaded mesh to asset map '{0}'", meshPath);
 		meshAssets[meshPath] = mesh;
 	}
@@ -49,9 +50,9 @@ namespace Shard3D::wb3d {
 #if !ENSET_CONFIDENT_ASSETS
 			if (meshAssets.find(path) != meshAssets.cend())
 				return meshAssets.at(path);
-			return meshAssets.at(ENGINE_ERRTEX);
+			return meshAssets.at(ENGINE_ERRMSH);
 #elif
-		return textureAssets.at(path);
+		return meshAssets.at(path);
 #endif
 	}
 #pragma endregion
@@ -67,6 +68,7 @@ namespace Shard3D::wb3d {
 					return; //prevent entries in unordered map with same path */
 			}
 		std::shared_ptr<EngineTexture> texture = EngineTexture::createTextureFromFile(Singleton::engineDevice, texturePath, filter);
+		if (!texture) return;
 		SHARD3D_LOG("Loaded texture to asset map '{0}'", texturePath);
 		textureAssets[texturePath] = texture;
 	}

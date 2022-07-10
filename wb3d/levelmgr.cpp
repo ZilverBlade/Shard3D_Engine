@@ -9,7 +9,7 @@
 namespace Shard3D {
 	namespace wb3d {
 		LevelManager::LevelManager(const std::shared_ptr<Level>& level) : mLevel(level) { 
-			LOGGER::getInfoLogger()->info("Loading Level Manager");
+			SHARD3D_INFO("Loading Level Manager");
 		}
 
 		std::string LevelManager::encrypt(std::string input) {

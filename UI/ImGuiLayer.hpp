@@ -19,7 +19,7 @@ namespace Shard3D {
 
 		void attach(VkRenderPass renderPass) override;
 		void detach() override;
-		void update(VkCommandBuffer buffer, float dt) override;
+		void update(FrameInfo frameInfo) override;
 	private:
 		void renderMenuBar();
 		int width;

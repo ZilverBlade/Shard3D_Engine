@@ -18,7 +18,7 @@ namespace Shard3D {
 	}
 	void LOGGER::logFatal(const std::string& message) {
 		errorLogger->critical(message.c_str());
-		MessageDialogs::show(message.c_str(), "Shard3D CORE FATAL", MessageDialogs::OPTABORTRETRYIGNORE);
+		MessageDialogs::show(message.c_str(), "Shard3D CORE FATAL", MessageDialogs::OPTABORTRETRYIGNORE | MessageDialogs::OPTICONERROR);
 		throw std::error_code();
 	}
 }

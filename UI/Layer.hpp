@@ -4,7 +4,7 @@
 #include "../utils/definitions.hpp"
 
 #include "../wb3d/level.hpp"
-
+#include "../frame_info.hpp"
 namespace Shard3D {
 	class Layer {
 	public:
@@ -15,7 +15,7 @@ namespace Shard3D {
 
 		virtual void detach();
 
-		virtual void update(VkCommandBuffer buffer, float dt);
+		virtual void update(FrameInfo frameInfo);
 
 	private:
 

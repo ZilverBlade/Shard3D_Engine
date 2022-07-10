@@ -51,7 +51,7 @@ namespace Shard3D {
 		std::ifstream file{ filePath, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
-			SHARD3D_FATAL("failed to open file: " + filePath);
+			SHARD3D_FATAL("failed to read shader: " + filePath);
 		}
 
 		size_t fileSize = static_cast<size_t>(file.tellg());

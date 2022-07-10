@@ -11,6 +11,6 @@ namespace Shard3D {
 
 	void Layer::detach(){}
 
-	void Layer::update(VkCommandBuffer buffer, float dt) {}
+	void Layer::update(FrameInfo frameInfo) {}
 
 }

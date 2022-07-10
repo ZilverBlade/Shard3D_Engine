@@ -39,7 +39,6 @@ const static std::string EDITOR_VERSION = "1.1.r1-alpha";	// WorldEditor3D {majo
 #endif
 #define ENSET_BETA_DEBUG_TOOLS		true
 
-
 // experimentals
 #define ENSET_USE_PBR								false	// PBR can look better, but it's experimental as of now and it's significantly slower and buggier;
 #define ENSET_ENABLE_COMPUTE_SHADERS				false	// Compute shaders can be very useful, however as of now they have not been fully implemented, only enable for development
@@ -48,8 +47,6 @@ const static std::string EDITOR_VERSION = "1.1.r1-alpha";	// WorldEditor3D {majo
 #endif
 
 // engine settings
-
-
 #define ENSET_WINDOW_ICON_PATH			"shardwinico.png"
 
 #define ENSET_WB3DLEVEL_CIPHER_KEY			128	// for level encyption and decryption for release ready games, MUST BE A MULTIPLE OF 2!!
