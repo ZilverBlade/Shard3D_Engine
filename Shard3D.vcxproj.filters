@@ -254,12 +254,6 @@
     <ClCompile Include="systems\physics_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\script_link.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="systems\particle_system.cpp">
-      <Filter>Source Files\systems</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -515,10 +509,10 @@
     <None Include="shaders\test.comp">
       <Filter>shaders\compute</Filter>
     </None>
-    <None Include="shaders\billboard_sva.vert">
+    <None Include="shaders\billboard_axial.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="shaders\billboard_sva.frag">
+    <None Include="shaders\billboard_axial.frag">
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="shaders\_editor\editor_svabill.vert">
@@ -532,18 +526,6 @@
     </None>
     <None Include="shaders\_editor\grid.frag">
       <Filter>shaders\fragment\editor</Filter>
-    </None>
-    <None Include="shaders\gui_element.vert">
-      <Filter>shaders\vertex</Filter>
-    </None>
-    <None Include="shaders\gui_element.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="shaders\_output_img.vert">
-      <Filter>shaders\vertex</Filter>
-    </None>
-    <None Include="shaders\_output_img.frag">
-      <Filter>shaders\fragment</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
