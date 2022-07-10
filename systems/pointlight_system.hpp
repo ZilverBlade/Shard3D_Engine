@@ -22,7 +22,7 @@ namespace Shard3D {
 		PointlightSystem& operator=(const PointlightSystem&) = delete;
 
 		void update(FrameInfo& frameInfo, GlobalUbo &ubo, std::shared_ptr<wb3d::Level>& level);
-		void bindbegin(FrameInfo& frameInfo);
+
 		void render(FrameInfo &frameInfo, std::shared_ptr<wb3d::Level>& level);
 
 	private:

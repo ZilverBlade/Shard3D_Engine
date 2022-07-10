@@ -192,7 +192,7 @@ namespace Shard3D {
 			Singleton::viewportImage = ImGui_ImplVulkan_AddTexture(Singleton::mainOffScreen.getSampler(), Singleton::mainOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 #if ENSET_ALLOW_PREVIEW_CAMERA
 			Singleton::previewViewportImage = ImGui_ImplVulkan_AddTexture(Singleton::previewCamOffScreen.getSampler(), Singleton::previewCamOffScreen.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-#endif // !_DEPLOY
+#endif
 		}
 	};
 }

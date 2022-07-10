@@ -76,6 +76,15 @@ namespace Shard3D {
 				out << YAML::EndMap;
 			}
 
+			// BILLBOARD
+			if (actor.hasComponent<Components::BillboardComponent>()) {
+				out << YAML::Key << "BillboardComponent";
+				out << YAML::BeginMap;
+				out << YAML::Key << "TexPath" << YAML::Value << actor.getComponent<Components::BillboardComponent>().file;
+				out << YAML::Key << "BillboardOrientation" << YAML::Value << (int)actor.getComponent<Components::BillboardComponent>().orientation;
+				out << YAML::EndMap;
+			}
+
 			// MODEL
 			if (actor.hasComponent<Components::MeshComponent>()) {
 				out << YAML::Key << "MeshComponent";
@@ -214,7 +223,13 @@ namespace Shard3D {
 						loadedActor.getComponent<Components::CameraComponent>().farClip = actor["CameraComponent"]["FarClipPlane"].as<float>();
 						loadedActor.getComponent<Components::CameraComponent>().ar = actor["CameraComponent"]["AspectRatio"].as<float>();
 					}
-
+					if (actor["BillboardComponent"]) {
+						AssetManager::emplaceTexture(
+							actor["BillboardComponent"]["TexPath"].as<std::string>()						
+						);
+						loadedActor.addComponent<Components::BillboardComponent>(
+							actor["BillboardComponent"]["TexPath"].as<std::string>());
+					}
 					if (actor["MeshComponent"]) {
 						AssetManager::emplaceMesh(
 							actor["MeshComponent"]["MeshPath"].as<std::string>(),

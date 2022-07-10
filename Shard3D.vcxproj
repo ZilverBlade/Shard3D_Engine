@@ -293,6 +293,7 @@
     <ClCompile Include="GUID.cpp" />
     <ClCompile Include="offscreen.cpp" />
     <ClCompile Include="scripts\script_link.cpp" />
+    <ClCompile Include="systems\particle_system.cpp" />
     <ClCompile Include="systems\physics_system.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="s3dtpch.cpp">
@@ -482,6 +483,7 @@
     <ClInclude Include="events\key_events.hpp" />
     <ClInclude Include="graphics_settings.hpp" />
     <ClInclude Include="offscreen.hpp" />
+    <ClInclude Include="systems\particle_system.hpp" />
     <ClInclude Include="systems\physics_system.hpp" />
     <ClInclude Include="Project.hpp" />
     <ClInclude Include="s3dtpch.h" />
@@ -574,6 +576,8 @@
     <None Include="shaders\basic_shader.vert">
       <FileType>Document</FileType>
     </None>
+    <None Include="shaders\gui_element.frag" />
+    <None Include="shaders\gui_element.vert" />
     <None Include="shaders\_editor\editor_svabill.frag" />
     <None Include="shaders\_editor\editor_svabill.vert" />
     <None Include="shaders\_editor\grid.frag" />
@@ -585,6 +589,8 @@
     <None Include="shaders\spotlight.frag" />
     <None Include="shaders\spotlight.vert" />
     <None Include="shaders\test.comp" />
+    <None Include="shaders\_output_img.frag" />
+    <None Include="shaders\_output_img.vert" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -13,6 +13,7 @@
 #include <Physics/Body/Body.h>
 #include <Physics/Collision/Shape/Shape.h>
 
+#include "systems/particle_system.hpp"
 namespace Shard3D {
 	namespace wb3d {
 		class Blueprint;
@@ -142,7 +143,10 @@ namespace Shard3D {
 			float lightIntensity = 1.0f;
 			float specularMod = 1.0f;
 		};
-
+		struct ParticleComponent {
+			ParticleProperties particleTemplate;
+			uint16_t maxParticles;
+		};
 		struct RigidbodyComponent {
 			enum class PhysicsState {
 				NONE = 0,

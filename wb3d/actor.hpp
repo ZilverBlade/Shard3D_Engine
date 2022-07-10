@@ -21,21 +21,24 @@ namespace Shard3D {
 
 			template<typename T, typename... Args>
 			T& addComponent(Args&&... args) {
+#if !ENSET_CONFIDENT_COMPONENTS
 				if (hasComponent<T>()) {	// return getComponent if component exists
 					SHARD3D_ERROR("Actor {0} already has component {1}!", this->getGUID(), typeid(T).name());
 					return getComponent<T>();
 					//SHARD3D_FATAL("Tried to add component when component already is present!");
 				}
-				SHARD3D_LOG("Added component {0}", typeid(T).name());
+#endif
 				return eLevel->registry.emplace<T>(actorHandle, std::forward<Args>(args)...);
 			}
 
 			template<typename T>
 			T& getComponent() {
+#if !ENSET_CONFIDENT_COMPONENTS
 				if (!hasComponent<T>()) { // is error since it will very likely cause a crash
 					SHARD3D_ERROR("Actor {0} does not have component '{1}'!", this->getGUID(), typeid(T).name());
 					SHARD3D_FATAL("Tried to get a component that does not exist!");
 				}
+#endif
 				return eLevel->registry.get<T>(actorHandle);
 			}
 
@@ -46,7 +49,7 @@ namespace Shard3D {
 
 			template<typename T>
 			void killComponent() { // is warn since it has the chance of not causing a crash or undefined behaviour
-				if (!hasComponent<T>()) {
+				if (!hasComponent<T>()) { // no #if !ENSET_CONFIDENT_COMPONENTS because this error is negligible;
 					SHARD3D_WARN("Actor {0} does not have component '{1}'!", this->getGUID(), typeid(T).name());
 					return;
 				}
