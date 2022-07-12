@@ -6,7 +6,7 @@
 #include "wb3d/level.hpp"
 #include "offscreen.hpp"
 #include "graphics_settings.hpp"
-
+#include "audio.hpp"
 namespace Shard3D {
 	// ignore
 	class Initializer {
@@ -14,6 +14,7 @@ namespace Shard3D {
 		friend class Singleton;
 		Initializer() {
 			LOGGER::init();
+			EngineAudio::init();
 			GraphicsSettings::init(nullptr);
 		}
 	};
@@ -57,7 +58,7 @@ namespace Shard3D {
 #ifndef _DEPLOY
 		inline static PreviewModes editorPreviewSettings;
 #endif
-
+		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
 		Destructor _ignore_destroy;
 	};
 }

@@ -1,6 +1,6 @@
 #version 450
 
-layout(location = 0) in vec3 fragColour;
+layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 fragPosWorld;
 layout(location = 2) in vec3 fragNormalWorld;
 
@@ -40,6 +40,8 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 	int numPointlights;
 	int numSpotlights;
 	int numDirectionalLights;
+
+    vec3 materialSettings;
 } ubo;
 
 layout(push_constant) uniform Push {
@@ -48,9 +50,6 @@ layout(push_constant) uniform Push {
 } push;
 
 float PI = 3.1415926;
-
-float roughness = 0.2;
-float metallic = 0.3;
 
 vec3 F0 = vec3(0.0); // base reflectiveness
 
@@ -84,13 +83,13 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 // ----------------------------------------------------------------------------
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
+    //float r = (roughness + 1.0);
+    float k = (roughness*roughness) / 2;
 
     float nom   = NdotV;
     float denom = NdotV * (1.0 - k) + k;
 
-    return nom / denom;
+    return nom / denom + 0.01;
 }
 // ----------------------------------------------------------------------------
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
@@ -121,10 +120,9 @@ void main(){
 
 	vec3 cameraPosWorld = ubo.invView[3].xyz;
 	vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
-    vec3 fragColor = fragColour;
 	vec3 N = fragNormalWorld;
 
-    F0 = mix(F0, fragColor, metallic);
+    F0 = mix(F0, fragColor, ubo.materialSettings.z);
 
 
      vec3 V = normalize(cameraPosWorld - fragPosWorld);
@@ -140,24 +138,20 @@ void main(){
         vec3 radiance = light.color.xyz * light.color.w * attenuation;
 
         // Cook-Torrance BRDF
-        float NDF = DistributionGGX(N, H, roughness);
-        float G   = GeometrySmith(N, V, L, roughness);
-        vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+        float NDF = DistributionGGX(N, H, clamp(ubo.materialSettings.y, 0.05, 1.0));
+        float G   = GeometrySmith(N, V, L, clamp(ubo.materialSettings.y, 0.05, 1.0));
+        vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
 
         vec3 numerator    = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
-        specular = numerator / denominator;
+        float denominator = 3.7 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+        specular = (numerator / denominator) * ubo.materialSettings.x;
 
         // kS is equal to Fresnel
-        vec3 kS = F;
-        // for energy conservation, the diffuse and specular light can't
-        // be above 1.0 (unless the surface emits light); to preserve this
-        // relationship the diffuse component (kD) should equal 1.0 - kS.
-        vec3 kD = vec3(1.0) - kS;
-        // multiply kD by the inverse metalness such that only non-metals
-        // have diffuse lighting, or a linear blend if partly metal (pure metals
-        // have no diffuse light).
-        kD *= 1.0 - metallic;
+       // vec3 kS = F;
+
+        vec3 kD = vec3(1.0);// - kS;
+       
+        kD *= 1.0 - ubo.materialSettings.z;
 
         // scale light by NdotL
         float NdotL = max(dot(N, L), 0.0);
@@ -166,7 +160,48 @@ void main(){
         Lo += (kD * fragColor / PI + specular) * radiance * NdotL * 100;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
 
-		// multiply fragColor by specular only if material is metallic
-	outColor = vec4(vec3(ubo.ambientLightColor.xyz + Lo) * ubo.ambientLightColor.w, 1.0); //RGBA
-	//outColor = vec4(diffuseLight * fragColor + specularLight, 1.0); //RGBA
+    for (int i = 0; i < ubo.numSpotlights; i++) {
+        Spotlight light = ubo.spotlights[i];
+        
+        
+        vec3 L = normalize(light.position.xyz - fragPosWorld);
+		float theta = dot(L, normalize(-light.direction.xyz));
+		
+		if(theta > sin(light.angle.x)) { 
+            float epsilon  = light.angle.y - light.angle.x;
+		    float intensity = clamp((theta - light.angle.x) / epsilon, 0.0, 1.0); 
+
+            vec3 H = normalize(V + L);
+            float distance = length(light.position.xyz - fragPosWorld);
+            float attenuation = 1.0 / (distance * distance);
+            vec3 radiance = light.color.xyz * light.color.w * attenuation;
+
+            // Cook-Torrance BRDF
+            float NDF = DistributionGGX(N, H, clamp(ubo.materialSettings.y, 0.05, 1.0));
+            float G   = GeometrySmith(N, V, L, clamp(ubo.materialSettings.y, 0.05, 1.0));
+            vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
+
+            vec3 numerator    = NDF * G * F;
+            float denominator = 3.75 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+            specular = (numerator / denominator) * ubo.materialSettings.x;
+
+            // kS is equal to Fresnel
+            // vec3 kS = F;
+
+            vec3 kD = vec3(1.0);// - kS;
+       
+            kD *= 1.0 - ubo.materialSettings.z;
+
+            // scale light by NdotL
+            float NdotL = max(dot(N, L), 0.0);
+
+            // add to outgoing radiance Lo
+            Lo += (kD * fragColor / PI + specular) * radiance * NdotL * 100 * intensity;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        }
+    }
+    
+	vec3 fogColor =  vec3(0.029f, 0.027f, 0.059f);
+	    outColor = vec4(mix((ubo.ambientLightColor.xyz + Lo) 
+        * ubo.ambientLightColor.w, fogColor, getFogFactor(distance(cameraPosWorld, fragPosWorld))), 
+        1.0); //RGBA
 }

@@ -5,8 +5,6 @@
 #include "../utils/definitions.hpp"
 #include "../camera.hpp"
 
-
-
 namespace Shard3D {
 	class EditorApp;
 	namespace wb3d {
@@ -41,6 +39,10 @@ namespace Shard3D {
 
 			void runGarbageCollector(VkDevice device);
 
+			Actor getActorFromGUID(GUID guid);
+			// Unreliable function as multiple actors can have identical tags, use getActorFromGUID() whenever possible.
+			Actor getActorFromTag(const std::string& tag);
+
 			void setPossessedCameraActor(Actor actor);
 			void setPossessedCameraActor(GUID guid);
 			Actor getPossessedCameraActor();
@@ -60,13 +62,18 @@ namespace Shard3D {
 */
 			void end();
 
+			void simulationStateCallback();
+
 			PlayState simulationState = PlayState::Stopped;
+
+			bool wasPaused;
 
 			entt::registry registry;
 			std::string name = "Some kind of level";
 			std::string currentpath;
 		protected:
 			GUID possessedCameraActorGUID;
+			GUID _possessedCameraActorGUID;
 #if ENSET_ALLOW_PREVIEW_CAMERA // ONLY FOR DEBUGGING PURPOSES
 			GUID possessedPreviewCameraActorGUID;
 #endif  

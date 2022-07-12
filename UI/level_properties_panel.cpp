@@ -243,6 +243,34 @@ namespace Shard3D {
 			}
 			if (killComponent) context->killTexture(actor);
 		}
+		if (actor.hasComponent<Components::AudioComponent>()) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::AudioComponent).hash_code(), nodeFlags, "Audio");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
+				auto& rfile = actor.getComponent<Components::AudioComponent>().file;
+				char fileBuffer[256];
+				memset(fileBuffer, 0, 256);
+				strncpy(fileBuffer, rfile.c_str(), 256);
+				if (ImGui::InputText("Audio File", fileBuffer, 256)) {
+					rfile = std::string(fileBuffer);
+				}
+				if (ImGui::TreeNode("Audio Properties")) {
+					ImGui::DragFloat("Volume", &actor.getComponent<Components::AudioComponent>().properties.volume, 0.01f, 0.f, 10.f);
+					ImGui::DragFloat("Pitch", &actor.getComponent<Components::AudioComponent>().properties.pitch, 0.01f, 0.f, 2.f);
+					ImGui::TreePop();
+				}
+				ImGui::TreePop();
+			}
+			if (killComponent) context->killMesh(actor);
+		}
 		if (actor.hasComponent<Components::CameraComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::CameraComponent).hash_code(), nodeFlags, "Camera");
 			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
@@ -292,10 +320,11 @@ namespace Shard3D {
 				ImGui::DragFloat("Intensity", &actor.getComponent<Components::PointlightComponent>().lightIntensity, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Radius", &actor.getComponent<Components::PointlightComponent>().radius, 0.01f, 0.f, 100.f);
 				ImGui::DragFloat("Specular", &actor.getComponent<Components::PointlightComponent>().specularMod, 0.001f, 0.f, 1.f);
-				if (ImGui::CollapsingHeader("Attenuation CLQ")) {
+				if (ImGui::TreeNode("Attenuation")) {
 					ImGui::DragFloat("Constant", &actor.getComponent<Components::PointlightComponent>().attenuationMod.x, 0.005f);
 					ImGui::DragFloat("Linear", &actor.getComponent<Components::PointlightComponent>().attenuationMod.y, 0.005f);
 					ImGui::DragFloat("Quadratic", &actor.getComponent<Components::PointlightComponent>().attenuationMod.z, 0.005f);
+					ImGui::TreePop();
 				}
 				ImGui::TreePop();
 			}
@@ -360,7 +389,7 @@ namespace Shard3D {
 				ImGui::EndPopup();
 			}
 			if (open) {
-				ImGui::Text(typeid(&actor.getComponent<Components::CppScriptComponent>().Inst).name());
+				ImGui::Text(std::to_string(reinterpret_cast<uint64_t>(actor.getComponent<Components::CppScriptComponent>().InstScript)).c_str());
 				ImGui::TreePop();
 			}
 			if (killComponent) actor.killComponent<Components::CppScriptComponent>();

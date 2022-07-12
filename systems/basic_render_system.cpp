@@ -47,21 +47,24 @@ namespace Shard3D {
 		EnginePipeline::enableVertexDescriptions(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-#if ENSET_USE_PBR
-		enginePipeline = std::make_unique<EnginePipeline>(
-			engineDevice,
-			"assets/shaders/pbr_shader.vert.spv",
-			"assets/shaders/pbr_shader.frag.spv",
-			pipelineConfig
-		);
-#else
-		enginePipeline = std::make_unique<EnginePipeline>(
-			engineDevice,
-			"assets/shaders/basic_shader.vert.spv",
-			"assets/shaders/basic_shader.frag.spv",
-			pipelineConfig
-		);
-#endif
+
+		CSimpleIniA ini;
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+		ini.SetUnicode();
+		if (ini.GetBoolValue("RENDERING", "PBR"))
+			enginePipeline = std::make_unique<EnginePipeline>(
+				engineDevice,
+				"assets/shaders/pbr_shader.vert.spv",
+				"assets/shaders/pbr_shader.frag.spv",
+				pipelineConfig
+			);
+		else 
+			enginePipeline = std::make_unique<EnginePipeline>(
+				engineDevice,
+				"assets/shaders/basic_shader.vert.spv",
+				"assets/shaders/basic_shader.frag.spv",
+				pipelineConfig
+			);
 	}
 
 	void BasicRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level) {

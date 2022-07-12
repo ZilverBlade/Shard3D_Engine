@@ -5,19 +5,23 @@
 namespace Shard3D::CppScripts {
 	class ExampleCppScript : public wb3d::ActingActor {
 	public:
-		void beginEvent() override {}
-		void endEvent()	override  {}
+		void beginEvent() override {
+			std::cout << "Example script!\n";
+		}
+		void endEvent()	override  {
+			std::cout << "Example script ended!\n";
+		}
 
 		void tickEvent(float dt) override {
 			// float dt = frametime
 		}
 
 		void spawnEvent() override {
-			std::cout << "Example script!\n";			
+					
 		}
 		
 		void killEvent() override {
-			std::cout << "Example script ended!\n";
+		
 		}
 	};
 }

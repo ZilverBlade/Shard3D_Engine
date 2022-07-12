@@ -118,7 +118,7 @@ void Shard3D::_special_assets::_editor_icons_load() {
 	}
 }
 
-void Shard3D::_special_assets::_editor_icons_destroy()
-{
+void Shard3D::_special_assets::_editor_icons_destroy() {
+	_editor_icons.clear();
 }
 #pragma endregion

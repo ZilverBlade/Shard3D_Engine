@@ -22,11 +22,11 @@ namespace Shard3D {
  */
 			virtual void endEvent() {}
 /**
-  Gets called upon creation of the actor
+  (unused) Gets called upon creation of the actor
  */
 			virtual void spawnEvent() {}
 /**
-  Gets called upon destruction of the actor
+  (unused) Gets called upon destruction of the actor
  */
 			virtual void killEvent() {}
 		

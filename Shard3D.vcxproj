@@ -117,6 +117,7 @@
       <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,7 +166,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -213,7 +214,7 @@
       <Optimization>Disabled</Optimization>
       <SupportJustMyCode>true</SupportJustMyCode>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -257,7 +258,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -286,6 +287,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="audio.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="engine_logger.cpp" />
@@ -477,6 +479,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="audio.hpp" />
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="cheat_codes.hpp" />
     <ClInclude Include="descriptor_pools.hpp" />
@@ -608,6 +611,7 @@
     <Image Include="shard3d_engine.png" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="changelogs.txt" />
     <Text Include="credits.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

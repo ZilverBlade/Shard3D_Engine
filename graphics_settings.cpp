@@ -14,9 +14,9 @@ namespace Shard3D {
 
 		engineWindow = window;
 		ini.LoadFile(GAME_SETTINGS_PATH);
-		get();
+		read();
 	}
-	GraphicsSettings::Settings GraphicsSettings::get() {
+	void GraphicsSettings::read() {
 		if ((std::string)ini.GetValue("WINDOW", "WINDOW_TYPE") == "Borderless")
 			graphics.WindowType = Borderless;
 		else if ((std::string)ini.GetValue("WINDOW", "WINDOW_TYPE") == "Fullscreen")
@@ -25,22 +25,23 @@ namespace Shard3D {
 			graphics.WindowType = Windowed;
 		graphics.WindowWidth = ini.GetLongValue("WINDOW", "WIDTH");
 		graphics.WindowHeight = ini.GetLongValue("WINDOW", "HEIGHT");
-
+	
 		graphics.VSync = ini.GetBoolValue("DISPLAY", "V-Sync");
-
+	
 		graphics.maxAnisotropy = ini.GetBoolValue("TEXTURES", "maxAnisotropy");
 		if (graphics.maxAnisotropy < 1 || graphics.maxAnisotropy > 16)
 			SHARD3D_FATAL("maxAnisotropy read is invalid!!");
-
+	
 		graphics.FramerateCap = ini.GetLongValue("GRAPHICS", "FramerateCap");
 		graphics.MSAASamples = ini.GetLongValue("GRAPHICS", "MSAASamples");
-		if (graphics.MSAASamples < 1) 
+		if (graphics.MSAASamples < 1)
 			SHARD3D_FATAL("MSAASamples read is invalid!!");
-
+	
 		graphics.LODCoef = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "LODCoef");
 		graphics.ShadowQuality = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "ShadowQuality");
 		graphics.ReflectionQuality = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "ReflectionQuality");
-
+	}
+	GraphicsSettings::Settings& GraphicsSettings::get() {
 		return graphics;
 	}
 	void GraphicsSettings::set(Settings sets) {

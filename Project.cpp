@@ -71,9 +71,9 @@ namespace Shard3D {
 		DirectionalLightSystem directionalLightSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		SHARD3D_INFO("Loading editor camera actor");
-		wb3d::Actor cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
-		cameraActor.addComponent<Components::CameraComponent>();
-		activeLevel->setPossessedCameraActor(cameraActor); // need default camera actor to prevent the engine dying
+		wb3d::Actor editor_cameraActor = activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
+		editor_cameraActor.addComponent<Components::CameraComponent>();
+		activeLevel->setPossessedCameraActor(editor_cameraActor); // need default camera actor to prevent the engine dying
 
 		loadGameObjects();
 
@@ -104,11 +104,11 @@ namespace Shard3D {
 			);
 
 			if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
-				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
+				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Perspective;
 				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 			}
 			else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
-				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
+				possessedCameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
 				possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 			}
 

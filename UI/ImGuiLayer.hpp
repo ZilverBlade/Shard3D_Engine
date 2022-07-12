@@ -49,6 +49,7 @@ namespace Shard3D {
 			float FarClipDistance{};
 			float FOV{};
 			float defaultBGColor[3] = {0.f, 0.f, 0.f};
+			bool pbr{};
 		};
 		struct EditorPreferences {
 			// WINDOW

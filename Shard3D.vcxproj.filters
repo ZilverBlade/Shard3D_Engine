@@ -272,6 +272,9 @@
     <ClCompile Include="UI\GUILayer.cpp">
       <Filter>Source Files\UI\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="audio.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -499,6 +502,9 @@
     <ClInclude Include="UI\GUILayer.hpp">
       <Filter>Header Files\UI\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="audio.hpp">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
@@ -591,5 +597,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="credits.txt" />
+    <Text Include="changelogs.txt" />
   </ItemGroup>
 </Project>

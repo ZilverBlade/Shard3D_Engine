@@ -6,6 +6,7 @@
 #include <imgui.h>
 #include "../wb3d/assetmgr.hpp"
 #include "../singleton.hpp"
+#include "../wb3d/actor.hpp"
 namespace Shard3D {
 
 	LevelPeekingPanel::LevelPeekingPanel(const std::shared_ptr<Level>& levelContext) {
@@ -49,8 +50,9 @@ namespace Shard3D {
 		ImGui::Begin("Actor Inspector");
 		Singleton::activeLevel->registry.each([&](auto actorGUID) {
 			wb3d::Actor actor{ actorGUID, Singleton::activeLevel.get() };
-			
-			std::string text = actor.getTag() + " (" + std::to_string((uint64_t)actor.getGUID()) + ")";
+
+			std::string text = actor.getTag() + " (" + std::to_string((uint64_t)actor.getGUID()) + ")" 
+				+ " handle (" + std::to_string((uint32_t)actor.actorHandle) + ")";
 			if (actor.isInvalid())
 				ImGui::TextColored({1.f, 0.f, 1.f, 1.f}, text.c_str());
 			else

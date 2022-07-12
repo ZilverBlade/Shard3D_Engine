@@ -11,6 +11,7 @@
 
 namespace Shard3D {
 	namespace wb3d {
+		class LevelPeekingPanel;
 		class Actor {
 
 		public:
@@ -79,8 +80,9 @@ namespace Shard3D {
 			bool operator!=(const Actor& other) const {
 				return !(*this == other);
 			}
+			entt::entity actorHandle{ entt::null };
 		private:
-			entt::entity actorHandle{entt::null};
+
 			Level *eLevel = nullptr; // 8 bytes (use it as much as needed)
 
 			friend class Level;

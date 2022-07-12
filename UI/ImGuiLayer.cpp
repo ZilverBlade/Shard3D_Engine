@@ -15,7 +15,7 @@
 #include "../wb3d/master_manager.hpp"
 #include "../texture.hpp"
 
-
+#include "../audio.hpp"
 #include "../utils/dialogs.h"
 #include "../video/video_decode.hpp"
 #include "../systems/material_system.hpp"
@@ -56,12 +56,12 @@ namespace Shard3D {
         enset.defaultBGColor[0] = ini.GetDoubleValue("RENDERING", "DefaultBGColorR");
         enset.defaultBGColor[1] = ini.GetDoubleValue("RENDERING", "DefaultBGColorG");
         enset.defaultBGColor[2] = ini.GetDoubleValue("RENDERING", "DefaultBGColorB");
+        enset.pbr = ini.GetBoolValue("RENDERING", "PBR");
     }
 
     void ImGuiLayer::detach() {
         // check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
         if (hasBeenDetached) return;
-        SHARD3D_LOG((void*)ImGuiInitter::imGuiDescriptorPool);
         vkDestroyDescriptorPool(Singleton::engineDevice.device(), ImGuiInitter::imGuiDescriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
@@ -152,33 +152,37 @@ namespace Shard3D {
 
         if (showTest) {
             ImGui::Begin("Material editor");
-            ax::NodeEditor::Begin("Matedit BP");
-            int uniqueId = 1;
+            ImGui::DragFloat("Specular", &Singleton::testPBR.x, 0.01f, 0.f, 2.f);
+            ImGui::DragFloat("Roughness", &Singleton::testPBR.y, 0.01f, 0.f, 1.f);
+            ImGui::DragFloat("Metallic", &Singleton::testPBR.z, 0.01f, 0.f, 1.f);
 
-            // Start drawing nodes.
-            ax::NodeEditor::BeginNode(uniqueId++);
-            ImGui::Text("Material");
-            ax::NodeEditor::PinPivotSize(ImVec2(8, 8));
-            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
-            ImGui::Text("Diffuse");
-            ax::NodeEditor::EndPin();
-
-            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
-            ImGui::Text("Specular");
-            ax::NodeEditor::EndPin();
-            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
-            ImGui::Text("Roughness");
-            ax::NodeEditor::EndPin();
-            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
-            ImGui::Text("Metalcy");
-            ax::NodeEditor::EndPin();
-            ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
-            ImGui::Text("Reflectiveness");
-            ax::NodeEditor::EndPin();
-
-            ImGui::SameLine();
-            ax::NodeEditor::EndNode();
-            ax::NodeEditor::End();
+            //ax::NodeEditor::Begin("Matedit BP");
+            //int uniqueId = 1;
+            //
+            //// Start drawing nodes.
+            //ax::NodeEditor::BeginNode(uniqueId++);
+            //ImGui::Text("Material");
+            //ax::NodeEditor::PinPivotSize(ImVec2(8, 8));
+            //ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            //ImGui::Text("Diffuse");
+            //ax::NodeEditor::EndPin();
+            //
+            //ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            //ImGui::Text("Specular");
+            //ax::NodeEditor::EndPin();
+            //ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            //ImGui::Text("Roughness");
+            //ax::NodeEditor::EndPin();
+            //ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            //ImGui::Text("Metalcy");
+            //ax::NodeEditor::EndPin();
+            //ax::NodeEditor::BeginPin(uniqueId++, ax::NodeEditor::PinKind::Input);
+            //ImGui::Text("Reflectiveness");
+            //ax::NodeEditor::EndPin();
+            //
+            //ImGui::SameLine();
+            //ax::NodeEditor::EndNode();
+            //ax::NodeEditor::End();
             ImGui::End();
         }
 
@@ -186,7 +190,7 @@ namespace Shard3D {
             ImGui::Begin("Stats");
             timeSinceLastSecond += frameInfo.frameTime;
             if (timeSinceLastSecond > 1.f) { deltaTimeFromLastSecond = frameInfo.frameTime; timeSinceLastSecond = 0; }
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", deltaTimeFromLastSecond * 1000, 1 / deltaTimeFromLastSecond);
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", deltaTimeFromLastSecond * 1000.f, 1.f / deltaTimeFromLastSecond);
             if (ImGui::CollapsingHeader("style editor")) {
                 ImGui::ShowStyleEditor();
             }
@@ -207,7 +211,8 @@ namespace Shard3D {
                 ImGui::SliderFloat("Near clip distance", &enset.NearClipDistance, 0.000000001, 2);
                 ImGui::SliderFloat("Far clip distance", &enset.FarClipDistance, 16, 32767);
                 ImGui::SliderFloat("FOV", &enset.FOV, 10, 180);
-                ImGui::ColorPicker3("Default world background colour", enset.defaultBGColor, edpref.displayFloatOr255);
+                ImGui::ColorPicker3("Background colour", enset.defaultBGColor, edpref.displayFloatOr255);
+                ImGui::Checkbox("Advanced materials (PBR)", &enset.pbr);
             }
             /*
             if (ImGui::CollapsingHeader("Engine Limits", ImGuiTreeNodeFlags_None)) {
@@ -218,13 +223,13 @@ namespace Shard3D {
             }
             */
             if (ImGui::CollapsingHeader("Misc", ImGuiTreeNodeFlags_None)) {
-                if (ImGui::CollapsingHeader("Logging", ImGuiTreeNodeFlags_None)) {
-                    ImGui::Checkbox("log.ModelLoadInfo", nullptr);
-                }
-                if (ImGui::CollapsingHeader("Warnings", ImGuiTreeNodeFlags_None)) {
-                    ImGui::Checkbox("warn.NotInverseSquareAttenuation", nullptr);
-                    ImGui::Checkbox("warn.InvertedSpotlightAngle ", nullptr);
-                }
+               // if (ImGui::CollapsingHeader("Logging", ImGuiTreeNodeFlags_None)) {
+               //     ImGui::Checkbox("log.ModelLoadInfo", nullptr);
+               // }
+               // if (ImGui::CollapsingHeader("Warnings", ImGuiTreeNodeFlags_None)) {
+               //     ImGui::Checkbox("warn.NotInverseSquareAttenuation", nullptr);
+               //     ImGui::Checkbox("warn.InvertedSpotlightAngle ", nullptr);
+               // }
             }
 
             if (ImGui::Button("Save Changes")) {
@@ -242,6 +247,7 @@ namespace Shard3D {
                     ini.SetDoubleValue("RENDERING", "DefaultBGColorR", enset.defaultBGColor[0]);
                     ini.SetDoubleValue("RENDERING", "DefaultBGColorG", enset.defaultBGColor[1]);
                     ini.SetDoubleValue("RENDERING", "DefaultBGColorB", enset.defaultBGColor[2]);
+                    ini.SetBoolValue("RENDERING", "PBR", enset.pbr);
 
                     ini.SaveFile(ENGINE_SETTINGS_PATH);
                     SHARD3D_INFO("Saved engine settings succesfully");
@@ -253,6 +259,68 @@ namespace Shard3D {
             if (ImGui::Button("Revert Changes")) {}
             ImGui::End();
         }
+        if (showGraphicsSettingsWindow) {
+            ImGui::Begin("Graphics Settings", &showGraphicsSettingsWindow);
+            if (ImGui::CollapsingHeader("settings", ImGuiTreeNodeFlags_None)) {
+               if(ImGui::Checkbox("V-Sync", &GraphicsSettings::get().VSync)) ;
+                ImGui::DragInt("Antisotropic Filtering", &GraphicsSettings::get().maxAnisotropy, 0.08f, 1, 16);
+               //ImGui::Combo("Window name", (int*)GraphicsSettings::get().LODCoef, "Poor\0Low\0Medium\0High\0\0Cinematic");
+            }
+            //if (ImGui::CollapsingHeader("Rendering", ImGuiTreeNodeFlags_None)) {
+            //    ImGui::Combo("View", &enset.ViewCombo, "Perspective\0Orthographic");
+            //
+            //    ImGui::SliderFloat("Near clip distance", &enset.NearClipDistance, 0.003f, 2.f);
+            //    ImGui::SliderFloat("Far clip distance", &enset.FarClipDistance, 16.f, 32767.f);
+            //    ImGui::SliderFloat("FOV", &enset.FOV, 10, 180);
+            //    ImGui::ColorPicker3("Background colour", enset.defaultBGColor, edpref.displayFloatOr255);
+            //    ImGui::Checkbox("Advanced materials (PBR)", &enset.pbr);
+            //}
+            /*
+            if (ImGui::CollapsingHeader("Engine Limits", ImGuiTreeNodeFlags_None)) {
+                ImGui::SliderInt("MaxPointlights", nullptr, 1, 50);
+                ImGui::SliderInt("MaxSpotlights", nullptr, 1, 50);
+                ImGui::SliderInt("MaxDirectionalLights", nullptr, 1, 10);
+                ImGui::SliderInt("MaxFramesInFlight", nullptr, 1, 16);
+            }
+            */
+           // if (ImGui::CollapsingHeader("Misc", ImGuiTreeNodeFlags_None)) {
+                // if (ImGui::CollapsingHeader("Logging", ImGuiTreeNodeFlags_None)) {
+                //     ImGui::Checkbox("log.ModelLoadInfo", nullptr);
+                // }
+                // if (ImGui::CollapsingHeader("Warnings", ImGuiTreeNodeFlags_None)) {
+                //     ImGui::Checkbox("warn.NotInverseSquareAttenuation", nullptr);
+                //     ImGui::Checkbox("warn.InvertedSpotlightAngle ", nullptr);
+                // }
+            //}
+
+           // if (ImGui::Button("Save Changes")) {
+           //     if (ini.GetSection("DEFAULT") != nullptr) {
+           //         ini.SetLongValue("WINDOW", "DEFAULT_WIDTH", enset.DEFAULT_WIDTH);
+           //         ini.SetLongValue("WINDOW", "DEFAULT_HEIGHT", enset.DEFAULT_HEIGHT);
+           //         ini.SetBoolValue("WINDOW", "Resizable", enset.defaultBGColor[2]);
+           //         ini.SetValue("WINDOW", "WindowName", enset.WindowName);
+           //
+           //         if (enset.ViewCombo == 0) ini.SetValue("RENDERING", "View", "Perspective");
+           //         else if (enset.ViewCombo == 1) ini.SetValue("RENDERING", "View", "Orthographic");
+           //         ini.SetDoubleValue("RENDERING", "NearClipDistance", enset.NearClipDistance);
+           //         ini.SetDoubleValue("RENDERING", "FarClipDistance", enset.FarClipDistance);
+           //         ini.SetDoubleValue("RENDERING", "FOV", enset.FOV);
+           //         ini.SetDoubleValue("RENDERING", "DefaultBGColorR", enset.defaultBGColor[0]);
+           //         ini.SetDoubleValue("RENDERING", "DefaultBGColorG", enset.defaultBGColor[1]);
+           //         ini.SetDoubleValue("RENDERING", "DefaultBGColorB", enset.defaultBGColor[2]);
+           //         ini.SetBoolValue("RENDERING", "PBR", enset.pbr);
+           //
+           //         ini.SaveFile(ENGINE_SETTINGS_PATH);
+           //         SHARD3D_INFO("Saved engine settings succesfully");
+           //     }
+           //     else {
+           //         SHARD3D_ERROR("Failed to write to ini file");
+           //     }
+           // }
+           // if (ImGui::Button("Revert Changes")) {}
+            ImGui::End();
+        }
+
 
         ImGui::End();
         ImGui::Render();
@@ -322,6 +390,7 @@ namespace Shard3D {
                 if (Singleton::activeLevel->simulationState != PlayState::Paused) {
                     ImGui::BeginDisabled(Singleton::activeLevel->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
                         Singleton::activeLevel->simulationState = PlayState::Paused;
+                        Singleton::activeLevel->simulationStateCallback();
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused) | " + Singleton::activeLevel->name;
                         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
@@ -329,6 +398,7 @@ namespace Shard3D {
                 else {
                     ImGui::BeginDisabled(Singleton::activeLevel->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
                         Singleton::activeLevel->simulationState = PlayState::Simulating;
+                        Singleton::activeLevel->simulationStateCallback();
                         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING) | " + Singleton::activeLevel->name;
                         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
                     } ImGui::EndDisabled();
@@ -367,6 +437,8 @@ namespace Shard3D {
         if (ImGui::BeginMenu("Debug")) {
             ImGui::TextDisabled("Shard3D Debug menu");
             if (ImGui::MenuItem("Play test audio")) {
+                EngineAudio audio;
+                audio.play("assets/audiodata/thou-3.mp3");
             }
             if (ImGui::MenuItem("Play test video")) {
                 VideoPlaybackEngine::EngineH264Video videoEngine;

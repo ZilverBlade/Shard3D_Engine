@@ -9,9 +9,7 @@
 
 namespace Shard3D {
 	namespace wb3d {
-		Level::Level(const std::string &lvlName) : name(lvlName) {
-
-		}
+		Level::Level(const std::string &lvlName) : name(lvlName) {}
 		Level::~Level() {
 			SHARD3D_INFO("Destroying level");
 			registry.clear();
@@ -22,7 +20,6 @@ namespace Shard3D {
 			auto view = src.view<Component>();
 			for (auto e : view) {
 				GUID guid = src.get<Components::GUIDComponent>(e).id;
-
 				if (map.find(guid) == map.end()) SHARD3D_FATAL("enttMap.find(guid) == enttMap.end()");
 
 				entt::entity dstEnttID = map.at(guid);
@@ -51,13 +48,14 @@ namespace Shard3D {
 			copyComponent<Components::TransformComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::BillboardComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::MeshComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::AudioComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CameraComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::DirectionalLightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
-			newLvl->setPossessedCameraActor(other->getPossessedCameraActor());
+			newLvl->possessedCameraActorGUID = other->getPossessedCameraActor().getGUID();
 			
 			return newLvl;
 		}
@@ -85,7 +83,8 @@ namespace Shard3D {
 
 		Actor Level::createActorWithGUID(GUID guid, const std::string& name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
-			Actor actor = { registry.create(), this };
+			Actor actor;
+			actor = { registry.create(), this };
 			actor.addComponent<Components::GUIDComponent>(guid);
 			actor.addComponent<Components::TagComponent>().tag = name;
 #ifdef ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT
@@ -139,6 +138,28 @@ namespace Shard3D {
 				}
 				actorKillMeshQueue.clear();
 			}
+		}
+
+		Actor Level::getActorFromGUID(GUID guid) {
+			auto guidView = registry.view<Components::GUIDComponent>();
+			for (auto actor : guidView) {
+				if (guidView.get<Components::GUIDComponent>(actor).id == guid) {				
+					return Actor{ actor, this };
+				}
+			}
+			SHARD3D_ERROR("Failed to find actor with guid '" + std::to_string(guid) + "'!");
+			return Actor();
+		}
+
+		Actor Level::getActorFromTag(const std::string& tag) {
+			auto guidView = registry.view<Components::TagComponent>();
+			for (auto actor : guidView) {
+				if (guidView.get<Components::TagComponent>(actor).tag == tag) {
+					return Actor{ actor, this };
+				}
+			}
+			SHARD3D_ERROR("Failed to find actor '" + tag + "'!");
+			return Actor();
 		}
 
 		void Level::setPossessedCameraActor(Actor actor) {
@@ -195,16 +216,16 @@ namespace Shard3D {
 		 }
 #endif
 		void Level::begin() {
-			SHARD3D_LOG("Beginning simulation");
+			SHARD3D_INFO("Level: Initializing scripts");
 			simulationState = PlayState::Simulating;
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				if (!csc.Inst) {
 					csc.Inst = csc.InstScript();
 					csc.Inst->thisActor = Actor{ actor, this };
 					csc.Inst->beginEvent();
-					csc.Inst->spawnEvent();
 				}
 			});
+			SHARD3D_INFO("Beginning simulation");
 		}
 
 		void Level::tick(float dt) {
@@ -214,17 +235,39 @@ namespace Shard3D {
 					registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 					csc.Inst->tickEvent(dt);
 				});
+			}			
+		}
+
+		void Level::simulationStateCallback() {
+			if (simulationState == PlayState::Paused) {
+				_possessedCameraActorGUID = possessedCameraActorGUID;
+				setPossessedCameraActor(0);
+				auto audioView = registry.view<Components::AudioComponent>();
+				for (auto actor : audioView) {
+					audioView.get<Components::AudioComponent>(actor).pause();
+				}
+				wasPaused = true;
+				SHARD3D_LOG("LEVEL: PAUSED");
 			}
-			
+			if (simulationState == PlayState::Simulating || simulationState == PlayState::Playing) {
+				setPossessedCameraActor(_possessedCameraActorGUID);
+				auto audioView = registry.view<Components::AudioComponent>();
+				for (auto actor : audioView) {
+					audioView.get<Components::AudioComponent>(actor).resume();
+				}
+				wasPaused = false;
+				SHARD3D_LOG("Level: Resumed");
+			}
 		}
 
 		void Level::end() {
-			SHARD3D_LOG("Ending simulation");
+			SHARD3D_INFO("Ending Level Simulation");
 			simulationState = PlayState::Stopped;
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->endEvent();
 			});
-			SHARD3D_INFO("Reloading level");
+			setPossessedCameraActor(0);
+			SHARD3D_LOG("Reloading level");
 			loadRegistryCapture = true;
 		}
 

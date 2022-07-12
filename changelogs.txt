@@ -1,0 +1,72 @@
+ALPHA:
+	> Shard3D Torque 1.0.9-alpha
+		- Preliminary implementation of blueprints
+		- Preliminary implementation of material system
+		- Preliminary implementation of compute shaders
+		- Experimental implementation of video playback
+		- Added proper logging system
+	
+	> Shard3D Torque 1.1.0-alpha
+		- Preliminary implementation of textures
+		- Preliminary implementation of asset system
+		- Improved WIP compute system
+		- Improved vulkan logging, now shows severity!
+		- Added material system serializer
+		- Added changes to resources.rc to show proper name in Task manager!
+		- Replaced std::throw with SHARD3D_FATAL
+	
+	> Shard3D Torque 1.1.1-alpha
+		- Added "level peeking" to show behind the scenes working of stuff like asset manager, or actor registry.
+		- Added GraphicsSettings class to manage current graphics settings
+		- Added Project.cpp for Deploy 
+		- Added a c++ script file for tech demo
+		- Added offscreen render pass
+		- Added global variable types for commonly used types
+		- Added cheatcode system
+		- Deprecated custom AR ratio for cameras.
+	
+	> Shard3D Torque 1.1.2-alpha
+		- Added docking to ImGui
+		- Added mesh support to asset manager
+		- Added (broken) PCH file
+		- Added new component: Billboard component
+			- Screenview aligned
+		- Added texture support to asset manager
+		- Added features to level peeker
+		- Added Actor::getTransform()
+		- Experimental implementation preview camera
+	
+	> Shard3D Torque 1.1.3-alpha
+		- Restructured folder setup
+		- Deprecated wb3d_imgui_frame.cpp and editor console.
+		- Improved WIP compute system
+		- Fixed several validation errors
+	
+	> Shard3D Torque 1.1.4-alpha
+		- Increased offscreen render pass resolution to 1920x1080
+		- Renamed definitions
+		- Fixed WB3D panels not displaying the reverted Level after stopping simulation
+		- Fixed billboard UV's being mirrored
+		- Fixed asset manager crashing when an invalid mesh/texture was loaded
+		- Fixed ImGui validation errors
+		- "Save Level" now saves directly, rather than do the same as "Save Level As"
+		- Billboards now can be created and saved in WB3D
+		- Changed visibility of functions from the ActingActor class
+		- Changed pointlights to use a billboard texture
+		- Changed editor theme
+		- Improved PBR (however broke spot and directional lights)
+		- Implemented preliminary code for particle system
+		- Added Jolt physics library
+		- Added "special assets" for core assets (textures)
+		- Optimised some rendering
+		- Added GUI system
+	
+	> Shard3D Torque 1.2.0-alpha
+		- Added changelog file counting after 1.0.8-alpha
+		- Added new component: Audio component
+			- Using Miniaudio, WIP implementation
+		- More improvements to PBR shader + can now adjust with the MaterialBuilder window
+		- PBR can now be toggled in engine_settings.ini
+		- ActingActor::spawnEvent and ActingActor::killEvent are now unused until they are properly used
+		- The possessed camera when resuming level simulation now actually possesses the editor camera rather than the previously possessed camera
+		- Renamed scenedata/ to leveldata/ and sounddata/ to audiodata/

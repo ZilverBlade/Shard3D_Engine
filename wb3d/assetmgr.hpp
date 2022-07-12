@@ -55,7 +55,7 @@ namespace Shard3D {
 			inline static std::unordered_map<uint64_t, MaterialSystem::MaterialList> materialListAssets;
 
 			static void clearAllAssetsAndDontAddDefaults();
-			friend class Shard3D::EditorApp;	
+			friend class Shard3D::EditorApp;
 		};
 	}
 	class _special_assets {

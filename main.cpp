@@ -1,10 +1,6 @@
 #include "s3dtpch.h" 
 #include "editor_app.hpp"
 #include "project.hpp"
-
-#include "cheat_codes.hpp"
-#include "graphics_settings.hpp"
-
 /*
     Shard3D 1.0 (2022) created by ZilverBlade
 */

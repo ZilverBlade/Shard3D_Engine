@@ -31,8 +31,6 @@
 
 
 namespace Shard3D {
-	EditorApp::
-
 	EditorApp::EditorApp() {
 		_special_assets::_editor_icons_load();
 		SharedPools::constructPools(Singleton::engineDevice);
@@ -40,9 +38,7 @@ namespace Shard3D {
 		SHARD3D_INFO("Constructing Level Pointer");
 		Singleton::activeLevel = std::make_shared<Level>("runtime test lvl");
 	}
-	EditorApp::~EditorApp() {
-		_special_assets::_editor_icons_destroy();
-	}
+	EditorApp::~EditorApp() { }
 	void EditorApp::setupDescriptors() {
 #if ENSET_ENABLE_COMPUTE_SHADERS
 
@@ -72,20 +68,18 @@ namespace Shard3D {
 		}
 		ImGuiInitter::init();
 
-
 #if ENSET_ENABLE_WORLDBUILDER3D
 		layerStack.pushOverlay(new ImGuiLayer());
 #endif
-#ifdef NDEBUG
 		GUILayer* guiLayer0 = new GUILayer();
 		GUILayer* guiLayer1 = new GUILayer();
 		GUILayer* guiLayer2 = new GUILayer();
 		GUILayer* guiLayer3 = new GUILayer();
-		layerStack.pushOverlay(guiLayer0);
-		layerStack.pushOverlay(guiLayer1);
-		layerStack.pushOverlay(guiLayer2);
 		layerStack.pushOverlay(guiLayer3);
-#endif
+		layerStack.pushOverlay(guiLayer2);
+		layerStack.pushOverlay(guiLayer1);
+		layerStack.pushOverlay(guiLayer0);
+
 		GridSystem gridSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #if ENSET_ENABLE_COMPUTE_SHADERS == true
 		ComputeSystem computeSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -109,14 +103,14 @@ namespace Shard3D {
 
 
 		SHARD3D_INFO("Loading editor camera actor");
-		wb3d::Actor cameraActor = Singleton::activeLevel->createActorWithGUID(0, "Camera Actor (SYSTEM RESERVED)");
-		cameraActor.addComponent<Components::CameraComponent>();
-		cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, 1.f, -1.f);
+		Actor editor_cameraActor = Singleton::activeLevel->createActorWithGUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
+		editor_cameraActor.addComponent<Components::CameraComponent>();
 
-		Singleton::activeLevel->setPossessedCameraActor(cameraActor);
-
+		Singleton::activeLevel->setPossessedCameraActor(editor_cameraActor);
+		editor_cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, 1.f, -1.f);
 		SHARD3D_INFO("Loading dummy actor");
-		wb3d::Actor dummy = Singleton::activeLevel->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
+		Actor dummy = Singleton::activeLevel->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
+
 #if ENSET_ALLOW_PREVIEW_CAMERA
 		dummy.addComponent<Components::CameraComponent>();
 		Singleton::activeLevel->setPossessedPreviewCameraActor(dummy); //dummy
@@ -124,24 +118,6 @@ namespace Shard3D {
 
 		loadGameObjects();
 
-#ifdef NDEBUG
-		GUI::Element exampleGUIElement;
-
-		AssetManager::emplaceTexture("assets/texturedata/gui/button.png");
-		exampleGUIElement.texturePath = "assets/texturedata/gui/button.png";
-
-		exampleGUIElement.position = { 0.2f, 0.5f };
-		exampleGUIElement.scale = { 0.3, 0.3f };
-
-		GUI::Element exampleGUIElement2;
-		AssetManager::emplaceTexture("assets/texturedata/gui/text.png");
-		exampleGUIElement2.texturePath = "assets/texturedata/gui/text.png";
-		exampleGUIElement2.position = { 0.2f, 0.5f };
-		exampleGUIElement2.scale = { 0.3, 0.3f };
-
-		guiLayer0->addElement(exampleGUIElement);
-		guiLayer1->addElement(exampleGUIElement2);
-#endif
 		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
 		controller::EditorMouseMovementController editorCameraControllerMouse{};
 
@@ -155,20 +131,21 @@ namespace Shard3D {
 
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		SHARD3D_INFO("Default FOV set to {0} degrees", fov);
-		cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
+		editor_cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
 		
 		if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
-			cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Perspective;
+			editor_cameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Perspective;
 		} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
-			cameraActor.getComponent<Components::CameraComponent>().projectionType = cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
+			editor_cameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
 		}
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while (!Singleton::engineWindow.shouldClose()) {
 			glfwPollEvents();
-
+			
 			auto possessedCameraActor = Singleton::activeLevel->getPossessedCameraActor();
 			auto possessedCamera = Singleton::activeLevel->getPossessedCamera();
+			editor_cameraActor = Singleton::activeLevel->getActorFromGUID(0);
 #if ENSET_ALLOW_PREVIEW_CAMERA
 			auto possessedPreviewCameraActor = Singleton::activeLevel->getPossessedPreviewCameraActor();
 			auto possessedPreviewCamera = Singleton::activeLevel->getPossessedPreviewCamera();
@@ -180,10 +157,13 @@ namespace Shard3D {
 			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice.device());
 			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
 			Singleton::activeLevel->tick(frameTime);
+			EngineAudio::globalUpdate(possessedCameraActor.getTransform().translation, 
+				possessedCameraActor.getTransform().rotation);
+
 
 			if (Singleton::activeLevel->simulationState != PlayState::Simulating) {
-				editorCameraControllerKeyboard.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
-				editorCameraControllerMouse.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, possessedCameraActor);
+				editorCameraControllerKeyboard.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
+				editorCameraControllerMouse.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
 			}
 
 			possessedCameraActor.getComponent<Components::CameraComponent>().ar = Singleton::engineRenderer.getAspectRatio();
@@ -228,12 +208,14 @@ namespace Shard3D {
 				ubo.view = possessedCamera.getView();
 				ubo.inverseView = possessedCamera.getInverseView();
 
+				ubo.materialSettings = Singleton::testPBR;
+
 				pointlightSystem.update(frameInfo, ubo, Singleton::activeLevel);
 				spotlightSystem.update(frameInfo, ubo, Singleton::activeLevel);
 				directionalLightSystem.update(frameInfo, ubo, Singleton::activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
-		
+
 				/*
 					this section is great for adding multiple render passes such as :
 					- Begin offscreen shadow pass
@@ -305,13 +287,15 @@ namespace Shard3D {
 			
 		}
 		if (Singleton::activeLevel->simulationState != PlayState::Stopped) Singleton::activeLevel->end();
+		vkDeviceWaitIdle(Singleton::engineDevice.device());
+		wb3d::AssetManager::clearAllAssetsAndDontAddDefaults();
+		_special_assets::_editor_icons_destroy();
 		for (Layer* layer : layerStack) {
 			layer->detach();
 		}
-		vkDeviceWaitIdle(Singleton::engineDevice.device());
 		SharedPools::destructPools();
 		Singleton::viewportImage = nullptr;
-		wb3d::AssetManager::clearAllAssetsAndDontAddDefaults();
+
 		Singleton::activeLevel = nullptr;
 	}
 
@@ -324,7 +308,7 @@ namespace Shard3D {
 		*/
 
 		wb3d::LevelManager levelman(Singleton::activeLevel);
-		levelman.load("assets/scenedata/drivecartest.wbl", true);
+		levelman.load("assets/leveldata/drivecartest.wbl", true);
 		
 		wb3d::Actor car = Singleton::activeLevel->createActor("Car");
 		wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
@@ -332,17 +316,9 @@ namespace Shard3D {
 
 		car.getComponent<Components::TransformComponent>().rotation = { 0.f, glm::radians(90.f), 0.f };
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-		{
-		wb3d::Actor billboard = Singleton::activeLevel->createActor("Billboard");
-		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/null_tex.png", VK_FILTER_NEAREST);
-		billboard.addComponent<Components::BillboardComponent>("assets/_engine/tex/null_tex.png");
-		billboard.getTransform().translation = { 1.f, 2.f, 0.f };
-		}
-		{
-		wb3d::Actor billboard = Singleton::activeLevel->createActor("Billboard");
-		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/axis2d.png");
-		billboard.addComponent<Components::BillboardComponent>("assets/_engine/tex/axis2d.png");
-		billboard.getTransform().translation = { 1.f, 2.f, 6.f };
-		}
+
+		car.addComponent<Components::AudioComponent>().file = 
+			"assets/audiodata/car_engine.wav";
+
 	}
 }

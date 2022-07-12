@@ -49,6 +49,8 @@ namespace Shard3D {
 		int numPointlights;
 		int numSpotlights;
 		int numDirectionalLights;
+		
+		alignas(16)glm::vec3 materialSettings= {1.f, 0.5f, 0.f};
 	};
 
 	struct ComputeUbo {

@@ -69,7 +69,6 @@ namespace Shard3D {
 
 	void GUIRenderSystem::render(FrameInfo& frameInfo, GUI& gui) {
 		enginePipeline->bind(frameInfo.commandBuffer);
-		unsigned i = 0;
 		for (auto& element : gui.elementsGUI) {
 			auto imageInfo = wb3d::AssetManager::retrieveTexture(element.texturePath)->getImageInfo();
 			VkDescriptorSet descriptorSet1;
@@ -90,7 +89,7 @@ namespace Shard3D {
 			GUIPushConstants push{};
 			push.translation = element.position;
 			push.scale = -element.scale;
-			push.index = i;
+			push.index = 0;
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
 				pipelineLayout,
@@ -101,7 +100,6 @@ namespace Shard3D {
 			);
 
 			vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
-			++i;
 		}
 			
 

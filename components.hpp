@@ -12,7 +12,7 @@
 #include <Jolt.h>
 #include <Physics/Body/Body.h>
 #include <Physics/Collision/Shape/Shape.h>
-
+#include "audio.hpp"
 #include "systems/particle_system.hpp"
 namespace Shard3D {
 	namespace wb3d {
@@ -119,7 +119,33 @@ namespace Shard3D {
 			MeshComponent(const std::string& mdl);
 			void reapplyMesh(const std::string& mdl);
 		};
+		struct AudioComponent {
+		private:
+			EngineAudio* audioEngine;
+		public:
+			std::string file{};
+			EngineAudio::AudioProperties properties{};
+			
+			void play() {
+				audioEngine = new EngineAudio();
+				audioEngine->play(file);
+				audioEngine->update(properties);
+			}
+			void pause() {
+				audioEngine->pause();
+			}
+			void resume() {
+				audioEngine->resume();
+			}
+			void update() {
+				audioEngine->update(properties);
+			}
+			void stop() {
+				audioEngine->stop();
+				delete audioEngine;
+			}
 
+		};
 		struct PointlightComponent {
 			float radius = 1.f;
 			glm::vec3 color = { 1.f, 1.f, 1.f };
