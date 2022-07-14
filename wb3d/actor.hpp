@@ -1,5 +1,4 @@
 #pragma once
-#include "../s3dtpch.h"
 #ifdef NDEBUG
 #define ENTT_ASSERT(...) ((void)1)
 #endif

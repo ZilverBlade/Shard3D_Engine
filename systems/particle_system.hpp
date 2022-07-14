@@ -1,5 +1,4 @@
 #pragma once
-#include "../s3dtpch.h"
 
 #include "../frame_info.hpp"
 #include "../wb3d/level.hpp"

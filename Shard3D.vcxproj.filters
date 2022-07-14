@@ -263,9 +263,6 @@
     <ClCompile Include="systems\physics_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\script_link.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
     <ClCompile Include="systems\particle_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>

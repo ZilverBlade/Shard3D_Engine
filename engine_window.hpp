@@ -1,6 +1,9 @@
 #pragma once
-#include "s3dtpch.h"
- 
+
+
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 namespace Shard3D {
 	class EngineWindow {
 	public:

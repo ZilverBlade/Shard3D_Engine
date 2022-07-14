@@ -1,9 +1,10 @@
-#pragma once
+#include "s3dtpch.h"
 #define MINIAUDIO_IMPLEMENTATION
 #include "audio.hpp"
 #include <iostream>
 #include "singleton.hpp"
 #include "wb3d/actor.hpp"
+
 namespace Shard3D {
     EngineAudio::~EngineAudio() {}
     void EngineAudio::init() {

@@ -1,5 +1,4 @@
 #pragma once
-#include "s3dtpch.h"
 #include "camera.hpp"
 
 #include "utils/definitions.hpp"

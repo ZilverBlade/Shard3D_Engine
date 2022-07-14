@@ -1,5 +1,8 @@
 #pragma once
-#include "s3dtpch.h"
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
+#include <glm/glm.hpp>
 namespace Shard3D {
 	class EngineCamera {
 	public:

@@ -80,3 +80,5 @@ ALPHA:
 		- Changed font to be 8px based tahoma 
 		- Added material builder controls for classic shading (specular and roughness)
 		- Tweaked PBR specular BRDF
+		- Tweaked blinn power specular
+		- Fixed PCH not working

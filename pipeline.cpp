@@ -2,6 +2,7 @@
 
 #include "pipeline.hpp"
 #include "model.hpp"
+#include <fstream>
 namespace Shard3D {
 
 	EnginePipeline::EnginePipeline(

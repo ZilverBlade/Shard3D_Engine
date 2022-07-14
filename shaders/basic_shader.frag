@@ -67,7 +67,7 @@ void main() {
 	vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
 
 	vec3 specularLight = vec3(0.0);
-	float blinnPow = max((1 - ubo.materialSettings.y) * 1024.0, 16.0);//higher val -> sharper light (16 - 1024)
+	float blinnPow = max((1 - ubo.materialSettings.y) * 4096.0, 16.0);//higher val -> sharper light (16 - 1024)
 
 	vec3 surfaceNormal = normalize(fragNormalWorld);
 
@@ -140,7 +140,7 @@ void main() {
 		
 		if (directionalLight.specularMod != 0.f){
 				// specular 
-		vec3 halfAngle = normalize(directionalLight.position.xyz + vec3(0, -1000.f, 0) - fragPosWorld + viewDirection) * 0.999f;
+		vec3 halfAngle = normalize(directionalLight.position.xyz + vec3(0, 1000.f, 0) - fragPosWorld + viewDirection) * 0.999f;
 		float blinnTerm = dot(surfaceNormal, halfAngle);
 		blinnTerm = clamp(blinnTerm, 0, 1);
 		blinnTerm = pow(blinnTerm, blinnPow); 

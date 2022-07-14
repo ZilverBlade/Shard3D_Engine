@@ -1,5 +1,5 @@
 #pragma once
-#include "../s3dtpch.h"
+
 #include <Jolt.h>
 #include "../device.hpp"
 #include <Physics/Body/Body.h>

@@ -1,5 +1,5 @@
 #pragma once
-#include "../s3dtpch.h"
+
  
 namespace Shard3D {
 

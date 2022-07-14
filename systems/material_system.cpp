@@ -1,6 +1,7 @@
 #include "../s3dtpch.h" 
 #include "material_system.hpp"
 #include "../wb3d/assetmgr.hpp"
+#include <fstream>
 namespace Shard3D {
 	MaterialSystem::MaterialSystem(SurfaceMaterialData materialData, EngineDevice& device, VkDescriptorSetLayout matSetLayout) : surfaceMaterialData{materialData}, engineDevice { device }, materialSetLayout(matSetLayout) {
 		//createDescriptorSetLayout();

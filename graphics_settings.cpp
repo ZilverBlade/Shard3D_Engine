@@ -1,7 +1,7 @@
 #include "s3dtpch.h" 
 #include "graphics_settings.hpp"
 #include "utils/definitions.hpp"
-
+#include <fstream>
 namespace Shard3D {
 	void GraphicsSettings::init(EngineWindow* window) {
 		// might as well check engine settings here, even tho it's prob too late lol

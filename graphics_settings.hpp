@@ -1,5 +1,5 @@
 #pragma once
-#include "s3dtpch.h"
+
 #include "simpleini/simple_ini.h"
 #include "engine_window.hpp"
 namespace Shard3D {

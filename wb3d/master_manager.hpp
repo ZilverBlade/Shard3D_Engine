@@ -1,5 +1,5 @@
 #pragma once
-#include "../s3dtpch.h"
+
 #include "../utils/definitions.hpp"
 
 #include "level.hpp"

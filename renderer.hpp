@@ -1,5 +1,5 @@
 #pragma once
-#include "s3dtpch.h"
+
 #include "engine_window.hpp"
 #include "device.hpp"
 

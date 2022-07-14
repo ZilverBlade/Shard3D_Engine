@@ -1,5 +1,5 @@
 #pragma once
-#include "../s3dtpch.h"
+
 #include "actor.hpp"
 namespace Shard3D {
 	namespace wb3d {

@@ -1,5 +1,5 @@
 #pragma once
-#include "s3dtpch.h"
+
 #include "texture.hpp"
 namespace Shard3D {
 	class GUI {

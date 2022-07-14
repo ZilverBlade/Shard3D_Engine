@@ -154,7 +154,7 @@ namespace Shard3D {
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
 
-			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice.device());
+			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice);
 			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
 			Singleton::activeLevel->tick(frameTime);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().translation, 

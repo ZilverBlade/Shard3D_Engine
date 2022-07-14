@@ -1,10 +1,9 @@
 #pragma once
-#include "../s3dtpch.h"
 #include <entt.hpp>
 #include "../GUID.hpp"
 #include "../utils/definitions.hpp"
 #include "../camera.hpp"
-
+#include "../device.hpp"
 namespace Shard3D {
 	class EditorApp;
 	namespace wb3d {
@@ -37,7 +36,7 @@ namespace Shard3D {
 			void reloadMesh(Actor actor);
 			void reloadTexture(Actor actor);
 
-			void runGarbageCollector(VkDevice device);
+			void runGarbageCollector(EngineDevice& device);
 
 			Actor getActorFromGUID(GUID guid);
 			// Unreliable function as multiple actors can have identical tags, use getActorFromGUID() whenever possible.

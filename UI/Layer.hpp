@@ -1,5 +1,4 @@
 #pragma once
-#include "../s3dtpch.h"
 #include "../device.hpp"
 #include "../utils/definitions.hpp"
 

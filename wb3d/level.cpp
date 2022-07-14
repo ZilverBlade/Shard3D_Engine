@@ -96,13 +96,13 @@ namespace Shard3D {
 		// Actor Level::getActorByGUID() {}
 		// Actor Level::getActorByTag() {}
 
-		void Level::runGarbageCollector(VkDevice device) {
+		void Level::runGarbageCollector(EngineDevice& device) {
 			if (actorKillQueue.size() != 0) {
 				for (int i = 0; i < actorKillQueue.size(); i++) {
 					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
 					if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
 						actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
-							vkDeviceWaitIdle(device);
+							vkDeviceWaitIdle(device.device());
 					registry.destroy(actorKillQueue.at(i));
 				}
 				actorKillQueue.clear();
@@ -110,7 +110,7 @@ namespace Shard3D {
 			}
 			if (actorReloadMeshQueue.size() != 0) {
 				for (int i = 0; i < actorReloadMeshQueue.size(); i++) {
-					vkDeviceWaitIdle(device);
+					vkDeviceWaitIdle(device.device());
 					actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().reapplyMesh(actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().cacheFile);
 				}
 				actorReloadMeshQueue.clear();
@@ -118,14 +118,14 @@ namespace Shard3D {
 			}
 			if (actorKillMeshQueue.size() != 0) {
 				for (int i = 0; i < actorKillMeshQueue.size(); i++) {
-					vkDeviceWaitIdle(device);
+					vkDeviceWaitIdle(device.device());
 					registry.remove<Components::MeshComponent>(actorKillMeshQueue.at(i));
 				}
 				actorKillMeshQueue.clear();
 			}
 			if (actorReloadTexQueue.size() != 0) {
 				for (int i = 0; i < actorReloadTexQueue.size(); i++) {
-					vkDeviceWaitIdle(device);
+					vkDeviceWaitIdle(device.device());
 					actorReloadTexQueue.at(i).getComponent<Components::BillboardComponent>().reapplyTexture(actorReloadTexQueue.at(i).getComponent<Components::BillboardComponent>().cacheFile);
 				}
 				actorReloadTexQueue.clear();
@@ -133,7 +133,7 @@ namespace Shard3D {
 			}
 			if (actorKillTexQueue.size() != 0) {
 				for (int i = 0; i < actorKillTexQueue.size(); i++) {
-					vkDeviceWaitIdle(device);
+					vkDeviceWaitIdle(device.device());
 					registry.remove<Components::BillboardComponent>(actorKillMeshQueue.at(i));
 				}
 				actorKillMeshQueue.clear();

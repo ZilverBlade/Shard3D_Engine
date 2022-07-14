@@ -1,5 +1,5 @@
 #pragma once
-#include "s3dtpch.h"
+
 #include "utils/def_dynamic.hpp"
 #include "UI/ImGuiLayer.hpp"
 namespace Shard3D {

@@ -1,5 +1,4 @@
 #pragma once
-#include "../s3dtpch.h"
 #include "Layer.hpp"
 #include "../pipeline.hpp"
 

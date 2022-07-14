@@ -1,4 +1,6 @@
+#include "../s3dtpch.h"
 #include "particle_system.hpp"
+
 namespace Shard3D {
 	ParticleSystem::ParticleSystem() {
 		particlePool.resize(1000);

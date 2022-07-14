@@ -1,5 +1,5 @@
 #pragma once
-#include "s3dtpch.h"
+
 #include "device.hpp"
 #include "UI/imgui_implementation.hpp"
 #include "renderer.hpp"

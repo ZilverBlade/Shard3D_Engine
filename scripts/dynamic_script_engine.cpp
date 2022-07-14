@@ -1,10 +1,13 @@
+#include "../s3dtpch.h"
+
 #include "dynamic_script_engine.hpp"
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include "../utils/definitions.hpp"
-#include "../engine_logger.hpp"
+
 #include <filesystem>
 #include <fstream>
+
 namespace Shard3D {
 	struct ScriptEngineData {
 		MonoDomain* rootDomain = nullptr;

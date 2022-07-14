@@ -1,5 +1,5 @@
 #pragma once
-#include "../s3dtpch.h"
+
 #include <imgui.h>
 #include <vulkan/vulkan.h>
 namespace Shard3D {

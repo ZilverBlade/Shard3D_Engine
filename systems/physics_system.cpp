@@ -1,3 +1,4 @@
+#include "../s3dtpch.h"
 #include "physics_system.hpp"
 
 namespace Shard3D {

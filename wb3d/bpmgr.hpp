@@ -1,5 +1,5 @@
 #pragma once
-#include "../s3dtpch.h"
+
 #include "../device.hpp"
 #include "actor.hpp"
 #include "blueprint.hpp"

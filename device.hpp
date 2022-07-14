@@ -1,9 +1,8 @@
 #pragma once
-#include "s3dtpch.h"
 #include "engine_window.hpp"
 
 #include "simpleini/simple_ini.h"
-
+#include <vulkan/vulkan.h>
 namespace Shard3D {
 
 struct SwapChainSupportDetails {

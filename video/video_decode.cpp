@@ -1,7 +1,6 @@
 #include "../s3dtpch.h"
 #include "video_decode.hpp"
 #include <filesystem>
-#include "../engine_logger.hpp"
 #include "../singleton.hpp"
 
 namespace VideoPlaybackEngine {
@@ -19,7 +18,6 @@ namespace VideoPlaybackEngine {
 		wchar_t absolutePath = (wchar_t)std::filesystem::absolute(mediaFile).string().c_str();
 		PlayVideo(glfwGetWin32Window(Shard3D::Singleton::engineWindow.getGLFWwindow()), L"assets\\videodata\\shard3d.wmv");
 	}
-
 	// WINDOWS
 #ifdef _WIN32
 	void OnMediaItemCreated(MFP_MEDIAITEM_CREATED_EVENT* pEvent)

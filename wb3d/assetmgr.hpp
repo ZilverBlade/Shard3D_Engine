@@ -1,5 +1,5 @@
 #pragma once
-#include "../s3dtpch.h"
+
 #include "../systems/material_system.hpp"
 #include "level.hpp"
 #include "../texture.hpp"

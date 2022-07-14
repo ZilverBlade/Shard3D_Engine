@@ -1,3 +1,4 @@
+#include "../../s3dtpch.h"
 #include "editor_keyboard_movement_controller.hpp"
 #include <limits>
 
