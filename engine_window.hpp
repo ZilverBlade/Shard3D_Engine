@@ -3,12 +3,14 @@
  
 namespace Shard3D {
 	class EngineWindow {
-	private:
+	public:
 		enum WindowType {
 			Windowed = 0,
 			Borderless = 1,
 			Fullscreen = 2
 		};
+	private:
+
 		friend class GraphicsSettings;
 	public:
 		EngineWindow(int w, int h, std::string name);

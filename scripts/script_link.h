@@ -12,5 +12,5 @@ namespace Shard3D::CppScripts {
 }
 */
 
-#include "example_script.hpp"
-#include "carcontroller.hpp"
+#include "cpp/example_script.hpp"
+#include "cpp/carcontroller.hpp"

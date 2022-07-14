@@ -114,6 +114,9 @@
     <Filter Include="Header Files\UI\GUI">
       <UniqueIdentifier>{352accfe-5a96-4980-954b-e8d4c98ae8de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scripts\c++">
+      <UniqueIdentifier>{6f67f61a-8614-46bf-834a-44a880019f00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -275,6 +278,15 @@
     <ClCompile Include="audio.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="UI\asset_explorer_panel.cpp">
+      <Filter>Source Files\UI\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\dynamic_script_engine.cpp">
+      <Filter>scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\asset_properties_panel.cpp">
+      <Filter>Source Files\UI\panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -391,9 +403,6 @@
     <ClInclude Include="plugins\example_component.hpp">
       <Filter>plugins</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\example_script.hpp">
-      <Filter>scripts</Filter>
-    </ClInclude>
     <ClInclude Include="scripts\script_handler.hpp">
       <Filter>scripts</Filter>
     </ClInclude>
@@ -460,9 +469,6 @@
     <ClInclude Include="engine_window.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\carcontroller.hpp">
-      <Filter>scripts</Filter>
-    </ClInclude>
     <ClInclude Include="Project.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -504,6 +510,21 @@
     </ClInclude>
     <ClInclude Include="audio.hpp">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\asset_explorer_panel.hpp">
+      <Filter>Header Files\UI\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\cpp\example_script.hpp">
+      <Filter>scripts\c++</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\dynamic_script_engine.hpp">
+      <Filter>scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\cpp\carcontroller.hpp">
+      <Filter>scripts\c++</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\asset_properties_panel.hpp">
+      <Filter>Header Files\UI\panels</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

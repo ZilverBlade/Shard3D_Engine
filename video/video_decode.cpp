@@ -2,20 +2,22 @@
 #include "video_decode.hpp"
 #include <filesystem>
 #include "../engine_logger.hpp"
+#include "../singleton.hpp"
 
 namespace VideoPlaybackEngine {
 	EngineH264Video::EngineH264Video() {}
 	EngineH264Video::~EngineH264Video() {}
 
 	void EngineH264Video::destroyPlayback() {
+		g_pPlayer->Stop();
 		Shard3D::SafeRelease(&g_pPlayer);
 		PostQuitMessage(0);
 	}
 
 	void EngineH264Video::createVideoSession(GLFWwindow* window, const std::string& mediaFile) {
 		SHARD3D_INFO("Creating video session");
-		PCWSTR absolutePath = std::filesystem::absolute(mediaFile).c_str();
-		PlayVideo(glfwGetWin32Window(window), L"D:\\video.wmv");
+		wchar_t absolutePath = (wchar_t)std::filesystem::absolute(mediaFile).string().c_str();
+		PlayVideo(glfwGetWin32Window(Shard3D::Singleton::engineWindow.getGLFWwindow()), L"assets\\videodata\\shard3d.wmv");
 	}
 
 	// WINDOWS
@@ -23,7 +25,7 @@ namespace VideoPlaybackEngine {
 	void OnMediaItemCreated(MFP_MEDIAITEM_CREATED_EVENT* pEvent)
 	{
 		// The media item was created successfully.
-		std::cout << "OnItemCreated\n";
+		//std::cout << "OnItemCreated\n";
 
 		if (g_pPlayer)
 		{
@@ -32,8 +34,8 @@ namespace VideoPlaybackEngine {
 
 			// Check if the media item contains video.
 			HRESULT hr = pEvent->pMediaItem->HasVideo(&bHasVideo, &bIsSelected);
-			std::cout << "bHasVideo "<< bHasVideo << "\n";
-			std::cout << "bIsSelected " << bIsSelected << "\n";
+			//std::cout << "bHasVideo "<< bHasVideo << "\n";
+			//std::cout << "bIsSelected " << bIsSelected << "\n";
 
 			if (SUCCEEDED(hr))
 			{
@@ -42,18 +44,18 @@ namespace VideoPlaybackEngine {
 				// Set the media item on the player. This method completes
 				// asynchronously.
 				hr = g_pPlayer->SetMediaItem(pEvent->pMediaItem);
-				SHARD3D_INFO("Succeded playing this file. {0}", hr);
+				SHARD3D_LOG("Succeded playing '{0}'", hr);
 			}
 
 			if (FAILED(hr))
 			{
-				SHARD3D_WARN("Failed playing this file. {0}", hr);
+				SHARD3D_WARN("Failed playing '{0}'", hr);
 			}
 		}
 	}
 	void OnMediaItemSet(MFP_MEDIAITEM_SET_EVENT* /*pEvent*/)
 	{
-		std::cout << "OnMediaItemSet\n";
+		//std::cout << "OnMediaItemSet\n";
 
 		HRESULT hr = g_pPlayer->Play();
 		if (FAILED(hr))
@@ -63,21 +65,31 @@ namespace VideoPlaybackEngine {
 	}
 	IFACEMETHODIMP_(void) MediaPlayerCallback::OnMediaPlayerEvent(MFP_EVENT_HEADER* pEventHeader)
 	{
-		std::cout << "OnMediaPlayerEvent\n";
-		if (FAILED(pEventHeader->hrEvent))
-		{
-			SHARD3D_WARN("Playback failed {0}", pEventHeader->hrEvent);
-			return;
-		}
-
+		//std::cout << "OnMediaPlayerEvent\n";
+		//if (FAILED(pEventHeader->hrEvent))
+		//{
+		//	SHARD3D_WARN("Playback failed {0}", pEventHeader->hrEvent);
+		//	return;
+		//}
+		//
+		//switch (pEventHeader->eEventType)
+		//{
+		//case MFP_EVENT_TYPE_MEDIAITEM_CREATED:
+		//	OnMediaItemCreated(MFP_GET_MEDIAITEM_CREATED_EVENT(pEventHeader));
+		//	break;
+		//
+		//case MFP_EVENT_TYPE_MEDIAITEM_SET:
+		//	OnMediaItemSet(MFP_GET_MEDIAITEM_SET_EVENT(pEventHeader));
+		//	break;
+		//}
 		switch (pEventHeader->eEventType)
 		{
-		case MFP_EVENT_TYPE_MEDIAITEM_CREATED:
-			OnMediaItemCreated(MFP_GET_MEDIAITEM_CREATED_EVENT(pEventHeader));
-			break;
-
-		case MFP_EVENT_TYPE_MEDIAITEM_SET:
-			OnMediaItemSet(MFP_GET_MEDIAITEM_SET_EVENT(pEventHeader));
+		case MFP_EVENT_TYPE_PLAYBACK_ENDED:
+			SHARD3D_LOG("Playback ended, stopping media");
+			g_pPlayer->Stop();
+			Shard3D::SafeRelease(&g_pPlayer);
+			g_pPlayerCB = nullptr;
+			
 			break;
 		}
 	}
@@ -98,7 +110,7 @@ namespace VideoPlaybackEngine {
 			hr = MFPCreateMediaPlayer(
 				pszURL,			// path
 				TRUE,           // Start playback automatically?
-				0,              // Flags
+				_MFP_CREATION_OPTIONS::MFP_OPTION_FREE_THREADED_CALLBACK,              // Flags
 				g_pPlayerCB,    // Callback pointer
 				hwnd,           // Video window
 				&g_pPlayer
@@ -108,8 +120,8 @@ namespace VideoPlaybackEngine {
 			WideCharToMultiByte(CP_ACP, 0, pszURL, wcslen(pszURL), buffer, len, NULL, NULL);
 			buffer[len] = '\0';
 
-			std::cout << buffer << " is the video file\n";
-			std::cout << "HR code " << hr << "\n";
+			SHARD3D_LOG("Loaded video file '{0}'", buffer);
+			//std::cout << "HR code " << hr << "\n";
 		}
 
 		// Create a new media item for this URL.
@@ -122,7 +134,7 @@ namespace VideoPlaybackEngine {
 		// The CreateMediaItemFromURL method completes asynchronously.
 		// The application will receive an MFP_EVENT_TYPE_MEDIAITEM_CREATED
 		// event. See MediaPlayerCallback::OnMediaPlayerEvent().
-		std::cout << hr << " code for media creation\n";
+		//std::cout << hr << " code for media creation\n";
 		return hr;
 	}
 	

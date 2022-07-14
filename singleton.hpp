@@ -7,6 +7,7 @@
 #include "offscreen.hpp"
 #include "graphics_settings.hpp"
 #include "audio.hpp"
+#include "scripts/dynamic_script_engine.hpp"
 namespace Shard3D {
 	// ignore
 	class Initializer {
@@ -16,6 +17,7 @@ namespace Shard3D {
 			LOGGER::init();
 			EngineAudio::init();
 			GraphicsSettings::init(nullptr);
+			DynamicScriptEngine::init();
 		}
 	};
 	class Destructor {
@@ -59,6 +61,6 @@ namespace Shard3D {
 		inline static PreviewModes editorPreviewSettings;
 #endif
 		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
-		Destructor _ignore_destroy;
+		static Destructor _ignore_destroy;
 	};
 }

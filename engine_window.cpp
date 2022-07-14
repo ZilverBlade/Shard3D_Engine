@@ -65,7 +65,7 @@ namespace Shard3D {
 	void EngineWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) {
 		if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
 			SHARD3D_FATAL("Failed to create window surface!");
-		}
+		}	
 	}
 
 	void EngineWindow::setWindowMode(WindowType winType) {

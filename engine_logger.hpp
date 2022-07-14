@@ -25,9 +25,13 @@ namespace Shard3D {
 /* Throw a message notifying that a function has not been implemented.
 */
 #define SHARD3D_NOIMPL		Shard3D::LOGGER::getErrorLogger()->error("function not implemented!")
+#ifndef NDEBUG
 /* Log for debugging, doesnt log in release/deploy mode, so use conservatively.
 */
 #define SHARD3D_LOG(...)	Shard3D::LOGGER::getDebugLogger()->trace(__VA_ARGS__)
+#elif NDEBUG
+#define SHARD3D_LOG(...)
+#endif
 /* Log information, for notifying what may happen, like asset loading.
 */
 #define SHARD3D_INFO(...)	Shard3D::LOGGER::getInfoLogger()->trace(__VA_ARGS__)

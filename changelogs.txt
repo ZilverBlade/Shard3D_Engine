@@ -70,3 +70,8 @@ ALPHA:
 		- ActingActor::spawnEvent and ActingActor::killEvent are now unused until they are properly used
 		- The possessed camera when resuming level simulation now actually possesses the editor camera rather than the previously possessed camera
 		- Renamed scenedata/ to leveldata/ and sounddata/ to audiodata/
+		- Added asset explorer
+		- Fixed _special_assets asset array causing null termination
+		- Experimental C# and VB script engines using Mono
+		- Fixed video playback crashing on start
+		- Removed "Release Debug" as it no longer makes sense and constantly breaks the linker, and renamed Optimised No-Debug back to Release

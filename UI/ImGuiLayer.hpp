@@ -9,6 +9,7 @@
 #include "level_tree_panel.hpp"
 #include "level_properties_panel.hpp"
 #include "level_peekers.hpp"
+#include "asset_explorer_panel.hpp"
 #include "level_gizmo.hpp"
 namespace Shard3D {
 
@@ -63,6 +64,7 @@ namespace Shard3D {
 		LevelTreePanel levelTreePanel;
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
+		AssetExplorerPanel AssetExplorerPanel;
 		bool refreshContext;
 //Gizmo levelGizmo;
 	};

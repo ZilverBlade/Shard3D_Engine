@@ -113,6 +113,7 @@ namespace Shard3D::wb3d {
 #pragma region special
 void Shard3D::_special_assets::_editor_icons_load() {
 	for (auto icon : _editor_icons_array) {
+		auto& readIco = icon[1];
 		std::shared_ptr<EngineTexture> tex = EngineTexture::createTextureFromFile(Singleton::engineDevice, icon[1], VK_FILTER_LINEAR);
 		_editor_icons[icon[0]] = tex;
 	}

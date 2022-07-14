@@ -59,21 +59,26 @@ namespace Shard3D {
 		};
 	}
 	class _special_assets {
-		inline static const std::string _editor_icons_array[6][2]{
-			{"editor.play",						"assets/_engine/tex/_editor/icon_null.png"},
-			{"editor.pause",					"assets/_engine/tex/_editor/icon_null.png"},
-			{"editor.pause",					"assets/_engine/tex/_editor/icon_null.png"},
-			{"editor.light.point",				"assets/_engine/tex/_editor/icon_null.png"},
-			{"editor.light.spot",				"assets/_engine/tex/_editor/icon_null.png"},
-			{"editor.light.directional",		"assets/_engine/tex/_editor/icon_null.png"}
-		};
 		// engine only function, do not call this
 		static void _editor_icons_load();
 		// engine only function, do not call this
 		static void _editor_icons_destroy();
 		// engine only function, do not call this
 		inline static std::unordered_map<std::string, std::shared_ptr<EngineTexture>> _editor_icons;
+
+		inline static const char* _editor_icons_array[8][2]{
+			{"editor.play",						"assets/_engine/tex/_editor/icon_null0.png"		},
+			{"editor.pause",					"assets/_engine/tex/_editor/icon_null0.png"		},
+			{"editor.stop",						"assets/_engine/tex/_editor/icon_null0.png"		},
+			{"editor.light.point",				"assets/_engine/tex/_editor/icon_null.png"		},
+			{"editor.light.spot",				"assets/_engine/tex/_editor/icon_null.png"		},
+			{"editor.light.directional",		"assets/_engine/tex/_editor/icon_null.png"		},
+			{"editor.browser.folder",			"assets/_engine/tex/_editor/icon_folder_d.png"	},
+			{"editor.browser.file",				"assets/_engine/tex/_editor/icon_null0.png"		}
+		};
+
 		friend class EditorApp;
 		friend class PointlightSystem;
+		friend class AssetExplorerPanel;
 	};
 }

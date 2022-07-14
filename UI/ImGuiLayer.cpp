@@ -139,7 +139,7 @@ namespace Shard3D {
             ImGui::EndMenuBar();
         }
 
-        ImGui::Begin("Viewport", (bool*)(true));
+        ImGui::Begin("Viewport");
         ImGui::Image(Singleton::viewportImage, ImGui::GetWindowViewport()->Size);
         ImGui::End();
         // start rendering stuff here
@@ -147,6 +147,7 @@ namespace Shard3D {
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel);
         levelPeekPanel.render();
+        AssetExplorerPanel.render();
         //levelGizmo.render(level, levelTreePanel);
 
 
