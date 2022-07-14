@@ -74,10 +74,10 @@ namespace Shard3D::CppScripts {
 
 			camAct.getComponent<Components::CameraComponent>().fov = 
 				glm::clamp(60.f + glm::dot(moveVector, moveVector) * 
-					glm::max(1.0f, (1.f / glm::dot(moveVector, moveVector))) * 10, 60.f, 90.f);
+					glm::max(1.0f, (1.f / glm::dot(moveVector, moveVector))) * 10.f, 60.f, 90.f);
 
 			thisActor.getComponent<Components::AudioComponent>().properties.relativePos = thisActor.getTransform().translation;
-			thisActor.getComponent<Components::AudioComponent>().properties.pitch = 0.5 + moveVector.z * 3;
+			thisActor.getComponent<Components::AudioComponent>().properties.pitch = 0.5f + moveVector.z * 3.f;
 			thisActor.getComponent<Components::AudioComponent>().update();
 		}
 

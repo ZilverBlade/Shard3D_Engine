@@ -11,7 +11,7 @@ namespace Shard3D {
 			struct ButtonMappings {
 				int canRotate = GLFW_MOUSE_BUTTON_RIGHT;
 			};
-
+			EditorMouseMovementController();
 			void moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor);
 
 			ButtonMappings buttons{};

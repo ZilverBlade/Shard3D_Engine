@@ -40,6 +40,8 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 	int numPointlights;
 	int numSpotlights;
 	int numDirectionalLights;
+
+	vec3 materialSettings;
 } ubo;
 
 layout(push_constant) uniform Push {
@@ -61,11 +63,11 @@ float getFogFactor(float d) {
 	return 1 - (FogMax - d) / (FogMax - FogMin);
 }
 
-void main(){
+void main() {
 	vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
 
 	vec3 specularLight = vec3(0.0);
-	float blinnPow = 128.f;//higher val -> sharper light (16 - 1024)
+	float blinnPow = max((1 - ubo.materialSettings.y) * 1024.0, 16.0);//higher val -> sharper light (16 - 1024)
 
 	vec3 surfaceNormal = normalize(fragNormalWorld);
 
@@ -94,7 +96,7 @@ void main(){
 		float blinnTerm = dot(surfaceNormal, halfAngle);
 		blinnTerm = clamp(blinnTerm, 0, 1);
 		blinnTerm = pow(blinnTerm, blinnPow); 
-		specularLight += color_intensity * blinnTerm * pointlight.specularMod; 
+		specularLight += color_intensity * blinnTerm * pointlight.specularMod * ubo.materialSettings.x; 
 	}
 
 	// Spotlight
@@ -123,7 +125,7 @@ void main(){
 			float blinnTerm = dot(surfaceNormal, halfAngle);
 			blinnTerm = clamp(blinnTerm, 0, 1);
 			blinnTerm = pow(blinnTerm, blinnPow); 
-			specularLight += color_intensity * blinnTerm * intensity * spotlight.specularMod; 
+			specularLight += color_intensity * blinnTerm * intensity * spotlight.specularMod * ubo.materialSettings.x; 
 		}		
 	}
 
@@ -142,7 +144,7 @@ void main(){
 		float blinnTerm = dot(surfaceNormal, halfAngle);
 		blinnTerm = clamp(blinnTerm, 0, 1);
 		blinnTerm = pow(blinnTerm, blinnPow); 
-		specularLight += color_intensity * blinnTerm * directionalLight.specularMod; 
+		specularLight += color_intensity * blinnTerm * directionalLight.specularMod * ubo.materialSettings.x; 
 		}
 	}
 

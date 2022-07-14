@@ -155,8 +155,9 @@ namespace Shard3D {
             ImGui::Begin("Material editor");
             ImGui::DragFloat("Specular", &Singleton::testPBR.x, 0.01f, 0.f, 2.f);
             ImGui::DragFloat("Roughness", &Singleton::testPBR.y, 0.01f, 0.f, 1.f);
+            ImGui::BeginDisabled(!enset.pbr);
             ImGui::DragFloat("Metallic", &Singleton::testPBR.z, 0.01f, 0.f, 1.f);
-
+            ImGui::EndDisabled();
             //ax::NodeEditor::Begin("Matedit BP");
             //int uniqueId = 1;
             //

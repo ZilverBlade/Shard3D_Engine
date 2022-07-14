@@ -143,8 +143,8 @@ void main(){
         vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
 
         vec3 numerator    = NDF * G * F;
-        float denominator = 3.7 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
-        specular = (numerator / denominator) * ubo.materialSettings.x;
+        float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+        specular = 2 * (numerator / denominator) * ubo.materialSettings.x;
 
         // kS is equal to Fresnel
        // vec3 kS = F;
@@ -182,7 +182,7 @@ void main(){
             vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
 
             vec3 numerator    = NDF * G * F;
-            float denominator = 3.75 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+            float denominator = 2 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
             specular = (numerator / denominator) * ubo.materialSettings.x;
 
             // kS is equal to Fresnel

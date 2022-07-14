@@ -3,9 +3,13 @@
 
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include "../../singleton.hpp"
 
 namespace Shard3D {
 	namespace controller {
+		EditorMouseMovementController::EditorMouseMovementController() {
+			glfwSetScrollCallback(Singleton::engineWindow.getGLFWwindow(), scroll_callback);
+		}
 		void EditorMouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
 			adjustFOV(window, dt, actor);
 			if (glfwGetMouseButton(window, buttons.canRotate) == GLFW_PRESS) {
@@ -50,7 +54,6 @@ namespace Shard3D {
 
 		void EditorMouseMovementController::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 			float fov = cachedActor.getComponent<Components::CameraComponent>().fov;
-			
 			fov -= yoffset * 4;
 			fov = glm::clamp(fov, 30.f, 170.f);
 			cachedActor.getComponent<Components::CameraComponent>().fov = fov;
@@ -58,7 +61,6 @@ namespace Shard3D {
 		
 		void EditorMouseMovementController::adjustFOV(GLFWwindow* window, float dt, wb3d::Actor& actor) {
 			cachedActor = actor;
-			glfwSetScrollCallback(window, scroll_callback);
 			actor = cachedActor;
 		}
 

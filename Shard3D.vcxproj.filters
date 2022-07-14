@@ -287,6 +287,9 @@
     <ClCompile Include="UI\asset_properties_panel.cpp">
       <Filter>Source Files\UI\panels</Filter>
     </ClCompile>
+    <ClCompile Include="UI\imgui_initter.cpp">
+      <Filter>Source Files\UI\ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">

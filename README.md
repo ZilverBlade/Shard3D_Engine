@@ -22,7 +22,7 @@ Make sure to install GLM and SDL2. The install of the contents of the SDK **MUST
 - [@DhiBaid](https://www.github.com/DHIBAID)
 
 
-### Controls
+### Camera Controls
 
 - Look Around = Right MB
 - Move Left = A
@@ -30,6 +30,7 @@ Make sure to install GLM and SDL2. The install of the contents of the SDK **MUST
 - Move Forward = W
 - Move Backward = S
 - Move Up = SPACE
-- Move Down = LEFT SHIFT
+- Move Down = RIGHT CONTROL
 - Slow Down Movement = LEFT CONTROL
 - Adjust FOV = Scroll Wheel
+- Adjust Speed = ALT + Scroll Wheel

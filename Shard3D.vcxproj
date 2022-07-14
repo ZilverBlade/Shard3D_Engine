@@ -256,6 +256,7 @@
     <ClCompile Include="UI\asset_explorer_panel.cpp" />
     <ClCompile Include="UI\asset_properties_panel.cpp" />
     <ClCompile Include="UI\GUILayer.cpp" />
+    <ClCompile Include="UI\imgui_initter.cpp" />
     <ClCompile Include="UI\level_gizmo.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>

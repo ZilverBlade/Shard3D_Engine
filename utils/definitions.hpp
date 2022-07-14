@@ -6,7 +6,7 @@ namespace Shard3D {
 //=====================================================================================================================
 //=====================================================================================================================
 
-const static std::string ENGINE_VERSION = "1.2.1.r0-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string ENGINE_VERSION = "1.2.1.r1-alpha";	// Shard3D {major, minor, patch, revision}-state
 const static std::string EDITOR_VERSION = "1.2.r0-alpha";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/settings/engine_settings.ini"
@@ -25,7 +25,7 @@ const static std::string EDITOR_VERSION = "1.2.r0-alpha";	// WorldEditor3D {majo
 #define ENGINE_CS_SCRIPT_RUNTIME_DLL	"assets/scriptdata/cs/bin/shard3d-csscript-core64.dll"
 #define ENGINE_VB_SCRIPT_RUNTIME_DLL	"assets/scriptdata/vb/bin/shard3d-vbscript-core64.dll"
 #define ENGINE_FONT_PATH					"assets/_engine/fnt/"		//Fonts
-#define ENGINE_DEFAULT_ENGINE_FONT			"assets/_engine/fnt/tahoma.ttf"		//Default engine font
+#define ENGINE_DEFAULT_ENGINE_FONT			"assets/_engine/fnt/fs-tahoma-8px.ttf"		//Default engine font
 #define ENGINE_FONT_SIZE			16		//size in px
 #define ENGINE_WORLDBUILDER3D_FILE_OPTIONS	"WorldBuilder3D Level (*.wbl)\0*.wbl\0All files (*.*)\0*.*\0"
 #define ENGINE_WORLDBUILDER3D_ASSETFILE_OPTIONS "WorldBuilder3D Asset (*.wbasset)\0*.wbasset\0All files (*.*)\0*.*\0"

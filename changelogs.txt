@@ -75,3 +75,7 @@ ALPHA:
 		- Experimental C# and VB script engines using Mono
 		- Fixed video playback crashing on start
 		- Removed "Release Debug" as it no longer makes sense and constantly breaks the linker, and renamed Optimised No-Debug back to Release
+		- Restructured camera controls to be less annoying
+		- Changed font to be 8px based tahoma 
+		- Added material builder controls for classic shading (specular and roughness)
+		- Tweaked PBR specular BRDF

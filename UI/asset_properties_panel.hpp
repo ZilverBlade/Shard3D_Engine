@@ -9,7 +9,7 @@ namespace Shard3D {
 	public:
 		AssetPropertiesPanel(const std::string& asset);
 		~AssetPropertiesPanel();
-		// returns false if closed
+
 		void render();
 	private:
 		std::string currentAsset;
