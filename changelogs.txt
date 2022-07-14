@@ -69,6 +69,7 @@ ALPHA:
 		- PBR can now be toggled in engine_settings.ini
 		- ActingActor::spawnEvent and ActingActor::killEvent are now unused until they are properly used
 		- The possessed camera when resuming level simulation now actually possesses the editor camera rather than the previously possessed camera
+	> Shard3D Torque 1.2.1-alpha	
 		- Renamed scenedata/ to leveldata/ and sounddata/ to audiodata/
 		- Added asset explorer
 		- Fixed _special_assets asset array causing null termination
