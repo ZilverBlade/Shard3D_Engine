@@ -31,8 +31,6 @@ namespace Shard3D {
 		void setupDescriptors();
 		void loadGameObjects();
 		LayerStack layerStack;
-
-		VkDescriptorPool imGuiDescriptorPool;
 };
 
 }

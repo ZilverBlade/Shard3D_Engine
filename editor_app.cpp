@@ -28,10 +28,31 @@
 #include "graphics_settings.hpp"
 #include "UI/imgui_initter.hpp"
 #include "wb3d/assetmgr.hpp"
+#include "video/video_decode.hpp"
 
 
 namespace Shard3D {
 	EditorApp::EditorApp() {
+		CSimpleIniA ini;
+
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+#ifndef _DEPLOY
+		if (ini.GetBoolValue("MISC", "enableIntroVideoNonDeploy") == true) {
+			VideoPlaybackEngine::EngineH264Video videoEngine;
+			videoEngine.createVideoSession(Singleton::engineWindow.getGLFWwindow(), ini.GetValue("MISC", "introVideo"));
+			while (videoEngine.isPlaying()) {
+				glfwPollEvents();
+			}		
+		}
+#elif _DEPLOY
+		VideoPlaybackEngine::EngineH264Video videoEngine;
+		videoEngine.createVideoSession(window, ini.GetValue("MISC", "introVideo"));
+		while (videoEngine.isPlaying()) {
+			glfwPollEvents();
+		}
+#endif
+
 		_special_assets::_editor_icons_load();
 		SharedPools::constructPools(Singleton::engineDevice);
 		GraphicsSettings::init(&Singleton::engineWindow);

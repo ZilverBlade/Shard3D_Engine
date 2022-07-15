@@ -50,7 +50,7 @@ namespace Shard3D {
 				else assetPropertiesRenderList.try_emplace(fileStr, AssetPropertiesPanel(fileStr));
 			}
 			ImGui::PopStyleVar();
-			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();		
 			ImGui::TextWrapped(fileStr.c_str());
 			//} else {
 			//	if (ImGui::Button(fileStr.c_str())) {

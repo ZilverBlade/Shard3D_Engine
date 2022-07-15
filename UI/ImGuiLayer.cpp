@@ -445,6 +445,9 @@ namespace Shard3D {
             if (ImGui::MenuItem("Play test video")) {
                 VideoPlaybackEngine::EngineH264Video videoEngine;
                 videoEngine.createVideoSession(Singleton::engineWindow.getGLFWwindow(), "assets/mediadata/video.wmw");
+                while (videoEngine.isPlaying()) {
+                    glfwPollEvents();
+                }
             }
             if (ImGui::MenuItem("Save test material")) {
                 MaterialSystem::Material surfaceMat;
@@ -502,7 +505,7 @@ namespace Shard3D {
 
             ImGui::EndMenu();
         }
-#endif // DEBUG
+#endif
         if (ImGui::BeginMenu("Actions")) {
             if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {
                 ShellExecuteA(nullptr, "open", "shadercompmgr.exe", "-o shaders/ shaders/", "/", false);

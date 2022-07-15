@@ -73,7 +73,7 @@ namespace Shard3D {
 			{"editor.light.point",				"assets/_engine/tex/_editor/icon_null.png"		},
 			{"editor.light.spot",				"assets/_engine/tex/_editor/icon_null.png"		},
 			{"editor.light.directional",		"assets/_engine/tex/_editor/icon_null.png"		},
-			{"editor.browser.folder",			"assets/_engine/tex/_editor/icon_folder_d.png"	},
+			{"editor.browser.folder",			"assets/_engine/tex/_editor/icon_folder.png"	},
 			{"editor.browser.file",				"assets/_engine/tex/_editor/icon_null0.png"		}
 		};
 

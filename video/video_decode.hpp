@@ -21,7 +21,11 @@ namespace VideoPlaybackEngine {
 #ifdef _WIN32
     class MediaPlayerCallback : public IMFPMediaPlayerCallback
     {
+        friend class EngineH264Video;
         long m_cRef; // Reference count
+        bool* playbackstateptr = nullptr;
+        HWND* hwndptr = nullptr;
+        GLFWwindow* glfwwinptr = nullptr;
     public:
         
         MediaPlayerCallback() : m_cRef(1)
@@ -58,11 +62,7 @@ namespace VideoPlaybackEngine {
         IFACEMETHODIMP_(void) OnMediaPlayerEvent(MFP_EVENT_HEADER* pEventHeader);
     };
 #endif
-#ifdef _WIN32
-    static inline IMFPMediaPlayer* g_pPlayer = NULL;      // The MFPlay player object.	
-    static inline MediaPlayerCallback* g_pPlayerCB = NULL;
-    static inline int g_bHasVideo = 0;
-#endif
+
 
 	class EngineH264Video {
 	public:
@@ -70,12 +70,15 @@ namespace VideoPlaybackEngine {
 		~EngineH264Video();
         void destroyPlayback();
 		void createVideoSession(GLFWwindow* window, const std::string& mediaFile);
-		
-	private:
-		// WINDOWS
+        bool isPlaying() { return playbackstate; }
 
+	private:
+        bool playbackstate; // to prevent modification of this value
+		// WINDOWS
+        friend class MediaPlayerCallback;
 #ifdef _WIN32
-		HRESULT PlayVideo(HWND hwnd, PCWSTR pszURL);
+        HWND hwndwin;
+		inline void PlayVideo(PCWSTR pszURL);
 #endif
 	};
 
