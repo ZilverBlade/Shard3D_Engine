@@ -51,8 +51,8 @@ namespace Shard3D {
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
-			"assets/shaders/directional_light.vert.spv",
-			"assets/shaders/directional_light.frag.spv",
+			"assets/shaderdata/directional_light.vert.spv",
+			"assets/shaderdata/directional_light.frag.spv",
 			pipelineConfig
 		);
 	}

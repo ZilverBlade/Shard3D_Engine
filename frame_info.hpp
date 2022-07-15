@@ -6,7 +6,11 @@
 #include "texture.hpp"
 
 namespace Shard3D {
-
+	// fix this shit up eventually, only temporary solution
+	struct tempInfo {
+		inline static uint32_t viewportSize[2];
+		inline static float aspectRatioWoH;
+	};
 	struct Pointlight {
 		glm::vec4 position{};
 		glm::vec4 color{}; 
@@ -40,7 +44,7 @@ namespace Shard3D {
 		glm::mat4 inverseView{ 1.f };
 
 		//reyleigh scattering fakery and/or indirect light
-		glm::vec4 ambientColor = { 0.8f, 0.9f, 1.f, 0.014f };
+		glm::vec4 ambientColor = { 1.0f, 1.0f, 1.0f, 0.01f };
 
 		Pointlight pointlights[ENGINE_MAX_POINTLIGHTS];
 		Spotlight spotlights[ENGINE_MAX_SPOTLIGHTS];

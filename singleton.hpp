@@ -61,6 +61,7 @@ namespace Shard3D {
 		inline static PreviewModes editorPreviewSettings;
 #endif
 		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
+
 		static Destructor _ignore_destroy;
 	};
 }

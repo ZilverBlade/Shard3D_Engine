@@ -6,7 +6,7 @@ namespace Shard3D {
 //=====================================================================================================================
 //=====================================================================================================================
 
-const static std::string ENGINE_VERSION = "1.2.1.r3-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string ENGINE_VERSION = "1.2.1.r4-alpha";	// Shard3D {major, minor, patch, revision}-state
 const static std::string EDITOR_VERSION = "1.2.r0-alpha";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/settings/engine_settings.ini"
@@ -18,7 +18,7 @@ const static std::string EDITOR_VERSION = "1.2.r0-alpha";	// WorldEditor3D {majo
 #define ENGINE_ERRMAT				"assets/_engine/tex/null_mat.png" // png texture
 #define ENGINE_ERRMSH				"assets/_engine/msh/null_mdl.obj" // obj model
 #define ENGINE_ASSETS_PATH			"assets"
-#define ENGINE_SHADER_FILES_PATH	"assets/shaders/"				//Shader files (SPIR-V)
+#define ENGINE_SHADER_FILES_PATH	"assets/shaderdata/"				//Shader files (SPIR-V)
 #define ENGINE_DEFAULT_MODEL_FILE	"assets/_engine/msh/cube.obj"
 #define ENGINE_CORE_ASSETS_PATH		"assets/_engine/"	
 #define ENGINE_MONO_SCRIPT_ASSEMBLY_PATH	"assets/scriptdata"

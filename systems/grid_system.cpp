@@ -40,8 +40,8 @@ namespace Shard3D {
         pipelineConfig.pipelineLayout = pipelineLayout;
         enginePipeline = std::make_unique<EnginePipeline>(
             engineDevice,
-            "assets/shaders/_editor/grid.vert.spv",
-            "assets/shaders/_editor/grid.frag.spv",
+            "assets/shaderdata/_editor/grid.vert.spv",
+            "assets/shaderdata/_editor/grid.frag.spv",
             pipelineConfig
             );
     }

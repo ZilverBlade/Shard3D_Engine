@@ -54,15 +54,15 @@ namespace Shard3D {
 		if (ini.GetBoolValue("RENDERING", "PBR"))
 			enginePipeline = std::make_unique<EnginePipeline>(
 				engineDevice,
-				"assets/shaders/pbr_shader.vert.spv",
-				"assets/shaders/pbr_shader.frag.spv",
+				"assets/shaderdata/pbr_shader.vert.spv",
+				"assets/shaderdata/pbr_shader.frag.spv",
 				pipelineConfig
 			);
 		else 
 			enginePipeline = std::make_unique<EnginePipeline>(
 				engineDevice,
-				"assets/shaders/basic_shader.vert.spv",
-				"assets/shaders/basic_shader.frag.spv",
+				"assets/shaderdata/basic_shader.vert.spv",
+				"assets/shaderdata/basic_shader.frag.spv",
 				pipelineConfig
 			);
 	}

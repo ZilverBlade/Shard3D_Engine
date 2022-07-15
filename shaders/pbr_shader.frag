@@ -1,5 +1,5 @@
 #version 450
-
+#extension GL_ARB_shading_language_420pack : enable
 layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 fragPosWorld;
 layout(location = 2) in vec3 fragNormalWorld;
@@ -200,7 +200,7 @@ void main(){
         }
     }
     
-	vec3 fogColor =  vec3(0.029f, 0.027f, 0.059f);
+	vec3 fogColor = vec3(0.01, 0.01, 0.01);
 	    outColor = vec4(mix((ubo.ambientLightColor.xyz + Lo) 
         * ubo.ambientLightColor.w, fogColor, getFogFactor(distance(cameraPosWorld, fragPosWorld))), 
         1.0); //RGBA

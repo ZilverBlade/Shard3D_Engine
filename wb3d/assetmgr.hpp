@@ -67,18 +67,19 @@ namespace Shard3D {
 		inline static std::unordered_map<std::string, std::shared_ptr<EngineTexture>> _editor_icons;
 
 		inline static const char* _editor_icons_array[8][2]{
-			{"editor.play",						"assets/_engine/tex/_editor/icon_null0.png"		},
-			{"editor.pause",					"assets/_engine/tex/_editor/icon_null0.png"		},
-			{"editor.stop",						"assets/_engine/tex/_editor/icon_null0.png"		},
-			{"editor.light.point",				"assets/_engine/tex/_editor/icon_null.png"		},
-			{"editor.light.spot",				"assets/_engine/tex/_editor/icon_null.png"		},
-			{"editor.light.directional",		"assets/_engine/tex/_editor/icon_null.png"		},
+			{"editor.play",						"assets/_engine/tex/_editor/icon_play.png"		},
+			{"editor.pause",					"assets/_engine/tex/_editor/icon_pause.png"		},
+			{"editor.stop",						"assets/_engine/tex/_editor/icon_null"			},
+			{"editor.light.point",				"assets/_engine/tex/_editor/icon_null"			},
+			{"editor.light.spot",				"assets/_engine/tex/_editor/icon_null"			},
+			{"editor.light.directional",		"assets/_engine/tex/_editor/icon_null"			},
 			{"editor.browser.folder",			"assets/_engine/tex/_editor/icon_folder.png"	},
-			{"editor.browser.file",				"assets/_engine/tex/_editor/icon_null0.png"		}
+			{"editor.browser.file",				"assets/_engine/tex/_editor/icon_null"			}
 		};
 
 		friend class EditorApp;
 		friend class PointlightSystem;
 		friend class AssetExplorerPanel;
+		friend class ImGuiLayer;
 	};
 }

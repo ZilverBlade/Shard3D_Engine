@@ -21,7 +21,9 @@ namespace Shard3D {
 		void detach() override;
 		void update(FrameInfo frameInfo) override;
 	private:
+		void createIcons();
 		void renderMenuBar();
+		void renderQuickBar();
 		int width;
 		int height;
 
@@ -66,6 +68,12 @@ namespace Shard3D {
 		AssetExplorerPanel AssetExplorerPanel;
 		bool refreshContext;
 //Gizmo levelGizmo;
+
+		// icons
+
+		VkDescriptorSet icons_play;
+		VkDescriptorSet icons_pause;
+		VkDescriptorSet icons_stop;
 	};
 
 }

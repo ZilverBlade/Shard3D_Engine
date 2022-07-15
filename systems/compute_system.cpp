@@ -51,7 +51,7 @@ namespace Shard3D {
             engineDevice,
             VK_SHADER_STAGE_COMPUTE_BIT,
             pipelineLayout,
-            "assets/shaders/test.comp.spv",
+            "assets/shaderdata/test.comp.spv",
             pipelineConfig
         );
 

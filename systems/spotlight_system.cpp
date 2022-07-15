@@ -53,8 +53,8 @@ namespace Shard3D {
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
-			"assets/shaders/spotlight.vert.spv",
-			"assets/shaders/spotlight.frag.spv",
+			"assets/shaderdata/spotlight.vert.spv",
+			"assets/shaderdata/spotlight.frag.spv",
 			pipelineConfig
 		);
 	}

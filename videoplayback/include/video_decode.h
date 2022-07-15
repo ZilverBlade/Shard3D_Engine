@@ -9,15 +9,20 @@
 #include <Shlwapi.h>
 #endif
 
-#include <vulkan/vulkan.h>
-
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
-
-#include "../utils/engine_utils.hpp"
+#include <string>
 namespace VideoPlaybackEngine {
-
+    template <class T>
+    static void SafeRelease(T** ppT)
+    {
+        if (*ppT)
+        {
+            (*ppT)->Release();
+            *ppT = NULL;
+        }
+    }
 #ifdef _WIN32
     class MediaPlayerCallback : public IMFPMediaPlayerCallback
     {
@@ -78,7 +83,7 @@ namespace VideoPlaybackEngine {
         friend class MediaPlayerCallback;
 #ifdef _WIN32
         HWND hwndwin;
-		inline void PlayVideo(PCWSTR pszURL);
+		inline void PlayVideo(GLFWwindow* window, PCWSTR pszURL);
 #endif
 	};
 

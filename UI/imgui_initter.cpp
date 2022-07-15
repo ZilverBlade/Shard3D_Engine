@@ -39,9 +39,10 @@ namespace Shard3D {
 		io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
 		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
 		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
-
+#define ENGINE_FONT			"assets/_engine/fnt/fs-tahoma-8px.ttf"	
 		io.FontAllowUserScaling = false;
-		io.Fonts->AddFontFromFileTTF(ENGINE_DEFAULT_ENGINE_FONT, ENGINE_FONT_SIZE);
+		io.Fonts->AddFontFromFileTTF(ENGINE_FONT, ENGINE_FONT_SIZE);
+
 		io.Fonts->Build();
 		//io.Fonts->AddFontFromFileTTF(std::string(ENGINE_FONT_PATH + std::string("")).c_str(), ENGINE_FONT_SIZE);
 		//io.Fonts->Build();

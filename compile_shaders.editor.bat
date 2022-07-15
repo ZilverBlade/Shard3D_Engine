@@ -1,3 +1,3 @@
-shadercompmgr.exe -o shaders/_editor assets/shaders/_editor
+shadercompmgr.exe -o shaders/_editor assets/shaderdata/_editor
 
 pause

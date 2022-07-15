@@ -16,7 +16,7 @@ namespace Shard3D {
         VkImageView view;
     };
     struct OffscreenPass {
-        uint32_t width, height;
+        uint32_t* width = &tempInfo::viewportSize[0], *height = &tempInfo::viewportSize[1];
         VkFramebuffer frameBuffer;
         FrameBufferAttachment color, depth;
         VkRenderPass renderPass;
@@ -51,8 +51,8 @@ namespace Shard3D {
         VkRenderPass getRenderPass() { return pass.renderPass; }
         const OffscreenPass getPass() { return pass; }
         void setViewportSize(const glm::vec2& size) {
-            pass.width = size.x;
-            pass.height = size.y;
+            *pass.width = size.x;
+            *pass.height = size.y;
 
             createImages();
         }

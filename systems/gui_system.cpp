@@ -61,8 +61,8 @@ namespace Shard3D {
 		pipelineConfig.pipelineLayout = pipelineLayout; 
 		enginePipeline = std::make_unique<EnginePipeline>(
 			Singleton::engineDevice,
-			"assets/shaders/gui_element.vert.spv",
-			"assets/shaders/gui_element.frag.spv",
+			"assets/shaderdata/gui_element.vert.spv",
+			"assets/shaderdata/gui_element.frag.spv",
 			pipelineConfig
 		);
 	}

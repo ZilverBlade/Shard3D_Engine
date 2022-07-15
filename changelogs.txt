@@ -76,6 +76,8 @@ ALPHA:
 		- Experimental C# and VB script engines using Mono
 		- Fixed video playback crashing on start
 		- Video playback now closes when playback ended
+		- Moved Video playback to its own static library
+		- Disabled video playback for non debug builds as they cause a crash
 		- Removed "Release Debug" as it no longer makes sense and constantly breaks the linker, and renamed Optimised No-Debug back to Release
 		- Restructured camera controls to be less annoying
 		- Changed font to be 8px based tahoma 
@@ -84,3 +86,7 @@ ALPHA:
 		- Tweaked blinn power specular
 		- Fixed PCH not working
 		- Updated editor icons
+		- Added "Quickbar" with image buttons
+		- Fixed viewport not conforming to the viewport window
+		- Renamed assets/shaders to assets/shaderdata to conform to naming scheme
+		- Changed clear colour to (0.01, 0.01, 0.01)

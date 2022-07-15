@@ -1,13 +1,12 @@
-#include "../s3dtpch.h"
-#include "video_decode.hpp"
-#include <filesystem>
-#include "../singleton.hpp"
+#include "pch.h"
+#include "include/video_decode.h"
+#include <iostream>
 
 namespace VideoPlaybackEngine {
 #ifdef _WIN32
-	static inline IMFPMediaPlayer* g_pPlayer = nullptr;      // The MFPlay player object.	
-	static inline MediaPlayerCallback* g_pPlayerCB = nullptr;
-	static inline int g_bHasVideo = 0;
+	static IMFPMediaPlayer* g_pPlayer = nullptr;      // The MFPlay player object.	
+	static MediaPlayerCallback* g_pPlayerCB = nullptr;
+	static int g_bHasVideo = 0;
 #endif
 
 	EngineH264Video::EngineH264Video() : playbackstate(false), hwndwin(nullptr) {}
@@ -15,15 +14,15 @@ namespace VideoPlaybackEngine {
 
 	void EngineH264Video::destroyPlayback() {
 		g_pPlayer->Stop();
-		Shard3D::SafeRelease(&g_pPlayer);
+		SafeRelease(&g_pPlayer);
 		PostQuitMessage(0);
 	}
 
 	void EngineH264Video::createVideoSession(GLFWwindow* window, const std::string& mediaFile) {
-		SHARD3D_INFO("Creating video session");
-		wchar_t absolutePath = (wchar_t)std::filesystem::absolute(mediaFile).string().c_str();
+		std:printf("Creating video session\n");
+	//	wchar_t absolutePath = (wchar_t)std::filesystem::absolute(mediaFile).string().c_str();
 
-		PlayVideo(L"assets\\videodata\\shard3d.wmv");
+		PlayVideo(window, L"assets\\videodata\\shard3d.wmv");
 	}
 	// WINDOWS
 #ifdef _WIN32
@@ -49,12 +48,12 @@ namespace VideoPlaybackEngine {
 				// Set the media item on the player. This method completes
 				// asynchronously.
 				hr = g_pPlayer->SetMediaItem(pEvent->pMediaItem);
-				Shard3D::LOGGER::getDebugLogger()->trace("Succeded playing '{0}'", hr);
+				std::printf("Succeded playing '{0}'", hr);
 			}
 	
 			if (FAILED(hr))
 			{
-				SHARD3D_WARN("Failed playing '{0}'", hr);
+				std::printf("Failed playing '%s'", hr);
 			}
 		}
 	}
@@ -65,7 +64,7 @@ namespace VideoPlaybackEngine {
 		HRESULT hr = g_pPlayer->Play();
 		if (FAILED(hr))
 		{
-			SHARD3D_WARN("IMFPMediaPlayer::Play failed. {0}", hr);
+			std::printf("IMFPMediaPlayer::Play failed. %s", hr);
 		}
 	}
 	IFACEMETHODIMP_(void) MediaPlayerCallback::OnMediaPlayerEvent(MFP_EVENT_HEADER* pEventHeader)
@@ -73,7 +72,7 @@ namespace VideoPlaybackEngine {
 		std::cout << "OnMediaPlayerEvent\n";
 		if (FAILED(pEventHeader->hrEvent))
 		{
-			SHARD3D_WARN("Playback failed {0}", pEventHeader->hrEvent);
+			std::printf("Playback failed {0}", pEventHeader->hrEvent);
 			return;
 		}
 		
@@ -88,9 +87,9 @@ namespace VideoPlaybackEngine {
 			break;
 		
 		case MFP_EVENT_TYPE_PLAYBACK_ENDED:
-			Shard3D::LOGGER::getDebugLogger()->trace("Playback ended, stopping media");
+			std::printf("Playback ended, stopping media");
 			g_pPlayer->Stop();
-			Shard3D::SafeRelease(&g_pPlayer);
+			SafeRelease(&g_pPlayer);
 			*playbackstateptr = false;
 			CloseWindow(*hwndptr);
 			DestroyWindow(*hwndptr);
@@ -102,7 +101,7 @@ namespace VideoPlaybackEngine {
 		}
 	}
 
-	inline void EngineH264Video::PlayVideo(PCWSTR pszURL) {
+	inline void EngineH264Video::PlayVideo(GLFWwindow* window, PCWSTR pszURL) {
 		HRESULT hr = S_OK;
 
 
@@ -119,7 +118,7 @@ namespace VideoPlaybackEngine {
 		);
 		hwndwin = glfwGetWin32Window(pWindow);
 
-		SetParent(hwndwin, glfwGetWin32Window(Shard3D::Singleton::engineWindow.getGLFWwindow()));
+		SetParent(hwndwin, glfwGetWin32Window(window));
 
 		long style = GetWindowLong(hwndwin, GWL_STYLE);
 		style &= ~WS_POPUP; // remove popup style
@@ -141,7 +140,7 @@ namespace VideoPlaybackEngine {
 			{
 				return;
 			}
-			SHARD3D_LOG("creating media");
+			std::printf("creating media");
 			hr = MFPCreateMediaPlayer(
 				pszURL,			// path
 				TRUE,           // Start playback automatically?

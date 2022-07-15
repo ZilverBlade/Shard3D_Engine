@@ -58,8 +58,8 @@ namespace Shard3D {
 		pipelineConfig.pipelineLayout = pipelineLayout; // support only view plane aligned atm
 		enginePipeline = std::make_unique<EnginePipeline>(
 			engineDevice,
-			"assets/shaders/billboard_sva.vert.spv",
-			"assets/shaders/billboard_sva.frag.spv",
+			"assets/shaderdata/billboard_sva.vert.spv",
+			"assets/shaderdata/billboard_sva.frag.spv",
 			pipelineConfig
 		);
 	}

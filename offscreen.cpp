@@ -5,8 +5,8 @@
 #include "offscreen.hpp"
 namespace Shard3D {
     OffScreen::OffScreen(EngineDevice &device) : m_Device{device} {
-        pass.width = 1920;
-        pass.height = 1080;
+        *pass.width = 1920;
+        *pass.height = 1080;
 
         createImages();
 
@@ -34,8 +34,8 @@ namespace Shard3D {
         image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         image.imageType = VK_IMAGE_TYPE_2D;
         image.format = VK_FORMAT_B8G8R8A8_SRGB;
-        image.extent.width = pass.width;
-        image.extent.height = pass.height;
+        image.extent.width = *pass.width;
+        image.extent.height = *pass.height;
         image.extent.depth = 1;
         image.mipLevels = 1;
         image.arrayLayers = 1;
@@ -203,8 +203,8 @@ namespace Shard3D {
         fbufCreateInfo.renderPass = pass.renderPass;
         fbufCreateInfo.attachmentCount = 2;
         fbufCreateInfo.pAttachments = attachments;
-        fbufCreateInfo.width = pass.width;
-        fbufCreateInfo.height = pass.height;
+        fbufCreateInfo.width = *pass.width;
+        fbufCreateInfo.height = *pass.height;
         fbufCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(m_Device.device(), &fbufCreateInfo, nullptr, &pass.frameBuffer) != VK_SUCCESS) {
@@ -222,8 +222,8 @@ namespace Shard3D {
         renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassBeginInfo.renderPass = pass.renderPass;
         renderPassBeginInfo.framebuffer = pass.frameBuffer;
-        renderPassBeginInfo.renderArea.extent.width = pass.width;
-        renderPassBeginInfo.renderArea.extent.height = pass.height;
+        renderPassBeginInfo.renderArea.extent.width = *pass.width;
+        renderPassBeginInfo.renderArea.extent.height = *pass.height;
         renderPassBeginInfo.clearValueCount = 2;
         renderPassBeginInfo.pClearValues = clearValues.data();
 
@@ -231,16 +231,16 @@ namespace Shard3D {
 
         VkViewport viewport = {};
         viewport.x = 0.0f;
-        viewport.y = (float)pass.height;
-        viewport.width = (float)pass.width;
-        viewport.height = -(float)pass.height;
+        viewport.y = (float)*pass.height;
+        viewport.width = (float)*pass.width;
+        viewport.height = -(float)*pass.height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
         vkCmdSetViewport(frameInfo.commandBuffer, 0, 1, &viewport);
 
         VkRect2D scissor = {};
-        scissor.extent.width = pass.width;
-        scissor.extent.height = pass.height;
+        scissor.extent.width = *pass.width;
+        scissor.extent.height = *pass.height;
         scissor.offset.x = 0;
         scissor.offset.y = 0;
         vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);

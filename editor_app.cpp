@@ -28,8 +28,9 @@
 #include "graphics_settings.hpp"
 #include "UI/imgui_initter.hpp"
 #include "wb3d/assetmgr.hpp"
-#include "video/video_decode.hpp"
-
+#ifndef NDEBUG
+#include <video_decode.h>
+#endif
 
 namespace Shard3D {
 	EditorApp::EditorApp() {
@@ -39,11 +40,15 @@ namespace Shard3D {
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 #ifndef _DEPLOY
 		if (ini.GetBoolValue("MISC", "enableIntroVideoNonDeploy") == true) {
+#ifndef NDEBUG
 			VideoPlaybackEngine::EngineH264Video videoEngine;
-			videoEngine.createVideoSession(Singleton::engineWindow.getGLFWwindow(), ini.GetValue("MISC", "introVideo"));
+			videoEngine.createVideoSession(Singleton::engineWindow.getGLFWwindow(), "assets/mediadata/video.wmw");
 			while (videoEngine.isPlaying()) {
 				glfwPollEvents();
-			}		
+			}
+#elif NDEBUG
+			SHARD3D_NOIMPL;
+#endif	
 		}
 #elif _DEPLOY
 		VideoPlaybackEngine::EngineH264Video videoEngine;
@@ -186,8 +191,7 @@ namespace Shard3D {
 				editorCameraControllerKeyboard.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
 				editorCameraControllerMouse.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
 			}
-
-			possessedCameraActor.getComponent<Components::CameraComponent>().ar = Singleton::engineRenderer.getAspectRatio();
+			possessedCameraActor.getComponent<Components::CameraComponent>().ar = tempInfo::aspectRatioWoH;
 			possessedCamera.setViewYXZ(
 				possessedCameraActor.getComponent<Components::TransformComponent>().translation, 
 				possessedCameraActor.getComponent<Components::TransformComponent>().rotation

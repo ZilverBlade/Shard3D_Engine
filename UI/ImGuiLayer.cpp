@@ -16,11 +16,14 @@
 
 #include "../audio.hpp"
 #include "../utils/dialogs.h"
-#include "../video/video_decode.hpp"
+#ifndef NDEBUG
+#include <video_decode.h>
+#endif
 #include "../systems/material_system.hpp"
 #include "../singleton.hpp"
 #include "imgui_initter.hpp"
 #include <shellapi.h>
+#include "../wb3d/assetmgr.hpp"
 namespace Shard3D {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
@@ -57,6 +60,21 @@ namespace Shard3D {
         enset.defaultBGColor[1] = ini.GetDoubleValue("RENDERING", "DefaultBGColorG");
         enset.defaultBGColor[2] = ini.GetDoubleValue("RENDERING", "DefaultBGColorB");
         enset.pbr = ini.GetBoolValue("RENDERING", "PBR");
+
+        createIcons();
+    }
+
+    void ImGuiLayer::createIcons() {
+        {
+            auto& img = _special_assets::_editor_icons.at("editor.play");
+            icons_play = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.pause");
+            icons_pause = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.stop");
+            icons_stop = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        }
     }
 
     void ImGuiLayer::detach() {
@@ -138,9 +156,13 @@ namespace Shard3D {
             renderMenuBar();
             ImGui::EndMenuBar();
         }
+        renderQuickBar();
 
+        // VIEWPORT
         ImGui::Begin("Viewport");
-        ImGui::Image(Singleton::viewportImage, ImGui::GetWindowViewport()->Size);
+            ImVec2 vSize = ImGui::GetContentRegionAvail();
+            tempInfo::aspectRatioWoH = vSize.x / vSize.y;
+        ImGui::Image(Singleton::viewportImage, vSize);
         ImGui::End();
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
@@ -334,6 +356,58 @@ namespace Shard3D {
         glfwMakeContextCurrent(backup_current_context);
     }
 
+
+    void ImGuiLayer::renderQuickBar() {
+        ImGui::Begin("##quickbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
+        ImVec2 btnSize = { 48.f, 48.f };
+        float panelWidth = ImGui::GetContentRegionAvail().x;
+        int columnCount = std::max((int)(panelWidth / (btnSize.x + 16.f))// <--- thumbnail size (96px) + padding (16px)
+            , 1);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4());
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
+        ImGui::Columns(columnCount, 0, false);                                                                                                                              // resume
+        if (ImGui::ImageButton(
+            (Singleton::activeLevel->simulationState == PlayState::Stopped) ? icons_play : 
+                ((Singleton::activeLevel->simulationState == PlayState::Paused) ? icons_play : icons_pause), btnSize)) {
+            if (Singleton::activeLevel->simulationState == PlayState::Stopped) {
+                wb3d::MasterManager::captureLevel(Singleton::activeLevel);
+                Singleton::activeLevel->begin();
+                std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING) | " + Singleton::activeLevel->name;
+                glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+            } else if (Singleton::activeLevel->simulationState == PlayState::Paused) {
+                Singleton::activeLevel->simulationState = PlayState::Simulating;
+                Singleton::activeLevel->simulationStateCallback();
+                std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING) | " + Singleton::activeLevel->name;
+                glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());          
+            } else if (Singleton::activeLevel->simulationState == PlayState::Simulating) {
+                Singleton::activeLevel->simulationState = PlayState::Paused;
+                Singleton::activeLevel->simulationStateCallback();
+                std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused) | " + Singleton::activeLevel->name;
+                glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+            }
+
+        }
+        ImGui::TextWrapped((Singleton::activeLevel->simulationState == PlayState::Stopped) ? "Play" :
+            ((Singleton::activeLevel->simulationState == PlayState::Paused) ? "Resume" : "Pause"));
+        ImGui::NextColumn();
+        ImGui::BeginDisabled(Singleton::activeLevel->simulationState == PlayState::Stopped);
+        if (ImGui::ImageButton(icons_stop, btnSize)) {        
+            levelTreePanel.clearSelectedActor();
+            Singleton::activeLevel->end();
+            std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null) | " + Singleton::activeLevel->name;
+            glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+            refreshContext = true;
+        }
+        ImGui::TextWrapped("Stop");
+        ImGui::EndDisabled();
+        ImGui::NextColumn();
+        ImGui::Columns(1);
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor();
+        ImGui::End();
+    }
+
+
     void ImGuiLayer::renderMenuBar() {
         if (ImGui::BeginMenu("File")) {
             ImGui::TextDisabled("WorldBuilder3D 0.1");
@@ -443,11 +517,15 @@ namespace Shard3D {
                 audio.play("assets/audiodata/thou-3.mp3");
             }
             if (ImGui::MenuItem("Play test video")) {
+#ifndef NDEBUG
                 VideoPlaybackEngine::EngineH264Video videoEngine;
                 videoEngine.createVideoSession(Singleton::engineWindow.getGLFWwindow(), "assets/mediadata/video.wmw");
                 while (videoEngine.isPlaying()) {
                     glfwPollEvents();
                 }
+#elif NDEBUG
+                SHARD3D_NOIMPL;
+#endif
             }
             if (ImGui::MenuItem("Save test material")) {
                 MaterialSystem::Material surfaceMat;

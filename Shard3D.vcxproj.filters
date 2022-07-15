@@ -221,9 +221,6 @@
     <ClCompile Include="wb3d\blueprint.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
-    <ClCompile Include="video\video_decode.cpp">
-      <Filter>video\Source</Filter>
-    </ClCompile>
     <ClCompile Include="systems\material_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
@@ -438,9 +435,6 @@
     </ClInclude>
     <ClInclude Include="wb3d\blueprint.hpp">
       <Filter>Header Files\wb3d</Filter>
-    </ClInclude>
-    <ClInclude Include="video\video_decode.hpp">
-      <Filter>video\Header</Filter>
     </ClInclude>
     <ClInclude Include="systems\material_system.hpp">
       <Filter>Header Files\systems</Filter>
