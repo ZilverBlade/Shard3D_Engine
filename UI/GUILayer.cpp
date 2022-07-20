@@ -3,36 +3,51 @@
 #include "../singleton.hpp"
 
 namespace Shard3D {
-    GUILayer::GUILayer() : Layer("ImGuiLayer") {}
+    GUILayer::GUILayer() : Layer("GUILayer"){}
 
     GUILayer::~GUILayer() {}
 
-    void GUILayer::attach(VkRenderPass renderPass) {
+    void GUILayer::attach(VkRenderPass renderPass, LayerStack* layerStack) {
+        window = Singleton::engineWindow.getGLFWwindow();
         guiRenderSystem.create(renderPass);
     }
 
     void GUILayer::detach() {
+        guiElements.elementsGUI.clear();
         guiRenderSystem.destroy();
     }
 
-    void GUILayer::update(FrameInfo frameInfo) {
+    void GUILayer::update(FrameInfo& frameInfo) {
         guiRenderSystem.render(frameInfo, guiElements);
+        if (Singleton::activeLevel->simulationState == wb3d::PlayState::Simulating) // only react to mouse when not playing
+        if (glfwGetMouseButton(Singleton::engineWindow.getGLFWwindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {     
+            if (getSelectedID() == 0) return;
+            getSelectedElement()->pressEventCallback();
+        }
     }
 
-    void GUILayer::addElement(GUI::Element element) {
-        guiElements.elementsGUI.push_back(element);
+    void GUILayer::addElement(std::shared_ptr<GUI::Element> element) {
+        if (element->guid == 0) { SHARD3D_ERROR("You cannot create a GUI element with GUID 0"); return; }
+        guiElements.elementsGUI.emplace(element->guid, element);
     }
 
-    void GUILayer::rmvElement(GUI::Element element) {
-       // std::vector<GUI::Element>::iterator itr = 
-       //     std::find(guiElements.elementsGUI.begin(), guiElements.elementsGUI.end(), element);
-       //
-       // guiElements.elementsGUI.erase(guiElements.elementsGUI.begin() + 
-       //     std::distance(guiElements.elementsGUI.begin(), itr));
+    uint64_t GUILayer::getSelectedID() {
+        auto* v = guiRenderSystem.pickBuffer->getMappedMemory();
+        auto u = static_cast<uint64_t*>(v);
+        return *u;
     }
 
-    void GUILayer::rmvElement(size_t index) {
-        guiElements.elementsGUI.erase(guiElements.elementsGUI.begin() + index);
+    std::shared_ptr<GUI::Element> GUILayer::getSelectedElement() {
+        
+        return guiElements.elementsGUI.find(getSelectedID())->second;
+    }
+
+    void GUILayer::rmvElement(std::shared_ptr<GUI::Element> element) {
+        guiElements.elementsGUI.erase(element->guid);
+    }
+
+    void GUILayer::rmvElement(uint64_t id) {
+        guiElements.elementsGUI.erase(id);
     }
 
 

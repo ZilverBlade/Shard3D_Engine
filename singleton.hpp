@@ -57,11 +57,11 @@ namespace Shard3D {
 
 		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
 
-#ifndef _DEPLOY
+//#ifndef _DEPLOY
 		inline static PreviewModes editorPreviewSettings;
-#endif
+//#endif
 		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
 
-		static Destructor _ignore_destroy;
+		inline static Destructor _ignore_destroy;
 	};
 }

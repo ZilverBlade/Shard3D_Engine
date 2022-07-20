@@ -15,16 +15,16 @@ namespace Shard3D {
 
 	void LayerStack::pushLayer(Layer* layer) {
 		layerInsert = layers.emplace(layerInsert, layer);
-		layer->attach(Singleton::engineRenderer.getSwapChainRenderPass());
+		layer->attach(Singleton::engineRenderer.getSwapChainRenderPass(), this);
 	}
 
 	void LayerStack::pushOverlay(Layer* overlay) {
 		layers.emplace_back(overlay);
-		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
+		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass(), this);
 	}
 
 	void LayerStack::repushOverlay(Layer* overlay) {
-		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass());
+		overlay->attach(Singleton::engineRenderer.getSwapChainRenderPass(), this);
 	}
 
 	void LayerStack::popLayer(Layer* layer) {
@@ -36,9 +36,15 @@ namespace Shard3D {
 	}
 
 	void LayerStack::popOverlay(Layer* overlay) {
-		auto iter = std::find(layers.begin(), layers.end(), overlay);
-		if (iter != layers.end()) {
-			layers.erase(iter);
+		eraseLayers.push_back(overlay);
+	}
+
+	void LayerStack::popQueue() {
+		for (auto layer : eraseLayers) {
+			auto iter = std::find(layers.begin(), layers.end(), layer);
+			if (iter != layers.end()) {
+				layers.erase(iter);
+			}
 		}
 	}
 

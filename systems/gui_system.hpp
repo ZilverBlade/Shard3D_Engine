@@ -5,7 +5,7 @@
 #include "../device.hpp"
 #include "../camera.hpp"
 #include "../frame_info.hpp"
-
+#include "../buffer.hpp"
 #include "../renderer.hpp"
 #include "../gui.hpp"
 namespace Shard3D {
@@ -28,6 +28,11 @@ namespace Shard3D {
 		std::unique_ptr<EnginePipeline> enginePipeline;
 		VkPipelineLayout pipelineLayout;
 		std::unique_ptr<EngineDescriptorSetLayout> guiSystemLayout;
+		std::unique_ptr<EngineDescriptorSetLayout> ssboLayout;
+		VkDescriptorSet ssboDescriptorSet{};
+		std::unique_ptr<EngineBuffer> pickBuffer;
+
+		friend class GUILayer;
 	};
 
 }

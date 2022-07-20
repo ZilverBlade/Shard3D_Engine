@@ -1,7 +1,14 @@
-Shard3D: 1.1.1.r0-alpha
-WorldBuilder3D: 0.1
+Shard3D: 1.2.2.r0-alpha
+WorldBuilder3D: 1.2.r1-alpha
 Level: Some kind of level
 Actors:
+  - Actor: 1
+    TagComponent:
+      Tag: Dummy Actor (SYSTEM RESERVED)
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
   - Actor: 17404735231192878213
     TagComponent:
       Tag: road
@@ -36,13 +43,13 @@ Actors:
     TagComponent:
       Tag: Spotlight
     TransformComponent:
-      Translation: [2.26999998, 1.59000003, 0.75999999]
-      Rotation: [-0.132645026, -0.164060935, -0.0191986226]
+      Translation: [2.26999998, 1.58000004, 1.96000004]
+      Rotation: [-0.132645026, -0.24085544, -0.1134464]
       Scale: [1, 1, 1]
     SpotlightComponent:
-      Emission: [1, 1, 1, 1]
+      Emission: [1, 1, 1, 2.88000011]
       Radius: 1
-      Angle: [0.785398185, 0.261799395]
+      Angle: [0.802851439, 0.968657732]
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
   - Actor: 2784833615538243943
@@ -69,3 +76,10 @@ Actors:
       Radius: 1
       Specularness: 1
       AttenuationCLQ: [0, 0, 1]
+  - Actor: 1
+    TagComponent:
+      Tag: Dummy Actor (SYSTEM RESERVED)
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]

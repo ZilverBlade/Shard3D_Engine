@@ -27,6 +27,7 @@ namespace Shard3D {
 				.setMaxSets(1024)
 				.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1024)
 				.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1024)
+				.addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1024)
 				.setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT);
 			for (int i = 0; i < drawPools.size(); i++) {
 				drawPools[i] = framePoolBuilder.build();

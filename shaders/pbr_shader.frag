@@ -166,10 +166,10 @@ void main(){
         
         vec3 L = normalize(light.position.xyz - fragPosWorld);
 		float theta = dot(L, normalize(-light.direction.xyz));
-		
-		if(theta > sin(light.angle.x)) { 
-            float epsilon  = light.angle.y - light.angle.x;
-		    float intensity = clamp((theta - light.angle.x) / epsilon, 0.0, 1.0); 
+		float outerCosAngle =  cos(light.angle.x);
+		if(theta > outerCosAngle) { 
+            float epsilon  = cos(light.angle.y) - outerCosAngle;
+		    float intensity = clamp((theta - outerCosAngle) / epsilon, 0.0, 1.0); 
 
             vec3 H = normalize(V + L);
             float distance = length(light.position.xyz - fragPosWorld);

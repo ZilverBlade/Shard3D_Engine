@@ -90,3 +90,17 @@ ALPHA:
 		- Fixed viewport not conforming to the viewport window
 		- Renamed assets/shaders to assets/shaderdata to conform to naming scheme
 		- Changed clear colour to (0.01, 0.01, 0.01)
+	> Shard3D Torque 1.2.2-alpha
+		- Added several new custom icons
+		- Remastered save icon
+		- Moved all editor billboards to render an editor billboard system
+		- Fixed broken spotlight angles
+		- Fixed example script not displaying camera correctly upon possession
+		- Renamed final folder, settings to configdata
+		- Added light theme (configurable in editor_settings.ini)
+		- Added experimental mouse picking support for GUI system using storage buffers
+		- Fixed ImGui detachment not working as intended
+		- Improvements to script engine
+
+
+		:: TODO, add credits, add editor layouts, add working GUI builder, finalize script engine, switch to clang

@@ -13,7 +13,7 @@ namespace Shard3D {
 		void repushOverlay(Layer* overlay);
 		void popLayer(Layer* layer);
 		void popOverlay(Layer* overlay);
-
+		void popQueue();
 		std::vector<Layer*>::iterator begin() { 
 			return layers.begin();
 		}
@@ -23,6 +23,7 @@ namespace Shard3D {
 	private:
 		std::vector<Layer*> layers;
 		std::vector<Layer*>::iterator layerInsert ;
+		std::vector<Layer*> eraseLayers;
 	};
 
 }

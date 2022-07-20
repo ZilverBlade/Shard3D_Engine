@@ -38,7 +38,7 @@ namespace Shard3D {
         descriptorSetLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
         descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
-
+        
         if (vkCreateDescriptorSetLayout(
             engineDevice.device(),
             &descriptorSetLayoutInfo,
@@ -88,7 +88,7 @@ namespace Shard3D {
         descriptorPoolInfo.pPoolSizes = poolSizes.data();
         descriptorPoolInfo.maxSets = maxSets;
         descriptorPoolInfo.flags = poolFlags;
-
+        
         if (vkCreateDescriptorPool(engineDevice.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
             VK_SUCCESS) {
             SHARD3D_FATAL("failed to create descriptor pool!");
@@ -149,7 +149,7 @@ namespace Shard3D {
         write.dstBinding = binding;
         write.pBufferInfo = bufferInfo;
         write.descriptorCount = 1;
-
+        
         writes.push_back(write);
         return *this;
     }

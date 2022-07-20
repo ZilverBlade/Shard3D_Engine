@@ -6,12 +6,12 @@ namespace Shard3D {
 //=====================================================================================================================
 //=====================================================================================================================
 
-const static std::string ENGINE_VERSION = "1.2.1.r4-alpha";	// Shard3D {major, minor, patch, revision}-state
-const static std::string EDITOR_VERSION = "1.2.r0-alpha";	// WorldEditor3D {major, minor};
+const static std::string ENGINE_VERSION = "1.2.2.r0-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string EDITOR_VERSION = "1.2.r1-alpha";	// WorldEditor3D {major, minor};
 
-#define ENGINE_SETTINGS_PATH		"assets/settings/engine_settings.ini"
-#define EDITOR_SETTINGS_PATH		"assets/settings/editor_settings.ini"	//unused
-#define GAME_SETTINGS_PATH			"assets/settings/game_settings.ini"	
+#define ENGINE_SETTINGS_PATH		"assets/configdata/engine_settings.ini"
+#define EDITOR_SETTINGS_PATH		"assets/configdata/editor_settings.ini"
+#define GAME_SETTINGS_PATH			"assets/configdata/game_settings.ini"	
 
 // DONT TOUCH
 #define ENGINE_ERRTEX				"assets/_engine/tex/null_tex.png" // png texture
@@ -44,7 +44,6 @@ const static std::string EDITOR_VERSION = "1.2.r0-alpha";	// WorldEditor3D {majo
 #define ENSET_BETA_DEBUG_TOOLS		true
 
 // experimentals
-#define ENSET_USE_PBR								true	// PBR can look better, but it's experimental as of now and it's significantly slower and buggier;
 #define ENSET_ENABLE_COMPUTE_SHADERS				false	// Compute shaders can be very useful, however as of now they have not been fully implemented, only enable for development
 #ifndef _DEPLOY
 #define ENSET_ALLOW_PREVIEW_CAMERA					false	// Allow previewing camera, has impact on performance and is broken at the moment. 

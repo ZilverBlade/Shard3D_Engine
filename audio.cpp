@@ -17,13 +17,14 @@ namespace Shard3D {
         ma_engine_uninit(&engine);
     }
 
-    void EngineAudio::play(const std::string& file) {
+    void EngineAudio::play(const std::string& file, audio_params_t params) {
         result = ma_sound_init_from_file(&engine, file.c_str(), 0, NULL, NULL, &sound);
         if (result != MA_SUCCESS) {
             SHARD3D_ERROR("Failed to initialize sound '{0}'! ({1})", file.c_str(), result);
         }
         ma_sound_start(&sound);
-        ma_sound_set_looping(&sound, true);
+        ma_sound_set_looping(&sound, params != AudioOneShot);
+        ma_sound_set_spatialization_enabled(&sound, params != AudioSpatialize);
     }
     void EngineAudio::globalUpdate(glm::vec3 position, glm::vec3 dir) {
         ma_engine_listener_set_position(&engine, 0, position.x, position.y, position.z);

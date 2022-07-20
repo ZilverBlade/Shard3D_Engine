@@ -12,7 +12,8 @@ int main() {
     Shard3D::EditorApp app{};
 #endif
 #ifdef _DEPLOY
-    Shard3D::ProjectApp app{};
+    //Shard3D::ProjectApp app{};
+    Shard3D::EditorApp app{};
 #endif
 #if ENSET_BETA_DEBUG_TOOLS == false // dont hide for beta testing, as it might be useful
 #ifdef _DEPLOY  // hide for deploy, and logging would be done in a file anyway, console is only for dev purposes

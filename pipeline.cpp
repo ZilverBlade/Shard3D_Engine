@@ -161,13 +161,13 @@ namespace Shard3D {
 		auto& bindingDescriptions = configInfo.bindingDescriptions;
 		auto& attributeDescriptions = configInfo.attributeDescriptions;
 
-		VkComputePipelineCreateInfo computePipelineCreateInfo{};
+		VkComputePipelineCreateInfo computePipelineCreateInfo {};
 		computePipelineCreateInfo.stage = shaderStages[0];
 		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-		computePipelineCreateInfo.layout = configInfo.pipelineLayout;
+		computePipelineCreateInfo.layout = pipelineLayout;
 		computePipelineCreateInfo.flags = 0;
 
-		if (vkCreateComputePipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+		if (vkCreateComputePipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &computePipeline) != VK_SUCCESS) {
 			SHARD3D_FATAL("failed to create compute pipeline!");
 		}
 	}
@@ -197,7 +197,7 @@ namespace Shard3D {
 	}
 
 	void EnginePipeline::bindCompute(VkCommandBuffer commandBuffer) {
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, graphicsPipeline);
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computePipeline);
 	}
 
 	void EnginePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
@@ -286,5 +286,8 @@ namespace Shard3D {
 		configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; 
 		configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
 		configInfo.colorBlendAttachment.alphaBlendOp = blendOp;
+	}
+	void EnginePipeline::discardRasterizer(PipelineConfigInfo& configInfo) {
+		configInfo.rasterizationInfo.rasterizerDiscardEnable = VK_TRUE;
 	}
 }

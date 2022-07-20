@@ -10,22 +10,23 @@
 
 namespace Shard3D {
 
-    struct FrameBufferAttachment {
-        VkImage image;
-        VkDeviceMemory mem;
-        VkImageView view;
-    };
-    struct OffscreenPass {
-        uint32_t* width = &tempInfo::viewportSize[0], *height = &tempInfo::viewportSize[1];
-        VkFramebuffer frameBuffer;
-        FrameBufferAttachment color, depth;
-        VkRenderPass renderPass;
-        VkSampler sampler;
-        VkDescriptorImageInfo descriptor;
-    };
 
     class OffScreen {
-    private:
+
+        struct FrameBufferAttachment {
+            VkImage image;
+            VkDeviceMemory mem;
+            VkImageView view;
+        };
+        struct OffscreenPass {
+            uint32_t* width = &tempInfo::viewportSize[0], * height = &tempInfo::viewportSize[1];
+            VkFramebuffer frameBuffer;
+            FrameBufferAttachment color, depth;
+            VkRenderPass renderPass;
+            VkSampler sampler;
+            VkDescriptorImageInfo descriptor;
+        };
+
         std::array<VkClearValue, 2> clearValues{};
         VkDeviceSize offsets[1] = { 0 };
     public:
@@ -57,8 +58,8 @@ namespace Shard3D {
             createImages();
         }
 
-        void start(FrameInfo frameInfo);
-        void end(FrameInfo frameInfo);
+        void start(FrameInfo& frameInfo);
+        void end(FrameInfo& frameInfo);
     private:
         void createImages();
 

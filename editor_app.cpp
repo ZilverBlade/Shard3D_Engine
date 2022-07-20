@@ -28,6 +28,7 @@
 #include "graphics_settings.hpp"
 #include "UI/imgui_initter.hpp"
 #include "wb3d/assetmgr.hpp"
+//#include "systems/fullscreen_renderer.hpp"
 #ifndef NDEBUG
 #include <video_decode.h>
 #endif
@@ -48,27 +49,30 @@ namespace Shard3D {
 			}
 #elif NDEBUG
 			SHARD3D_NOIMPL;
-#endif	
+#endif
 		}
 #elif _DEPLOY
-		VideoPlaybackEngine::EngineH264Video videoEngine;
-		videoEngine.createVideoSession(window, ini.GetValue("MISC", "introVideo"));
-		while (videoEngine.isPlaying()) {
-			glfwPollEvents();
-		}
+		//VideoPlaybackEngine::EngineH264Video videoEngine;
+		//videoEngine.createVideoSession(window, ini.GetValue("MISC", "introVideo"));
+		//while (videoEngine.isPlaying()) {
+		//	glfwPollEvents();
+		//}
 #endif
-
+		AssetManager::clearAllAssets();
 		_special_assets::_editor_icons_load();
 		SharedPools::constructPools(Singleton::engineDevice);
 		GraphicsSettings::init(&Singleton::engineWindow);
 		SHARD3D_INFO("Constructing Level Pointer");
 		Singleton::activeLevel = std::make_shared<Level>("runtime test lvl");
+		ini.LoadFile(EDITOR_SETTINGS_PATH);
+		ImGuiInitter::init(ini.GetBoolValue("THEME", "useLightMode"));
 	}
 	EditorApp::~EditorApp() { }
-	void EditorApp::setupDescriptors() {
-#if ENSET_ENABLE_COMPUTE_SHADERS
 
-#endif
+	void buttonClickYay() {
+		SHARD3D_NOIMPL;
+	}
+	void button3ClickYay() {
 	}
 	void EditorApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -92,7 +96,8 @@ namespace Shard3D {
 				.writeBuffer(0, &bufferInfo)
 				.build(globalDescriptorSets[i]);
 		}
-		ImGuiInitter::init();
+
+
 
 #if ENSET_ENABLE_WORLDBUILDER3D
 		layerStack.pushOverlay(new ImGuiLayer());
@@ -101,21 +106,27 @@ namespace Shard3D {
 		GUILayer* guiLayer1 = new GUILayer();
 		GUILayer* guiLayer2 = new GUILayer();
 		GUILayer* guiLayer3 = new GUILayer();
-		layerStack.pushOverlay(guiLayer3);
-		layerStack.pushOverlay(guiLayer2);
-		layerStack.pushOverlay(guiLayer1);
+
 		layerStack.pushOverlay(guiLayer0);
+		//guiLayer0->attach(Singleton::mainOffScreen.getRenderPass(), &layerStack);
+		// 
+		// TODO: render the GUILayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
+		// but render the GUI seperately from everything in the GUIEditor window.
 
 		GridSystem gridSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-#if ENSET_ENABLE_COMPUTE_SHADERS == true
+#if ENSET_ENABLE_COMPUTE_SHADERS
 		ComputeSystem computeSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
 		BasicRenderSystem basicRenderSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		BillboardRenderSystem billboardRenderSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		PointlightSystem pointlightSystem{ Singleton::engineDevice,Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		SpotlightSystem spotlightSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		DirectionalLightSystem directionalLightSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		_EditorBillboardRenderer editorBillboardRenderer{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+
+		PointlightSystem pointlightSystem{};
+		SpotlightSystem spotlightSystem{};
+		DirectionalLightSystem directionalLightSystem{};
+
+//		FullscreenRenderer renderScreen{ Singleton::engineRenderer.getSwapChainRenderPass() };
 
 #if ENSET_ALLOW_PREVIEW_CAMERA
 		GridSystem pgridSystem{ Singleton::engineDevice, Singleton::previewCamOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -164,21 +175,45 @@ namespace Shard3D {
 		} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
 			editor_cameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
 		}
+	
+	std::shared_ptr<GUI::Element> exampleGUIElement = std::make_shared<GUI::Element>();
 
+	AssetManager::emplaceTexture("assets/texturedata/gui/button.png");
+	exampleGUIElement->texturePath = "assets/texturedata/gui/button.png";
+
+	exampleGUIElement->position = { 0.0f, 0.0f };
+	exampleGUIElement->scale = { 0.3, -0.3f };
+	exampleGUIElement->guid = 5;
+	exampleGUIElement->pressEventCallback = buttonClickYay;
+	
+	std::shared_ptr<GUI::Element> exampleGUIElement2 = std::make_shared<GUI::Element>();
+
+	exampleGUIElement2->texturePath = "assets/texturedata/gui/button.png";
+
+	exampleGUIElement2->position = { 0.5f, -0.5f };
+	exampleGUIElement2->scale = { 0.3, -0.6f };
+	exampleGUIElement2->guid = 8;
+	exampleGUIElement2->pressEventCallback = button3ClickYay;
+	//guiLayer0->addElement(exampleGUIElement);
+	//guiLayer0->addElement(exampleGUIElement2);
+
+
+	float constIncr = 0;
 		auto currentTime = std::chrono::high_resolution_clock::now();
+beginWhileLoop:
 		while (!Singleton::engineWindow.shouldClose()) {
 			glfwPollEvents();
-			
+			auto newTime = std::chrono::high_resolution_clock::now();
+			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+			currentTime = newTime;
+
 			auto possessedCameraActor = Singleton::activeLevel->getPossessedCameraActor();
-			auto possessedCamera = Singleton::activeLevel->getPossessedCamera();
+			auto& possessedCamera = Singleton::activeLevel->getPossessedCamera();
 			editor_cameraActor = Singleton::activeLevel->getActorFromGUID(0);
 #if ENSET_ALLOW_PREVIEW_CAMERA
 			auto possessedPreviewCameraActor = Singleton::activeLevel->getPossessedPreviewCameraActor();
 			auto possessedPreviewCamera = Singleton::activeLevel->getPossessedPreviewCamera();
 #endif
-			auto newTime = std::chrono::high_resolution_clock::now();
-			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
-			currentTime = newTime;
 
 			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice);
 			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
@@ -211,11 +246,10 @@ namespace Shard3D {
 #ifndef NDEBUG
 				MessageDialogs::show("No fullscreen in Debug Mode allowed!", "Debug", MessageDialogs::OPTICONERROR);
 #endif
-#ifndef NDEBUG
+//#ifndef NDEBUG
 				GraphicsSettings::toggleFullscreen();
-#endif
+//#endif
 			}
-
 			if (auto commandBuffer = Singleton::engineRenderer.beginFrame()) {
 				int frameIndex = Singleton::engineRenderer.getFrameIndex();
 				SharedPools::drawPools[frameIndex]->resetPool();
@@ -254,27 +288,26 @@ namespace Shard3D {
 
 					Also order absolutely matters, post processing for example must go last
 				*/
-
+				constIncr += frameTime;
+				exampleGUIElement2->rotation = glm::sin(constIncr);
 				//	render
 				Singleton::mainOffScreen.start(frameInfo);
 				basicRenderSystem.renderGameObjects(frameInfo, Singleton::activeLevel);
 				billboardRenderSystem.render(frameInfo, Singleton::activeLevel);
 
-#if ENSET_ENABLE_COMPUTE_SHADERS
-				computeSystem.render(frameInfo);
-#endif
-#ifndef _DEPLOY
+//#ifndef _DEPLOY
 				if (Singleton::editorPreviewSettings.ONLY_GAME == false) {
-					if (Singleton::editorPreviewSettings.V_EDITOR_BILLBOARDS == true) {
-						pointlightSystem.render(frameInfo, Singleton::activeLevel);
-						spotlightSystem.render(frameInfo, Singleton::activeLevel);
-						directionalLightSystem.render(frameInfo, Singleton::activeLevel);
-					}
+					if (Singleton::editorPreviewSettings.V_EDITOR_BILLBOARDS == true)
+						editorBillboardRenderer.render(frameInfo, Singleton::activeLevel);
 					if (Singleton::editorPreviewSettings.V_GRID == true)
 						gridSystem.render(frameInfo);
 				}
-#endif
+//#endif
+		//		guiLayer0->update(frameInfo);
 				Singleton::mainOffScreen.end(frameInfo);
+#if ENSET_ENABLE_COMPUTE_SHADERS
+				computeSystem.render(frameInfo);
+#endif
 
 #if ENSET_ALLOW_PREVIEW_CAMERA
 				GlobalUbo pubo{};
@@ -299,22 +332,31 @@ namespace Shard3D {
 
 				//pgridSystem.render(frameInfo);
 				Singleton::previewCamOffScreen.end(frameInfo);
-#endif
+#endif			
 				Singleton::engineRenderer.beginSwapChainRenderPass(commandBuffer);
 				// Layer overlays (use UI here)
 				for (Layer* layer : layerStack) {
 					layer->update(frameInfo);
 				}
-
+		
 				Singleton::engineRenderer.endSwapChainRenderPass(commandBuffer);
 				Singleton::engineRenderer.endFrame();
-			}
-			
+			}	
+			layerStack.popQueue();
 		}
+
+		if (MessageDialogs::show("Any unsaved changes will be lost! Are you sure you want to exit?",
+			"Shard3D Torque", MessageDialogs::OPTYESNO | MessageDialogs::OPTDEFBUTTON2 | MessageDialogs::OPTICONEXCLAMATION) == MessageDialogs::RESNO) {
+			glfwSetWindowShouldClose(Singleton::engineWindow.getGLFWwindow(), GLFW_FALSE);
+			goto beginWhileLoop;
+		}
+
 		if (Singleton::activeLevel->simulationState != PlayState::Stopped) Singleton::activeLevel->end();
+
 		vkDeviceWaitIdle(Singleton::engineDevice.device());
 		wb3d::AssetManager::clearAllAssetsAndDontAddDefaults();
 		_special_assets::_editor_icons_destroy();
+		
 		for (Layer* layer : layerStack) {
 			layer->detach();
 		}
@@ -335,15 +377,13 @@ namespace Shard3D {
 		wb3d::LevelManager levelman(Singleton::activeLevel);
 		levelman.load("assets/leveldata/drivecartest.wbl", true);
 		
-		wb3d::Actor car = Singleton::activeLevel->createActor("Car");
+		wb3d::Actor car = Singleton::activeLevel->createActorWithGUID(43827493259, "Car");
 		wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
 		car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
-
+		
 		car.getComponent<Components::TransformComponent>().rotation = { 0.f, glm::radians(90.f), 0.f };
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-
 		car.addComponent<Components::AudioComponent>().file = 
 			"assets/audiodata/car_engine.wav";
-
 	}
 }

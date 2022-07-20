@@ -22,6 +22,7 @@ namespace Shard3D {
 	private:
 
 		void createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		VkDescriptorSet descriptorSet1;
 
 		EngineDevice& engineDevice;
 		VkDescriptorImageInfo srcImageInfo{};

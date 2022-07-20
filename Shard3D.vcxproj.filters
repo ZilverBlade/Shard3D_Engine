@@ -284,6 +284,18 @@
     <ClCompile Include="UI\imgui_initter.cpp">
       <Filter>Source Files\UI\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="systems\editor_billboard_renderer.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\ScreenLayer.cpp">
+      <Filter>Source Files\UI\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\fullscreen_renderer.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\dynamic_script_engine_linker.cpp">
+      <Filter>scripts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -309,9 +321,6 @@
     </ClInclude>
     <ClInclude Include="systems\basic_render_system.hpp">
       <Filter>Header Files\systems</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\definitions.hpp">
-      <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="buffer.hpp">
       <Filter>Header Files\core</Filter>
@@ -520,6 +529,24 @@
     <ClInclude Include="UI\asset_properties_panel.hpp">
       <Filter>Header Files\UI\panels</Filter>
     </ClInclude>
+    <ClInclude Include="systems\editor_billboard_renderer.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\ScreenLayer.hpp">
+      <Filter>Header Files\UI\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\fullscreen_renderer.hpp">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\definitions.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\dynamic_script_engine_linker.hpp">
+      <Filter>scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\script_engine_plugin_link.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
@@ -553,7 +580,6 @@
     <None Include="shaders\pbr_shader.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="cpp.hint" />
     <None Include="shaders\test.comp">
       <Filter>shaders\compute</Filter>
     </None>
@@ -611,7 +637,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="credits.txt" />
     <Text Include="changelogs.txt" />
   </ItemGroup>
 </Project>

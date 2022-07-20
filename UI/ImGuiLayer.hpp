@@ -1,7 +1,7 @@
 #pragma once
 #include "Layer.hpp"
 #include "../pipeline.hpp"
-
+#include "LayerStack.hpp"
 #include <imgui_node_editor.h>
 
 // panels
@@ -17,15 +17,20 @@ namespace Shard3D {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void attach(VkRenderPass renderPass) override;
+		void attach(VkRenderPass renderPass, LayerStack* layerStack) override;
 		void detach() override;
-		void update(FrameInfo frameInfo) override;
+		void update(FrameInfo& frameInfo) override;
 	private:
+		void detachTag() { }
 		void createIcons();
-		void renderMenuBar();
 		void renderQuickBar();
+		void renderGUIBuilder();
+		void renderGUIBuilderToolbar();
+		void renderMenuBar();
 		int width;
 		int height;
+
+		LayerStack* currentStack;
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 
@@ -37,7 +42,7 @@ namespace Shard3D {
 		bool showStatsWindow = false;
 		bool showEngineSettingsWindow = false;
 		bool showGraphicsSettingsWindow = false;
-
+		bool showStylizersWindow = false;
 		struct EngineSettings {	
 			// WINDOW
 			int DEFAULT_WIDTH{};
@@ -71,9 +76,13 @@ namespace Shard3D {
 
 		// icons
 
-		VkDescriptorSet icons_play;
-		VkDescriptorSet icons_pause;
-		VkDescriptorSet icons_stop;
+		struct {
+			VkDescriptorSet play, pause, stop, 
+				pref, save, load,
+				preview, layout, viewport, level,
+				settings;
+			
+		} icons;
 	};
 
 }

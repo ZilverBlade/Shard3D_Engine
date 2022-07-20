@@ -70,7 +70,7 @@ namespace Shard3D {
 			}
 		}
 		for (const auto& tex : AssetManager::getTextureAssets())
-			if (ImGui::TreeNodeEx(std::string(tex.first + "##" + tex.first).c_str(), ImGuiTreeNodeFlags_None)) {}
+		ImGui::Text(std::string(tex.first).c_str());
 		ImGui::End();
 	}
 	void LevelPeekingPanel::peekLODInspector() {
@@ -82,8 +82,8 @@ namespace Shard3D {
 			}
 		}
 
-		for (const auto& model : AssetManager::getMeshAssets()) 
-			if (ImGui::TreeNodeEx(std::string(model.first + "##" + model.first).c_str(), ImGuiTreeNodeFlags_None)) {}
+		for (const auto& model : AssetManager::getMeshAssets())
+		ImGui::Text(std::string(model.first).c_str());
 		ImGui::End();
 	}
 

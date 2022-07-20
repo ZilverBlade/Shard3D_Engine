@@ -9,14 +9,17 @@ namespace Shard3D {
 		GUILayer();
 		~GUILayer();
 
-		void attach(VkRenderPass renderPass) override;
+		void attach(VkRenderPass renderPass, LayerStack* layerStack) override;
 		void detach() override;
-		void update(FrameInfo frameInfo) override;
+		void update(FrameInfo& frameInfo) override;
 
-		void addElement(GUI::Element element);
-		void rmvElement(GUI::Element element);
-		void rmvElement(size_t index);
+		void addElement(std::shared_ptr<GUI::Element>  element);
+		uint64_t getSelectedID();
+		std::shared_ptr<GUI::Element> getSelectedElement();
+		void rmvElement(std::shared_ptr<GUI::Element> element);
+		void rmvElement(uint64_t id);
 	private:
+		GLFWwindow* window;
 		GUIRenderSystem guiRenderSystem;
 		GUI guiElements;
 	};

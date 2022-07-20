@@ -17,6 +17,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Shard3D Script VB", "script
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "videoplayback", "videoplayback\videoplayback.vcxproj", "{49C63812-C440-478D-BFAB-C5F75FDC3F79}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shard3D Core", "scripts\script_utils\Shard3D Core.csproj", "{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -112,6 +114,24 @@ Global
 		{49C63812-C440-478D-BFAB-C5F75FDC3F79}.Release|x64.Build.0 = Release|x64
 		{49C63812-C440-478D-BFAB-C5F75FDC3F79}.Release|x86.ActiveCfg = Release|Win32
 		{49C63812-C440-478D-BFAB-C5F75FDC3F79}.Release|x86.Build.0 = Release|Win32
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Debug|x64.Build.0 = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Debug|x86.Build.0 = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Deploy|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Deploy|Any CPU.Build.0 = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Deploy|x64.ActiveCfg = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Deploy|x64.Build.0 = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Deploy|x86.ActiveCfg = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Deploy|x86.Build.0 = Debug|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Release|x64.ActiveCfg = Release|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Release|x64.Build.0 = Release|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,10 +7,10 @@ namespace Shard3D {
 
 	Layer::~Layer() {}
 
-	void Layer::attach(VkRenderPass renderPass) {}
+	void Layer::attach(VkRenderPass renderPass, LayerStack* layerStack) {}
 
 	void Layer::detach(){}
 
-	void Layer::update(FrameInfo frameInfo) {}
+	void Layer::update(FrameInfo& frameInfo) {}
 
 }

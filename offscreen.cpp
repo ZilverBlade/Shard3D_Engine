@@ -28,7 +28,6 @@ namespace Shard3D {
                 {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
                 VK_IMAGE_TILING_OPTIMAL,
                 VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
-
         // Color attachment
         VkImageCreateInfo image = {};
         image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -42,8 +41,11 @@ namespace Shard3D {
         image.samples = VK_SAMPLE_COUNT_1_BIT;
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
         // We will sample directly from the color attachment
-        image.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-
+        image.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT
+#if ENSET_ENABLE_COMPUTE_SHADERS
+            | VK_IMAGE_USAGE_STORAGE_BIT
+#endif
+            ;
         VkMemoryAllocateInfo memAlloc = {};
         memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         VkMemoryRequirements memReqs;
@@ -215,9 +217,9 @@ namespace Shard3D {
         pass.descriptor.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         pass.descriptor.imageView = pass.color.view;
         pass.descriptor.sampler = pass.sampler;
-    };
+    }
 
-    void OffScreen::start(FrameInfo frameInfo) {
+    void OffScreen::start(FrameInfo& frameInfo) {
         VkRenderPassBeginInfo renderPassBeginInfo{};
         renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassBeginInfo.renderPass = pass.renderPass;
@@ -246,7 +248,7 @@ namespace Shard3D {
         vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);
     }
 
-    void OffScreen::end(FrameInfo frameInfo) {
+    void OffScreen::end(FrameInfo& frameInfo) {
         vkCmdEndRenderPass(frameInfo.commandBuffer);
     }
 }

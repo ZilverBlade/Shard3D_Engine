@@ -158,8 +158,8 @@ namespace Shard3D {
 			float radius = 1.f;
 			glm::vec3 color = { 1.f, 1.f, 1.f };
 			float lightIntensity = 1.0f;
-			float outerAngle = glm::radians(15.0f);
-			float innerAngle = glm::radians(45.0f);
+			float outerAngle = glm::radians(60.0f);
+			float innerAngle = glm::radians(30.0f);
 			glm::vec3 attenuationMod = { 0.f, 0.f, 1.f };
 			float specularMod = 1.0f;
 		};

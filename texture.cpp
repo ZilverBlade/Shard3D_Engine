@@ -17,6 +17,11 @@ namespace Shard3D {
         createTextureSampler();
         updateDescriptor();
     }
+    EngineTexture::EngineTexture(EngineDevice& device) : mDevice{ device } { 
+        mFilter = VK_FILTER_LINEAR;
+        createBlankTextureImage();
+        updateDescriptor();
+    }
     EngineTexture::EngineTexture(
         EngineDevice& device,
         VkFormat format,
@@ -114,6 +119,11 @@ namespace Shard3D {
         return std::make_unique<EngineTexture>(device, filepath, filter);
     }
 
+    std::unique_ptr<EngineTexture> EngineTexture::createEmptyTexture(EngineDevice& device)
+    {
+        return std::make_unique<EngineTexture>(device);
+    }
+
     void EngineTexture::updateDescriptor() {
         mDescriptor.sampler = mTextureSampler;
         mDescriptor.imageView = mTextureImageView;
@@ -125,6 +135,62 @@ namespace Shard3D {
     void EngineTexture::freeSTBImage(void* pixels) {
         stbi_image_free(pixels);
     }
+    void EngineTexture::createBlankTextureImage() {
+
+        VkImageCreateInfo imageCreateInfo{};
+        imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageCreateInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+        imageCreateInfo.extent = { 1920, 1080, 1 };
+        imageCreateInfo.mipLevels = 1;
+        imageCreateInfo.arrayLayers = 1;
+        imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        // Image will be sampled in the fragment shader and used as storage target in the compute shader
+        imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+        imageCreateInfo.flags = 0;
+        // If compute and graphics queue family indices differ, we create an image that can be shared between them
+        // This can result in worse performance than exclusive sharing mode, but save some synchronization to keep the sample simple
+        mFormat = VK_FORMAT_R8G8B8A8_SRGB;
+        mExtent = imageCreateInfo.extent;
+
+        mDevice.createImageWithInfo(
+            imageCreateInfo,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            mTextureImage,
+            mTextureImageMemory);
+  
+        // If we generate mip maps then the final image will alerady be READ_ONLY_OPTIMAL
+        // mDevice.generateMipmaps(mTextureImage, mFormat, texWidth, texHeight, mMipLevels);
+        mTextureLayout = VK_IMAGE_LAYOUT_GENERAL;
+
+
+        // Create sampler
+        VkSamplerCreateInfo sampler{};
+        sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        sampler.magFilter = VK_FILTER_LINEAR;
+        sampler.minFilter = VK_FILTER_LINEAR;
+        sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+        sampler.addressModeV = sampler.addressModeU;
+        sampler.addressModeW = sampler.addressModeU;
+        sampler.mipLodBias = 0.0f;
+        sampler.maxAnisotropy = 1.0f;
+        sampler.compareOp = VK_COMPARE_OP_NEVER;
+        sampler.minLod = 0.0f;
+        sampler.maxLod = mMipLevels;
+        sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+        vkCreateSampler(mDevice.device(), &sampler, nullptr, &mTextureSampler);
+
+        VkImageViewCreateInfo viewInfo{};
+        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        viewInfo.image = VK_NULL_HANDLE;
+        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        viewInfo.format = VK_FORMAT_R8G8B8_SRGB;
+        viewInfo.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
+        viewInfo.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+        viewInfo.image = mTextureImage;
+         vkCreateImageView(mDevice.device(), &viewInfo, nullptr, &mTextureImageView);
+    }
     void EngineTexture::createTextureImage(const std::string& filepath) {
         int texWidth, texHeight, texChannels;
         // stbi_set_flip_vertically_on_load(1);  // todo determine why texture coordinates are flipped
@@ -133,7 +199,7 @@ namespace Shard3D {
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
         if (!pixels) {
-            SHARD3D_FATAL("failed to load texture image!");
+            SHARD3D_FATAL(std::string("failed to load texture image! Tried to load " + filepath));
         }
 
         // mMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;

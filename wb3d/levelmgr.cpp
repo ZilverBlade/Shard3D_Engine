@@ -167,7 +167,8 @@ namespace Shard3D {
 			strStream << stream.rdbuf();
 
 #ifdef _DEPLOY
-			YAML::Node data = YAML::Load(decrypt(strStream.str()));
+			//YAML::Node data = YAML::Load(decrypt(strStream.str()));
+			YAML::Node data = YAML::Load(strStream.str());
 #if ENSET_BETA_DEBUG_TOOLS
 			std::ofstream fout(sourcePath + ".dcr");
 			fout << decrypt(strStream.str());

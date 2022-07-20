@@ -54,6 +54,7 @@ namespace Shard3D {
 		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 		static void enableVertexDescriptions(PipelineConfigInfo& configInfo);
 		static void enableAlphaBlending(PipelineConfigInfo& configInfo, VkBlendOp blendOp);
+		static void discardRasterizer(PipelineConfigInfo& configInfo);
 
 		void destroyGraphicsPipeline();
 
@@ -77,6 +78,7 @@ namespace Shard3D {
 
 		EngineDevice& engineDevice;
 		VkPipeline graphicsPipeline;
+		VkPipeline computePipeline;
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;
 

@@ -93,9 +93,6 @@ namespace Shard3D {
 			return actor;
 		}
 
-		// Actor Level::getActorByGUID() {}
-		// Actor Level::getActorByTag() {}
-
 		void Level::runGarbageCollector(EngineDevice& device) {
 			if (actorKillQueue.size() != 0) {
 				for (int i = 0; i < actorKillQueue.size(); i++) {
@@ -164,7 +161,8 @@ namespace Shard3D {
 
 		void Level::setPossessedCameraActor(Actor actor) {
 			if (!actor.hasComponent<Components::CameraComponent>()) {
-				SHARD3D_FATAL("Can't possess a non camera actor!!");
+				SHARD3D_ERROR("Can't possess a non camera actor!!");
+				return;
 			}
 			possessedCameraActorGUID = actor.getGUID();
 		}

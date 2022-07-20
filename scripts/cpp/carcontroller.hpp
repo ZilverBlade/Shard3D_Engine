@@ -3,6 +3,7 @@
 #include <chrono>
 namespace Shard3D::CppScripts {
 	class CarController : public wb3d::ActingActor {
+		const float basePitch = 0.1f;
 	public:
 		wb3d::Actor camAct;
 		float exponent;
@@ -11,9 +12,9 @@ namespace Shard3D::CppScripts {
 			thisActor.getComponent<Components::TransformComponent>().translation = { 0.f, 0.2f, 0.f };
 			camAct = getActiveLevel()->createActor("cambeam");
 			camAct.addComponent<Components::CameraComponent>();
-			posessCameraActor(camAct);
+
 			camAct.getComponent<Components::TransformComponent>().rotation.x = 0.3f;
-			camAct.getComponent<Components::CameraComponent>().fov = 60.f;
+
 			for (int i = 0; i < 17; i++) {
 				auto light = getActiveLevel()->createActor("pointlight" + std::to_string(i));
 				light.addComponent<Components::PointlightComponent>().lightIntensity = 3.f;
@@ -35,8 +36,17 @@ namespace Shard3D::CppScripts {
 			}
 
 			thisActor.getComponent<Components::AudioComponent>().play();
-			thisActor.getComponent<Components::AudioComponent>().properties.pitch = 0.5f;
-			thisActor.getComponent<Components::AudioComponent>().properties.volume = 2.0f;
+			thisActor.getComponent<Components::AudioComponent>().properties.pitch = basePitch;
+			thisActor.getComponent<Components::AudioComponent>().properties.volume = 2.f;
+
+			//camAct.getComponent<Components::CameraComponent>().fov = 60.f;
+			camAct.getComponent<Components::CameraComponent>().camera.setViewYXZ(
+				camAct.getComponent<Components::TransformComponent>().translation,
+				camAct.getComponent<Components::TransformComponent>().rotation
+			);
+			camAct.getComponent<Components::CameraComponent>().setProjection();
+			possessCameraActor(camAct);
+			moveVector = glm::vec3(0.001f);
 		}
 		void endEvent() override {
 			thisActor.getComponent<Components::AudioComponent>().stop();
@@ -73,11 +83,11 @@ namespace Shard3D::CppScripts {
 						thisActor.getComponent<Components::TransformComponent>().translation.z  -4.f));
 
 			camAct.getComponent<Components::CameraComponent>().fov = 
-				glm::clamp(60.f + glm::dot(moveVector, moveVector) * 
-					glm::max(1.0f, (1.f / glm::dot(moveVector, moveVector))) * 10.f, 60.f, 90.f);
+				glm::clamp(60.f + glm::dot(moveVector, moveVector) *
+					glm::max(1.0f, (5.f / glm::dot(moveVector, moveVector))) * 10.f, 60.f, 90.f);
 
 			thisActor.getComponent<Components::AudioComponent>().properties.relativePos = thisActor.getTransform().translation;
-			thisActor.getComponent<Components::AudioComponent>().properties.pitch = 0.5f + moveVector.z * 3.f;
+			thisActor.getComponent<Components::AudioComponent>().properties.pitch = basePitch + moveVector.z * 3.f;
 			thisActor.getComponent<Components::AudioComponent>().update();
 		}
 

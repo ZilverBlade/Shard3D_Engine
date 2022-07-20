@@ -79,7 +79,7 @@ namespace Shard3D {
 			));
 #endif
 #ifdef __linux__ 
-			SHARD3D_WARN("unsupported function");
+			SHARD3D_NOIMPL;
 #endif
 			return RESERROR;
 		}	

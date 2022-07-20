@@ -1,6 +1,4 @@
 #pragma once
-#define NOMINMAX
-
 //std
 #include <string>
 #include <memory>

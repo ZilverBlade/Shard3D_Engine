@@ -31,7 +31,7 @@ namespace Shard3D {
 			virtual void killEvent() {}
 		
 
-			void posessCameraActor(Actor actor) {
+			void possessCameraActor(Actor actor) {
 				thisActor.eLevel->setPossessedCameraActor(actor);
 			}
 			Level* const getActiveLevel() {

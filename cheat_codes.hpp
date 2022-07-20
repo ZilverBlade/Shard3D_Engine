@@ -15,12 +15,12 @@ namespace Shard3D {
             if (action == GLFW_PRESS) {
                 cheatCodeInput.push_back(key);
             }
-            if (cheatCodeInput.find("HOOKERS") != std::string::npos) {
+            if (cheatCodeInput.find("HOOKC") != std::string::npos) {
                 cheatCodeInput.clear();
 
                 SHARD3D_TOGGLECONSOLE();
             }
-            if (cheatCodeInput.find("FUCKMYASS10") != std::string::npos) {
+            if (cheatCodeInput.find("FUCKTHIS") != std::string::npos) {
                 cheatCodeInput.clear();
 
                 SHARD3D_FATAL("LMFAO");

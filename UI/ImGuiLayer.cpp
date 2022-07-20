@@ -29,7 +29,8 @@ namespace Shard3D {
 
     ImGuiLayer::~ImGuiLayer() {}
 
-    void ImGuiLayer::attach(VkRenderPass renderPass) {
+    void ImGuiLayer::attach(VkRenderPass renderPass, LayerStack* layerStack) {
+        currentStack = layerStack;
         std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null)";
         glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
         hasBeenDetached = false;
@@ -67,19 +68,44 @@ namespace Shard3D {
     void ImGuiLayer::createIcons() {
         {
             auto& img = _special_assets::_editor_icons.at("editor.play");
-            icons_play = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            icons.play = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         } {
             auto& img = _special_assets::_editor_icons.at("editor.pause");
-            icons_pause = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            icons.pause = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         } {
             auto& img = _special_assets::_editor_icons.at("editor.stop");
-            icons_stop = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            icons.stop = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.pref");
+            icons.pref = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);       
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.save");
+            icons.save = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.preview");
+            icons.preview = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);       
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.layout");
+            icons.layout = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.load");
+            icons.load = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.level");
+            icons.level = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.viewport");
+            icons.viewport = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        } {
+            auto& img = _special_assets::_editor_icons.at("editor.settings");
+            icons.settings = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         }
     }
 
     void ImGuiLayer::detach() {
         // check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
         if (hasBeenDetached) return;
+        vkDeviceWaitIdle(Singleton::engineDevice.device());
         vkDestroyDescriptorPool(Singleton::engineDevice.device(), ImGuiInitter::imGuiDescriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
@@ -89,10 +115,12 @@ namespace Shard3D {
         levelPropertiesPanel.destroyContext();
         levelPeekPanel.destroyContext();
         hasBeenDetached = true;
+        SHARD3D_LOG("Detached ImGui");
     }
 
-    void ImGuiLayer::update(FrameInfo frameInfo) {
+    void ImGuiLayer::update(FrameInfo& frameInfo) {
         if (hasBeenDetached) return;
+        if (hasBeenDetached) SHARD3D_ERROR("FAILED TO DETACH IMGUI");
         if (refreshContext) {
             levelTreePanel.setContext(Singleton::activeLevel);
             levelPropertiesPanel.setContext(Singleton::activeLevel);
@@ -117,7 +145,7 @@ namespace Shard3D {
         static bool visible = true;
 
         //ImGui::ShowDemoWindow(&visible);
-
+        
 #pragma region boilerplate dockspace code    
         static bool opt_fullscreen = true;
         static bool opt_padding = true;
@@ -152,10 +180,13 @@ namespace Shard3D {
             ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
         }
+
         if (ImGui::BeginMenuBar()) {
             renderMenuBar();
             ImGui::EndMenuBar();
         }
+        renderGUIBuilder();
+        renderGUIBuilderToolbar();
         renderQuickBar();
 
         // VIEWPORT
@@ -163,6 +194,19 @@ namespace Shard3D {
             ImVec2 vSize = ImGui::GetContentRegionAvail();
             tempInfo::aspectRatioWoH = vSize.x / vSize.y;
         ImGui::Image(Singleton::viewportImage, vSize);
+        if (Singleton::activeLevel->simulationState == PlayState::Paused) { 
+            ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+            vMin.x += ImGui::GetWindowPos().x + 8;
+            vMin.y += ImGui::GetWindowPos().y + 16;
+            ImGui::GetWindowDrawList()->AddImage(icons.pause, vMin, ImVec2(vMin.x + 64, vMin.y + 64), ImVec2(0, 0), ImVec2(1, 1)); 
+        }
+        if (Singleton::editorPreviewSettings.ONLY_GAME) {
+           ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+           vMin.x += ImGui::GetWindowPos().x + 80;
+           vMin.y += ImGui::GetWindowPos().y + 16;
+         // ImGui::GetWindowDrawList()->AddText(io.Fonts->Fonts[0], 14.f, ImVec2(vMin.x, vMin.y), ImU32(1.f), "Test");
+           ImGui::GetWindowDrawList()->AddImage(icons.preview, vMin, ImVec2(vMin.x + 64, vMin.y + 64), ImVec2(0, 0), ImVec2(1, 1));
+       }
         ImGui::End();
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
@@ -215,12 +259,18 @@ namespace Shard3D {
             timeSinceLastSecond += frameInfo.frameTime;
             if (timeSinceLastSecond > 1.f) { deltaTimeFromLastSecond = frameInfo.frameTime; timeSinceLastSecond = 0; }
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", deltaTimeFromLastSecond * 1000.f, 1.f / deltaTimeFromLastSecond);
+            ImGui::End();
+        }
+        if (showStylizersWindow) {
+            ImGui::Begin("Stats");
+            timeSinceLastSecond += frameInfo.frameTime;
+            if (timeSinceLastSecond > 1.f) { deltaTimeFromLastSecond = frameInfo.frameTime; timeSinceLastSecond = 0; }
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", deltaTimeFromLastSecond * 1000.f, 1.f / deltaTimeFromLastSecond);
             if (ImGui::CollapsingHeader("style editor")) {
                 ImGui::ShowStyleEditor();
             }
             ImGui::End();
         }
-
         if (showEngineSettingsWindow) {
             ImGui::Begin("Engine Settings", &showEngineSettingsWindow);
             if (ImGui::CollapsingHeader("Window", ImGuiTreeNodeFlags_None)) {
@@ -345,7 +395,6 @@ namespace Shard3D {
             ImGui::End();
         }
 
-
         ImGui::End();
         ImGui::Render();
 
@@ -358,32 +407,49 @@ namespace Shard3D {
 
 
     void ImGuiLayer::renderQuickBar() {
-        ImGui::Begin("##quickbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
+        ImGui::Begin("_editor_quickbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
         ImVec2 btnSize = { 48.f, 48.f };
         float panelWidth = ImGui::GetContentRegionAvail().x;
         int columnCount = std::max((int)(panelWidth / (btnSize.x + 16.f))// <--- thumbnail size (96px) + padding (16px)
             , 1);
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4());
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
-        ImGui::Columns(columnCount, 0, false);                                                                                                                              // resume
+        ImGui::Columns(columnCount, 0, false);                
+        // begin
+
+        // Save/Load
+        if (ImGui::ImageButton(icons.save, btnSize)) {
+            SHARD3D_NOIMPL;
+        }
+        ImGui::TextWrapped("Save");
+        ImGui::NextColumn();
+        if (ImGui::ImageButton(icons.load, btnSize)) {
+            SHARD3D_NOIMPL;
+        }
+        ImGui::TextWrapped("Load");
+        ImGui::NextColumn();
+        ImGui::NextColumn();
+
+        // PLAY MODE
         if (ImGui::ImageButton(
-            (Singleton::activeLevel->simulationState == PlayState::Stopped) ? icons_play : 
-                ((Singleton::activeLevel->simulationState == PlayState::Paused) ? icons_play : icons_pause), btnSize)) {
-            if (Singleton::activeLevel->simulationState == PlayState::Stopped) {
+            (Singleton::activeLevel->simulationState == PlayState::Stopped) ? icons.play : 
+                ((Singleton::activeLevel->simulationState == PlayState::Paused) ? icons.play : icons.pause), btnSize)) {
+            if (Singleton::activeLevel->simulationState == PlayState::Stopped) { // Play
                 wb3d::MasterManager::captureLevel(Singleton::activeLevel);
                 Singleton::activeLevel->begin();
                 std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING) | " + Singleton::activeLevel->name;
                 glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
-            } else if (Singleton::activeLevel->simulationState == PlayState::Paused) {
+            } else if (Singleton::activeLevel->simulationState == PlayState::Paused) {  // Resume
                 Singleton::activeLevel->simulationState = PlayState::Simulating;
                 Singleton::activeLevel->simulationStateCallback();
                 std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: SIMULATING) | " + Singleton::activeLevel->name;
                 glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());          
-            } else if (Singleton::activeLevel->simulationState == PlayState::Simulating) {
+
+            } else if (Singleton::activeLevel->simulationState == PlayState::Simulating) {  // Pause
                 Singleton::activeLevel->simulationState = PlayState::Paused;
                 Singleton::activeLevel->simulationStateCallback();
                 std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused) | " + Singleton::activeLevel->name;
-                glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());
+                glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());                           
             }
 
         }
@@ -391,7 +457,7 @@ namespace Shard3D {
             ((Singleton::activeLevel->simulationState == PlayState::Paused) ? "Resume" : "Pause"));
         ImGui::NextColumn();
         ImGui::BeginDisabled(Singleton::activeLevel->simulationState == PlayState::Stopped);
-        if (ImGui::ImageButton(icons_stop, btnSize)) {        
+        if (ImGui::ImageButton(icons.stop, btnSize)) {        // Stop
             levelTreePanel.clearSelectedActor();
             Singleton::activeLevel->end();
             std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Null) | " + Singleton::activeLevel->name;
@@ -400,14 +466,50 @@ namespace Shard3D {
         }
         ImGui::TextWrapped("Stop");
         ImGui::EndDisabled();
+
         ImGui::NextColumn();
+        ImGui::NextColumn();
+        // Editor settings
+        if (ImGui::ImageButton(icons.pref, btnSize)) {
+            SHARD3D_NOIMPL;
+        }
+        ImGui::TextWrapped("Pref");
+        ImGui::NextColumn();
+        // Editor settings
+        if (ImGui::ImageButton(icons.settings, btnSize)) {
+            SHARD3D_NOIMPL;
+        }
+        ImGui::TextWrapped("Config");
+        ImGui::NextColumn();
+        if (ImGui::ImageButton(icons.layout, btnSize)) {
+            SHARD3D_NOIMPL;
+        }
+        ImGui::TextWrapped("Layout");
+        ImGui::NextColumn();
+        if (ImGui::ImageButton(icons.viewport, btnSize)) {
+            SHARD3D_NOIMPL;
+        }
+        ImGui::TextWrapped("View");
+        ImGui::NextColumn();
+        // end
         ImGui::Columns(1);
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
         ImGui::End();
     }
-
-
+    void ImGuiLayer::renderGUIBuilder() {
+        ImGui::Begin("GUI Builder2D");
+        
+        ImGui::End();
+    }
+    void ImGuiLayer::renderGUIBuilderToolbar() {
+        ImGui::Begin("GUI Toolbar");
+        ImGui::Button("Button");
+        ImGui::Button("Text");
+        ImGui::Button("Image");
+        ImGui::Button("Loading Screen");
+        ImGui::End();
+    }
     void ImGuiLayer::renderMenuBar() {
         if (ImGui::BeginMenu("File")) {
             ImGui::TextDisabled("WorldBuilder3D 0.1");
@@ -446,7 +548,7 @@ namespace Shard3D {
                 }
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { detach(); return; }
+            if (ImGui::MenuItem("Close WorldBuilder3D", "Esc")) { currentStack->popOverlay(this); }
             ImGui::Separator();
             ImGui::EndDisabled();
 
@@ -512,10 +614,12 @@ namespace Shard3D {
 #ifndef NDEBUG
         if (ImGui::BeginMenu("Debug")) {
             ImGui::TextDisabled("Shard3D Debug menu");
+            ImGui::Checkbox("Stylizer", &showStylizersWindow);
             if (ImGui::MenuItem("Play test audio")) {
                 EngineAudio audio;
                 audio.play("assets/audiodata/thou-3.mp3");
             }
+
             if (ImGui::MenuItem("Play test video")) {
 #ifndef NDEBUG
                 VideoPlaybackEngine::EngineH264Video videoEngine;
@@ -620,6 +724,6 @@ namespace Shard3D {
 #endif
             ImGui::EndMenu();
         }
-
+        if (ImGui::MenuItem("Credits")) SHARD3D_NOIMPL;      
     }
 }

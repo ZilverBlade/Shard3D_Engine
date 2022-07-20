@@ -1,5 +1,5 @@
 #version 450
-// screen view aligned
+// output img
 #extension GL_KHR_vulkan_glsl : enable
 
 const vec2 OFFSETS[6] = vec2[](
@@ -24,5 +24,5 @@ void main(){
 	vec2 fragOffset = OFFSETS[gl_VertexIndex];
 	fragUV = UV[gl_VertexIndex];
 
-	gl_Position = vec4(fragOffset * vec2(-1, 1), 0.0, 1.0);
+	gl_Position = vec4(fragOffset, 0.0, 1.0);
 }

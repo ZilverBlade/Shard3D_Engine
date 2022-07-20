@@ -9,7 +9,7 @@ namespace Shard3D {
         inline static ma_engine engine;
 
         ma_sound sound;
-
+        typedef int audio_params_t;
     public:
 
         ~EngineAudio();
@@ -18,12 +18,17 @@ namespace Shard3D {
             float pitch{ 0.f };
             glm::vec3 relativePos{ 0.f };
         };
+        enum AudioParams {
+            AudioNull,
+            AudioSpatialize,
+            AudioOneShot
+        };
 
         static void init();
         static void destroy();
         static void globalUpdate(glm::vec3 position, glm::vec3 dir);
 
-        void play(const std::string& file);
+        void play(const std::string& file, audio_params_t params = 0);
         void stop();
         void update(AudioProperties& properties);
         void pause();

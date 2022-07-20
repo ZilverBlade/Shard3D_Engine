@@ -5,19 +5,39 @@
 
 #include "../wb3d/assetmgr.hpp"
 #include "../singleton.hpp"
+#include <gtx/dual_quaternion.hpp>
 
 namespace Shard3D {
 
 	struct GUIPushConstants {
 		glm::vec2 translation;
 		glm::vec2 scale;
-		int index;
-		//float rotation;
+		glm::vec2 mousePos;
+		float rotation;
+		uint64_t id;
 	};
+
+	struct GUIInfo {
+		uint64_t selectedID = 0;
+	};
+
 	GUIRenderSystem::GUIRenderSystem() {}
 	GUIRenderSystem::~GUIRenderSystem() {}
 
 	void GUIRenderSystem::create(VkRenderPass renderPass) {
+
+		pickBuffer = std::make_unique<EngineBuffer>(
+			Singleton::engineDevice,
+			sizeof(GUIInfo),
+			1,
+			VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+		pickBuffer->map();
+		pickBuffer->writeToBuffer(new GUIInfo());
+		pickBuffer->flush();
+
+
 		createPipelineLayout();
 		createPipeline(renderPass);
 	}
@@ -25,6 +45,7 @@ namespace Shard3D {
 		vkDestroyPipelineLayout(Singleton::engineDevice.device(), pipelineLayout, nullptr);
 	}
 	void GUIRenderSystem::createPipelineLayout() {
+
 		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 		pushConstantRange.offset = 0;
@@ -34,9 +55,13 @@ namespace Shard3D {
 			EngineDescriptorSetLayout::Builder(Singleton::engineDevice)
 			.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 			.build();
+		ssboLayout = EngineDescriptorSetLayout::Builder(Singleton::engineDevice)
+			.addBinding(10, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+			.build();
 
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{
-			guiSystemLayout->getDescriptorSetLayout() 
+			guiSystemLayout->getDescriptorSetLayout(),
+			ssboLayout->getDescriptorSetLayout()
 		};
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -55,7 +80,7 @@ namespace Shard3D {
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
-	 	EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
+	 	//EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout; 
@@ -68,9 +93,20 @@ namespace Shard3D {
 	}
 
 	void GUIRenderSystem::render(FrameInfo& frameInfo, GUI& gui) {
+		double x, y;
+		glfwGetCursorPos(Singleton::engineWindow.getGLFWwindow(), &x, &y);
+		glm::vec2 mousePos = { x,y };
+		
 		enginePipeline->bind(frameInfo.commandBuffer);
-		for (auto& element : gui.elementsGUI) {
-			auto imageInfo = wb3d::AssetManager::retrieveTexture(element.texturePath)->getImageInfo();
+		
+		auto bufferInfo = pickBuffer->descriptorInfo();
+		EngineDescriptorWriter(*ssboLayout, frameInfo.perDrawDescriptorPool)
+			.writeBuffer(10, &bufferInfo)
+			.build(ssboDescriptorSet);
+
+		for (auto& elmt : gui.elementsGUI) {
+			auto& element = elmt.second;
+			auto imageInfo = wb3d::AssetManager::retrieveTexture(element->texturePath)->getImageInfo();
 			VkDescriptorSet descriptorSet1;
 			EngineDescriptorWriter(*guiSystemLayout, frameInfo.perDrawDescriptorPool)
 				.writeImage(2, &imageInfo)
@@ -85,11 +121,21 @@ namespace Shard3D {
 				&descriptorSet1,
 				0,
 				nullptr);
-
+			vkCmdBindDescriptorSets(
+				frameInfo.commandBuffer,
+				VK_PIPELINE_BIND_POINT_GRAPHICS,
+				pipelineLayout,
+				1,  // first set
+				1,  // set count
+				&ssboDescriptorSet,
+				0,
+				nullptr);
 			GUIPushConstants push{};
-			push.translation = element.position;
-			push.scale = -element.scale;
-			push.index = 0;
+			push.translation = element->position;
+			push.scale = -element->scale;
+			push.id = element->guid;
+			push.rotation = element->rotation;
+			push.mousePos = mousePos;
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
 				pipelineLayout,
@@ -100,8 +146,6 @@ namespace Shard3D {
 			);
 
 			vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
-		}
-			
-
+		}	
 	}
 }

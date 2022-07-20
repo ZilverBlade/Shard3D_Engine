@@ -1,26 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Shard3D.Core;
+using Shard3D.Core.Components;
+using System;
 
-namespace Shard3D.CSScripts
-{
+namespace Shard3D.Scripts
+{  
     public class Main
     {
         public Main()
         {
-            Console.WriteLine("Successfully loaded C#");
+            Vector4 val;
+
+            InternalCalls.Log("Successfully loaded C#", LogSeverity.Debug);
+            Console.WriteLine("fail");
         }
 
         public void FuncCall(float input)
         {
-            Console.WriteLine($"C# float: {input}");
+            InternalCalls.Log($"C# float: {input}", LogSeverity.Debug);
         }
 
         ~Main()
         {
-            Console.WriteLine("Goodbye world!");
+            InternalCalls.Log("Goodbye world!", LogSeverity.Debug);
         }
     }
 }
