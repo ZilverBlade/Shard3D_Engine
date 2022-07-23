@@ -32,13 +32,6 @@ namespace Shard3D {
 		inline static constexpr int HEIGHT = 720; //600
 		inline static const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
 	public:
-		struct PreviewModes {
-			bool V_EDITOR_BILLBOARDS = true;
-			bool V_HIDDEN_MESHES = true;
-			bool V_HIDDEN_BILLBOARDS = true;
-			bool V_GRID = true;
-			bool ONLY_GAME;
-		};
 		Singleton() {}
 		~Singleton() {}
 		inline static Initializer _ignore_init;
@@ -58,7 +51,15 @@ namespace Shard3D {
 		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
 
 //#ifndef _DEPLOY
-		inline static PreviewModes editorPreviewSettings;
+		struct eps {
+			bool V_EDITOR_BILLBOARDS = true;
+			bool V_HIDDEN_MESHES = true;
+			bool V_HIDDEN_BILLBOARDS = true;
+			bool V_GRID = true;
+			bool V_GUI = false;
+			bool ONLY_GAME;
+		};
+		inline static eps editorPreviewSettings;
 //#endif
 		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
 

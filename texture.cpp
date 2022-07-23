@@ -22,91 +22,7 @@ namespace Shard3D {
         createBlankTextureImage();
         updateDescriptor();
     }
-    EngineTexture::EngineTexture(
-        EngineDevice& device,
-        VkFormat format,
-        VkExtent3D extent,
-        VkImageUsageFlags usage,
-        VkSampleCountFlagBits sampleCount)
-        : mDevice{ device } {
-        VkImageAspectFlags aspectMask = 0;
-        VkImageLayout imageLayout;
-
-        mFormat = format;
-        mExtent = extent;
-
-        if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
-            aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        }
-        if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-            aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-            imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        }
-
-        // Don't like this, should I be using an image array instead of multiple images?
-        VkImageCreateInfo imageInfo{};
-        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        imageInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageInfo.format = format;
-        imageInfo.extent = extent;
-        imageInfo.mipLevels = 1;
-        imageInfo.arrayLayers = 1;
-        imageInfo.samples = sampleCount;
-        imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-        imageInfo.usage = usage;
-        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        device.createImageWithInfo(
-            imageInfo,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            mTextureImage,
-            mTextureImageMemory);
-
-        VkImageViewCreateInfo viewInfo{};
-        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        viewInfo.format = format;
-        viewInfo.subresourceRange = {};
-        viewInfo.subresourceRange.aspectMask = aspectMask;
-        viewInfo.subresourceRange.baseMipLevel = 0;
-        viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = 0;
-        viewInfo.subresourceRange.layerCount = 1;
-        viewInfo.image = mTextureImage;
-        if (vkCreateImageView(device.device(), &viewInfo, nullptr, &mTextureImageView) != VK_SUCCESS) {
-            SHARD3D_FATAL("failed to create texture image view!");
-        }
-
-        // Sampler should be seperated out
-        if (usage & VK_IMAGE_USAGE_SAMPLED_BIT) {
-            // Create sampler to sample from the attachment in the fragment shader
-            VkSamplerCreateInfo samplerInfo{};
-            samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-            samplerInfo.magFilter = VK_FILTER_LINEAR;
-            samplerInfo.minFilter = VK_FILTER_LINEAR;
-            samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-            samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-            samplerInfo.addressModeV = samplerInfo.addressModeU;
-            samplerInfo.addressModeW = samplerInfo.addressModeU;
-            samplerInfo.mipLodBias = 0.0f;
-            samplerInfo.maxAnisotropy = 1.0f;
-            samplerInfo.minLod = 0.0f;
-            samplerInfo.maxLod = 1.0f;
-            samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
-
-            if (vkCreateSampler(device.device(), &samplerInfo, nullptr, &mTextureSampler) != VK_SUCCESS) {
-                SHARD3D_FATAL("failed to create sampler!");
-            }
-
-            VkImageLayout samplerImageLayout = imageLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-                ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-                : VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-            mDescriptor.sampler = mTextureSampler;
-            mDescriptor.imageView = mTextureImageView;
-            mDescriptor.imageLayout = samplerImageLayout;
-        }
-    }
-
+  
     EngineTexture::~EngineTexture() {
         vkDestroySampler(mDevice.device(), mTextureSampler, nullptr);
         vkDestroyImageView(mDevice.device(), mTextureImageView, nullptr);
@@ -130,6 +46,7 @@ namespace Shard3D {
         mDescriptor.imageLayout = mTextureLayout;
     }
     unsigned char* EngineTexture::getSTBImage(const std::string& filepath, int* x, int* y, int* comp, int req_comp) {
+        SHARD3D_LOG("Loading STBImage {0}", filepath);
         return stbi_load(filepath.c_str(), x, y, comp, req_comp);
     }
     void EngineTexture::freeSTBImage(void* pixels) {

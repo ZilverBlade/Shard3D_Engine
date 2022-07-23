@@ -55,7 +55,7 @@ namespace Shard3D {
 				}
 				eLevel->registry.remove<T>(actorHandle);
 			}
-			
+
 			bool isInvalid() {
 				return (getGUID() == 0 || getGUID() == 1 || getGUID() == UINT64_MAX)
 					|| !hasComponent<Components::TagComponent>()
@@ -80,6 +80,7 @@ namespace Shard3D {
 				return !(*this == other);
 			}
 			entt::entity actorHandle{ entt::null };
+			entt::entity parentHandle{ entt::null };
 		private:
 
 			Level *eLevel = nullptr; // 8 bytes (use it as much as needed)

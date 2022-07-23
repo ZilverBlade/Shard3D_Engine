@@ -14,6 +14,8 @@ namespace Shard3D {
 		GUIRenderSystem();
 		~GUIRenderSystem();
 
+		void reset();
+
 		GUIRenderSystem(const GUIRenderSystem&) = delete;
 		GUIRenderSystem& operator=(const GUIRenderSystem&) = delete;
 

@@ -10,8 +10,10 @@
 #include "level_peekers.hpp"
 #include "asset_explorer_panel.hpp"
 #include "level_gizmo.hpp"
+#include "gui_builder_panel.hpp"
 namespace Shard3D {
-
+	class GUILayer;
+	class GUI;
 	class ImGuiLayer : public Shard3D::Layer {
 	public:
 		ImGuiLayer();
@@ -20,17 +22,18 @@ namespace Shard3D {
 		void attach(VkRenderPass renderPass, LayerStack* layerStack) override;
 		void detach() override;
 		void update(FrameInfo& frameInfo) override;
+		void attachGUIEditorInfo(GUILayer** guiArray);
 	private:
 		void detachTag() { }
 		void createIcons();
 		void renderQuickBar();
-		void renderGUIBuilder();
-		void renderGUIBuilderToolbar();
 		void renderMenuBar();
 		int width;
 		int height;
 
 		LayerStack* currentStack;
+
+		std::shared_ptr<GUIContainer> guiLayers{};
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 
@@ -43,6 +46,7 @@ namespace Shard3D {
 		bool showEngineSettingsWindow = false;
 		bool showGraphicsSettingsWindow = false;
 		bool showStylizersWindow = false;
+		bool showCredits = false;
 		struct EngineSettings {	
 			// WINDOW
 			int DEFAULT_WIDTH{};
@@ -71,6 +75,7 @@ namespace Shard3D {
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
 		AssetExplorerPanel AssetExplorerPanel;
+		GuiBuilderPanel guiBuilder;
 		bool refreshContext;
 //Gizmo levelGizmo;
 
@@ -80,7 +85,8 @@ namespace Shard3D {
 			VkDescriptorSet play, pause, stop, 
 				pref, save, load,
 				preview, layout, viewport, level,
-				settings;
+				settings,
+				l_save, l_load;
 			
 		} icons;
 	};

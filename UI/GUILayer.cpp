@@ -18,16 +18,20 @@ namespace Shard3D {
     }
 
     void GUILayer::update(FrameInfo& frameInfo) {
+        if (!Singleton::editorPreviewSettings.V_GUI) return;
         guiRenderSystem.render(frameInfo, guiElements);
-        if (Singleton::activeLevel->simulationState == wb3d::PlayState::Simulating) // only react to mouse when not playing
+        if (Singleton::activeLevel->simulationState == wb3d::PlayState::Simulating || 
+            Singleton::activeLevel->simulationState == wb3d::PlayState::PausedRuntime)
         if (glfwGetMouseButton(Singleton::engineWindow.getGLFWwindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {     
             if (getSelectedID() == 0) return;
             getSelectedElement()->pressEventCallback();
         }
+        guiRenderSystem.reset();
     }
 
     void GUILayer::addElement(std::shared_ptr<GUI::Element> element) {
         if (element->guid == 0) { SHARD3D_ERROR("You cannot create a GUI element with GUID 0"); return; }
+        contextRefresh = true;
         guiElements.elementsGUI.emplace(element->guid, element);
     }
 
@@ -38,7 +42,7 @@ namespace Shard3D {
     }
 
     std::shared_ptr<GUI::Element> GUILayer::getSelectedElement() {
-        
+        SHARD3D_LOG(getSelectedID());
         return guiElements.elementsGUI.find(getSelectedID())->second;
     }
 

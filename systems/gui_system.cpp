@@ -23,9 +23,11 @@ namespace Shard3D {
 
 	GUIRenderSystem::GUIRenderSystem() {}
 	GUIRenderSystem::~GUIRenderSystem() {}
-
+	void GUIRenderSystem::reset() {
+		pickBuffer->writeToBuffer(new GUIInfo());
+		pickBuffer->flush();
+	}
 	void GUIRenderSystem::create(VkRenderPass renderPass) {
-
 		pickBuffer = std::make_unique<EngineBuffer>(
 			Singleton::engineDevice,
 			sizeof(GUIInfo),
@@ -36,7 +38,6 @@ namespace Shard3D {
 		pickBuffer->map();
 		pickBuffer->writeToBuffer(new GUIInfo());
 		pickBuffer->flush();
-
 
 		createPipelineLayout();
 		createPipeline(renderPass);
@@ -80,7 +81,7 @@ namespace Shard3D {
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::defaultPipelineConfigInfo(pipelineConfig);
-	 	//EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
+	 	EnginePipeline::enableAlphaBlending(pipelineConfig, VK_BLEND_OP_ADD);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout; 

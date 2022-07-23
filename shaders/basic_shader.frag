@@ -54,8 +54,8 @@ float wrapDiffuse(vec3 normal, vec3 lightVector, float wrap) {
 }
 
 float getFogFactor(float d) {
-	const float FogMax = 20.0;
-	const float FogMin = 10.0;
+	const float FogMax = 100.0;
+	const float FogMin = 30.0;
 
 	if (d>=FogMax) return 1;
 	if (d<=FogMin) return 0;
@@ -114,11 +114,12 @@ void main() {
 		float cosAngIndicence = max(dot(surfaceNormal, normalize(lightDistance)), 0);
 		vec3 color_intensity = spotlight.color.xyz * spotlight.color.w * attenuation;
 
-		float theta = dot(lightDistance, normalize(-spotlight.direction.xyz));
-		float epsilon  = spotlight.angle.y - spotlight.angle.x;
-		float intensity = clamp((theta - spotlight.angle.x) / epsilon, 0.0, 1.0); 
-
-		if(theta > sin(spotlight.angle.x)) { 
+        vec3 L = normalize(spotlight.position.xyz - fragPosWorld);
+		float theta = dot(L, normalize(-spotlight.direction.xyz));
+		float outerCosAngle =  cos(spotlight.angle.x);
+		if(theta > outerCosAngle) { 
+            float epsilon  = cos(spotlight.angle.y) - outerCosAngle;
+		    float intensity = clamp((theta - outerCosAngle) / epsilon, 0.0, 1.0); 
 			diffuseLight += color_intensity * cosAngIndicence * intensity ;
 				//specular 
 			vec3 halfAngle = normalize(lightDistance + viewDirection);

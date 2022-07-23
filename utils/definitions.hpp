@@ -6,8 +6,8 @@ namespace Shard3D {
 //=====================================================================================================================
 //=====================================================================================================================
 
-const static std::string ENGINE_VERSION = "1.2.2.r0-alpha";	// Shard3D {major, minor, patch, revision}-state
-const static std::string EDITOR_VERSION = "1.2.r1-alpha";	// WorldEditor3D {major, minor};
+const static std::string ENGINE_VERSION = "1.2.2.r1-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string EDITOR_VERSION = "1.3.r0-alpha";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/configdata/engine_settings.ini"
 #define EDITOR_SETTINGS_PATH		"assets/configdata/editor_settings.ini"
@@ -22,8 +22,8 @@ const static std::string EDITOR_VERSION = "1.2.r1-alpha";	// WorldEditor3D {majo
 #define ENGINE_DEFAULT_MODEL_FILE	"assets/_engine/msh/cube.obj"
 #define ENGINE_CORE_ASSETS_PATH		"assets/_engine/"	
 #define ENGINE_MONO_SCRIPT_ASSEMBLY_PATH	"assets/scriptdata"
-#define ENGINE_CS_SCRIPT_RUNTIME_DLL	"assets/scriptdata/cs/bin/shard3d-csscript-core64.dll"
-#define ENGINE_VB_SCRIPT_RUNTIME_DLL	"assets/scriptdata/vb/bin/shard3d-vbscript-core64.dll"
+#define ENGINE_CS_SCRIPT_RUNTIME_DLL	"assets/scriptdata/cs/export/shard3d-csscript-core64.dll"
+#define ENGINE_VB_SCRIPT_RUNTIME_DLL	"assets/scriptdata/vb/export/shard3d-vbscript-core64.dll"
 #define ENGINE_FONT_PATH					"assets/_engine/fnt/"		//Fonts
 #define ENGINE_DEFAULT_ENGINE_FONT			"assets/_engine/fnt/fs-tahoma-8px.ttf"		//Default engine font
 #define ENGINE_FONT_SIZE			16		//size in px

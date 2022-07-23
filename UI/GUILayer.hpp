@@ -19,8 +19,10 @@ namespace Shard3D {
 		void rmvElement(std::shared_ptr<GUI::Element> element);
 		void rmvElement(uint64_t id);
 	private:
+		bool contextRefresh;
 		GLFWwindow* window;
 		GUIRenderSystem guiRenderSystem;
 		GUI guiElements;
+		friend class ImGuiLayer;
 	};
 }

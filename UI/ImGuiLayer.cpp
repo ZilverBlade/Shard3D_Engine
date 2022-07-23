@@ -24,6 +24,8 @@
 #include "imgui_initter.hpp"
 #include <shellapi.h>
 #include "../wb3d/assetmgr.hpp"
+#include "GUILayer.hpp"
+#include <imgui_internal.h>
 namespace Shard3D {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
@@ -40,6 +42,7 @@ namespace Shard3D {
         levelTreePanel.setContext(Singleton::activeLevel);
         levelPropertiesPanel.setContext(Singleton::activeLevel);
         levelPeekPanel.setContext(Singleton::activeLevel);
+
         //levelGizmo.setContext(level);
 
         // set the default values for the structure from ini file so that you can actually modify them
@@ -127,6 +130,7 @@ namespace Shard3D {
             levelPeekPanel.setContext(Singleton::activeLevel);
             refreshContext = false;
         }
+
         CSimpleIniA ini;
         ini.SetUnicode();
         ini.LoadFile(ENGINE_SETTINGS_PATH);
@@ -185,8 +189,7 @@ namespace Shard3D {
             renderMenuBar();
             ImGui::EndMenuBar();
         }
-        renderGUIBuilder();
-        renderGUIBuilderToolbar();
+        
         renderQuickBar();
 
         // VIEWPORT
@@ -214,11 +217,12 @@ namespace Shard3D {
         levelPropertiesPanel.render(levelTreePanel);
         levelPeekPanel.render();
         AssetExplorerPanel.render();
+        guiBuilder.render();
         //levelGizmo.render(level, levelTreePanel);
 
 
         if (showTest) {
-            ImGui::Begin("Material editor");
+            ImGui::Begin("Material editor", &showTest);
             ImGui::DragFloat("Specular", &Singleton::testPBR.x, 0.01f, 0.f, 2.f);
             ImGui::DragFloat("Roughness", &Singleton::testPBR.y, 0.01f, 0.f, 1.f);
             ImGui::BeginDisabled(!enset.pbr);
@@ -251,6 +255,29 @@ namespace Shard3D {
             //ImGui::SameLine();
             //ax::NodeEditor::EndNode();
             //ax::NodeEditor::End();
+            ImGui::End();
+        }
+        if (showCredits) {
+            ImGui::Begin("Credits", &showCredits);
+            if (ImGui::TreeNodeEx("Programming", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Text("ZilverBlade (Lead)");
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNodeEx("Graphics", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Text("ZilverBlade (Lead)");
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNodeEx("Editor Design", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Text("ZilverBlade (Layout and Colours)");
+                ImGui::Text("Dhibaid (Icons)");
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNodeEx("Special thanks", ImGuiTreeNodeFlags_DefaultOpen)) {
+                ImGui::Text("Brendan Galea (Vulkan tutorial series)");
+                ImGui::Text("The Cherno (Game engine series)");
+                ImGui::Text("All of the creators of the used libraries");
+                ImGui::TreePop();
+            }
             ImGui::End();
         }
 
@@ -401,8 +428,21 @@ namespace Shard3D {
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), frameInfo.commandBuffer);
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        glfwMakeContextCurrent(backup_current_context);
+    }
+
+    void ImGuiLayer::attachGUIEditorInfo(GUILayer** guiArray) {
+        guiLayers = std::make_shared<GUIContainer>();
+        for (int i = 0; i < 4; i++) {
+            if (guiArray[i]) 
+                guiLayers->guiLayerList
+                .push_back(&guiArray[i]->guiElements);
+        }
+
+        for (int i = 0; i < guiLayers->getList().size(); i++) {
+            SHARD3D_LOG("GUI Layer {0} has {1} elements", i, guiLayers->getList().at(i)->elementsGUI.size()) ;
+        }
+
+        guiBuilder.setContext(guiLayers);
     }
 
 
@@ -497,19 +537,7 @@ namespace Shard3D {
         ImGui::PopStyleColor();
         ImGui::End();
     }
-    void ImGuiLayer::renderGUIBuilder() {
-        ImGui::Begin("GUI Builder2D");
-        
-        ImGui::End();
-    }
-    void ImGuiLayer::renderGUIBuilderToolbar() {
-        ImGui::Begin("GUI Toolbar");
-        ImGui::Button("Button");
-        ImGui::Button("Text");
-        ImGui::Button("Image");
-        ImGui::Button("Loading Screen");
-        ImGui::End();
-    }
+
     void ImGuiLayer::renderMenuBar() {
         if (ImGui::BeginMenu("File")) {
             ImGui::TextDisabled("WorldBuilder3D 0.1");
@@ -606,6 +634,7 @@ namespace Shard3D {
                 ImGui::Separator();
                 ImGui::Checkbox("Grid", &Singleton::editorPreviewSettings.V_GRID);
                 ImGui::Checkbox("Billboards", &Singleton::editorPreviewSettings.V_EDITOR_BILLBOARDS);
+                ImGui::Checkbox("GUI", &Singleton::editorPreviewSettings.V_GUI);
                 ImGui::EndMenu();
             }
 #endif
@@ -724,6 +753,6 @@ namespace Shard3D {
 #endif
             ImGui::EndMenu();
         }
-        if (ImGui::MenuItem("Credits")) SHARD3D_NOIMPL;      
+        if (ImGui::MenuItem("Credits")) showCredits = true;
     }
 }

@@ -296,6 +296,15 @@
     <ClCompile Include="scripts\dynamic_script_engine_linker.cpp">
       <Filter>scripts</Filter>
     </ClCompile>
+    <ClCompile Include="UI\gui_builder_panel.cpp">
+      <Filter>Source Files\UI\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="wb3d\guimgr.cpp">
+      <Filter>Source Files\wb3d</Filter>
+    </ClCompile>
+    <ClCompile Include="cubemap.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -546,6 +555,15 @@
     </ClInclude>
     <ClInclude Include="plugins\script_engine_plugin_link.h">
       <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\gui_builder_panel.hpp">
+      <Filter>Header Files\UI\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="wb3d\guimgr.hpp">
+      <Filter>Header Files\wb3d</Filter>
+    </ClInclude>
+    <ClInclude Include="cubemap.hpp">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

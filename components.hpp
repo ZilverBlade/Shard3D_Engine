@@ -41,14 +41,24 @@ namespace Shard3D {
 		};
 
 		struct TransformComponent {
-			glm::vec3 translation{ 0.f, 0.f, 0.f };
-			glm::vec3 scale{ 1.f, 1.f, 1.f };
-			glm::vec3 rotation{ 0.f, 0.f, 0.f };
+			void setTranslation(glm::vec3 _t) { translation = _t; }
+			void setRotation(glm::vec3 _r) { rotation = _r; }
+			void setScale(glm::vec3 _s) { scale = _s; }
+
+			glm::vec3 getTranslation() { return translation; }
+			glm::vec3 getRotation() { return rotation; }
+			glm::vec3 getScale() { return scale; }
+
+
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
 
 			glm::mat4 mat4();
 			glm::mat3 normalMatrix();
+		
+			glm::vec3 translation{ 0.f, 0.f, 0.f };
+			glm::vec3 scale{ 1.f, 1.f, 1.f };
+			glm::vec3 rotation{ 0.f, 0.f, 0.f };
 		};
 
 		struct CameraComponent {

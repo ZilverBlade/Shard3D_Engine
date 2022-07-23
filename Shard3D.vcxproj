@@ -126,7 +126,8 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>compile_shaders.bat</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <ResourceCompile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -225,6 +226,7 @@
   <ItemGroup>
     <ClCompile Include="audio.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="cubemap.cpp" />
     <ClCompile Include="descriptors.cpp" />
     <ClCompile Include="engine_logger.cpp" />
     <ClCompile Include="graphics_settings.cpp" />
@@ -302,6 +304,17 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">..\s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="UI\gui_builder_panel.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="UI\imgui_initter.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">..\s3dtpch.h</PrecompiledHeaderFile>
@@ -333,6 +346,11 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="wb3d\bpmgr.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="wb3d\guimgr.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
@@ -445,6 +463,7 @@
     <ClInclude Include="audio.hpp" />
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="cheat_codes.hpp" />
+    <ClInclude Include="cubemap.hpp" />
     <ClInclude Include="descriptor_pools.hpp" />
     <ClInclude Include="events\events.hpp" />
     <ClInclude Include="events\event_handler.hpp" />
@@ -480,6 +499,7 @@
     <ClInclude Include="UI\asset_explorer_panel.hpp" />
     <ClInclude Include="UI\asset_properties_panel.hpp" />
     <ClInclude Include="UI\GUILayer.hpp" />
+    <ClInclude Include="UI\gui_builder_panel.hpp" />
     <ClInclude Include="UI\imgui_initter.hpp" />
     <ClInclude Include="UI\level_peekers.hpp" />
     <ClInclude Include="UI\ScreenLayer.hpp" />
@@ -496,6 +516,7 @@
     <ClInclude Include="wb3d\assetmgr.hpp" />
     <ClInclude Include="wb3d\blueprint.hpp" />
     <ClInclude Include="wb3d\bpmgr.hpp" />
+    <ClInclude Include="wb3d\guimgr.hpp" />
     <ClInclude Include="wb3d\levelmgr.hpp" />
     <ClInclude Include="systems\directional_light_system.hpp" />
     <ClInclude Include="systems\pointlight_system.hpp" />

@@ -100,15 +100,23 @@ namespace Shard3D {
 
 
 #if ENSET_ENABLE_WORLDBUILDER3D
-		layerStack.pushOverlay(new ImGuiLayer());
+		ImGuiLayer* imguiLayer = new ImGuiLayer();
+		layerStack.pushOverlay(imguiLayer);
 #endif
 		GUILayer* guiLayer0 = new GUILayer();
 		GUILayer* guiLayer1 = new GUILayer();
 		GUILayer* guiLayer2 = new GUILayer();
 		GUILayer* guiLayer3 = new GUILayer();
 
+		layerStack.pushOverlay(guiLayer3);
+		layerStack.pushOverlay(guiLayer2);
+		layerStack.pushOverlay(guiLayer1);
 		layerStack.pushOverlay(guiLayer0);
+
+		
+
 		//guiLayer0->attach(Singleton::mainOffScreen.getRenderPass(), &layerStack);
+		// 
 		// 
 		// TODO: render the GUILayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
 		// but render the GUI seperately from everything in the GUIEditor window.
@@ -175,30 +183,15 @@ namespace Shard3D {
 		} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
 			editor_cameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
 		}
-	
-	std::shared_ptr<GUI::Element> exampleGUIElement = std::make_shared<GUI::Element>();
 
-	AssetManager::emplaceTexture("assets/texturedata/gui/button.png");
-	exampleGUIElement->texturePath = "assets/texturedata/gui/button.png";
+		GUILayer* layerList[4]{
+			guiLayer0,
+			guiLayer1,
+			guiLayer2,
+			guiLayer3
+		};
+		imguiLayer->attachGUIEditorInfo(layerList);
 
-	exampleGUIElement->position = { 0.0f, 0.0f };
-	exampleGUIElement->scale = { 0.3, -0.3f };
-	exampleGUIElement->guid = 5;
-	exampleGUIElement->pressEventCallback = buttonClickYay;
-	
-	std::shared_ptr<GUI::Element> exampleGUIElement2 = std::make_shared<GUI::Element>();
-
-	exampleGUIElement2->texturePath = "assets/texturedata/gui/button.png";
-
-	exampleGUIElement2->position = { 0.5f, -0.5f };
-	exampleGUIElement2->scale = { 0.3, -0.6f };
-	exampleGUIElement2->guid = 8;
-	exampleGUIElement2->pressEventCallback = button3ClickYay;
-	//guiLayer0->addElement(exampleGUIElement);
-	//guiLayer0->addElement(exampleGUIElement2);
-
-
-	float constIncr = 0;
 		auto currentTime = std::chrono::high_resolution_clock::now();
 beginWhileLoop:
 		while (!Singleton::engineWindow.shouldClose()) {
@@ -288,8 +281,6 @@ beginWhileLoop:
 
 					Also order absolutely matters, post processing for example must go last
 				*/
-				constIncr += frameTime;
-				exampleGUIElement2->rotation = glm::sin(constIncr);
 				//	render
 				Singleton::mainOffScreen.start(frameInfo);
 				basicRenderSystem.renderGameObjects(frameInfo, Singleton::activeLevel);
@@ -384,6 +375,8 @@ beginWhileLoop:
 		car.getComponent<Components::TransformComponent>().rotation = { 0.f, glm::radians(90.f), 0.f };
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
 		car.addComponent<Components::AudioComponent>().file = 
-			"assets/audiodata/car_engine.wav";
+			"assets/audiodata/race_engine_nb.wav";
+		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/cubemaps/sky0/yes.png");
+
 	}
 }

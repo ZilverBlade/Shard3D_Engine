@@ -34,13 +34,13 @@ layout(push_constant) uniform Push {
 vec2 rotate(vec2 v, float a) {
 	const float s = sin(a);
 	const float c = cos(a);
-	const mat2 m = mat2(c, -s, s, c);
-	return m * v;
+	const mat2 m = mat2(c, s, -s, c);
+	return v * m;
 }
 void main(){
 	vec2 fragOffset = OFFSETS[gl_VertexIndex];
 	fragUV = UV[gl_VertexIndex];
 	id = push.id;
 	mousePos = push.mousePos;
-	gl_Position = vec4(rotate(fragOffset, push.rotation) * push.scale.xy + push.translation.xy, 0.0, 1.0);
+	gl_Position = vec4(rotate(fragOffset * push.scale.xy, push.rotation) + push.translation.xy, 0.0, 1.0);
 }

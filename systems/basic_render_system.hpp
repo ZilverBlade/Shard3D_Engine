@@ -33,6 +33,7 @@ namespace Shard3D {
 
 		std::unique_ptr<EnginePipeline> enginePipeline;
 		VkPipelineLayout pipelineLayout;
+		std::unique_ptr<EngineDescriptorSetLayout> skyboxLayout;
 	};
 
 }

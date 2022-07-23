@@ -74,21 +74,33 @@ namespace Shard3D::CppScripts {
 				if (exponent < 0) exponent = 0.f;
 			}
 			thisActor.getComponent<Components::TransformComponent>().translation += moveVector * forwardDir;
-			camAct.getComponent<Components::TransformComponent>().translation =
-				glm::vec3(thisActor.getComponent<Components::TransformComponent>().translation.x,
-					thisActor.getComponent<Components::TransformComponent>().translation.y + 1.5f,
-					glm::clamp(thisActor.getComponent<Components::TransformComponent>().
-						translation.z - 4.f - moveVector.z * 5, 
-						thisActor.getComponent<Components::TransformComponent>().translation.z - 15.f, 
-						thisActor.getComponent<Components::TransformComponent>().translation.z  -4.f));
-
-			camAct.getComponent<Components::CameraComponent>().fov = 
-				glm::clamp(60.f + glm::dot(moveVector, moveVector) *
-					glm::max(1.0f, (5.f / glm::dot(moveVector, moveVector))) * 10.f, 60.f, 90.f);
-
+			updateCameraPos();
 			thisActor.getComponent<Components::AudioComponent>().properties.relativePos = thisActor.getTransform().translation;
 			thisActor.getComponent<Components::AudioComponent>().properties.pitch = basePitch + moveVector.z * 3.f;
 			thisActor.getComponent<Components::AudioComponent>().update();
+		}
+
+		void updateCameraPos() {
+			glm::vec3 cameraPos = thisActor.getTransform().mat4() * glm::vec4(4.f, 0.f, 0.f, 1.f);
+
+			camAct.getComponent<Components::TransformComponent>().translation = 
+				glm::vec3(cameraPos.x, cameraPos.y + 1.5f, cameraPos.z);
+				//glm::vec4(thisActor.getComponent<Components::TransformComponent>().translation.x,
+				//	thisActor.getComponent<Components::TransformComponent>().translation.y + 1.5f,
+				//	(thisActor.getComponent<Components::TransformComponent>().
+				//		translation.z ,
+				//		thisActor.getComponent<Components::TransformComponent>().translation.z - 15.f,
+				//		thisActor.getComponent<Components::TransformComponent>().translation.z - 4.f), 1.f);
+
+			camAct.getComponent<Components::TransformComponent>().rotation.y =
+				thisActor.getTransform().rotation.y - 1.57079632679f;
+
+		
+
+			camAct.getComponent<Components::CameraComponent>().fov =
+				glm::clamp(60.f + glm::dot(moveVector, moveVector) *
+					glm::max(1.0f, (5.f / glm::dot(moveVector, moveVector))) * 10.f, 60.f, 90.f);
+
 		}
 
 		void spawnEvent() override {

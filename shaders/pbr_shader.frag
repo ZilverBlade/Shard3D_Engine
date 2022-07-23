@@ -6,6 +6,8 @@ layout(location = 2) in vec3 fragNormalWorld;
 
 layout (location = 0) out vec4 outColor;
 
+//layout (set = 1, binding = 20) uniform sampler2D skybox;
+
 struct Pointlight {
 	vec4 position;
 	vec4 color;
@@ -51,15 +53,15 @@ layout(push_constant) uniform Push {
 
 float PI = 3.1415926;
 
-vec3 F0 = vec3(0.0); // base reflectiveness
+vec3 F0V = vec3(0.0); // base reflectiveness
 
 float wrapDiffuse(vec3 normal, vec3 lightVector, float wrap) {
     return max(0.f, (dot(lightVector, normal) + wrap) / (1.0 + wrap));
 }
 
 float getFogFactor(float d) {
-	const float FogMax = 20.0;
-	const float FogMin = 10.0;
+	const float FogMax = 100.0;
+	const float FogMin = 30.0;
 
 	if (d>=FogMax) return 1;
 	if (d<=FogMin) return 0;
@@ -108,12 +110,10 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 }
 // ----------------------------------------------------------------------------
 
-
-
 // shader code
 void main(){
-	vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
-
+    vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+	
 	vec3 specularLight = vec3(0.0);
 	
 	vec3 surfaceNormal = normalize(fragNormalWorld);
@@ -122,13 +122,20 @@ void main(){
 	vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
 	vec3 N = fragNormalWorld;
 
-    F0 = mix(F0, fragColor, ubo.materialSettings.z);
+    vec3 V = normalize(cameraPosWorld - fragPosWorld);
+    vec3 specular = vec3(1.f);
 
-
-     vec3 V = normalize(cameraPosWorld - fragPosWorld);
-     vec3 specular = vec3(1.f);
     // reflectance equation
-    vec3 Lo = vec3(0.0);
+    //vec3 Igl = normalize(fragPosWorld - cameraPosWorld);
+    //vec3 Rgl = reflect(Igl, normalize(fragNormalWorld));
+    //  vec3  Lo = texture(skybox, vec2(Rgl.x, Rgl.z)).rgb * 3.0 * mix(vec3(1.0), 
+    //    fragColor, 
+    //    ubo.materialSettings.z) +
+    //    mix(fragColor, 
+    //    vec3(0.0), 
+    //    ubo.materialSettings.z);;
+    vec3  Lo = vec3(0.0);
+
     for (int i = 0; i < ubo.numPointlights; i++) {
         Pointlight light = ubo.pointlights[i];
         vec3 L = normalize(light.position.xyz - fragPosWorld);
@@ -140,7 +147,7 @@ void main(){
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, clamp(ubo.materialSettings.y, 0.05, 1.0));
         float G   = GeometrySmith(N, V, L, clamp(ubo.materialSettings.y, 0.05, 1.0));
-        vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
+        vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0V) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
 
         vec3 numerator    = NDF * G * F;
         float denominator = max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
@@ -179,7 +186,7 @@ void main(){
             // Cook-Torrance BRDF
             float NDF = DistributionGGX(N, H, clamp(ubo.materialSettings.y, 0.05, 1.0));
             float G   = GeometrySmith(N, V, L, clamp(ubo.materialSettings.y, 0.05, 1.0));
-            vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
+            vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0V) * (1.0 - clamp(ubo.materialSettings.z, 0.0, 0.9));
 
             vec3 numerator    = NDF * G * F;
             float denominator = 2 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero

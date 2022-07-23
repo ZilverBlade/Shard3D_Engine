@@ -101,6 +101,10 @@ ALPHA:
 		- Added experimental mouse picking support for GUI system using storage buffers
 		- Fixed ImGui detachment not working as intended
 		- Improvements to script engine
-
-
-		:: TODO, add credits, add editor layouts, add working GUI builder, finalize script engine, switch to clang
+		- Fixed rotation matrix for GUI elements
+		- Credits menu
+		- Fixed vb and c# script dll's not being pushed to repo
+		- Fixed camera movement relative to car in the example script
+		- Improvements to GUI system
+		- Added getters and setters for TransformComponent
+		:: TODO, add editor layouts, add working GUI builder, finalize script engine, switch to clang

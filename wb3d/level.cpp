@@ -185,6 +185,9 @@ namespace Shard3D {
 		 EngineCamera& Level::getPossessedCamera() {
 			return getPossessedCameraActor().getComponent<Components::CameraComponent>().camera;
 		 }
+		 void Level::parentActor(Actor parent, Actor child){
+			 child.parentHandle = parent.actorHandle;			 
+		 }
 #if ENSET_ALLOW_PREVIEW_CAMERA// ONLY FOR DEBUGGING PURPOSES
 		 void Level::setPossessedPreviewCameraActor(Actor actor) {
 			 if (!actor.hasComponent<Components::CameraComponent>()) {

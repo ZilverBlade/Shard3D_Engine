@@ -24,11 +24,10 @@ class EngineDevice {
     CSimpleIniA ini;
  public:
 #ifdef NDEBUG
-  //const bool enableValidationLayers = false;
+  const bool enableValidationLayers = false;
 #else
-  //const bool enableValidationLayers = true;
-#endif
   const bool enableValidationLayers = true;
+#endif
   EngineDevice(EngineWindow &window);
   ~EngineDevice();
 
@@ -88,6 +87,7 @@ class EngineDevice {
   void setupDebugMessenger();
   void createSurface();
   void pickPhysicalDevice();
+  void requestDeviceFeatures(VkPhysicalDeviceFeatures& features);
   void createLogicalDevice();
   void createCommandPool();
 

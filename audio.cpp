@@ -35,6 +35,7 @@ namespace Shard3D {
         ma_sound_set_pitch(&sound, properties.pitch);
         ma_sound_set_volume(&sound, properties.volume);
         ma_sound_set_position(&sound, properties.relativePos.x, properties.relativePos.y, properties.relativePos.z);
+        ma_sound_set_attenuation_model(&sound, ma_attenuation_model_exponential);
     }
 
     void EngineAudio::pause() {

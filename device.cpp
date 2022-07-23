@@ -113,8 +113,8 @@ void EngineDevice::createInstance() {
   appInfo.pApplicationName = "Shard3D (Vulkan)";
   appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
   appInfo.pEngineName = "Shard3D Torque";
-  appInfo.engineVersion = VK_MAKE_VERSION(1, 1, 0);
-  appInfo.apiVersion = VK_API_VERSION_1_0;
+  appInfo.engineVersion = VK_MAKE_VERSION(1, 3, 0);
+  appInfo.apiVersion = VK_API_VERSION_1_3;
 
   VkInstanceCreateInfo createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -185,7 +185,11 @@ void EngineDevice::pickPhysicalDevice() {
   if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU)
       SHARD3D_WARN("Graphics are being rendered with CPU, this can cause signicicantly worse performance. Continue at own risk.");
 }
-
+void EngineDevice::requestDeviceFeatures(VkPhysicalDeviceFeatures& features) {
+    features.samplerAnisotropy = VK_TRUE;
+    features.fragmentStoresAndAtomics = VK_TRUE;
+    features.shaderInt64 = VK_TRUE;
+}
 void EngineDevice::createLogicalDevice() {
   QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
@@ -202,12 +206,11 @@ void EngineDevice::createLogicalDevice() {
     queueCreateInfos.push_back(queueCreateInfo);
   }
 
-  VkPhysicalDeviceFeatures deviceFeatures = {};
-  deviceFeatures.samplerAnisotropy = VK_TRUE;
-
   VkDeviceCreateInfo createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
+  VkPhysicalDeviceFeatures deviceFeatures = {};
+  requestDeviceFeatures(deviceFeatures);
   createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
   createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
@@ -234,7 +237,7 @@ void EngineDevice::createLogicalDevice() {
 
 void EngineDevice::createCommandPool() {
   QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
-
+  
   VkCommandPoolCreateInfo poolInfo = {};
   poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
   poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;

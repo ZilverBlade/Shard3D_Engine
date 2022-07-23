@@ -19,6 +19,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "videoplayback", "videoplayb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shard3D Core", "scripts\script_utils\Shard3D Core.csproj", "{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripting", "Scripting", "{228EAB1C-965D-4010-BDD6-7FBBC6D821E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{C42255EE-9B60-4867-A4E0-D525AF771BAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -136,8 +140,15 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{01497360-F264-47BE-83E6-F210320F3AD7} = {C42255EE-9B60-4867-A4E0-D525AF771BAB}
+		{D281BE64-B259-42EC-A0B5-533F2ED6245E} = {228EAB1C-965D-4010-BDD6-7FBBC6D821E7}
+		{C152C0EE-5A9F-4BAF-A863-74AD1A194968} = {228EAB1C-965D-4010-BDD6-7FBBC6D821E7}
+		{49C63812-C440-478D-BFAB-C5F75FDC3F79} = {C42255EE-9B60-4867-A4E0-D525AF771BAB}
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584} = {228EAB1C-965D-4010-BDD6-7FBBC6D821E7}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {FD8CA4F0-B794-4F2F-B1B6-A2F8EEEE5906}
 		BuildVersion_StartDate = 2000/1/1
+		SolutionGuid = {FD8CA4F0-B794-4F2F-B1B6-A2F8EEEE5906}
 	EndGlobalSection
 EndGlobal
