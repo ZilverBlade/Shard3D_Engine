@@ -104,7 +104,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib;videoplayback\lib;extern\mono\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib;videoplayback\lib;extern\mono\lib\d</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;videoplayback.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib;mfplay.lib;shlwapi.lib</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
@@ -159,7 +159,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib;extern\mono\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib;extern\mono\lib\r;</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;mfplay.lib;shlwapi.lib</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
@@ -204,7 +204,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib;extern\mono\lib\Release;videoplayback/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\GameEngines\Vulkan-1.3.211.0\Lib;extern\glfw-3.3.7\lib-vc2019;extern\imgui\lib;extern\imgui-node-editor\lib;extern\yaml\lib;extern\mono\lib\r;videoplayback/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;mfplay.lib;shlwapi.lib;videoplayback.lib</AdditionalDependencies>
       <PreventDllBinding>
       </PreventDllBinding>
