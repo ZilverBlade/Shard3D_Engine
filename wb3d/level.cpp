@@ -6,7 +6,7 @@
 #include "master_manager.hpp"
 #include "bpmgr.hpp"
 #include "assetmgr.hpp"
-
+#include "../scripts/dynamic_script_engine.hpp"
 namespace Shard3D {
 	namespace wb3d {
 		Level::Level(const std::string &lvlName) : name(lvlName) {}
@@ -54,6 +54,7 @@ namespace Shard3D {
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::ScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
 			newLvl->possessedCameraActorGUID = other->getPossessedCameraActor().getGUID();
 			
@@ -219,24 +220,34 @@ namespace Shard3D {
 		void Level::begin() {
 			SHARD3D_INFO("Level: Initializing scripts");
 			simulationState = PlayState::Simulating;
-			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
-				if (!csc.Inst) {
-					csc.Inst = csc.InstScript();
-					csc.Inst->thisActor = Actor{ actor, this };
-					csc.Inst->beginEvent();
-				}
-			});
+			{
+				registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+					if (!csc.Inst) {
+						csc.Inst = csc.InstScript();
+						csc.Inst->thisActor = Actor{ actor, this };
+						csc.Inst->beginEvent();
+					}
+				});
+			}
+			{
+				DynamicScriptEngine::runtimeStart(this);
+				registry.view<Components::ScriptComponent>().each([=](auto actor, auto& scr) {
+					DynamicScriptEngine::actorScript().beginEvent({ actor, this });
+				});
+			}
 			SHARD3D_INFO("Beginning simulation");
 		}
 
 		void Level::tick(float dt) {
 			// update scripts	
 			{ // scoped because if tickevent does something else then it doesnt need to keep stack allocated memory
-				if (simulationState == PlayState::Simulating)
 					registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 					csc.Inst->tickEvent(dt);
 				});
-			}			
+			}	
+			{ // Actor loop gets managed by the script engine
+				DynamicScriptEngine::actorScript().tickEvent(dt);
+			}
 		}
 
 		void Level::simulationStateCallback() {
@@ -267,6 +278,10 @@ namespace Shard3D {
 			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
 				csc.Inst->endEvent();
 			});
+			{
+				DynamicScriptEngine::actorScript().endEvent();
+			}
+			DynamicScriptEngine::runtimeStop();
 			setPossessedCameraActor(0);
 			SHARD3D_LOG("Reloading level");
 			loadRegistryCapture = true;

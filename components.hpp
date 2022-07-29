@@ -96,10 +96,13 @@ namespace Shard3D {
 				camera.setPerspectiveProjection(glm::radians(fov), ar, nearClip, farClip);
 				else  camera.setOrthographicProjection(-ar, ar, -1, 1, nearClip, farClip);
 			}
-
+			void setFOV(float _f) { fov = _f; }
+			float getFOV() { return fov; }
 			operator EngineCamera&() {
 				return camera;
 			}
+			CameraComponent() = default;
+			CameraComponent(const CameraComponent&) = default;
 		};
 		struct BillboardComponent {
 			std::string file{};
@@ -154,7 +157,8 @@ namespace Shard3D {
 				audioEngine->stop();
 				delete audioEngine;
 			}
-
+			AudioComponent() = default;
+			AudioComponent(const AudioComponent&) = default;
 		};
 		struct PointlightComponent {
 			float radius = 1.f;
@@ -162,6 +166,9 @@ namespace Shard3D {
 			float lightIntensity = 1.0f;
 			glm::vec3 attenuationMod = { 0.f, 0.f, 1.f };
 			float specularMod = 1.0f;
+
+			PointlightComponent() = default;
+			PointlightComponent(const PointlightComponent&) = default;
 		};
 
 		struct SpotlightComponent {
@@ -172,12 +179,18 @@ namespace Shard3D {
 			float innerAngle = glm::radians(30.0f);
 			glm::vec3 attenuationMod = { 0.f, 0.f, 1.f };
 			float specularMod = 1.0f;
+
+			SpotlightComponent() = default;
+			SpotlightComponent(const SpotlightComponent&) = default;
 		};
 
 		struct DirectionalLightComponent {
 			glm::vec3 color = { 1.f, 1.f, 1.f };
 			float lightIntensity = 1.0f;
 			float specularMod = 1.0f;
+
+			DirectionalLightComponent() = default;
+			DirectionalLightComponent(const DirectionalLightComponent&) = default;
 		};
 		struct ParticleComponent {
 			ParticleProperties particleTemplate;

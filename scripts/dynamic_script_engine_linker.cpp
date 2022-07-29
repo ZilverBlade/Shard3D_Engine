@@ -10,6 +10,12 @@ namespace Shard3D {
 	void DynamicScriptEngineLinker::registerInternalCalls() {
 		_S3D_ICALL(Log);
 		_S3D_ICALL(LogNoImpl);
+		_S3D_ICALL(SetTranslation);
+		_S3D_ICALL(GetTranslation);
+		_S3D_ICALL(SetRotation);
+		_S3D_ICALL(GetRotation);
+		_S3D_ICALL(SetScale);
+		_S3D_ICALL(GetScale);
 	}
 }
 namespace Shard3D::InternalScriptCalls {
@@ -31,5 +37,24 @@ namespace Shard3D::InternalScriptCalls {
 	}
 	void LogNoImpl() {
 		SHARD3D_NOIMPL;
+	}
+
+	void GetTranslation(uint64_t actorID, glm::vec3* v) {
+
+	}
+	void SetTranslation(uint64_t actorID, glm::vec3* v) {
+
+	}
+	void GetRotation(uint64_t actorID, glm::vec3* v) {
+
+	}
+	void SetRotation(uint64_t actorID, glm::vec3* v) {
+
+	}
+	void GetScale(uint64_t actorID, glm::vec3* v) {
+
+	}
+	void SetScale(uint64_t actorID, glm::vec3* v) {
+
 	}
 }

@@ -2,7 +2,7 @@
 #include "level_properties_panel.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include "../engine_window.hpp"
-
+#include "../scripts/dynamic_script_engine.hpp"
 #include <imgui_internal.h>
 #include "../wb3d/assetmgr.hpp"
 #include "../singleton.hpp"
@@ -29,6 +29,14 @@ namespace Shard3D {
 						ImGui::CloseCurrentPopup();
 					}
 #endif
+					if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
+						tree.selectedActor.addComponent<Components::CppScriptComponent>();
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::ScriptComponent>()) if (ImGui::MenuItem("C#/VB Script")) {
+						tree.selectedActor.addComponent<Components::ScriptComponent>();
+						ImGui::CloseCurrentPopup();
+					}
 					if (!tree.selectedActor.hasComponent<Components::PointlightComponent>()) if (ImGui::MenuItem("Pointlight")) {
 						tree.selectedActor.addComponent<Components::PointlightComponent>();
 						ImGui::CloseCurrentPopup();
@@ -56,10 +64,7 @@ namespace Shard3D {
 						tree.selectedActor.getComponent<Components::MeshComponent>().hideInGame = true;
 						ImGui::CloseCurrentPopup();
 					}
-					if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
-						tree.selectedActor.addComponent<Components::CppScriptComponent>();
-						ImGui::CloseCurrentPopup();
-					}
+					
 					ImGui::EndPopup();
 				}
 			}
@@ -177,6 +182,54 @@ namespace Shard3D {
 
 				ImGui::TreePop();
 			}
+		}
+		if (actor.hasComponent<Components::CppScriptComponent>()) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::CppScriptComponent).hash_code(), nodeFlags, "C++ Script");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
+				ImGui::Text(std::to_string(reinterpret_cast<uint64_t>(actor.getComponent<Components::CppScriptComponent>().InstScript)).c_str());
+				ImGui::TreePop();
+			}
+			if (killComponent) actor.killComponent<Components::CppScriptComponent>();
+		}
+		if (actor.hasComponent<Components::ScriptComponent>()) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::ScriptComponent).hash_code(), nodeFlags, "C#/VB Script");
+			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
+			bool killComponent = false;
+			if (ImGui::BeginPopup("KillComponent")) {
+				if (ImGui::MenuItem("Remove Component")) {
+					killComponent = true;
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			if (open) {
+				bool exists = false;
+				static char buffer[32];
+
+				auto& name = actor.getComponent<Components::ScriptComponent>().name;
+				memset(buffer, 0, 32);
+				strncpy(buffer, name.c_str(), 32);
+				//const auto& actorClasses = DynamicScriptEngine::getActorClasses(actor.getComponent<Components::ScriptComponent>().lang);
+				exists = DynamicScriptEngine::doesClassExist("Shard3D.Scripts." + name, actor.getComponent<Components::ScriptComponent>().lang);
+				if (!exists) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4, 0.7f, 1.0f));
+				if (ImGui::InputText("Script Class", buffer, 32)) {
+					name = std::string(buffer);
+				}
+				if (!exists) ImGui::PopStyleColor();
+				ImGui::Combo("Language", &actor.getComponent<Components::ScriptComponent>().lang, "C#\0Visual Basic");
+				
+				ImGui::TreePop();
+			}
+			if (killComponent) actor.killComponent<Components::ScriptComponent>();
 		}
 		if (actor.hasComponent<Components::MeshComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::MeshComponent).hash_code(), nodeFlags, "Mesh");
@@ -377,22 +430,6 @@ namespace Shard3D {
 			}
 			if (killComponent) actor.killComponent<Components::DirectionalLightComponent>();
 		}
-		if (actor.hasComponent<Components::CppScriptComponent>()) {
-			bool open = ImGui::TreeNodeEx((void*)typeid(Components::CppScriptComponent).hash_code(), nodeFlags, "C++ Script");
-			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
-			bool killComponent = false;
-			if (ImGui::BeginPopup("KillComponent")) {
-				if (ImGui::MenuItem("Remove Component")) {
-					killComponent = true;
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}
-			if (open) {
-				ImGui::Text(std::to_string(reinterpret_cast<uint64_t>(actor.getComponent<Components::CppScriptComponent>().InstScript)).c_str());
-				ImGui::TreePop();
-			}
-			if (killComponent) actor.killComponent<Components::CppScriptComponent>();
-		}
+		
 	}
 }

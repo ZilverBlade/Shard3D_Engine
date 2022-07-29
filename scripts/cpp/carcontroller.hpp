@@ -6,7 +6,7 @@ namespace Shard3D::CppScripts {
 		const float basePitch = 0.1f;
 	public:
 		wb3d::Actor camAct;
-		float exponent;
+
 		glm::vec3 moveVector;
 		void beginEvent() override {
 			thisActor.getComponent<Components::TransformComponent>().translation = { 0.f, 0.2f, 0.f };
@@ -62,16 +62,13 @@ namespace Shard3D::CppScripts {
 			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_S) == GLFW_PRESS)
 				moveVector -= dt;
 			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_W) == GLFW_PRESS) {
-				moveVector += exponent * 0.008;
-				exponent += dt * 0.005f * glm::clamp(0.1f / moveVector.z, 0.f, 10.f);
+				moveVector += dt * 0.025f * glm::clamp(0.1f / moveVector.z, 0.f, 10.f) * 0.008;
 			}
 			else {
 				moveVector.x -= dt * 0.0098f;
 				moveVector.z -= dt * 0.0098f;
-				exponent -= 0.05f * dt;
 				if (moveVector.x < 0) moveVector.x = 0.f;
 				if (moveVector.z < 0) moveVector.z = 0.f;
-				if (exponent < 0) exponent = 0.f;
 			}
 			thisActor.getComponent<Components::TransformComponent>().translation += moveVector * forwardDir;
 			updateCameraPos();

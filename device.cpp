@@ -123,7 +123,7 @@ void EngineDevice::createInstance() {
   auto extensions = getRequiredExtensions();
   createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
   createInfo.ppEnabledExtensionNames = extensions.data();
-
+ 
   VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
   if (enableValidationLayers) {
     createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -136,7 +136,7 @@ void EngineDevice::createInstance() {
     createInfo.pNext = nullptr;
   }
 
-
+  
 
   if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
       SHARD3D_FATAL("Failed to create instance!");

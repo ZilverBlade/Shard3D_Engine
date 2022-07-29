@@ -465,9 +465,6 @@
     <ClInclude Include="cheat_codes.hpp" />
     <ClInclude Include="cubemap.hpp" />
     <ClInclude Include="descriptor_pools.hpp" />
-    <ClInclude Include="events\events.hpp" />
-    <ClInclude Include="events\event_handler.hpp" />
-    <ClInclude Include="events\key_events.hpp" />
     <ClInclude Include="graphics_settings.hpp" />
     <ClInclude Include="gui.hpp" />
     <ClInclude Include="offscreen.hpp" />

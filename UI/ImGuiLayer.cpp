@@ -217,7 +217,7 @@ namespace Shard3D {
         levelPropertiesPanel.render(levelTreePanel);
         levelPeekPanel.render();
         AssetExplorerPanel.render();
-        guiBuilder.render();
+      //  guiBuilder.render();
         //levelGizmo.render(level, levelTreePanel);
 
 

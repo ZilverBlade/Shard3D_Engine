@@ -433,15 +433,6 @@
     <ClInclude Include="version.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="events\events.hpp">
-      <Filter>events</Filter>
-    </ClInclude>
-    <ClInclude Include="events\event_handler.hpp">
-      <Filter>events</Filter>
-    </ClInclude>
-    <ClInclude Include="events\key_events.hpp">
-      <Filter>events</Filter>
-    </ClInclude>
     <ClInclude Include="systems\compute_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>

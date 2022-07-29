@@ -113,7 +113,8 @@ namespace Shard3D {
 		layerStack.pushOverlay(guiLayer1);
 		layerStack.pushOverlay(guiLayer0);
 
-		
+
+		std::shared_ptr<GUI::Element> test = std::make_shared<GUI::Element>();
 
 		//guiLayer0->attach(Singleton::mainOffScreen.getRenderPass(), &layerStack);
 		// 
@@ -210,7 +211,7 @@ beginWhileLoop:
 
 			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice);
 			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
-			Singleton::activeLevel->tick(frameTime);
+			if (Singleton::activeLevel->simulationState == PlayState::Simulating) Singleton::activeLevel->tick(frameTime);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().translation, 
 				possessedCameraActor.getTransform().rotation);
 
@@ -376,7 +377,7 @@ beginWhileLoop:
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
 		car.addComponent<Components::AudioComponent>().file = 
 			"assets/audiodata/race_engine_nb.wav";
-		wb3d::AssetManager::emplaceTexture("assets/_engine/tex/cubemaps/sky0/yes.png");
 
+		car.addComponent<Components::ScriptComponent>();
 	}
 }

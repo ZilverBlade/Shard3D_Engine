@@ -107,4 +107,6 @@ ALPHA:
 		- Fixed camera movement relative to car in the example script
 		- Improvements to GUI system
 		- Added getters and setters for TransformComponent
+	> Shard3D Torque 1.2.3-alpha
+		- Made improvements to script system
 		:: TODO, add editor layouts, add working GUI builder, finalize script engine, switch to clang

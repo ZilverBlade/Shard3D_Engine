@@ -19,11 +19,20 @@ namespace Shard3D {
 
 	namespace InternalScriptCalls {
 #pragma region Logging
-		void Log(MonoString* string, int severity);
-		void LogNoImpl();
+		static void Log(MonoString* string, int severity);
+		static void LogNoImpl();
 #pragma endregion
 
-	
+#pragma region Transforms
+		static void GetTranslation(uint64_t actorID, glm::vec3* v);
+		static void SetTranslation(uint64_t actorID, glm::vec3* v);
+
+		static void GetRotation(uint64_t actorID, glm::vec3* v);
+		static void SetRotation(uint64_t actorID, glm::vec3* v);
+		 
+		static void GetScale(uint64_t actorID, glm::vec3* v);
+		static void SetScale(uint64_t actorID, glm::vec3* v);
+#pragma endregion
 	
 	}
 }
