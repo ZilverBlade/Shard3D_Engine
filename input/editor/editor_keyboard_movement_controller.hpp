@@ -19,7 +19,7 @@ namespace Shard3D {
             int slowDown = GLFW_KEY_LEFT_CONTROL;
         };
 
-        void moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor);
+        void moveInPlaneXY(GLFWwindow* window, float dt, wb3d::Actor& actor);
 
         KeyMappings keys{};
         float moveSpeed{ 5.f };

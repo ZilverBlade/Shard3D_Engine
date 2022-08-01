@@ -37,7 +37,7 @@ namespace Shard3D {
 		static void runtimeStart(wb3d::Level* level);
 		static void runtimeStop();
 		static bool doesClassExist(const std::string& fullClassName, int lang);
-		wb3d::Level* getContext();
+		static wb3d::Level* getContext();
 		static _e actorScript() { return _e(); }
 	private:
 		

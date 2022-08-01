@@ -161,6 +161,9 @@ namespace Shard3D {
 
 		globalData->rootDomain = rootDomain;
 		
+		scriptEngineData->appDomain = mono_domain_create_appdomain((char*)("Shard3D_CS_Runtime"), nullptr);
+		vbScriptEngineData->appDomain = mono_domain_create_appdomain((char*)("Shard3D_VB_Runtime"), nullptr);
+
 		reloadAssembly(ScriptLanguage::CSharp);
 		reloadAssembly(ScriptLanguage::VisualBasic);
 
@@ -168,7 +171,6 @@ namespace Shard3D {
 
 		scriptEngineData->actorClass = DynamicScriptClass("Shard3D.Core", "Actor", 0);
 		vbScriptEngineData->actorClass = DynamicScriptClass("Shard3D.Core", "Actor", 1);
-
 
 		loadAssemblyClasses(scriptEngineData);
 		loadAssemblyClasses(vbScriptEngineData);
@@ -217,7 +219,6 @@ namespace Shard3D {
 	}
 
 	inline void DynamicScriptEngine::_reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang) {
-		scriptEngine->appDomain = mono_domain_create_appdomain((char*)((lang == ScriptLanguage::CSharp) ? "Shard3D_CS_Runtime" : "Shard3D_VB_Runtime"), nullptr);
 		mono_domain_set(scriptEngine->appDomain, true);
 		scriptEngine->coreAssembly = MonoUtils::loadAssembly((lang == ScriptLanguage::CSharp) ? ENGINE_CS_SCRIPT_RUNTIME_DLL : ENGINE_VB_SCRIPT_RUNTIME_DLL);
 		scriptEngine->coreAssemblyImage = mono_assembly_get_image(scriptEngine->coreAssembly);
@@ -313,20 +314,18 @@ namespace Shard3D {
 		return mono_runtime_invoke(method, instance, params, nullptr);
 	}
 
-	DynamicScriptInstance::DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, wb3d::Actor actor) : scriptClass(s_class), scriptEvents(s_class, instance) {
+	DynamicScriptInstance::DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, wb3d::Actor actor) : scriptClass(s_class) {
 		instance = s_class->inst();
-		constructor = (!lang?scriptEngineData : vbScriptEngineData)->actorClass.getMethod(".ctor", 1);	
+		
+		constructor = (!lang? scriptEngineData : vbScriptEngineData)->actorClass.getMethod(".ctor", 1);	
+		scriptEvents = ScriptEvents(s_class, instance);
 		{
 			uint64_t guid = actor.getGUID();
 			void* param = &guid;
 			scriptClass->invokeMethod(instance, constructor, &param);
 		}
 	}
-
-	DynamicScriptInstance::ScriptEvents DynamicScriptInstance::invokeEvent() {
-		return scriptEvents; 
-	}
-
+	DynamicScriptInstance::ScriptEvents DynamicScriptInstance::invokeEvent() { return scriptEvents; }
 	DynamicScriptInstance::ScriptEvents::ScriptEvents(std::shared_ptr<DynamicScriptClass> ptr, MonoObject* i) : s_c(ptr), _i(i) {
 		beginEventMethod = s_c->getMethod("BeginEvent", 0);
 		endEventMethod = s_c->getMethod("EndEvent", 0);
@@ -334,20 +333,9 @@ namespace Shard3D {
 		spawnEventMethod = s_c->getMethod("SpawnEvent", 0);
 		killEventMethod = s_c->getMethod("KillEvent", 0);	
 	}
-	void DynamicScriptInstance::ScriptEvents::beginEvent() {
-		s_c->invokeMethod(_i, beginEventMethod);
-	}
-	void DynamicScriptInstance::ScriptEvents::endEvent() {
-		s_c->invokeMethod(_i, endEventMethod);
-	}
-	void DynamicScriptInstance::ScriptEvents::tickEvent(float dt) {
-		void* param = &dt;
-		s_c->invokeMethod(_i, tickEventMethod, &param);
-	}
-	void DynamicScriptInstance::ScriptEvents::spawnEvent() {
-		s_c->invokeMethod(_i, spawnEventMethod);
-	}
-	void DynamicScriptInstance::ScriptEvents::killEvent() {
-		s_c->invokeMethod(_i, killEventMethod);
-	}
+	void DynamicScriptInstance::ScriptEvents::beginEvent() { s_c->invokeMethod(_i, beginEventMethod); }
+	void DynamicScriptInstance::ScriptEvents::endEvent() { s_c->invokeMethod(_i, endEventMethod); }
+	void DynamicScriptInstance::ScriptEvents::tickEvent(float dt) { void* param = &dt; s_c->invokeMethod(_i, tickEventMethod, &param); }
+	void DynamicScriptInstance::ScriptEvents::spawnEvent() { s_c->invokeMethod(_i, spawnEventMethod); }
+	void DynamicScriptInstance::ScriptEvents::killEvent() { s_c->invokeMethod(_i, killEventMethod); }
 }

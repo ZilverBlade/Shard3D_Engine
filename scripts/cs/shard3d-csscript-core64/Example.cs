@@ -1,34 +1,38 @@
 ﻿using Shard3D.Core;
 using static Shard3D.Core.InternalCalls;
-using Shard3D.Core.Components;
 
 namespace Shard3D.Scripts
 {
 	public class Example : Actor
-	{ 
-		Example() {
-				Log($"Le id {this.ID}", LogSeverity.Info);
-		}
+	{
+		private ulong frames;
+		// Called when level starts playing
 		protected void BeginEvent() {
 			Log("BeginEvent() in C#", LogSeverity.Info);
-			//Log(frames.ToString());
 			Log($"ID is {this.ID}", LogSeverity.Info);
 		}
 
+		// Called when level stops playing
 		protected void EndEvent() {
 			Log("EndEvent() in C#", LogSeverity.Info);
 		}
 
+		// Called every frame, includes frametime value to keep game loop timing accurate
 		protected void TickEvent(float dt) { // float dt = frametime 
-
+			Vector3 _T = this.Translation;
+			_T.y -= 10 * dt;
+			this.Translation = _T;
+			frames++;
 		}
 
-		protected void SpawnEvent() {
-		
+		// Called on destruction of the actor
+		protected void KillEvent()
+		{
+			Log("I died D:", LogSeverity.Info);
+			Log($"I lasted {frames} frames");
 		}
 
-		protected void KillEvent() {
-		
-		}
+		// This is unused as there are no blueprints that can be spawned in with scripts
+		protected void SpawnEvent() { }
 	}
 }

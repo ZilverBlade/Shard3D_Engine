@@ -12,7 +12,7 @@ namespace Shard3D {
 				int canRotate = GLFW_MOUSE_BUTTON_RIGHT;
 			};
 			EditorMouseMovementController();
-			void moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor);
+			void moveInPlaneXY(GLFWwindow* window, float dt, wb3d::Actor& actor);
 
 			ButtonMappings buttons{};
 			float sensitivity{ 15.f };

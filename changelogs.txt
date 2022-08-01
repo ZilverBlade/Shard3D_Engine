@@ -108,5 +108,8 @@ ALPHA:
 		- Improvements to GUI system
 		- Added getters and setters for TransformComponent
 	> Shard3D Torque 1.2.3-alpha
-		- Made improvements to script system
+		- Script system is now usable
+		- Rebranded logos and icons
+		- Forced use of getters and setters of transforms
+		- Transforms now expose proper Z up values
 		:: TODO, add editor layouts, add working GUI builder, finalize script engine, switch to clang

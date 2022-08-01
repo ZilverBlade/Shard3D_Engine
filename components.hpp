@@ -14,13 +14,24 @@
 #include <Physics/Collision/Shape/Shape.h>
 #include "audio.hpp"
 #include "systems/particle_system.hpp"
+
 namespace Shard3D {
 	namespace wb3d {
 		class Blueprint;
 	}
 	class wb3d::Blueprint;
-
+	class LevelPropertiesPanel;
 	namespace Components {
+		enum class ComponentsList {
+			CameraComponent,
+			BillboardComponent,
+			MeshComponent,
+			AudioComponent,
+			PointlightComponent,
+			SpotlightComponent,
+			DirectionalLightComponent
+		};
+
 		struct GUIDComponent {
 			GUID id;
 
@@ -41,24 +52,34 @@ namespace Shard3D {
 		};
 
 		struct TransformComponent {
-			void setTranslation(glm::vec3 _t) { translation = _t; }
-			void setRotation(glm::vec3 _r) { rotation = _r; }
-			void setScale(glm::vec3 _s) { scale = _s; }
+			void setTranslation(glm::vec3 _t) { translation = glm::vec3(_t.x, _t.z, _t.y); }
+			void setRotation(glm::vec3 _r) { rotation = glm::vec3(_r.x, _r.z, _r.y); }
+			void setScale(glm::vec3 _s) { scale = glm::vec3(_s.x, _s.z, _s.y); }
 
-			glm::vec3 getTranslation() { return translation; }
-			glm::vec3 getRotation() { return rotation; }
-			glm::vec3 getScale() { return scale; }
+			void setTranslationX(float val) { translation.x = val; }
+			void setRotationX(float val) { rotation.x = val; }
+			void setScaleX(float val) { scale.x = val; }
+			void setTranslationY(float val) { translation.z = val; }
+			void setRotationY(float val) { rotation.z = val;}
+			void setScaleY(float val) { scale.z = val; }
+			void setTranslationZ(float val) { translation.y = val; }
+			void setRotationZ(float val) { rotation.y = val; }
+			void setScaleZ(float val) { scale.y = val; }
 
+			glm::vec3 getTranslation() { return glm::vec3(translation.x, translation.z, translation.y); }
+			glm::vec3 getRotation() { return glm::vec3(rotation.x, rotation.z, rotation.y); }
+			glm::vec3 getScale() { return glm::vec3(scale.x, scale.z, scale.y); }
 
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
 
 			glm::mat4 mat4();
 			glm::mat3 normalMatrix();
-		
+		private:
 			glm::vec3 translation{ 0.f, 0.f, 0.f };
-			glm::vec3 scale{ 1.f, 1.f, 1.f };
 			glm::vec3 rotation{ 0.f, 0.f, 0.f };
+			glm::vec3 scale{ 1.f, 1.f, 1.f };
+			friend class LevelPropertiesPanel; // to modify the values real time
 		};
 
 		struct CameraComponent {
@@ -66,43 +87,51 @@ namespace Shard3D {
 				Orthographic = 0,
 				Perspective = 1
 			};
-
 			EngineCamera camera{};
 			/* *
 * Projection type (Perspective/Orthographic)
 */
-			ProjectType projectionType = ProjectType::Perspective;
+			void setProjectionType(ProjectType _pt) { projectionType = _pt; setProjection(); };
+			ProjectType getProjectionType() { return projectionType; };
 			/* *
 * Vertical Field of view (degrees)
 */
-			float fov = 70.f;
+			void setFOV(float _f) { fov = _f; camera.setPerspectiveProjection(glm::radians(fov), ar, nearClip, farClip); }
+			float getFOV() { return fov; }
 			/* *
 * Near clip distance (meters)
 */
-			float nearClip = 0.05f;
+			void setNearClip(float _d) { nearClip = _d; setProjection(); }
+			float getNearClip() { return fov; }
 			/* *
 * Far clip distance (meters)
 */
-			float farClip = 1024.f;
+			void setFarClip(float _d) { farClip = _d; setProjection();}
+			float getFarClip() { return fov; }
 			/* *
 * Aspect ratio (width/height)
 */
 			float ar = 16 / 9;
 			/* *
 * Set projection with the given settings
-*/
-			void setProjection() {
-				if (projectionType == ProjectType::Perspective)
-				camera.setPerspectiveProjection(glm::radians(fov), ar, nearClip, farClip);
-				else  camera.setOrthographicProjection(-ar, ar, -1, 1, nearClip, farClip);
-			}
-			void setFOV(float _f) { fov = _f; }
-			float getFOV() { return fov; }
+*/	
 			operator EngineCamera&() {
 				return camera;
 			}
 			CameraComponent() = default;
 			CameraComponent(const CameraComponent&) = default;
+			void setProjection() {
+				if (projectionType == ProjectType::Perspective)
+					camera.setPerspectiveProjection(glm::radians(fov), ar, nearClip, farClip);
+				else  camera.setOrthographicProjection(-ar, ar, -1, 1, nearClip, farClip);
+			}
+		private:
+			float fov = 70.f;
+			float nearClip = 0.05f;
+			float farClip = 1024.f;
+			ProjectType projectionType = ProjectType::Perspective;
+			
+			friend class LevelPropertiesPanel;
 		};
 		struct BillboardComponent {
 			std::string file{};
@@ -112,7 +141,7 @@ namespace Shard3D {
 				VIEW_POINT_ALIGNED,
 				AXIAL,
 			};
-			// BILLBOARD_ORIENTATION_AXIAL is the only supported orientation at the moment
+			// SCREEN_VIEW_ALIGNED is the only supported orientation at the moment
 			BillboardOrientation orientation = BillboardOrientation::SCREEN_VIEW_ALIGNED;
 
 			BillboardComponent() = default;

@@ -83,7 +83,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actor.vb" />
+    <Compile Include="Core\Actor.vb" />
+    <Compile Include="Core\ECSMgr.vb" />
     <Compile Include="Example.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

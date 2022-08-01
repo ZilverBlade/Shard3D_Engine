@@ -1,6 +1,6 @@
 #pragma once
 #include "../plugins/script_engine_plugin_link.h"
-
+#include "../components.hpp"
 extern "C" {
 	typedef struct _MonoString MonoString;
 	typedef struct _MonoArray MonoArray;
@@ -32,6 +32,12 @@ namespace Shard3D {
 		 
 		static void GetScale(uint64_t actorID, glm::vec3* v);
 		static void SetScale(uint64_t actorID, glm::vec3* v);
+#pragma endregion
+
+#pragma region ECS
+		static void SpawnActor(uint64_t* actorID, MonoString* string);
+		static void ActorAddComponent(uint64_t actorID, Components::ComponentsList component);
+		static void ActorRmvComponent(uint64_t actorID, Components::ComponentsList component);
 #pragma endregion
 	
 	}

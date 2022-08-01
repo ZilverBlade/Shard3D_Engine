@@ -47,9 +47,9 @@ namespace Shard3D {
 			if (actor.hasComponent<Components::TransformComponent>()) {
 				out << YAML::Key << "TransformComponent";
 				out << YAML::BeginMap;
-					out << YAML::Key << "Translation" << YAML::Value << actor.getComponent<Components::TransformComponent>().translation;
-					out << YAML::Key << "Rotation" << YAML::Value << actor.getComponent<Components::TransformComponent>().rotation;
-					out << YAML::Key << "Scale" << YAML::Value << actor.getComponent<Components::TransformComponent>().scale;
+					out << YAML::Key << "Translation" << YAML::Value << actor.getComponent<Components::TransformComponent>().getTranslation();
+					out << YAML::Key << "Rotation" << YAML::Value << actor.getComponent<Components::TransformComponent>().getRotation();
+					out << YAML::Key << "Scale" << YAML::Value << actor.getComponent<Components::TransformComponent>().getScale();
 				out << YAML::EndMap;
 			}
 
@@ -57,10 +57,10 @@ namespace Shard3D {
 			if (actor.hasComponent<Components::CameraComponent>()) {
 				out << YAML::Key << "CameraComponent";
 				out << YAML::BeginMap;
-				out << YAML::Key << "ProjectionType" << YAML::Value << (int)actor.getComponent<Components::CameraComponent>().projectionType;
-				out << YAML::Key << "FOV" << YAML::Value << actor.getComponent<Components::CameraComponent>().fov;
-				out << YAML::Key << "NearClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().nearClip;
-				out << YAML::Key << "FarClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().farClip;
+				out << YAML::Key << "ProjectionType" << YAML::Value << (int)actor.getComponent<Components::CameraComponent>().getProjectionType();
+				out << YAML::Key << "FOV" << YAML::Value << actor.getComponent<Components::CameraComponent>().getFOV();
+				out << YAML::Key << "NearClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().getNearClip();
+				out << YAML::Key << "FarClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().getFarClip();
 				out << YAML::Key << "AspectRatio" << YAML::Value << actor.getComponent<Components::CameraComponent>().ar;
 				out << YAML::EndMap;
 			}
@@ -194,9 +194,9 @@ namespace Shard3D {
 #ifndef ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT		
 						loadedActor.addComponent<Components::TransformComponent>();
 #endif
-						loadedActor.getComponent<Components::TransformComponent>().translation = actor["TransformComponent"]["Translation"].as<glm::vec3>();
-						loadedActor.getComponent<Components::TransformComponent>().rotation = actor["TransformComponent"]["Rotation"].as<glm::vec3>();
-						loadedActor.getComponent<Components::TransformComponent>().scale = actor["TransformComponent"]["Scale"].as<glm::vec3>();
+						loadedActor.getComponent<Components::TransformComponent>().setTranslation(actor["TransformComponent"]["Translation"].as<glm::vec3>());
+						loadedActor.getComponent<Components::TransformComponent>().setRotation(actor["TransformComponent"]["Rotation"].as<glm::vec3>());
+						loadedActor.getComponent<Components::TransformComponent>().setScale(actor["TransformComponent"]["Scale"].as<glm::vec3>());
 
 					}
 
@@ -204,10 +204,10 @@ namespace Shard3D {
 					if (actor["CameraComponent"]) {
 						loadedActor.addComponent<Components::CameraComponent>();
 
-						loadedActor.getComponent<Components::CameraComponent>().projectionType = (Components::CameraComponent::ProjectType)actor["CameraComponent"]["ProjectionType"].as<int>();
-						loadedActor.getComponent<Components::CameraComponent>().fov = actor["CameraComponent"]["FOV"].as<float>();
-						loadedActor.getComponent<Components::CameraComponent>().nearClip = actor["CameraComponent"]["NearClipPlane"].as<float>();
-						loadedActor.getComponent<Components::CameraComponent>().farClip = actor["CameraComponent"]["FarClipPlane"].as<float>();
+						loadedActor.getComponent<Components::CameraComponent>().setProjectionType((Components::CameraComponent::ProjectType)actor["CameraComponent"]["ProjectionType"].as<int>());
+						loadedActor.getComponent<Components::CameraComponent>().setFOV(actor["CameraComponent"]["FOV"].as<float>());
+						loadedActor.getComponent<Components::CameraComponent>().setNearClip(actor["CameraComponent"]["NearClipPlane"].as<float>());
+						loadedActor.getComponent<Components::CameraComponent>().setFarClip(actor["CameraComponent"]["FarClipPlane"].as<float>());
 						loadedActor.getComponent<Components::CameraComponent>().ar = actor["CameraComponent"]["AspectRatio"].as<float>();
 					}
 

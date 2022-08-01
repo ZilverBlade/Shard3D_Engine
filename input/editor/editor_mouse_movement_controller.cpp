@@ -10,7 +10,7 @@ namespace Shard3D {
 		EditorMouseMovementController::EditorMouseMovementController() {
 			glfwSetScrollCallback(Singleton::engineWindow.getGLFWwindow(), scroll_callback);
 		}
-		void EditorMouseMovementController::moveInPlaneXZ(GLFWwindow* window, float dt, wb3d::Actor& actor) {
+		void EditorMouseMovementController::moveInPlaneXY(GLFWwindow* window, float dt, wb3d::Actor& actor) {
 			adjustFOV(window, dt, actor);
 			if (glfwGetMouseButton(window, buttons.canRotate) == GLFW_PRESS) {
 				
@@ -48,15 +48,14 @@ namespace Shard3D {
 			else { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); firstClick = true; }
 
 			if (glm::dot(orientation, orientation) > std::numeric_limits<float>::epsilon()) {
-				actor.getComponent<Components::TransformComponent>().rotation = orientation;
+				actor.getComponent<Components::TransformComponent>().setRotation({ orientation.x, orientation.z, orientation.y });
 			}
 		}
 
 		void EditorMouseMovementController::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-			float fov = cachedActor.getComponent<Components::CameraComponent>().fov;
+			float fov = cachedActor.getComponent<Components::CameraComponent>().getFOV();
 			fov -= yoffset * 4;
-			fov = glm::clamp(fov, 30.f, 170.f);
-			cachedActor.getComponent<Components::CameraComponent>().fov = fov;
+			cachedActor.getComponent<Components::CameraComponent>().setFOV(glm::clamp(fov, 30.f, 170.f));
 		}
 		
 		void EditorMouseMovementController::adjustFOV(GLFWwindow* window, float dt, wb3d::Actor& actor) {

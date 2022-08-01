@@ -3,11 +3,10 @@
     public class Actor
     {
         protected Actor()  {  ID = 1;  }
-        internal Actor(ulong _id) {  ID = _id; InternalCalls.Log($"Constructed Actor in C# {this.ID}", LogSeverity.Warn); }
+        internal Actor(ulong _id) { ID = _id; }
 
         public readonly ulong ID;
-
-
+#region Transform
         public Vector3 Translation
         {
             get
@@ -44,6 +43,20 @@
                 InternalCalls.SetScale(ID, ref value);
             }
         }
+#endregion
+
+
+#region ECS
+        public void AddComponent(Components _component)
+        {
+            InternalCalls.ActorAddComponent(ID, _component);
+        }
+        public void RmvComponent(Components _component)
+        {
+            InternalCalls.ActorRmvComponent(ID, _component);
+        }
+#endregion
+
 
     }
 }

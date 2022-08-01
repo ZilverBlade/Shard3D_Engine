@@ -9,7 +9,7 @@ namespace Shard3D.Core
         public extern static void Log(string message, LogSeverity severity = LogSeverity.Debug);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void LogNoImpl();
-#endregion
+ #endregion
 
 #region Transforms
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -24,6 +24,25 @@ namespace Shard3D.Core
         public extern static void GetScale(ulong guid, out Vector3 scale);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void SetScale(ulong guid, ref Vector3 scale);
+#endregion
+
+#region ECS
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SpawnActor(out ulong guid, string name);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void ActorAddComponent(ulong guid, Components _c);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void ActorRmvComponent(ulong guid, Components _c);
+
+        public static void SpawnBlueprint() => LogNoImpl();
+#endregion
+
+#region etc
+
+#endregion
+
+#region etc
+
 #endregion
     }
 }

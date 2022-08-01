@@ -73,12 +73,14 @@ namespace Shard3D {
 * Set camera view based on the camera's position and rotation
 */
 	void EngineCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
-		const float c3 = glm::cos(rotation.z);
-		const float s3 = glm::sin(rotation.z);
-		const float c2 = glm::cos(rotation.x);
-		const float s2 = glm::sin(rotation.x);
-		const float c1 = glm::cos(rotation.y);
-		const float s1 = glm::sin(rotation.y);
+		const glm::vec3 _r = { rotation.x, rotation.z, rotation.y };
+		const glm::vec3 _t = { position.x, position.z, position.y };
+		const float c3 = glm::cos(_r.z);
+		const float s3 = glm::sin(_r.z);
+		const float c2 = glm::cos(_r.x);
+		const float s2 = glm::sin(_r.x);
+		const float c1 = glm::cos(_r.y);
+		const float s1 = glm::sin(_r.y);
 		const glm::vec3 u{ (c1 * c3 + s1 * s2 * s3), (c2 * s3), (c1 * s2 * s3 - c3 * s1) };
 		const glm::vec3 v{ (c3 * s1 * s2 - c1 * s3), (c2 * c3), (c1 * c3 * s2 + s1 * s3) };
 		const glm::vec3 w{ (c2 * s1), (-s2), (c1 * c2) };
@@ -92,9 +94,9 @@ namespace Shard3D {
 		viewMatrix[0][2] = w.x;
 		viewMatrix[1][2] = w.y;
 		viewMatrix[2][2] = w.z;
-		viewMatrix[3][0] = -glm::dot(u, position);
-		viewMatrix[3][1] = -glm::dot(v, position);
-		viewMatrix[3][2] = -glm::dot(w, position);
+		viewMatrix[3][0] = -glm::dot(u, _t);
+		viewMatrix[3][1] = -glm::dot(v, _t);
+		viewMatrix[3][2] = -glm::dot(w, _t);
 
 		inverseViewMatrix = glm::mat4{ 1.f };
 		inverseViewMatrix[0][0] = u.x;
@@ -106,8 +108,8 @@ namespace Shard3D {
 		inverseViewMatrix[2][0] = w.x;
 		inverseViewMatrix[2][1] = w.y;
 		inverseViewMatrix[2][2] = w.z;
-		inverseViewMatrix[3][0] = position.x;
-		inverseViewMatrix[3][1] = position.y;
-		inverseViewMatrix[3][2] = position.z;
+		inverseViewMatrix[3][0] = _t.x;
+		inverseViewMatrix[3][1] = _t.y;
+		inverseViewMatrix[3][2] = _t.z;
 	}
 }

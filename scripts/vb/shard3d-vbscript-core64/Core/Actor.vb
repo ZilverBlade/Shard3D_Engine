@@ -6,11 +6,10 @@
 
         Friend Sub New(ByVal _id As ULong)
             ID = _id
-            InternalCalls.Log($"Constructed Actor in VB {Me.ID}", LogSeverity.Warn)
         End Sub
 
         Public ReadOnly ID As ULong
-
+#Region "Transform"
         Public Property Translation As Vector3
             Get
                 Dim _translation As Vector3 = Nothing
@@ -43,5 +42,15 @@
                 InternalCalls.SetScale(ID, value)
             End Set
         End Property
+#End Region
+#Region "ECS"
+        Public Sub AddComponent(ByVal _component As Components)
+            InternalCalls.ActorAddComponent(ID, _component)
+        End Sub
+
+        Public Sub RmvComponent(ByVal _component As Components)
+            InternalCalls.ActorRmvComponent(ID, _component)
+        End Sub
+#End Region
     End Class
 End Namespace

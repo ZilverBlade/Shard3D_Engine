@@ -92,6 +92,8 @@ namespace Shard3D {
 
 			bool loadRegistryCapture = false;
 
+			// map
+			std::unordered_map<GUID, entt::entity> actorMap;
 
 			// queues 
 			std::vector<Actor> actorKillQueue;

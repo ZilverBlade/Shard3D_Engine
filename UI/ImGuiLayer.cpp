@@ -213,11 +213,12 @@ namespace Shard3D {
         ImGui::End();
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
+        guiBuilder.render();
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel);
         levelPeekPanel.render();
         AssetExplorerPanel.render();
-      //  guiBuilder.render();
+       
         //levelGizmo.render(level, levelTreePanel);
 
 

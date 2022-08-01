@@ -2,7 +2,8 @@
 #include "dynamic_script_engine_linker.hpp"
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
-
+#include "dynamic_script_engine.hpp"
+#include "../wb3d/actor.hpp"
 namespace Shard3D {
 	void DynamicScriptEngineLinker::registerLinker() {
 		registerInternalCalls();
@@ -16,6 +17,9 @@ namespace Shard3D {
 		_S3D_ICALL(GetRotation);
 		_S3D_ICALL(SetScale);
 		_S3D_ICALL(GetScale);
+		_S3D_ICALL(SpawnActor);
+		_S3D_ICALL(ActorAddComponent);
+		_S3D_ICALL(ActorRmvComponent);
 	}
 }
 namespace Shard3D::InternalScriptCalls {
@@ -40,21 +44,83 @@ namespace Shard3D::InternalScriptCalls {
 	}
 
 	void GetTranslation(uint64_t actorID, glm::vec3* v) {
-
+		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().getTranslation();
 	}
 	void SetTranslation(uint64_t actorID, glm::vec3* v) {
-
+		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().setTranslation(*v);
 	}
 	void GetRotation(uint64_t actorID, glm::vec3* v) {
-
+		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().getRotation();
 	}
 	void SetRotation(uint64_t actorID, glm::vec3* v) {
-
+		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().setRotation(*v);
 	}
 	void GetScale(uint64_t actorID, glm::vec3* v) {
-
+		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().getScale();
 	}
 	void SetScale(uint64_t actorID, glm::vec3* v) {
-
+		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().setScale(*v);
+	}
+	void SpawnActor(uint64_t* actorID, MonoString* string) {
+		char* t = mono_string_to_utf8(string);
+		std::string text(t);
+		*actorID = DynamicScriptEngine::getContext()->createActor(text).getGUID();
+		mono_free(t);
+	}
+	void ActorAddComponent(uint64_t actorID, Components::ComponentsList component) {
+		switch (component) {
+			case Components::ComponentsList::AudioComponent:
+				DynamicScriptEngine::getContext()->getActorFromGUID(actorID).addComponent<Components::AudioComponent>();
+				break;
+			case Components::ComponentsList::BillboardComponent:
+				DynamicScriptEngine::getContext()->getActorFromGUID(actorID).addComponent<Components::BillboardComponent>();
+				break;
+			case Components::ComponentsList::CameraComponent:
+				DynamicScriptEngine::getContext()->getActorFromGUID(actorID).addComponent<Components::CameraComponent>();
+				break;
+			case Components::ComponentsList::MeshComponent:
+				DynamicScriptEngine::getContext()->getActorFromGUID(actorID).addComponent<Components::MeshComponent>();
+				break;
+			case Components::ComponentsList::PointlightComponent:
+				DynamicScriptEngine::getContext()->getActorFromGUID(actorID).addComponent<Components::PointlightComponent>();
+				break;
+			case Components::ComponentsList::SpotlightComponent:
+				DynamicScriptEngine::getContext()->getActorFromGUID(actorID).addComponent<Components::SpotlightComponent>();
+				break;
+			case Components::ComponentsList::DirectionalLightComponent:
+				DynamicScriptEngine::getContext()->getActorFromGUID(actorID).addComponent<Components::DirectionalLightComponent>();
+				break;
+			default:
+				SHARD3D_ERROR("Component provided does not exist!");
+				break;
+		}
+	}
+	void ActorRmvComponent(uint64_t actorID, Components::ComponentsList component) {
+		switch (component) {
+		case Components::ComponentsList::AudioComponent:
+			DynamicScriptEngine::getContext()->getActorFromGUID(actorID).killComponent<Components::AudioComponent>();
+			break;
+		case Components::ComponentsList::BillboardComponent:
+			DynamicScriptEngine::getContext()->getActorFromGUID(actorID).killComponent<Components::BillboardComponent>();
+			break;
+		case Components::ComponentsList::CameraComponent:
+			DynamicScriptEngine::getContext()->getActorFromGUID(actorID).killComponent<Components::CameraComponent>();
+			break;
+		case Components::ComponentsList::MeshComponent:
+			DynamicScriptEngine::getContext()->getActorFromGUID(actorID).killComponent<Components::MeshComponent>();
+			break;
+		case Components::ComponentsList::PointlightComponent:
+			DynamicScriptEngine::getContext()->getActorFromGUID(actorID).killComponent<Components::PointlightComponent>();
+			break;
+		case Components::ComponentsList::SpotlightComponent:
+			DynamicScriptEngine::getContext()->getActorFromGUID(actorID).killComponent<Components::SpotlightComponent>();
+			break;
+		case Components::ComponentsList::DirectionalLightComponent:
+			DynamicScriptEngine::getContext()->getActorFromGUID(actorID).killComponent<Components::DirectionalLightComponent>();
+			break;
+		default:
+			SHARD3D_ERROR("Component provided does not exist!");
+			break;
+		}
 	}
 }

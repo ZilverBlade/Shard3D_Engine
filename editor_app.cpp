@@ -115,6 +115,7 @@ namespace Shard3D {
 
 
 		std::shared_ptr<GUI::Element> test = std::make_shared<GUI::Element>();
+		test->clickEventCallback = buttonClickYay;
 
 		//guiLayer0->attach(Singleton::mainOffScreen.getRenderPass(), &layerStack);
 		// 
@@ -153,7 +154,7 @@ namespace Shard3D {
 		editor_cameraActor.addComponent<Components::CameraComponent>();
 
 		Singleton::activeLevel->setPossessedCameraActor(editor_cameraActor);
-		editor_cameraActor.getComponent<Components::TransformComponent>().translation = glm::vec3(0.f, 1.f, -1.f);
+		editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
 		SHARD3D_INFO("Loading dummy actor");
 		Actor dummy = Singleton::activeLevel->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
 
@@ -177,12 +178,12 @@ namespace Shard3D {
 
 		float fov = ini.GetDoubleValue("RENDERING", "FOV");
 		SHARD3D_INFO("Default FOV set to {0} degrees", fov);
-		editor_cameraActor.getComponent<Components::CameraComponent>().fov = ini.GetDoubleValue("RENDERING", "FOV");
+		editor_cameraActor.getComponent<Components::CameraComponent>().setFOV(ini.GetDoubleValue("RENDERING", "FOV"));
 		
 		if ((std::string)ini.GetValue("RENDERING", "View") == "Perspective") {
-			editor_cameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Perspective;
+			editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Perspective);
 		} else if ((std::string)ini.GetValue("RENDERING", "View") == "Orthographic") {
-			editor_cameraActor.getComponent<Components::CameraComponent>().projectionType = editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic;  //Ortho perspective (not needed 99.99% of the time)
+			editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic);  //Ortho perspective (not needed 99.99% of the time)
 		}
 
 		GUILayer* layerList[4]{
@@ -212,20 +213,16 @@ beginWhileLoop:
 			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice);
 			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
 			if (Singleton::activeLevel->simulationState == PlayState::Simulating) Singleton::activeLevel->tick(frameTime);
-			EngineAudio::globalUpdate(possessedCameraActor.getTransform().translation, 
-				possessedCameraActor.getTransform().rotation);
+			EngineAudio::globalUpdate(possessedCameraActor.getTransform().getTranslation(), 
+				possessedCameraActor.getTransform().getRotation());
 
 
 			if (Singleton::activeLevel->simulationState != PlayState::Simulating) {
-				editorCameraControllerKeyboard.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
-				editorCameraControllerMouse.moveInPlaneXZ(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
+				editorCameraControllerKeyboard.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
+				editorCameraControllerMouse.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
 			}
 			possessedCameraActor.getComponent<Components::CameraComponent>().ar = tempInfo::aspectRatioWoH;
-			possessedCamera.setViewYXZ(
-				possessedCameraActor.getComponent<Components::TransformComponent>().translation, 
-				possessedCameraActor.getComponent<Components::TransformComponent>().rotation
-			);
-
+			possessedCamera.setViewYXZ(possessedCameraActor.getTransform().getTranslation(), possessedCameraActor.getTransform().getRotation());
 			possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 #if ENSET_ALLOW_PREVIEW_CAMERA
 			possessedPreviewCameraActor.getComponent<Components::CameraComponent>().ar = Singleton::engineRenderer.getAspectRatio();
@@ -359,12 +356,6 @@ beginWhileLoop:
 	}
 
 	void EditorApp::loadGameObjects() {
-		
-		/*
-			NOTE:
-			As of now, the model loads in as X right, Y forward, Z up, however the transform values still are X right, Z forward, Y up.
-			That means that in the editor, the level must save object transform values as (X, Z, Y), otherwise it will be incorrect
-		*/
 
 		wb3d::LevelManager levelman(Singleton::activeLevel);
 		levelman.load("assets/leveldata/drivecartest.wbl", true);
@@ -373,11 +364,15 @@ beginWhileLoop:
 		wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
 		car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
 		
-		car.getComponent<Components::TransformComponent>().rotation = { 0.f, glm::radians(90.f), 0.f };
+		car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
 		car.addComponent<Components::AudioComponent>().file = 
 			"assets/audiodata/race_engine_nb.wav";
 
-		car.addComponent<Components::ScriptComponent>();
+		//car.addComponent<Components::ScriptComponent>();
+
+		wb3d::Actor light = Singleton::activeLevel->createActor("bling");
+		light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
+		light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
 	}
 }

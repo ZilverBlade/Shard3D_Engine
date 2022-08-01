@@ -1,5 +1,4 @@
 ﻿using Shard3D.Core;
-using Shard3D.Core.Components;
 namespace Shard3D
 {
     class DeveloperSandbox
@@ -15,9 +14,7 @@ namespace Shard3D
             Vector4 lmao2 = (Vector4)vecthing;
             Vector3 xd = new Vector2(4); // implicit casts go brrr
 
-            TransformComponent transform3d;
-            transform3d.scale = xd * vecthing;
-
+            
         }
     }
 }

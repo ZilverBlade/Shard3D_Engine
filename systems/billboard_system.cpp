@@ -93,10 +93,13 @@ namespace Shard3D {
 				&descriptorSet1,
 				0,
 				nullptr);
+			glm::vec3 s = transform.getScale();
+			glm::vec3 t = transform.getTranslation();
 
 			BillboardPushConstants push{};
-			push.translation = glm::vec4(transform.translation, 1.f);
-			push.scale = glm::vec4(transform.scale, 1.f);
+			push.translation = glm::vec4(t.x, t.z, t.y, 1.f);
+			push.scale = glm::vec4(s.x, 0.f, s.y, 1.f);
+
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
 				pipelineLayout,

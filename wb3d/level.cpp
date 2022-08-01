@@ -72,25 +72,19 @@ namespace Shard3D {
 		}
 
 		Actor Level::createActor(const std::string& name) {
-			assert(this != nullptr && "Level does not exist! Cannot create actors!");
-			Actor actor = { registry.create(), this };
-			actor.addComponent<Components::GUIDComponent>();
-			actor.addComponent<Components::TagComponent>().tag = name;
-#ifdef ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT
-			actor.addComponent<Components::TransformComponent>();
-#endif
-			return actor;
+			return createActorWithGUID(GUID(), name);
 		}
 
 		Actor Level::createActorWithGUID(GUID guid, const std::string& name) {
 			assert(this != nullptr && "Level does not exist! Cannot create actors!");
-			Actor actor;
-			actor = { registry.create(), this };
+			Actor actor = { registry.create(), this };
 			actor.addComponent<Components::GUIDComponent>(guid);
 			actor.addComponent<Components::TagComponent>().tag = name;
 #ifdef ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT
 			actor.addComponent<Components::TransformComponent>();
 #endif
+			actorMap[guid] = actor;
+
 			return actor;
 		}
 
@@ -98,9 +92,20 @@ namespace Shard3D {
 			if (actorKillQueue.size() != 0) {
 				for (int i = 0; i < actorKillQueue.size(); i++) {
 					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
+					if (simulationState == PlayState::Simulating) {
+						{
+							registry.view<Components::CppScriptComponent>().each([&](auto actor, auto& csc) {
+								csc.Inst->killEvent();
+							});
+						}
+						{
+							DynamicScriptEngine::actorScript().killEvent();
+						}
+					}
 					if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
 						actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
 							vkDeviceWaitIdle(device.device());
+					actorMap.erase(actorKillQueue.at(i).getGUID());
 					registry.destroy(actorKillQueue.at(i));
 				}
 				actorKillQueue.clear();
@@ -139,14 +144,12 @@ namespace Shard3D {
 		}
 
 		Actor Level::getActorFromGUID(GUID guid) {
-			auto guidView = registry.view<Components::GUIDComponent>();
-			for (auto actor : guidView) {
-				if (guidView.get<Components::GUIDComponent>(actor).id == guid) {				
-					return Actor{ actor, this };
-				}
+			if (actorMap.find(guid) != actorMap.end()) {
+				return { actorMap.at(guid), this };
+			} else {
+				SHARD3D_ERROR("Failed to find actor with guid '" + std::to_string(guid) + "'!");
+				return { actorMap.at(1), this }; // dummy actor
 			}
-			SHARD3D_ERROR("Failed to find actor with guid '" + std::to_string(guid) + "'!");
-			return Actor();
 		}
 
 		Actor Level::getActorFromTag(const std::string& tag) {
@@ -187,7 +190,8 @@ namespace Shard3D {
 			return getPossessedCameraActor().getComponent<Components::CameraComponent>().camera;
 		 }
 		 void Level::parentActor(Actor parent, Actor child){
-			 child.parentHandle = parent.actorHandle;			 
+			 child.parentHandle = parent.actorHandle;	
+			// child.getTransform().parent_mat4 = &parent.getTransform().mat4();
 		 }
 #if ENSET_ALLOW_PREVIEW_CAMERA// ONLY FOR DEBUGGING PURPOSES
 		 void Level::setPossessedPreviewCameraActor(Actor actor) {
@@ -221,7 +225,7 @@ namespace Shard3D {
 			SHARD3D_INFO("Level: Initializing scripts");
 			simulationState = PlayState::Simulating;
 			{
-				registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+				registry.view<Components::CppScriptComponent>().each([&](auto actor, auto& csc) {
 					if (!csc.Inst) {
 						csc.Inst = csc.InstScript();
 						csc.Inst->thisActor = Actor{ actor, this };
@@ -231,7 +235,7 @@ namespace Shard3D {
 			}
 			{
 				DynamicScriptEngine::runtimeStart(this);
-				registry.view<Components::ScriptComponent>().each([=](auto actor, auto& scr) {
+				registry.view<Components::ScriptComponent>().each([&](auto actor, auto& scr) {
 					DynamicScriptEngine::actorScript().beginEvent({ actor, this });
 				});
 			}
@@ -241,7 +245,7 @@ namespace Shard3D {
 		void Level::tick(float dt) {
 			// update scripts	
 			{ // scoped because if tickevent does something else then it doesnt need to keep stack allocated memory
-					registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+					registry.view<Components::CppScriptComponent>().each([&](auto actor, auto& csc) {
 					csc.Inst->tickEvent(dt);
 				});
 			}	

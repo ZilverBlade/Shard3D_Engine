@@ -1,4 +1,7 @@
-﻿namespace Shard3D.Core
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Shard3D.Core.InternalCalls")]
+namespace Shard3D.Core
 {
     public enum LogSeverity
     {
