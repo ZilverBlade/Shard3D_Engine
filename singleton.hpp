@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 
 #include "device.hpp"
 #include "UI/imgui_implementation.hpp"
@@ -28,27 +28,27 @@ namespace Shard3D {
 	};
 	class Singleton {
 	private:
-		inline static constexpr int WIDTH = 1280; //800
-		inline static constexpr int HEIGHT = 720; //600
-		inline static const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
+		_S3D_GVAR constexpr int WIDTH = 1280; //800
+		_S3D_GVAR constexpr int HEIGHT = 720; //600
+		_S3D_GVAR const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
 	public:
 		Singleton() {}
 		~Singleton() {}
-		inline static Initializer _ignore_init;
+		_S3D_GVAR Initializer _ignore_init;
 
-		inline static EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
-		inline static EngineDevice engineDevice{ engineWindow };
-		inline static EngineRenderer engineRenderer{ engineWindow, engineDevice };
-		inline static VkDescriptorSet viewportImage{};
-		inline static OffScreen mainOffScreen{ engineDevice };
+		_S3D_GVAR EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
+		_S3D_GVAR EngineDevice engineDevice{ engineWindow };
+		_S3D_GVAR EngineRenderer engineRenderer{ engineWindow, engineDevice };
+		_S3D_GVAR VkDescriptorSet viewportImage{};
+		_S3D_GVAR OffScreen mainOffScreen{ engineDevice };
 
 #if ALLOW_PREVIEW_CAMERA
-		inline static OffScreen previewCamOffScreen{ engineDevice };
-		inline static VkDescriptorSet previewViewportImage{};
+		_S3D_GVAR OffScreen previewCamOffScreen{ engineDevice };
+		_S3D_GVAR VkDescriptorSet previewViewportImage{};
 #endif
-		inline static std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
+		_S3D_GVAR std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
 
-		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
+		_S3D_GVAR ImGui_ImplVulkan_InitInfo imgui_init_info{};
 
 //#ifndef _DEPLOY
 		struct eps {
@@ -59,10 +59,10 @@ namespace Shard3D {
 			bool V_GUI = false;
 			bool ONLY_GAME;
 		};
-		inline static eps editorPreviewSettings;
+		_S3D_GVAR eps editorPreviewSettings;
 //#endif
-		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
+		_S3D_GVAR glm::vec3 testPBR = {1.f, 0.5f, 0.f};
 
-		inline static Destructor _ignore_destroy;
+		_S3D_GVAR Destructor _ignore_destroy;
 	};
 }

@@ -27,8 +27,8 @@ namespace Shard3D {
 			void endEvent();
 			void tickEvent(float __dt);
 
-			void spawnEvent();
-			void killEvent();
+			void spawnEvent(wb3d::Actor actor);
+			void killEvent(wb3d::Actor actor);
 		};
 		static void init();
 		static void destroy();
@@ -41,7 +41,7 @@ namespace Shard3D {
 		static _e actorScript() { return _e(); }
 	private:
 		
-		inline static void _reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang);
+		_S3D_GVAR void _reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang);
 		static void destroyMono(ScriptEngineData* scriptEngine);
 
 		static MonoObject* instClass(MonoClass* monoClass, int lang);

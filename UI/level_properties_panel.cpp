@@ -29,10 +29,6 @@ namespace Shard3D {
 						ImGui::CloseCurrentPopup();
 					}
 #endif
-					if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
-						tree.selectedActor.addComponent<Components::CppScriptComponent>();
-						ImGui::CloseCurrentPopup();
-					}
 					if (!tree.selectedActor.hasComponent<Components::ScriptComponent>()) if (ImGui::MenuItem("C#/VB Script")) {
 						tree.selectedActor.addComponent<Components::ScriptComponent>();
 						ImGui::CloseCurrentPopup();

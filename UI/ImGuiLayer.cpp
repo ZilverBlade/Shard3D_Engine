@@ -24,8 +24,9 @@
 #include "imgui_initter.hpp"
 #include <shellapi.h>
 #include "../wb3d/assetmgr.hpp"
-#include "GUILayer.hpp"
+#include "HUDLayer.hpp"
 #include <imgui_internal.h>
+
 namespace Shard3D {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
@@ -431,16 +432,16 @@ namespace Shard3D {
         ImGui::RenderPlatformWindowsDefault();
     }
 
-    void ImGuiLayer::attachGUIEditorInfo(GUILayer** guiArray) {
-        guiLayers = std::make_shared<GUIContainer>();
+    void ImGuiLayer::attachGUIEditorInfo(HUDLayer** guiArray) {
+        guiLayers = std::make_shared<HUDContainer>();
         for (int i = 0; i < 4; i++) {
             if (guiArray[i]) 
-                guiLayers->guiLayerList
-                .push_back(&guiArray[i]->guiElements);
+                guiLayers->hudLayerList
+                .push_back(&guiArray[i]->hud);
         }
 
         for (int i = 0; i < guiLayers->getList().size(); i++) {
-            SHARD3D_LOG("GUI Layer {0} has {1} elements", i, guiLayers->getList().at(i)->elementsGUI.size()) ;
+            SHARD3D_LOG("HUD Layer {0} has {1} elements", i, guiLayers->getList().at(i)->elements.size()) ;
         }
 
         guiBuilder.setContext(guiLayers);
@@ -474,7 +475,7 @@ namespace Shard3D {
         // PLAY MODE
         if (ImGui::ImageButton(
             (Singleton::activeLevel->simulationState == PlayState::Stopped) ? icons.play : 
-                ((Singleton::activeLevel->simulationState == PlayState::Paused) ? icons.play : icons.pause), btnSize)) {
+                ((Singleton::activeLevel->simulationState == PlayState::Paused) ? icons.play : icons.pause), btnSize))
             if (Singleton::activeLevel->simulationState == PlayState::Stopped) { // Play
                 wb3d::MasterManager::captureLevel(Singleton::activeLevel);
                 Singleton::activeLevel->begin();
@@ -492,8 +493,6 @@ namespace Shard3D {
                 std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused) | " + Singleton::activeLevel->name;
                 glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());                           
             }
-
-        }
         ImGui::TextWrapped((Singleton::activeLevel->simulationState == PlayState::Stopped) ? "Play" :
             ((Singleton::activeLevel->simulationState == PlayState::Paused) ? "Resume" : "Pause"));
         ImGui::NextColumn();
@@ -635,7 +634,7 @@ namespace Shard3D {
                 ImGui::Separator();
                 ImGui::Checkbox("Grid", &Singleton::editorPreviewSettings.V_GRID);
                 ImGui::Checkbox("Billboards", &Singleton::editorPreviewSettings.V_EDITOR_BILLBOARDS);
-                ImGui::Checkbox("GUI", &Singleton::editorPreviewSettings.V_GUI);
+                ImGui::Checkbox("HUD", &Singleton::editorPreviewSettings.V_GUI);
                 ImGui::EndMenu();
             }
 #endif

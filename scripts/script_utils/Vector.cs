@@ -35,7 +35,6 @@
         {
             return new Vector2(first.x / second.x, first.y / second.y);
         }
-
         public static Vector2 operator *(Vector2 first, float second)
         {
             return new Vector2(first.x * second, first.y * second);
@@ -44,7 +43,16 @@
         {
             return new Vector2(first.x / second, first.y / second);
         }
-        // No sum operator as you'd not know what axis to sum to
+
+        public static Vector2 operator +(Vector2 first, float second)
+        {
+            return new Vector2(first.x + second, first.y + second);
+        }
+        public static Vector2 operator -(Vector2 first, float second)
+        {
+            return new Vector2(first.x - second, first.y - second);
+        }
+
         public static bool operator ==(Vector2 first, Vector2 second)
         {
             return first.x == second.x && first.y == second.y;
@@ -123,7 +131,15 @@
         {
             return new Vector3(first.x / second, first.y / second, first.z / second);
         }
-        // No sum operator as you'd not know what axis to sum to
+
+        public static Vector3 operator +(Vector3 first, float second)
+        {
+            return new Vector3(first.x + second, first.y + second, first.z + second);
+        }
+        public static Vector3 operator -(Vector3 first, float second)
+        {
+            return new Vector3(first.x - second, first.y - second, first.z - second);
+        }
 
         public static implicit operator Vector3(Vector2 value)
         {
@@ -242,8 +258,15 @@
         {
             return new Vector4(first.x / second, first.y / second, first.z / second, first.w / second);
         }
-        // No sum operator as you'd not know what axis to sum to
 
+        public static Vector4 operator +(Vector4 first, float second)
+        {
+            return new Vector4(first.x + second, first.y + second, first.z + second, first.w + second);
+        }
+        public static Vector4 operator -(Vector4 first, float second)
+        {
+            return new Vector4(first.x - second, first.y - second, first.z - second, first.w - second);
+        }
 
         public static implicit operator Vector4(Vector2 value)
         {

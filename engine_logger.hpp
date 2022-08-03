@@ -3,23 +3,23 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "spdlog/sinks/rotating_file_sink.h"
-
+#define _S3D_GVAR inline static
 namespace Shard3D {
 	class LOGGER {
 	public:
 		static void init();
 		static void logFatal(const std::string& message);
 
-		inline static std::shared_ptr<spdlog::logger>& getDebugLogger() { return debugLogger; }
-		inline static std::shared_ptr<spdlog::logger>& getInfoLogger() { return infoLogger; }
-		inline static std::shared_ptr<spdlog::logger>& getWarnLogger() { return warnLogger; }
-		inline static std::shared_ptr<spdlog::logger>& getErrorLogger() { return errorLogger; }
+		_S3D_GVAR std::shared_ptr<spdlog::logger>& getDebugLogger() { return debugLogger; }
+		_S3D_GVAR std::shared_ptr<spdlog::logger>& getInfoLogger() { return infoLogger; }
+		_S3D_GVAR std::shared_ptr<spdlog::logger>& getWarnLogger() { return warnLogger; }
+		_S3D_GVAR std::shared_ptr<spdlog::logger>& getErrorLogger() { return errorLogger; }
 
 	private:
-		inline static std::shared_ptr<spdlog::logger> debugLogger;
-		inline static std::shared_ptr<spdlog::logger> infoLogger;
-		inline static std::shared_ptr<spdlog::logger> warnLogger;
-		inline static std::shared_ptr<spdlog::logger> errorLogger;
+		_S3D_GVAR std::shared_ptr<spdlog::logger> debugLogger;
+		_S3D_GVAR std::shared_ptr<spdlog::logger> infoLogger;
+		_S3D_GVAR std::shared_ptr<spdlog::logger> warnLogger;
+		_S3D_GVAR std::shared_ptr<spdlog::logger> errorLogger;
 	};
 }
 /* Throw a message notifying that a function has not been implemented.

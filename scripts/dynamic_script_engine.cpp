@@ -270,28 +270,32 @@ namespace Shard3D {
 		}
 	}
 
-	void DynamicScriptEngine::_e::spawnEvent() {
+	void DynamicScriptEngine::_e::spawnEvent(wb3d::Actor actor) {
 		{ // C#
-			for (auto& actor : scriptEngineData->actorInstances) {
-				actor.second->invokeEvent().spawnEvent();
-			}
+			const auto guid = actor.getGUID();
+			if (scriptEngineData->actorInstances.find(guid) != scriptEngineData->actorInstances.end()) 
+				scriptEngineData->actorInstances[guid]->invokeEvent().spawnEvent();
 		}
 		{ // Visual Basic
-			for (auto& actor : vbScriptEngineData->actorInstances) {
-				actor.second->invokeEvent().spawnEvent();
-			}
+			const auto guid = actor.getGUID();
+			if (vbScriptEngineData->actorInstances.find(guid) != vbScriptEngineData->actorInstances.end())
+				vbScriptEngineData->actorInstances[guid]->invokeEvent().spawnEvent();
 		}
 	}
 
-	void DynamicScriptEngine::_e::killEvent() {
+	void DynamicScriptEngine::_e::killEvent(wb3d::Actor actor) {
 		{ // C#
-			for (auto& actor : scriptEngineData->actorInstances) {
-				actor.second->invokeEvent().killEvent();
+			const auto guid = actor.getGUID();
+			if (scriptEngineData->actorInstances.find(guid) != scriptEngineData->actorInstances.end()) {
+				scriptEngineData->actorInstances[guid]->invokeEvent().killEvent();
+				scriptEngineData->actorInstances.erase(guid);
 			}
 		}
 		{ // Visual Basic
-			for (auto& actor : vbScriptEngineData->actorInstances) {
-				actor.second->invokeEvent().killEvent();
+			const auto guid = actor.getGUID();
+			if (vbScriptEngineData->actorInstances.find(guid) != vbScriptEngineData->actorInstances.end()) {
+				vbScriptEngineData->actorInstances[guid]->invokeEvent().killEvent();
+				vbScriptEngineData->actorInstances.erase(guid);
 			}
 		}
 	}

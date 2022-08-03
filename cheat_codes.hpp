@@ -9,7 +9,7 @@ namespace Shard3D {
             glfwSetKeyCallback(window, key_callback);
         }
     private:
-        inline static std::string cheatCodeInput;
+        _S3D_GVAR std::string cheatCodeInput;
 
         static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
             if (action == GLFW_PRESS) {
@@ -24,6 +24,11 @@ namespace Shard3D {
                 cheatCodeInput.clear();
 
                 SHARD3D_FATAL("LMFAO");
+            }
+            if (cheatCodeInput.find("ELYTRA19") != std::string::npos) {
+                cheatCodeInput.clear();
+
+                SHARD3D_FATAL("I died");
             }
         } 
 	};

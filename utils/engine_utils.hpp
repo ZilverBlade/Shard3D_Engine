@@ -34,21 +34,5 @@ namespace Shard3D {
 			return (fullString.rfind(starting, 0) == 0);
 		}
 	};
-
-
-	/*
-	//no checks or anything, so can only be used by core functions that know what type of value it returns
-	auto getValFromEngineConfig(const char* header, const char* key) {
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		ini.LoadFile(ENGINE_SETTINGS_PATH);
-		return ini.GetValue(header, key);
-	};
-	auto getValFromGameConfig(const char* header, const char* key) {
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		ini.LoadFile(GAME_SETTINGS_PATH);
-		return ini.GetValue(header, key);
-	};
-	*/
 } 
+#define _S3D_GVAR inline static

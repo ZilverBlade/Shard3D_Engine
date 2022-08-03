@@ -24,12 +24,11 @@ namespace Shard3D {
         }
         ma_sound_start(&sound);
         ma_sound_set_looping(&sound, params != AudioOneShot);
-        ma_sound_set_spatialization_enabled(&sound, params != AudioSpatialize);
+        ma_sound_set_spatialization_enabled(&sound, params == AudioSpatialize);
     }
     void EngineAudio::globalUpdate(glm::vec3 position, glm::vec3 dir) {
         ma_engine_listener_set_position(&engine, 0, position.x, position.y, position.z);
-       
-      
+        ma_engine_listener_set_direction(&engine, 0, dir.x, dir.y, dir.z);
     }
     void EngineAudio::update(AudioProperties& properties) {
         ma_sound_set_pitch(&sound, properties.pitch);

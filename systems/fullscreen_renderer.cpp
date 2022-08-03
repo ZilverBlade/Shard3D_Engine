@@ -34,8 +34,8 @@ namespace Shard3D {
 			SHARD3D_FATAL("failed to create pipeline layout!");
 		}
 
-		//imageInfo.sampler = Singleton::mainOffScreen.getSampler();
-		//imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.sampler = Singleton::mainOffScreen.getSampler();
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		imageInfo.imageView = Singleton::mainOffScreen.getImageView();
 	}
 

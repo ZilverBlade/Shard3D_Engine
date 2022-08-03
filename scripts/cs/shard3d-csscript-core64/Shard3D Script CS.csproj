@@ -77,10 +77,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\HUD.cs" />
     <Compile Include="Core\Actor.cs" />
     <Compile Include="Core\ECSMgr.cs" />
-    <Compile Include="Example.cs" />
+    <Compile Include="Scripting\Example.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="HUD\ExampleHUD.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

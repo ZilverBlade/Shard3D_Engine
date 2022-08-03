@@ -2,7 +2,7 @@
 
 #include "Layer.hpp"
 
-#include "../systems/gui_system.hpp"
+#include "../systems/hud_system.hpp"
 namespace Shard3D {
 	class ScreenLayer : public Shard3D::Layer {
 	public:
@@ -13,7 +13,7 @@ namespace Shard3D {
 		void detach() override;
 		void update(FrameInfo& frameInfo) override;
 	private:
-		GUIRenderSystem guiRenderSystem;
+		HUDRenderSystem guiRenderSystem;
 		VkDescriptorSet screenImage;
 	};
 }

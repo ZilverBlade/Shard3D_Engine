@@ -25,7 +25,7 @@ namespace Shard3D {
 			static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 			static void adjustFOV(GLFWwindow* window, float dt, wb3d::Actor& actor);
 
-			inline static wb3d::Actor cachedActor;
+			_S3D_GVAR wb3d::Actor cachedActor;
 
 		};
 	}

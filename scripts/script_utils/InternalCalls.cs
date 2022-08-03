@@ -30,6 +30,10 @@ namespace Shard3D.Core
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void SpawnActor(out ulong guid, string name);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void GetActorByTag(out ulong guid, string name);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void KillActor(ulong guid);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void ActorAddComponent(ulong guid, Components _c);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void ActorRmvComponent(ulong guid, Components _c);

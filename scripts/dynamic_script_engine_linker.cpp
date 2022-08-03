@@ -20,6 +20,7 @@ namespace Shard3D {
 		_S3D_ICALL(SpawnActor);
 		_S3D_ICALL(ActorAddComponent);
 		_S3D_ICALL(ActorRmvComponent);
+		_S3D_ICALL(KillActor);
 	}
 }
 namespace Shard3D::InternalScriptCalls {
@@ -66,6 +67,9 @@ namespace Shard3D::InternalScriptCalls {
 		std::string text(t);
 		*actorID = DynamicScriptEngine::getContext()->createActor(text).getGUID();
 		mono_free(t);
+	}
+	void KillActor(uint64_t actorID) {
+		DynamicScriptEngine::getContext()->killActor(DynamicScriptEngine::getContext()->getActorFromGUID(actorID));
 	}
 	void ActorAddComponent(uint64_t actorID, Components::ComponentsList component) {
 		switch (component) {
