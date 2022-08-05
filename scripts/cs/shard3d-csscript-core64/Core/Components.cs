@@ -50,22 +50,19 @@ namespace Shard3D.Components
             }
         }
     }
-    //public class PointlightComponent : Component
-    //{
-    //    public float radius;
-    //    public Vector3 color;
-    //    public float lightIntensity;
-    //    public Vector3 attenuationMod;
-    //    public float specularMod;
-    //}
-    //public class SpotlightComponent : Component
-    //{
-    //    public float radius;
-    //    public Vector3 color;
-    //    public float lightIntensity;
-    //    public float outerAngle;
-    //    public float innerAngle;
-    //    public Vector3 attenuationMod;
-    //    public float specularMod;
-    //}
+    public class PointlightComponent : Component
+    {
+        public Vector3 Color
+        {
+            get
+            {
+                InternalCalls.PointlightComponent_GetColor(_Actor.ID, out Vector3 _color);
+                return _color;
+            }
+            set
+            {
+                InternalCalls.PointlightComponent_SetColor(_Actor.ID, ref value);
+            }
+        }
+    }
 }

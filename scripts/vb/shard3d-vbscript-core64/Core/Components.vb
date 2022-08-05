@@ -48,22 +48,15 @@ Namespace Shard3D.Components
     Public Class PointlightComponent
         Inherits Component
 
-        Public radius As Single
-        Public color As Vector3
-        Public lightIntensity As Single
-        Public attenuationMod As Vector3
-        Public specularMod As Single
-    End Class
-
-    Public Class SpotlightComponent
-        Inherits Component
-
-        Public radius As Single
-        Public color As Vector3
-        Public lightIntensity As Single
-        Public outerAngle As Single
-        Public innerAngle As Single
-        Public attenuationMod As Vector3
-        Public specularMod As Single
+        Public Property Color As Vector3
+            Get
+                Dim _color As Vector3 = Nothing
+                InternalCalls.PointlightComponent_GetColor(_Actor.ID, _color)
+                Return _color
+            End Get
+            Set(ByVal value As Vector3)
+                InternalCalls.PointlightComponent_SetColor(_Actor.ID, value)
+            End Set
+        End Property
     End Class
 End Namespace

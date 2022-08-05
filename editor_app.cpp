@@ -32,6 +32,7 @@
 #ifndef NDEBUG
 #include <video_decode.h>
 #endif
+#include "scripts/dynamic_script_engine_linker.hpp"
 
 namespace Shard3D {
 	EditorApp::EditorApp() {
@@ -215,8 +216,7 @@ beginWhileLoop:
 			if (Singleton::activeLevel->simulationState == PlayState::Simulating) Singleton::activeLevel->tick(frameTime);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().getTranslation(), 
 				possessedCameraActor.getTransform().getRotation());
-
-
+			
 			if (Singleton::activeLevel->simulationState != PlayState::Simulating) {
 				editorCameraControllerKeyboard.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
 				editorCameraControllerMouse.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);

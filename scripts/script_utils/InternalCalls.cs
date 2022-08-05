@@ -30,11 +30,11 @@ namespace Shard3D.Core
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void SpawnActor(out ulong guid, string name);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        public extern static bool Actor_HasComponent(ulong guid, System.Type componentType);
+        public extern static bool Actor_HasComponent(ulong guid, System.Type componentType, int lang);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        public extern static void Actor_AddComponent(ulong guid, System.Type componentType);
+        public extern static void Actor_AddComponent(ulong guid, System.Type componentType, int lang);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        public extern static void Actor_RmvComponent(ulong guid, System.Type componentType);
+        public extern static void Actor_RmvComponent(ulong guid, System.Type componentType, int lang);
 
         public static void SpawnBlueprint() => LogNoImpl();
         #endregion
@@ -43,13 +43,23 @@ namespace Shard3D.Core
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void PointlightComponent_GetColor(ulong GUID, out Vector3 _c);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void PointlightComponent_SetColor(ulong GUID, ref Vector3 _c);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void PointlightComponent_GetIntensity(ulong GUID, out float _i);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void PointlightComponent_SetIntensity(ulong GUID, ref float _i);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void PointlightComponent_GetAttenuationFactor(ulong GUID, out Vector3 _c);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void PointlightComponent_SetAttenuationFactor(ulong GUID, ref Vector3 _c);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void PointlightComponent_GetSpecularFactor(ulong GUID, out float _s);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void PointlightComponent_SetSpecularFactor(ulong GUID, ref float _s);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void PointlightComponent_GetRadius(ulong GUID, out float _r);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void PointlightComponent_SetRadius(ulong GUID, ref float _r);
         #endregion
 
         #region SpotlightComponent
