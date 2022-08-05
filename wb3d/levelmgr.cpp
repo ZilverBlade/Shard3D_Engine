@@ -40,6 +40,7 @@ namespace Shard3D {
 		}
 
 		static void saveActor(YAML::Emitter& out, Actor actor) {
+			if (actor.isInvalid()) return;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Actor" << YAML::Value << actor.getGUID();
 
@@ -140,7 +141,6 @@ namespace Shard3D {
 
 			mLevel->registry.each([&](auto actorGUID) { Actor actor = { actorGUID, mLevel.get() };
 				if (!actor) return;
-				if (actor.isInvalid()) continue;
 				saveActor(out, actor);
 			});
 

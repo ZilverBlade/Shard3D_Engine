@@ -24,7 +24,7 @@ namespace Shard3D {
 		MonoAssembly* coreAssembly = nullptr;
 		MonoImage* coreAssemblyImage = nullptr;
 
-		DynamicScriptEngine::ScriptLanguage lang;
+		ScriptLanguage lang;
 
 		DynamicScriptClass actorClass;
 		std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> actorClasses;
@@ -103,7 +103,7 @@ namespace Shard3D {
 
 				const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
 				const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-				if (strUtils::hasStarting(nameSpace, "Shard3D.Core") || strUtils::hasStarting(nameSpace, "My") || strUtils::hasStarting(name, "MyWebServices") || strUtils::hasStarting(name, "Thread")) continue; // dont log core stuff
+				if (!strUtils::hasStarting(nameSpace, "Shard3D.")) continue; // dont log core stuff
 				std::printf("\t%s.%s\n", nameSpace, name);
 			}
 		}
@@ -116,7 +116,7 @@ namespace Shard3D {
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 		MonoClass* actorClass = mono_class_from_name(image, "Shard3D.Core", "Actor");
 
-		
+
 		for (int32_t i = 0; i < numTypes; i++) {
 			uint32_t cols[MONO_TYPEDEF_SIZE];
 			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
@@ -139,7 +139,11 @@ namespace Shard3D {
 		}
 	}
 
-	MonoObject* DynamicScriptEngine::instClass(MonoClass* monoClass, int lang) {
+	MonoImage* DynamicScriptEngine::getCoreAssemblyImage(ScriptLanguage lang) {
+		return !lang ? scriptEngineData->coreAssemblyImage : vbScriptEngineData->coreAssemblyImage;
+	}
+
+	MonoObject* DynamicScriptEngine::instClass(MonoClass* monoClass, ScriptLanguage lang) {
 		MonoObject* instance = mono_object_new(!lang ? scriptEngineData->appDomain : vbScriptEngineData->appDomain, monoClass);
 		mono_runtime_object_init(instance);
 		return instance;
@@ -147,9 +151,9 @@ namespace Shard3D {
 
 	void DynamicScriptEngine::init() {
 		scriptEngineData = new ScriptEngineData();
-		scriptEngineData->lang = ScriptLanguage::CSharp;
+		scriptEngineData->lang = ScriptLanguage_CSharp;
 		vbScriptEngineData = new ScriptEngineData();
-		vbScriptEngineData->lang = ScriptLanguage::VisualBasic;
+		vbScriptEngineData->lang = ScriptLanguage_VBasic;
 
 		globalData = new GlobalScriptEngineData();
 
@@ -160,20 +164,21 @@ namespace Shard3D {
 		}
 
 		globalData->rootDomain = rootDomain;
-		
+
 		scriptEngineData->appDomain = mono_domain_create_appdomain((char*)("Shard3D_CS_Runtime"), nullptr);
 		vbScriptEngineData->appDomain = mono_domain_create_appdomain((char*)("Shard3D_VB_Runtime"), nullptr);
 
-		reloadAssembly(ScriptLanguage::CSharp);
-		reloadAssembly(ScriptLanguage::VisualBasic);
+		reloadAssembly(ScriptLanguage_CSharp);
+		reloadAssembly(ScriptLanguage_VBasic);
 
-		DynamicScriptEngineLinker::registerLinker();
-
+		
 		scriptEngineData->actorClass = DynamicScriptClass("Shard3D.Core", "Actor", 0);
 		vbScriptEngineData->actorClass = DynamicScriptClass("Shard3D.Core", "Actor", 1);
 
 		loadAssemblyClasses(scriptEngineData);
 		loadAssemblyClasses(vbScriptEngineData);
+		DynamicScriptEngineLinker::registerLinker();
+
 	}
 
 	void DynamicScriptEngine::destroy() {
@@ -186,15 +191,15 @@ namespace Shard3D {
 	}
 
 	void DynamicScriptEngine::reloadAssembly(ScriptLanguage lang) {
-		if (lang == ScriptLanguage::CSharp) {
+		if (lang == 0) {
 			_reloadAssembly(scriptEngineData, lang);
 		}
-		else if (lang == ScriptLanguage::VisualBasic) {
+		else if (lang == 1) {
 			_reloadAssembly(vbScriptEngineData, lang);
 		}
 	}
 
-	std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> DynamicScriptEngine::getActorClasses(int lang) {
+	std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> DynamicScriptEngine::getActorClasses(ScriptLanguage lang) {
 		return !lang ? scriptEngineData->actorClasses : vbScriptEngineData->actorClasses;
 	}
 
@@ -209,8 +214,8 @@ namespace Shard3D {
 		vbScriptEngineData->actorInstances.clear();
 	}
 
-	bool DynamicScriptEngine::doesClassExist(const std::string& fullClassName, int lang) {
-		return !lang ? scriptEngineData->actorClasses.find(fullClassName) != scriptEngineData->actorClasses.end() : 
+	bool DynamicScriptEngine::doesClassExist(const std::string& fullClassName, ScriptLanguage lang) {
+		return !lang ? scriptEngineData->actorClasses.find(fullClassName) != scriptEngineData->actorClasses.end() :
 			vbScriptEngineData->actorClasses.find(fullClassName) != vbScriptEngineData->actorClasses.end();
 	}
 
@@ -220,7 +225,7 @@ namespace Shard3D {
 
 	inline void DynamicScriptEngine::_reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang) {
 		mono_domain_set(scriptEngine->appDomain, true);
-		scriptEngine->coreAssembly = MonoUtils::loadAssembly((lang == ScriptLanguage::CSharp) ? ENGINE_CS_SCRIPT_RUNTIME_DLL : ENGINE_VB_SCRIPT_RUNTIME_DLL);
+		scriptEngine->coreAssembly = MonoUtils::loadAssembly((lang == ScriptLanguage_CSharp) ? ENGINE_CS_SCRIPT_RUNTIME_DLL : ENGINE_VB_SCRIPT_RUNTIME_DLL);
 		scriptEngine->coreAssemblyImage = mono_assembly_get_image(scriptEngine->coreAssembly);
 		MonoUtils::printAssemblyTypes(scriptEngine, scriptEngine->coreAssembly, (int)lang);
 	}
@@ -235,7 +240,7 @@ namespace Shard3D {
 
 	void DynamicScriptEngine::_e::beginEvent(wb3d::Actor _a) {
 		const auto& scr = _a.getComponent<Components::ScriptComponent>();
-		
+
 		if (doesClassExist("Shard3D.Scripts." + scr.name, scr.lang)) {
 			auto& data = !scr.lang ? scriptEngineData : vbScriptEngineData;
 			std::shared_ptr<DynamicScriptInstance> instance = std::make_shared<DynamicScriptInstance>(data->actorClasses["Shard3D.Scripts." + scr.name], scr.lang, _a);
@@ -298,7 +303,7 @@ namespace Shard3D {
 
 }
 namespace Shard3D {
-	DynamicScriptClass::DynamicScriptClass(const std::string& c_ns, const std::string& c_n, int _lang) : classNamespace(c_ns), className(c_n), lang(_lang) {
+	DynamicScriptClass::DynamicScriptClass(const std::string& c_ns, const std::string& c_n, ScriptLanguage _lang) : classNamespace(c_ns), className(c_n), lang(_lang) {
 		monoClass = mono_class_from_name(!lang ? scriptEngineData->coreAssemblyImage : vbScriptEngineData->coreAssemblyImage, c_ns.c_str(), c_n.c_str());
 	}
 
@@ -314,10 +319,10 @@ namespace Shard3D {
 		return mono_runtime_invoke(method, instance, params, nullptr);
 	}
 
-	DynamicScriptInstance::DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, wb3d::Actor actor) : scriptClass(s_class) {
+	DynamicScriptInstance::DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, ScriptLanguage lang, wb3d::Actor actor) : scriptClass(s_class) {
 		instance = s_class->inst();
-		
-		constructor = (!lang? scriptEngineData : vbScriptEngineData)->actorClass.getMethod(".ctor", 1);	
+
+		constructor = (!lang ? scriptEngineData : vbScriptEngineData)->actorClass.getMethod(".ctor", 1);
 		scriptEvents = ScriptEvents(s_class, instance);
 		{
 			uint64_t guid = actor.getGUID();
@@ -331,7 +336,7 @@ namespace Shard3D {
 		endEventMethod = s_c->getMethod("EndEvent", 0);
 		tickEventMethod = s_c->getMethod("TickEvent", 1);
 		spawnEventMethod = s_c->getMethod("SpawnEvent", 0);
-		killEventMethod = s_c->getMethod("KillEvent", 0);	
+		killEventMethod = s_c->getMethod("KillEvent", 0);
 	}
 	void DynamicScriptInstance::ScriptEvents::beginEvent() { s_c->invokeMethod(_i, beginEventMethod); }
 	void DynamicScriptInstance::ScriptEvents::endEvent() { s_c->invokeMethod(_i, endEventMethod); }

@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Actor.vb" />
+    <Compile Include="Core\Components.vb" />
     <Compile Include="Core\ECSMgr.vb" />
     <Compile Include="Example.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

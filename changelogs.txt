@@ -112,4 +112,5 @@ ALPHA:
 		- Rebranded logos and icons
 		- Forced use of getters and setters of transforms
 		- Transforms now expose proper Z up values
+		- Added C# and VB Generics for components
 		:: TODO, add editor layouts, add working GUI builder, finalize script engine, switch to clang

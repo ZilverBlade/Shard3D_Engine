@@ -19,10 +19,7 @@ namespace Shard3D.Scripts
 
 		// Called every frame, includes frametime value to keep game loop timing accurate
 		protected void TickEvent(float dt) { // float dt = frametime 
-			Vector3 _T = this.Translation;
-			_T.y -= 10 * dt;
-			this.Translation = _T;
-			frames++;
+			
 		}
 
 		// Called on destruction of the actor

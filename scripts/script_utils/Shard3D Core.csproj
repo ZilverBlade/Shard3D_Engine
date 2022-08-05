@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components.cs" />
     <Compile Include="developer fuckery.cs" />
     <Compile Include="InternalCalls.cs" />
     <Compile Include="Misc.cs" />

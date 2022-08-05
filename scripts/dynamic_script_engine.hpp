@@ -16,12 +16,12 @@ namespace Shard3D {
 		class Level;
 		class Actor;
 	}
+	typedef int ScriptLanguage;
+#define ScriptLanguage_CSharp 0
+#define ScriptLanguage_VBasic 1
 	class DynamicScriptEngine {
-	public:	
-		enum class ScriptLanguage {
-			CSharp,
-			VisualBasic
-		};
+	public:
+		
 		struct _e {
 			void beginEvent(wb3d::Actor _a);
 			void endEvent();
@@ -33,26 +33,30 @@ namespace Shard3D {
 		static void init();
 		static void destroy();
 		static void reloadAssembly(ScriptLanguage lang);
-		static std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> getActorClasses(int lang);
+		static std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> getActorClasses(ScriptLanguage lang);
 		static void runtimeStart(wb3d::Level* level);
 		static void runtimeStop();
-		static bool doesClassExist(const std::string& fullClassName, int lang);
+		static bool doesClassExist(const std::string& fullClassName, ScriptLanguage lang);
 		static wb3d::Level* getContext();
 		static _e actorScript() { return _e(); }
+		static MonoImage* getCoreAssemblyImage(ScriptLanguage lang);
+
 	private:
-		
+
 		inline static void _reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang);
 		static void destroyMono(ScriptEngineData* scriptEngine);
 
-		static MonoObject* instClass(MonoClass* monoClass, int lang);
+		static MonoObject* instClass(MonoClass* monoClass, ScriptLanguage lang);
 		static void loadAssemblyClasses(ScriptEngineData* data);
 		friend class DynamicScriptClass;
+		friend class DynamicScriptEngineLinker;
+		friend struct MonoTypeCombo;
 	};
 
 	class DynamicScriptClass {
 	public:
 		DynamicScriptClass() = default;
-		DynamicScriptClass(const std::string& c_ns, const std::string& c_n, int _lang);
+		DynamicScriptClass(const std::string& c_ns, const std::string& c_n, ScriptLanguage _lang);
 
 		MonoObject* inst();
 		MonoMethod* getMethod(const std::string& name, int parameterCount);
@@ -72,7 +76,7 @@ namespace Shard3D {
 
 			void spawnEvent();
 			void killEvent();
-			
+
 			MonoMethod* beginEventMethod{};
 			MonoMethod* endEventMethod{};
 			MonoMethod* tickEventMethod{};
@@ -84,14 +88,14 @@ namespace Shard3D {
 			MonoObject* _i{};
 		};
 		ScriptEvents scriptEvents;
-	public:	
-		DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, wb3d::Actor actor);
+	public:
+		DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, ScriptLanguage lang, wb3d::Actor actor);
 		ScriptEvents invokeEvent();
 	private:
 		std::shared_ptr<DynamicScriptClass> scriptClass;
 
 		MonoMethod* constructor{};
-		MonoObject* instance{};		
+		MonoObject* instance{};
 	};
 	namespace Components {
 		struct ScriptComponent {
