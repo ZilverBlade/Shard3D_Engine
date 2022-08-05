@@ -48,7 +48,7 @@ namespace Shard3D.Scripts
 
 		protected void BeginEvent()
 		{
-		
+
 		}
 
 		protected void EndEvent()
@@ -72,6 +72,32 @@ namespace Shard3D.Scripts
 		protected void KillEvent()
 		{
 			Log($"my job here is done", LogSeverity.Info);	
+		}
+
+		protected void SpawnEvent() { }
+	}
+
+	public class UISpawner : Actor
+	{
+
+		protected void BeginEvent()
+		{
+			SceneManager.LoadHUDTemplate("assets/huddata/test.wbgt", 1);
+		}
+
+		protected void EndEvent()
+		{
+			SceneManager.DestructHUDLayer(1);
+		}
+
+		protected void TickEvent(float dt)
+		{
+			
+		}
+
+		protected void KillEvent()
+		{
+			
 		}
 
 		protected void SpawnEvent() { }

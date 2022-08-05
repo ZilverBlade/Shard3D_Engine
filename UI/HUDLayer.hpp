@@ -13,16 +13,15 @@ namespace Shard3D {
 		void detach() override;
 		void update(FrameInfo& frameInfo) override;
 
-		void addElement(std::shared_ptr<HUD::Element> element);
-		uint64_t getSelectedID();
-		std::shared_ptr<HUD::Element> getSelectedElement();
-		void rmvElement(std::shared_ptr<HUD::Element> element);
+		void addElement(std::shared_ptr<HUDElement> element);
+		std::shared_ptr<HUDElement> getSelectedElement();
+		void rmvElement(std::shared_ptr<HUDElement> element);
 		void rmvElement(uint64_t id);
 	private:
 		bool contextRefresh;
 		GLFWwindow* window;
 		HUDRenderSystem hudRenderSystem;
 		HUD hud;
-		friend class ImGuiLayer;
+		friend class EditorApp;
 	};
 }

@@ -138,26 +138,26 @@ namespace Shard3D {
 		SurfaceMaterialData surfaceMaterialData;
 		VkDescriptorSetLayout materialSetLayout;
 #pragma region Helper stuff
-		_S3D_GVAR std::string stringFromEnum(MaterialType enm) {
+		inline static std::string stringFromEnum(MaterialType enm) {
 			if (enm == SurfaceMaterial)				return "SurfaceMaterial";
 			if (enm == DecalMaterial)				return "DecalMaterial";
 			if (enm == PostProcessMaterial)			return "PostProcessMaterial";
 			return "ERROR_MAT";
 		}
-		_S3D_GVAR std::string stringFromEnum(SurfaceMaterialProperties enm) {
+		inline static std::string stringFromEnum(SurfaceMaterialProperties enm) {
 			if (enm == SurfaceStandardLit)			return "SurfaceStandardLit";
 			if (enm == SurfaceStandardUnlit)		return "SurfaceStandardUnlit";
 			if (enm == SurfaceClearcoat)			return "SurfaceClearcoat";
 			return "Null";
 		}
-		_S3D_GVAR std::string stringFromEnum(SurfaceMaterialType enm) {
+		inline static std::string stringFromEnum(SurfaceMaterialType enm) {
 			if (enm == SurfaceOpaqueMaterial)				return "OpaqueMaterial";
 			if (enm == SurfaceMaskedMaterial)				return "MaskedMaterial";
 			if (enm == SurfaceTranslucentMaterial)			return "TranslucentMaterial";
 			if (enm == SurfaceMaskedTranslucentMaterial)	return "MaskedTranslucentMaterial";
 			return "Null";
 		}
-		_S3D_GVAR int enumFromString(const std::string& input) {
+		inline static int enumFromString(const std::string& input) {
 			if (input == "SurfaceMaterial")			return SurfaceMaterial;
 			if (input == "DecalMaterial")			return DecalMaterial;
 			if (input == "PostProcessMaterial")		return PostProcessMaterial;

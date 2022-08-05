@@ -7,6 +7,8 @@
 #include "bpmgr.hpp"
 #include "assetmgr.hpp"
 #include "../scripts/dynamic_script_engine.hpp"
+#include "../singleton.hpp"
+#include "../hud.hpp"
 namespace Shard3D {
 	namespace wb3d {
 		Level::Level(const std::string &lvlName) : name(lvlName) {}
@@ -229,6 +231,10 @@ namespace Shard3D {
 					DynamicScriptEngine::actorScript().beginEvent({ actor, this });
 				});
 			}
+			{
+				for (HUD* hud : Singleton::hudList) for (auto& element : hud->elements)
+						DynamicScriptEngine::hudScript().begin(element.second.get());
+			}
 			SHARD3D_INFO("Beginning simulation");
 		}
 
@@ -269,11 +275,17 @@ namespace Shard3D {
 		void Level::end() {
 			SHARD3D_INFO("Ending Level Simulation");
 			simulationState = PlayState::Stopped;
-			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
-				csc.Inst->endEvent();
-			});
+			{
+				registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+					csc.Inst->endEvent();
+				}); 
+			}
 			{
 				DynamicScriptEngine::actorScript().endEvent();
+			}
+			{
+				for (HUD* hud : Singleton::hudList) for (auto& element : hud->elements)
+					DynamicScriptEngine::hudScript().end(element.second.get());
 			}
 			DynamicScriptEngine::runtimeStop();
 			setPossessedCameraActor(0);
@@ -296,7 +308,6 @@ namespace Shard3D {
 					DynamicScriptEngine::actorScript().killEvent(actor);
 				}	_next:;
 			}
-
 		}
 
 		void Level::killMesh(Actor actor) {

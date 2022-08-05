@@ -9,7 +9,7 @@ namespace Shard3D {
             glfwSetKeyCallback(window, key_callback);
         }
     private:
-        _S3D_GVAR std::string cheatCodeInput;
+        inline static std::string cheatCodeInput;
 
         static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
             if (action == GLFW_PRESS) {

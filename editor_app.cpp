@@ -113,10 +113,6 @@ namespace Shard3D {
 		layerStack.pushOverlay(guiLayer1);
 		layerStack.pushOverlay(guiLayer0);
 
-
-		std::shared_ptr<HUD::Element> test = std::make_shared<HUD::Element>();
-		test->clickEventCallback = buttonClickYay;
-
 		//guiLayer0->attach(Singleton::mainOffScreen.getRenderPass(), &layerStack);
 		// 
 		// 
@@ -193,7 +189,19 @@ namespace Shard3D {
 			guiLayer2,
 			guiLayer3
 		};
-		imguiLayer->attachGUIEditorInfo(layerList);
+
+		std::shared_ptr<HUDContainer> h_l_layer = std::make_shared<HUDContainer>();
+		for (int i = 0; i < 4; i++) {
+			if (layerList[i])
+				h_l_layer->hudLayerList
+				.push_back(&layerList[i]->hud);
+		}
+
+		for (int i = 0; i < h_l_layer->getList().size(); i++) {
+			SHARD3D_LOG("HUD Layer {0} has {1} elements", i, h_l_layer->getList().at(i)->elements.size());
+		}
+		DynamicScriptEngine::setHUDContext(h_l_layer.get());
+		imguiLayer->attachGUIEditorInfo(h_l_layer);
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 beginWhileLoop:

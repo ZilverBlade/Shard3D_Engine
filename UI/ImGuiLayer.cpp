@@ -214,7 +214,7 @@ namespace Shard3D {
         ImGui::End();
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
-        guiBuilder.render();
+        hudBuilder.render();
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel);
         levelPeekPanel.render();
@@ -423,7 +423,7 @@ namespace Shard3D {
            // if (ImGui::Button("Revert Changes")) {}
             ImGui::End();
         }
-
+        if (showDemoWindow) ImGui::ShowDemoWindow();
         ImGui::End();
         ImGui::Render();
 
@@ -432,19 +432,8 @@ namespace Shard3D {
         ImGui::RenderPlatformWindowsDefault();
     }
 
-    void ImGuiLayer::attachGUIEditorInfo(HUDLayer** guiArray) {
-        guiLayers = std::make_shared<HUDContainer>();
-        for (int i = 0; i < 4; i++) {
-            if (guiArray[i]) 
-                guiLayers->hudLayerList
-                .push_back(&guiArray[i]->hud);
-        }
-
-        for (int i = 0; i < guiLayers->getList().size(); i++) {
-            SHARD3D_LOG("HUD Layer {0} has {1} elements", i, guiLayers->getList().at(i)->elements.size()) ;
-        }
-
-        guiBuilder.setContext(guiLayers);
+    void ImGuiLayer::attachGUIEditorInfo(std::shared_ptr<HUDContainer>& container) {
+        hudBuilder.setContext(container);
     }
 
 
@@ -644,6 +633,7 @@ namespace Shard3D {
         if (ImGui::BeginMenu("Debug")) {
             ImGui::TextDisabled("Shard3D Debug menu");
             ImGui::Checkbox("Stylizer", &showStylizersWindow);
+            ImGui::Checkbox("ImGuiDemo", &showDemoWindow);
             if (ImGui::MenuItem("Play test audio")) {
                 EngineAudio audio;
                 audio.play("assets/audiodata/thou-3.mp3");

@@ -21,7 +21,7 @@ namespace Shard3D {
 
 		class HUDManager {
 		public:
-			HUDManager(const std::shared_ptr<HUDContainer>& container);
+			HUDManager(HUDContainer* container);
 
 			std::string encrypt(std::string input);
 			std::string decrypt(std::string input);
@@ -33,7 +33,7 @@ namespace Shard3D {
 			HUDMgrResults loadRuntime(const std::string& sourcePath);
 
 		private:
-			std::shared_ptr<HUDContainer> mHud;
+			HUDContainer* mHud;
 		};
 	}
 }

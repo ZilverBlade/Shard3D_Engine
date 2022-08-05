@@ -8,7 +8,7 @@
 namespace Shard3D {
 	class DYNAMICDEF {
 	public:
-		_S3D_GVAR void toggleConsole() {
+		inline static void toggleConsole() {
 #ifdef _WIN32
 			if (IsWindowVisible(GetConsoleWindow()) == TRUE) {
 				ShowWindowAsync(GetConsoleWindow(), SW_HIDE);

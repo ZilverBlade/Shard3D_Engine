@@ -16,7 +16,7 @@ namespace Shard3D {
 		void render();
 
 	private:
-		_S3D_GVAR bool textureInspector, materialInspector, actorInspector, lodInspector, miscInspector;
+		inline static bool textureInspector, materialInspector, actorInspector, lodInspector, miscInspector;
 
 		void peekTextureInspector();
 		void peekMaterialInspector();

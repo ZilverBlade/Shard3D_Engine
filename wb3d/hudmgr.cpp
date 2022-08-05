@@ -5,7 +5,7 @@
 
 namespace Shard3D {
 	namespace wb3d {
-		HUDManager::HUDManager(const std::shared_ptr<HUDContainer>& container) {
+		HUDManager::HUDManager(HUDContainer* container) {
 			mHud = container;
 			SHARD3D_INFO("Loading HUD Manager");
 		}
@@ -37,7 +37,7 @@ namespace Shard3D {
 			return decryptedString;
 		}
 
-		static void saveElement(YAML::Emitter& out, std::shared_ptr<HUD::Element> element) {
+		static void saveElement(YAML::Emitter& out, std::shared_ptr<HUDElement> element) {
 			if (element->guid == 0) return; // might be reserved for core engine purposes
 
 			out << YAML::BeginMap;
@@ -54,17 +54,29 @@ namespace Shard3D {
 					out << YAML::Key << "Position" << YAML::Value << element->position;
 					out << YAML::Key << "Scale" << YAML::Value << element->scale;
 					out << YAML::Key << "Rotation" << YAML::Value << element->rotation;
+					out << YAML::Key << "Zpos" << YAML::Value << element->zPos;
+					out << YAML::Key << "Anchor" << YAML::Value << element->anchorOffset;
 				out << YAML::EndMap;
 			}		
 			{
 				out << YAML::Key << "Texture";
 				out << YAML::BeginMap;
-					out << YAML::Key << "TexPath" << YAML::Value << element->texturePath;
+					out << YAML::Key << "DefaultTex" << YAML::Value << element->default_texture;
+					out << YAML::Key << "HoverTex" << YAML::Value << element->hover_texture;
+					out << YAML::Key << "PressTex" << YAML::Value << element->press_texture;
 				out << YAML::EndMap;
-			}			
+			}		
+			{
+				out << YAML::Key << "Script";
+				out << YAML::BeginMap;
+				out << YAML::Key << "Module" << YAML::Value << element->scriptmodule;
+				out << YAML::Key << "Language" << YAML::Value << (element->scriptlang ? "C#" : "VB");
+				out << YAML::Key << "Static" << !element->isActive;
+				out << YAML::EndMap;
+			}
 			out << YAML::EndMap;
 		}
-		static void saveLayer(YAML::Emitter& out, std::shared_ptr<HUDContainer> hudLayerInfo, int layer) {
+		static void saveLayer(YAML::Emitter& out, HUDContainer* hudLayerInfo, int layer) {
 			out << YAML::Key << "Elements" << YAML::Value << YAML::BeginSeq;
 			for (auto& element : hudLayerInfo->getList().at(layer)->elements) {
 				saveElement(out, element.second);
@@ -132,7 +144,6 @@ namespace Shard3D {
 				}// change this to check if the version is less or more
 
 			}
-
 			
 			if (data["Elements"]) {
 				SHARD3D_LOG("Loading layer {0}", layer);
@@ -143,7 +154,7 @@ namespace Shard3D {
 						continue;
 					}
 					
-					std::shared_ptr<HUD::Element> loadedElement = std::make_shared<HUD::Element>();
+					std::shared_ptr<HUDElement> loadedElement = std::make_shared<HUDElement>();
 					GUID guid = element["Element"].as<uint64_t>();
 					SHARD3D_LOG("Loading HUD element {0}", guid);
 					obj.elements.emplace(guid, loadedElement);
@@ -153,8 +164,18 @@ namespace Shard3D {
 					loadedElement->position = element["Transform2D"]["Position"].as<glm::vec2>();
 					loadedElement->scale = element["Transform2D"]["Scale"].as<glm::vec2>();
 					loadedElement->rotation = element["Transform2D"]["Rotation"].as<float>();
+					loadedElement->zPos = element["Transform2D"]["Zpos"].as<int>();
+					loadedElement->anchorOffset = element["Transform2D"]["Anchor"].as<glm::vec2>();
 
-					loadedElement->texturePath = element["Texture"]["TexPath"].as<std::string>();
+					loadedElement->default_texture = element["Texture"]["DefaultTex"].as<std::string>();
+					AssetManager::emplaceTexture(loadedElement->default_texture);
+					loadedElement->hover_texture = element["Texture"]["HoverTex"].as<std::string>();
+					AssetManager::emplaceTexture(loadedElement->hover_texture);
+					loadedElement->press_texture = element["Texture"]["PressTex"].as<std::string>();
+					AssetManager::emplaceTexture(loadedElement->press_texture);
+					loadedElement->scriptmodule = element["Script"]["Module"].as<std::string>();
+					loadedElement->scriptlang = element["Script"]["Language"].as<std::string>() == "C#" ? 0 : 1;
+					loadedElement->isActive = !element["Script"]["Static"].as<bool>();
 				}
 				mHud->swap(layer, &obj);
 			}

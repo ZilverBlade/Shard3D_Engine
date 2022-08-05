@@ -8,6 +8,7 @@
 #include "../guid.hpp"
 #include "../wb3d/assetmgr.hpp"
 #include <fstream>
+#include "../scripts/dynamic_script_engine.hpp"
 namespace Shard3D {
 	//HUDBuilderPanel::HUDBuilderPanel() {}
 
@@ -65,15 +66,18 @@ namespace Shard3D {
         for (int i = 0; i < hudLayerInfo->getList().size(); i++) {
             if (ImGui::TreeNode(std::string("Layer " + std::to_string(i)).c_str())) {
                 if (ImGui::Button("Save Layer")) {
-                    wb3d::HUDManager guiman(hudLayerInfo);
-                    guiman.save("assets/guidata/test.wbgt", i);
+                    wb3d::HUDManager guiman(hudLayerInfo.get());
+                    guiman.save("assets/huddata/test.wbgt", i);
                 }
                 if (ImGui::Button("Load Layer")) {
-                    wb3d::HUDManager guiman(hudLayerInfo);
-                    guiman.load("assets/guidata/test.wbgt", i);
+                    wb3d::HUDManager guiman(hudLayerInfo.get());
+                    guiman.load("assets/huddata/test.wbgt", i);
+                }
+                if (ImGui::Button("Wipe Layer")) {
+                    if (MessageDialogs::show("This will delete everything in this layer. Are you sure you want to continue?", "Warning!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) hudLayerInfo->wipe(i);
                 }
                 if (ImGui::Button("Add Element")) {
-                    std::shared_ptr<HUD::Element> hudElement = std::make_shared<HUD::Element>();
+                    std::shared_ptr<HUDElement> hudElement = std::make_shared<HUDElement>();
                     hudElement->guid = GUID();
                     hudElement->scale = { 0.1f, 0.1f };
                     hudLayerInfo->getList().at(i)->elements.emplace(hudElement->guid, hudElement);
@@ -87,7 +91,7 @@ namespace Shard3D {
         ImGui::End();
     }
 
-    void HUDBuilderPanel::renderGUIElementProperties(std::shared_ptr<HUD::Element> element) {
+    void HUDBuilderPanel::renderGUIElementProperties(std::shared_ptr<HUDElement> element) {
         if (ImGui::TreeNodeEx((void*)(element.get()), nodeFlags, element->tag.c_str())) {
             {
                 auto& tag = element->tag;
@@ -98,24 +102,65 @@ namespace Shard3D {
                     tag = std::string(tagBuffer);
                 }
             }
-            {
-                auto& tag = element->texturePath;
-                char tagBuffer[256];
-                memset(tagBuffer, 0, 256);
-                strncpy(tagBuffer, tag.c_str(), 256);
-                if (ImGui::InputText("Texture", tagBuffer, 256)) {
-                    tag = std::string(tagBuffer);
-                }
-
-                if (ImGui::Button("Load Texture")) {
-                    std::ifstream ifile(tag);
-                    if (ifile.good()) {
-                        SHARD3D_LOG("Reloading texture '{0}'", tag);
-                        wb3d::AssetManager::emplaceTexture(tag);
-                        element->texturePath = tag;
+            if (ImGui::TreeNode("Textures")) {
+                {
+                    auto& tag = element->default_texture;
+                    char tagBuffer[256];
+                    memset(tagBuffer, 0, 256);
+                    strncpy(tagBuffer, tag.c_str(), 256);
+                    if (ImGui::InputText("Default", tagBuffer, 256)) {
+                        tag = std::string(tagBuffer);
                     }
-                    else SHARD3D_WARN("File '{0}' does not exist!", tag);
+
+                    if (ImGui::Button("Load Texture##X")) {
+                        std::ifstream ifile(tag);
+                        if (ifile.good()) {
+                            SHARD3D_LOG("Reloading texture '{0}'", tag);
+                            wb3d::AssetManager::emplaceTexture(tag);
+                            element->default_texture = tag;
+                        }
+                        else SHARD3D_WARN("File '{0}' does not exist!", tag);
+                    }
                 }
+                {
+                    auto& tag = element->hover_texture;
+                    char tagBuffer[256];
+                    memset(tagBuffer, 0, 256);
+                    strncpy(tagBuffer, tag.c_str(), 256);
+                    if (ImGui::InputText("Hover", tagBuffer, 256)) {
+                        tag = std::string(tagBuffer);
+                    }
+
+                    if (ImGui::Button("Load Texture##Y")) {
+                        std::ifstream ifile(tag);
+                        if (ifile.good()) {
+                            SHARD3D_LOG("Reloading texture '{0}'", tag);
+                            wb3d::AssetManager::emplaceTexture(tag);
+                            element->hover_texture = tag;
+                        }
+                        else SHARD3D_WARN("File '{0}' does not exist!", tag);
+                    }
+                }
+                {
+                    auto& tag = element->press_texture;
+                    char tagBuffer[256];
+                    memset(tagBuffer, 0, 256);
+                    strncpy(tagBuffer, tag.c_str(), 256);
+                    if (ImGui::InputText("Press", tagBuffer, 256)) {
+                        tag = std::string(tagBuffer);
+                    }
+
+                    if (ImGui::Button("Load Texture##Z")) {
+                        std::ifstream ifile(tag);
+                        if (ifile.good()) {
+                            SHARD3D_LOG("Reloading texture '{0}'", tag);
+                            wb3d::AssetManager::emplaceTexture(tag);
+                            element->press_texture = tag;
+                        }
+                        else SHARD3D_WARN("File '{0}' does not exist!", tag);
+                    }
+                }
+                ImGui::TreePop();
             }
             if (ImGui::TreeNode("Transform2D")) {
                 drawTransform2DControl("Position", element->position);
@@ -128,16 +173,35 @@ namespace Shard3D {
                 ImGui::TreePop();
             }
             if (ImGui::TreeNode("Anchoring")) {
-                ImGui::Combo("Anchor Position", &element->anchorType, "Top Left\0Top Right\0Bottom Left\0Bottom Right");
+                for (int y = 0; y < 3; y++)
+                    for (int x = 0; x < 3; x++) {
+                        if (x > 0)
+                            ImGui::SameLine();
+                        glm::vec2 coord = { static_cast<float>(x), static_cast<float>(y) };
+                        if (ImGui::Button(std::string(std::to_string((coord.x / 2.f - .5f)) + ", " + std::to_string(coord.y / 2.f - .5f)).c_str(), ImVec2(50, 50))) {
+                            element->anchorOffset = glm::vec2(coord.x / 2.f - 0.5f, coord.y / 2.f - 0.5f);
+                        }
+                    }
                 ImGui::TreePop();
             }
-            if (ImGui::TreeNode("Events")) {
-                ImGui::Text(std::string("pressEvent() -> " + std::string(typeid(element->pressEventCallback).raw_name())).c_str());
-                ImGui::Text(std::string("hoverEvent() -> " + std::string(typeid(element->hoverEventCallback).raw_name())).c_str());
-                ImGui::Text(std::string("clickEvent() -> " + std::string(typeid(element->clickEventCallback).raw_name())).c_str());
+            if (ImGui::TreeNode("Script")) {
+                bool exists = false;
+                static char buffer[32];
+                auto& name = element->scriptmodule;
+                memset(buffer, 0, 32);
+                strncpy(buffer, name.c_str(), 32);
+                //const auto& actorClasses = DynamicScriptEngine::getActorClasses(actor.getComponent<Components::ScriptComponent>().lang);
+                exists = DynamicScriptEngine::doesHUDClassExist("Shard3D.UI." + name, element->scriptlang);
+                if (!exists) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4, 0.7f, 1.0f));
+                if (ImGui::InputText("Script Class", buffer, 32)) {
+                    name = std::string(buffer);
+                }
+                if (!exists) ImGui::PopStyleColor();
+                ImGui::Combo("Language", &element->scriptlang, "C#\0Visual Basic");
+                ImGui::Checkbox("Is Button", &element->isActive);
+                ImGui::TreePop();
+            }
 
-                ImGui::TreePop();
-            }
             ImGui::TreePop();
         }
     }

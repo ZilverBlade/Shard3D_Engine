@@ -45,8 +45,8 @@ namespace Shard3D {
 			void loadIndexedMesh(const std::string& filepath, MeshType modelType);
 		};
 
-		_S3D_GVAR std::string fpath;
-		_S3D_GVAR MeshType mType;
+		inline static std::string fpath;
+		inline static MeshType mType;
 
 		EngineMesh(const EngineMesh::Builder &builder);
 		~EngineMesh();

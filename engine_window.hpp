@@ -37,8 +37,8 @@ namespace Shard3D {
 		int width;
 		int height;
 
-		_S3D_GVAR int windowPosX;
-		_S3D_GVAR int windowPosY;
+		inline static int windowPosX;
+		inline static int windowPosY;
 
 		bool framebufferResized = false;
 

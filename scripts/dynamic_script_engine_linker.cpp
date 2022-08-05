@@ -4,6 +4,9 @@
 #include <mono/metadata/assembly.h>
 #include "dynamic_script_engine.hpp"
 #include "../wb3d/actor.hpp"
+#include "../wb3d/levelmgr.hpp"
+#include "../wb3d/hudmgr.hpp"
+
 namespace Shard3D {
 	void DynamicScriptEngineLinker::registerLinker() {
 		registerInternalCalls();
@@ -21,6 +24,9 @@ namespace Shard3D {
 		_S3D_ICALL(ActorAddComponent);
 		_S3D_ICALL(ActorRmvComponent);
 		_S3D_ICALL(KillActor);
+		_S3D_ICALL(SceneManagerLoadLevel);
+		_S3D_ICALL(SceneManagerLoadHUD);
+		_S3D_ICALL(SceneManagerDestroyHUDLayer);
 	}
 }
 namespace Shard3D::InternalScriptCalls {
@@ -126,5 +132,26 @@ namespace Shard3D::InternalScriptCalls {
 			SHARD3D_ERROR("Component provided does not exist!");
 			break;
 		}
+	}
+	void SceneManagerLoadLevel(MonoString* string) {
+		char* t = mono_string_to_utf8(string);
+		std::string text(t);
+
+		std::shared_ptr<wb3d::Level> ptr(DynamicScriptEngine::getContext());
+
+		wb3d::LevelManager l_man = wb3d::LevelManager(ptr);
+		l_man.load(text, true);
+		mono_free(t);
+	}
+	void SceneManagerLoadHUD(MonoString* string, int layer) {
+		char* t = mono_string_to_utf8(string);
+		std::string text(t);
+
+		wb3d::HUDManager h_man(DynamicScriptEngine::getHUDContext());
+		h_man.load(text, layer, true);
+		mono_free(t);
+	}
+	void SceneManagerDestroyHUDLayer(int layer) {
+		DynamicScriptEngine::getHUDContext()->wipe(layer);
 	}
 }

@@ -21,7 +21,7 @@ namespace Shard3D {
 
 		void create(VkRenderPass renderPass);
 		void destroy();
-
+		uint64_t getSelectedID();
 		void render(FrameInfo& frameInfo, HUD& gui);
 	private:
 		void createPipelineLayout();

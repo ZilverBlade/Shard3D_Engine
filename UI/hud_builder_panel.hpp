@@ -12,7 +12,7 @@ namespace Shard3D {
 	private:
 		void renderGUIBuilder();
 		void renderGUIBuilderToolbar();
-		void renderGUIElementProperties(std::shared_ptr<HUD::Element> element);
+		void renderGUIElementProperties(std::shared_ptr<HUDElement> element);
 		std::shared_ptr<HUDContainer> hudLayerInfo;
 		const int nodeFlags = 32 | 4;
 	};

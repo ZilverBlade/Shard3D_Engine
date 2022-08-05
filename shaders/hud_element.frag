@@ -16,10 +16,10 @@ layout (set = 1, binding = 10) writeonly buffer IdOutput {
 void main()	{
 	if (texture(uiTex, fragUV).w < 0.001) 
 		discard; // discard before mouse picking operation as we dont want to select masked out elements
-	float len = length( mousePos - gl_FragCoord.xy);
-	if(len < 1)
+	float len = length(mousePos - gl_FragCoord.xy);
+	if(len < 1 && id != 0)
 		idOut.selectedID = id; 
 	outColor = vec4(texture(uiTex, fragUV).xyz 
-	* min((len/100), 1.0), // this multiplication is just for debugging purposes
-	texture(uiTex, fragUV).w);
+	* min((len/100), 1.0) // this multiplication is just for debugging purposes
+	, texture(uiTex, fragUV).w);
 }

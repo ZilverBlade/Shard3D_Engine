@@ -8,18 +8,14 @@
 #include <glm/gtx/dual_quaternion.hpp>
 
 namespace Shard3D {
-	enum class AnchorType {
-		TOPLEFT		= 0,
-		TOPRIGHT	= 1,
-		BOTTOMLEFT  = 2,
-		BOTTOMRIGHT = 3
-	};
 	struct GUIPushConstants {
 		glm::vec4 PZR;
 		glm::vec2 scale;
 		glm::vec2 mousePos;
+		glm::vec2 anchorOffset;
 		float ar;
-		AnchorType anchorType;
+
+		bool activeElement;
 		uint64_t id;
 	};
 
@@ -50,6 +46,11 @@ namespace Shard3D {
 	}
 	void HUDRenderSystem::destroy() {
 		vkDestroyPipelineLayout(Singleton::engineDevice.device(), pipelineLayout, nullptr);
+	}
+	uint64_t HUDRenderSystem::getSelectedID() {
+		auto* v = pickBuffer->getMappedMemory();
+		auto u = static_cast<uint64_t*>(v);
+		return *u;
 	}
 	void HUDRenderSystem::createPipelineLayout() {
 
@@ -93,8 +94,8 @@ namespace Shard3D {
 		pipelineConfig.pipelineLayout = pipelineLayout; 
 		enginePipeline = std::make_unique<EnginePipeline>(
 			Singleton::engineDevice,
-			"assets/shaderdata/gui_element.vert.spv",
-			"assets/shaderdata/gui_element.frag.spv",
+			"assets/shaderdata/hud_element.vert.spv",
+			"assets/shaderdata/hud_element.frag.spv",
 			pipelineConfig
 		);
 	}
@@ -116,7 +117,15 @@ namespace Shard3D {
 
 		for (auto& elmt : gui.elements) {
 			auto& element = elmt.second;
-			auto imageInfo = wb3d::AssetManager::retrieveTexture(element->texturePath)->getImageInfo();
+			uint64_t id = getSelectedID();
+			bool isPress = glfwGetMouseButton(Singleton::engineWindow.getGLFWwindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+			if (isPress && id == element->guid)
+				element->_design_tex = element->press_texture;
+			else if (id == element->guid)
+				element->_design_tex = element->hover_texture;
+			else
+				element->_design_tex = element->default_texture;
+			auto imageInfo = wb3d::AssetManager::retrieveTexture(element->_design_tex)->getImageInfo();
 			VkDescriptorSet descriptorSet1;
 			EngineDescriptorWriter(*guiSystemLayout, frameInfo.perDrawDescriptorPool)
 				.writeImage(2, &imageInfo)
@@ -142,14 +151,15 @@ namespace Shard3D {
 				nullptr);
 			GUIPushConstants push{};
 			push.PZR.x = element->position.x;
-			push.PZR.y = element->position.y;
+			push.PZR.y = -element->position.y;
 			push.PZR.z = static_cast<float>(element->zPos);
 			push.PZR.w = element->rotation;
 			push.scale = -element->scale;
 			push.ar = ar;
 			push.id = element->guid;
 			push.mousePos = mousePos;
-			push.anchorType = static_cast<AnchorType>(element->anchorType);
+			push.anchorOffset = element->anchorOffset;
+			push.activeElement = element->isActive;
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,
 				pipelineLayout,

@@ -35,4 +35,3 @@ namespace Shard3D {
 		}
 	};
 } 
-#define _S3D_GVAR inline static

@@ -5,8 +5,8 @@
 #include <glm/glm.hpp>
 namespace Shard3D {
     class EngineAudio {
-        _S3D_GVAR ma_result result;
-        _S3D_GVAR ma_engine engine;
+        inline static ma_result result;
+        inline static ma_engine engine;
 
         ma_sound sound;
         typedef int audio_params_t;

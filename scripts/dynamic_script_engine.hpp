@@ -16,19 +16,28 @@ namespace Shard3D {
 		class Level;
 		class Actor;
 	}
+	struct HUDElement;
+	class HUDContainer;
 	class DynamicScriptEngine {
 	public:	
 		enum class ScriptLanguage {
 			CSharp,
 			VisualBasic
 		};
-		struct _e {
-			void beginEvent(wb3d::Actor _a);
+		struct _a {
+			void beginEvent(wb3d::Actor __a);
 			void endEvent();
 			void tickEvent(float __dt);
 
 			void spawnEvent(wb3d::Actor actor);
 			void killEvent(wb3d::Actor actor);
+		};
+		struct _h {
+			void begin(HUDElement* __h);	// special use case, doesnt call any events, just initialises
+			void end(HUDElement* __h);		// special use case, doesnt call any events, just destroys
+			void hoverEvent(HUDElement* __h, float __dt);
+			void pressEvent(HUDElement* __h, float __dt);
+			void clickEvent(HUDElement* __h);
 		};
 		static void init();
 		static void destroy();
@@ -36,12 +45,15 @@ namespace Shard3D {
 		static std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> getActorClasses(int lang);
 		static void runtimeStart(wb3d::Level* level);
 		static void runtimeStop();
-		static bool doesClassExist(const std::string& fullClassName, int lang);
+		static void setHUDContext(HUDContainer* container);
+		inline static bool doesClassExist(const std::string& fullClassName, int lang);
+		inline static bool doesHUDClassExist(const std::string& fullClassName, int lang);
 		static wb3d::Level* getContext();
-		static _e actorScript() { return _e(); }
+		static HUDContainer* getHUDContext();
+		static _a actorScript() { return _a(); }
+		static _h hudScript() { return _h(); }
 	private:
-		
-		_S3D_GVAR void _reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang);
+		static void _reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang);
 		static void destroyMono(ScriptEngineData* scriptEngine);
 
 		static MonoObject* instClass(MonoClass* monoClass, int lang);
@@ -79,7 +91,6 @@ namespace Shard3D {
 			MonoMethod* spawnEventMethod{};
 			MonoMethod* killEventMethod{};
 
-
 			std::shared_ptr<DynamicScriptClass> s_c;
 			MonoObject* _i{};
 		};
@@ -92,6 +103,31 @@ namespace Shard3D {
 
 		MonoMethod* constructor{};
 		MonoObject* instance{};		
+	};
+	class HUDScriptInstance {
+		struct ScriptEvents {
+			ScriptEvents() = default;
+			ScriptEvents(std::shared_ptr<DynamicScriptClass> ptr, MonoObject* i);
+			void hoverEvent(float dt);
+			void pressEvent(float dt);
+			void clickEvent();
+
+			MonoMethod* hoverEventMethod{};
+			MonoMethod* pressEventMethod{};
+			MonoMethod* clickEventMethod{};
+
+			std::shared_ptr<DynamicScriptClass> s_c;
+			MonoObject* _i{};
+		};
+		ScriptEvents scriptEvents;
+	public:
+		HUDScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, HUDElement* element);
+		ScriptEvents invokeEvent();
+	private:
+		std::shared_ptr<DynamicScriptClass> scriptClass;
+
+		MonoMethod* constructor{};
+		MonoObject* instance{};
 	};
 	namespace Components {
 		struct ScriptComponent {

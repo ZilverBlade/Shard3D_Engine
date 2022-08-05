@@ -10,6 +10,7 @@
 #include "scripts/dynamic_script_engine.hpp"
 namespace Shard3D {
 	// ignore
+	class HUD;
 	class Initializer {
 	private:
 		friend class Singleton;
@@ -28,27 +29,27 @@ namespace Shard3D {
 	};
 	class Singleton {
 	private:
-		_S3D_GVAR constexpr int WIDTH = 1280; //800
-		_S3D_GVAR constexpr int HEIGHT = 720; //600
-		_S3D_GVAR const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
+		inline static constexpr int WIDTH = 1280; //800
+		inline static constexpr int HEIGHT = 720; //600
+		inline static const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
 	public:
 		Singleton() {}
 		~Singleton() {}
-		_S3D_GVAR Initializer _ignore_init;
+		inline static Initializer _ignore_init;
 
-		_S3D_GVAR EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
-		_S3D_GVAR EngineDevice engineDevice{ engineWindow };
-		_S3D_GVAR EngineRenderer engineRenderer{ engineWindow, engineDevice };
-		_S3D_GVAR VkDescriptorSet viewportImage{};
-		_S3D_GVAR OffScreen mainOffScreen{ engineDevice };
+		inline static EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
+		inline static EngineDevice engineDevice{ engineWindow };
+		inline static EngineRenderer engineRenderer{ engineWindow, engineDevice };
+		inline static VkDescriptorSet viewportImage{};
+		inline static OffScreen mainOffScreen{ engineDevice };
 
 #if ALLOW_PREVIEW_CAMERA
-		_S3D_GVAR OffScreen previewCamOffScreen{ engineDevice };
-		_S3D_GVAR VkDescriptorSet previewViewportImage{};
+		inline static OffScreen previewCamOffScreen{ engineDevice };
+		inline static VkDescriptorSet previewViewportImage{};
 #endif
-		_S3D_GVAR std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
-
-		_S3D_GVAR ImGui_ImplVulkan_InitInfo imgui_init_info{};
+		inline static std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
+		inline static std::vector<HUD*> hudList;
+		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
 
 //#ifndef _DEPLOY
 		struct eps {
@@ -56,13 +57,13 @@ namespace Shard3D {
 			bool V_HIDDEN_MESHES = true;
 			bool V_HIDDEN_BILLBOARDS = true;
 			bool V_GRID = true;
-			bool V_GUI = false;
+			bool V_GUI = true;
 			bool ONLY_GAME;
 		};
-		_S3D_GVAR eps editorPreviewSettings;
+		inline static eps editorPreviewSettings;
 //#endif
-		_S3D_GVAR glm::vec3 testPBR = {1.f, 0.5f, 0.f};
+		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
 
-		_S3D_GVAR Destructor _ignore_destroy;
+		inline static Destructor _ignore_destroy;
 	};
 }

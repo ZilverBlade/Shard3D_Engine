@@ -22,7 +22,7 @@ namespace Shard3D {
 		void attach(VkRenderPass renderPass, LayerStack* layerStack) override;
 		void detach() override;
 		void update(FrameInfo& frameInfo) override;
-		void attachGUIEditorInfo(HUDLayer** guiArray);
+		void attachGUIEditorInfo(std::shared_ptr<HUDContainer>& container);
 	private:
 		void detachTag() { }
 		void createIcons();
@@ -32,8 +32,6 @@ namespace Shard3D {
 		int height;
 
 		LayerStack* currentStack;
-
-		std::shared_ptr<HUDContainer> guiLayers{};
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 
@@ -47,6 +45,7 @@ namespace Shard3D {
 		bool showGraphicsSettingsWindow = false;
 		bool showStylizersWindow = false;
 		bool showCredits = false;
+		bool showDemoWindow = false;
 		struct EngineSettings {	
 			// WINDOW
 			int DEFAULT_WIDTH{};
@@ -75,7 +74,7 @@ namespace Shard3D {
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
 		AssetExplorerPanel AssetExplorerPanel;
-		HUDBuilderPanel guiBuilder;
+		HUDBuilderPanel hudBuilder;
 		bool refreshContext;
 //Gizmo levelGizmo;
 

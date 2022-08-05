@@ -39,14 +39,19 @@ namespace Shard3D.Core
         public extern static void ActorRmvComponent(ulong guid, Components _c);
 
         public static void SpawnBlueprint() => LogNoImpl();
+        #endregion
+
+#region SceneManager
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SceneManagerLoadLevel(string levelPath);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SceneManagerLoadHUD(string hudTemplatePath, int layer);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SceneManagerDestroyHUDLayer(int layer);
 #endregion
 
-#region etc
+        #region etc
 
-#endregion
-
-#region etc
-
-#endregion
+        #endregion
     }
 }

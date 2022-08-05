@@ -85,9 +85,9 @@ namespace Shard3D {
 		};
 	
 	private:
-		_S3D_GVAR Settings graphics;
-		_S3D_GVAR CSimpleIniA ini;
-		_S3D_GVAR EngineWindow* engineWindow;
+		inline static Settings graphics;
+		inline static CSimpleIniA ini;
+		inline static EngineWindow* engineWindow;
 	public:
 		// you may initialise this twice, as the engine window is required later on. First initialisation can be with nullptr as argument.
 		static void init(EngineWindow* window);

@@ -5,7 +5,30 @@
 #include <vector>
 #include <unordered_map>
 namespace Shard3D {
-	static void no_call() {}
+	struct HUDElement {
+		glm::vec2 position;
+		glm::vec2 scale = { 0.2f, 0.2f };
+		int zPos;
+		float rotation;
+		glm::vec2 anchorOffset;
+
+		GUID guid;
+
+		bool isActive;
+
+		std::string scriptmodule;
+		int scriptlang;
+
+		std::string tag = "Some kind of HUD";
+
+		std::string default_texture;
+		std::string hover_texture;
+		std::string press_texture;
+	private:
+		std::string _design_tex;
+		friend class HUDRenderSystem;
+		friend class HUDLayer;
+	};
 	class HUD {
 	public:
 		enum class ElementType {
@@ -13,23 +36,7 @@ namespace Shard3D {
 			Image,
 			Text
 		};
-		struct Element {
-			glm::vec2 position;
-			glm::vec2 scale = {1.f, 1.f};
-			int zPos;
-			float rotation;
-			std::string texturePath;
-			std::string cachePath;
-			GUID guid;
-			std::string tag = "Some kind of HUD";
-			int anchorType;
-
-			void (*hoverEventCallback)() = no_call;
-			void (*pressEventCallback)() = no_call;
-			void (*clickEventCallback)() = no_call;
-		};
-		
-		std::unordered_map<uint64_t, std::shared_ptr<Element>> elements;
+		std::unordered_map<uint64_t, std::shared_ptr<HUDElement>> elements;
 	};
 
 	class HUDContainer {
@@ -47,11 +54,14 @@ namespace Shard3D {
 				hudLayerList.at(layer)->elements = object->elements;
 			}
 		}
-		void merge(int layer, std::shared_ptr<HUD::Element> object) {
+		void merge(int layer, std::shared_ptr<HUDElement> object) {
 			hudLayerList.at(layer)->elements.try_emplace(object->guid, object);
+		}
+		void wipe(int layer) {
+			hudLayerList.at(layer)->elements.clear();
 		}
 	private:
 		std::vector<HUD*> hudLayerList;
-		friend class ImGuiLayer;
+		friend class EditorApp;
 	};
 }
