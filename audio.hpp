@@ -4,6 +4,17 @@
 #include "engine_logger.hpp"
 #include <glm/glm.hpp>
 namespace Shard3D {
+    struct AudioProperties {
+        float volume{ 1.f };
+        float pitch{ 0.f };
+        glm::vec3 relativePos{ 0.f };
+    };
+    enum AudioParams {
+        AudioNull,
+        AudioSpatialize,
+        AudioOneShot
+    };
+
     class EngineAudio {
         inline static ma_result result;
         inline static ma_engine engine;
@@ -13,16 +24,6 @@ namespace Shard3D {
     public:
 
         ~EngineAudio();
-        struct AudioProperties {
-            float volume{ 1.f };
-            float pitch{ 0.f };
-            glm::vec3 relativePos{ 0.f };
-        };
-        enum AudioParams {
-            AudioNull,
-            AudioSpatialize,
-            AudioOneShot
-        };
 
         static void init();
         static void destroy();
