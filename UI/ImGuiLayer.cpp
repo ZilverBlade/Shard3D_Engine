@@ -24,8 +24,9 @@
 #include "imgui_initter.hpp"
 #include <shellapi.h>
 #include "../wb3d/assetmgr.hpp"
-#include "GUILayer.hpp"
+#include "HUDLayer.hpp"
 #include <imgui_internal.h>
+
 namespace Shard3D {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
@@ -213,7 +214,7 @@ namespace Shard3D {
         ImGui::End();
         // start rendering stuff here
         //ImGuizmo::BeginFrame();
-        guiBuilder.render();
+        hudBuilder.render();
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel);
         levelPeekPanel.render();
@@ -422,7 +423,7 @@ namespace Shard3D {
            // if (ImGui::Button("Revert Changes")) {}
             ImGui::End();
         }
-
+        if (showDemoWindow) ImGui::ShowDemoWindow();
         ImGui::End();
         ImGui::Render();
 
@@ -431,19 +432,8 @@ namespace Shard3D {
         ImGui::RenderPlatformWindowsDefault();
     }
 
-    void ImGuiLayer::attachGUIEditorInfo(GUILayer** guiArray) {
-        guiLayers = std::make_shared<GUIContainer>();
-        for (int i = 0; i < 4; i++) {
-            if (guiArray[i]) 
-                guiLayers->guiLayerList
-                .push_back(&guiArray[i]->guiElements);
-        }
-
-        for (int i = 0; i < guiLayers->getList().size(); i++) {
-            SHARD3D_LOG("GUI Layer {0} has {1} elements", i, guiLayers->getList().at(i)->elementsGUI.size()) ;
-        }
-
-        guiBuilder.setContext(guiLayers);
+    void ImGuiLayer::attachGUIEditorInfo(std::shared_ptr<HUDContainer>& container) {
+        hudBuilder.setContext(container);
     }
 
 
@@ -474,7 +464,7 @@ namespace Shard3D {
         // PLAY MODE
         if (ImGui::ImageButton(
             (Singleton::activeLevel->simulationState == PlayState::Stopped) ? icons.play : 
-                ((Singleton::activeLevel->simulationState == PlayState::Paused) ? icons.play : icons.pause), btnSize)) {
+                ((Singleton::activeLevel->simulationState == PlayState::Paused) ? icons.play : icons.pause), btnSize))
             if (Singleton::activeLevel->simulationState == PlayState::Stopped) { // Play
                 wb3d::MasterManager::captureLevel(Singleton::activeLevel);
                 Singleton::activeLevel->begin();
@@ -492,8 +482,6 @@ namespace Shard3D {
                 std::string title = "Shard3D Engine " + ENGINE_VERSION + " (Playstate: Paused) | " + Singleton::activeLevel->name;
                 glfwSetWindowTitle(Singleton::engineWindow.getGLFWwindow(), title.c_str());                           
             }
-
-        }
         ImGui::TextWrapped((Singleton::activeLevel->simulationState == PlayState::Stopped) ? "Play" :
             ((Singleton::activeLevel->simulationState == PlayState::Paused) ? "Resume" : "Pause"));
         ImGui::NextColumn();
@@ -553,7 +541,7 @@ namespace Shard3D {
             }
             if (ImGui::MenuItem("Load Level...", "Ctrl+O")) {
                 if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
-                    std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_FILE_OPTIONS);
+                    std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_LEVELFILE_OPTIONS);
                     if (!filepath.empty()) {
                         levelTreePanel.clearSelectedActor();
                         Singleton::activeLevel->killEverything();
@@ -570,7 +558,7 @@ namespace Shard3D {
                 levelMan.save(Singleton::activeLevel->currentpath, true);
             }
             if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
-                std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_FILE_OPTIONS);
+                std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_LEVELFILE_OPTIONS);
                 if (!filepath.empty()) {
                     wb3d::LevelManager levelMan(Singleton::activeLevel);
                     levelMan.save(filepath, false);
@@ -635,7 +623,7 @@ namespace Shard3D {
                 ImGui::Separator();
                 ImGui::Checkbox("Grid", &Singleton::editorPreviewSettings.V_GRID);
                 ImGui::Checkbox("Billboards", &Singleton::editorPreviewSettings.V_EDITOR_BILLBOARDS);
-                ImGui::Checkbox("GUI", &Singleton::editorPreviewSettings.V_GUI);
+                ImGui::Checkbox("HUD", &Singleton::editorPreviewSettings.V_GUI);
                 ImGui::EndMenu();
             }
 #endif
@@ -645,6 +633,7 @@ namespace Shard3D {
         if (ImGui::BeginMenu("Debug")) {
             ImGui::TextDisabled("Shard3D Debug menu");
             ImGui::Checkbox("Stylizer", &showStylizersWindow);
+            ImGui::Checkbox("ImGuiDemo", &showDemoWindow);
             if (ImGui::MenuItem("Play test audio")) {
                 EngineAudio audio;
                 audio.play("assets/audiodata/thou-3.mp3");

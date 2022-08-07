@@ -59,7 +59,7 @@ ALPHA:
 		- Added Jolt physics library
 		- Added "special assets" for core assets (textures)
 		- Optimised some rendering
-		- Added GUI system
+		- Added HUD system
 	
 	> Shard3D Torque 1.2.0-alpha
 		- Added changelog file counting after 1.0.8-alpha
@@ -98,18 +98,27 @@ ALPHA:
 		- Fixed example script not displaying camera correctly upon possession
 		- Renamed final folder, settings to configdata
 		- Added light theme (configurable in editor_settings.ini)
-		- Added experimental mouse picking support for GUI system using storage buffers
+		- Added experimental mouse picking support for HUD system using storage buffers
 		- Fixed ImGui detachment not working as intended
 		- Improvements to script engine
-		- Fixed rotation matrix for GUI elements
+		- Fixed rotation matrix for HUD elements
 		- Credits menu
 		- Fixed vb and c# script dll's not being pushed to repo
 		- Fixed camera movement relative to car in the example script
-		- Improvements to GUI system
+		- Improvements to HUD system
 		- Added getters and setters for TransformComponent
 	> Shard3D Torque 1.2.3-alpha
 		- Script system is now usable
 		- Rebranded logos and icons
 		- Forced use of getters and setters of transforms
 		- Transforms now expose proper Z up values
-		:: TODO, add editor layouts, add working GUI builder, finalize script engine, switch to clang
+		- Removed unnecessary shader files
+		- Fixed HUD stretching with screen size
+		- Fixed rotation issues with HUD
+		- Added HUD element anchoring
+		- Added 2 seperate layer designations for HUD, one for depth layering and one for overlay layering
+		- Added scripting ability for HUD
+		- Added ability to load and destroy HUD from scripts
+		- Added proper HUD buttons that can change texture depending if being hovered over, pressed, or idle
+
+		:: TODO, add editor layouts, add working HUD builder, finalize script engine, switch to clang

@@ -10,10 +10,10 @@
 #include "level_peekers.hpp"
 #include "asset_explorer_panel.hpp"
 #include "level_gizmo.hpp"
-#include "gui_builder_panel.hpp"
+#include "hud_builder_panel.hpp"
 namespace Shard3D {
-	class GUILayer;
-	class GUI;
+	class HUDLayer;
+	class HUD;
 	class ImGuiLayer : public Shard3D::Layer {
 	public:
 		ImGuiLayer();
@@ -22,7 +22,7 @@ namespace Shard3D {
 		void attach(VkRenderPass renderPass, LayerStack* layerStack) override;
 		void detach() override;
 		void update(FrameInfo& frameInfo) override;
-		void attachGUIEditorInfo(GUILayer** guiArray);
+		void attachGUIEditorInfo(std::shared_ptr<HUDContainer>& container);
 	private:
 		void detachTag() { }
 		void createIcons();
@@ -32,8 +32,6 @@ namespace Shard3D {
 		int height;
 
 		LayerStack* currentStack;
-
-		std::shared_ptr<GUIContainer> guiLayers{};
 
 		ax::NodeEditor::EditorContext* nodeEditorContext;
 
@@ -47,6 +45,7 @@ namespace Shard3D {
 		bool showGraphicsSettingsWindow = false;
 		bool showStylizersWindow = false;
 		bool showCredits = false;
+		bool showDemoWindow = false;
 		struct EngineSettings {	
 			// WINDOW
 			int DEFAULT_WIDTH{};
@@ -75,7 +74,7 @@ namespace Shard3D {
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
 		AssetExplorerPanel AssetExplorerPanel;
-		GuiBuilderPanel guiBuilder;
+		HUDBuilderPanel hudBuilder;
 		bool refreshContext;
 //Gizmo levelGizmo;
 

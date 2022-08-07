@@ -44,6 +44,7 @@
     <Compile Include="Components.cs" />
     <Compile Include="developer fuckery.cs" />
     <Compile Include="InternalCalls.cs" />
+    <Compile Include="SceneMgr.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

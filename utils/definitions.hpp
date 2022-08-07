@@ -6,7 +6,7 @@ namespace Shard3D {
 //=====================================================================================================================
 //=====================================================================================================================
 
-const static std::string ENGINE_VERSION = "1.2.3.r1-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string ENGINE_VERSION = "1.2.3.r2-alpha";	// Shard3D {major, minor, patch, revision}-state
 const static std::string EDITOR_VERSION = "1.3.r0-alpha";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/configdata/engine_settings.ini"
@@ -27,8 +27,9 @@ const static std::string EDITOR_VERSION = "1.3.r0-alpha";	// WorldEditor3D {majo
 #define ENGINE_FONT_PATH					"assets/_engine/fnt/"		//Fonts
 #define ENGINE_DEFAULT_ENGINE_FONT			"assets/_engine/fnt/fs-tahoma-8px.ttf"		//Default engine font
 #define ENGINE_FONT_SIZE			16		//size in px
-#define ENGINE_WORLDBUILDER3D_FILE_OPTIONS	"WorldBuilder3D Level (*.wbl)\0*.wbl\0All files (*.*)\0*.*\0"
+#define ENGINE_WORLDBUILDER3D_LEVELFILE_OPTIONS	"WorldBuilder3D Level (*.wbl)\0*.wbl\0All files (*.*)\0*.*\0"
 #define ENGINE_WORLDBUILDER3D_ASSETFILE_OPTIONS "WorldBuilder3D Asset (*.wbasset)\0*.wbasset\0All files (*.*)\0*.*\0"
+#define ENGINE_WORLDBUILDER3D_HUDFILE_OPTIONS "WorldBuilder3D HUD (*.wbht)\0*.wbht\0All files (*.*)\0*.*\0"
 #define ENGINE_MAX_POINTLIGHTS						20		// dont change because these dont match shader code
 #define ENGINE_MAX_SPOTLIGHTS						20 
 #define ENGINE_MAX_DIRECTIONAL_LIGHTS				6

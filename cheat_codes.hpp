@@ -25,6 +25,11 @@ namespace Shard3D {
 
                 SHARD3D_FATAL("LMFAO");
             }
+            if (cheatCodeInput.find("ELYTRA19") != std::string::npos) {
+                cheatCodeInput.clear();
+
+                SHARD3D_FATAL("I died");
+            }
         } 
 	};
 }

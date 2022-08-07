@@ -161,7 +161,7 @@ void EngineDevice::pickPhysicalDevice() {
   for (const auto &device : devices) {
     if (isDeviceSuitable(device)) {
       physicalDevice = device;
-
+      
       //MSAA setup
       assert(msaaSamples >= 1 && "MSAA samples cannot be inferior to 1!");
       if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { SHARD3D_WARN("MSAA Sample count exceeds device capability, dropping down to device's limit"); }
@@ -195,7 +195,7 @@ void EngineDevice::createLogicalDevice() {
 
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
   std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily, indices.presentFamily};
-
+  
   float queuePriority = 1.0f;
   for (uint32_t queueFamily : uniqueQueueFamilies) {
     VkDeviceQueueCreateInfo queueCreateInfo = {};

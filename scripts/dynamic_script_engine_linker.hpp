@@ -36,9 +36,16 @@ namespace Shard3D {
 
 #pragma region ECS
 		static void SpawnActor(uint64_t* actorID, MonoString* string);
+		static void KillActor(uint64_t actorID);
 		static void ActorAddComponent(uint64_t actorID, Components::ComponentsList component);
 		static void ActorRmvComponent(uint64_t actorID, Components::ComponentsList component);
 #pragma endregion
+
+#pragma region Scene
+		static void SceneManagerLoadLevel(MonoString* string);
+		static void SceneManagerLoadHUD(MonoString* string, int layer);
+		static void SceneManagerDestroyHUDLayer(int layer);
+#pragma region
 	
 	}
 }

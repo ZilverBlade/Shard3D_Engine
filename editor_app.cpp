@@ -22,7 +22,7 @@
 
 //UI stuff
 #include "UI/ImGuiLayer.hpp"
-#include "UI/GUILayer.hpp"
+#include "UI/HUDLayer.hpp"
 //scripts
 #include "scripts/script_link.h"
 #include "graphics_settings.hpp"
@@ -103,25 +103,21 @@ namespace Shard3D {
 		ImGuiLayer* imguiLayer = new ImGuiLayer();
 		layerStack.pushOverlay(imguiLayer);
 #endif
-		GUILayer* guiLayer0 = new GUILayer();
-		GUILayer* guiLayer1 = new GUILayer();
-		GUILayer* guiLayer2 = new GUILayer();
-		GUILayer* guiLayer3 = new GUILayer();
+		HUDLayer* guiLayer0 = new HUDLayer();
+		HUDLayer* guiLayer1 = new HUDLayer();
+		HUDLayer* guiLayer2 = new HUDLayer();
+		HUDLayer* guiLayer3 = new HUDLayer();
 
 		layerStack.pushOverlay(guiLayer3);
 		layerStack.pushOverlay(guiLayer2);
 		layerStack.pushOverlay(guiLayer1);
 		layerStack.pushOverlay(guiLayer0);
 
-
-		std::shared_ptr<GUI::Element> test = std::make_shared<GUI::Element>();
-		test->clickEventCallback = buttonClickYay;
-
 		//guiLayer0->attach(Singleton::mainOffScreen.getRenderPass(), &layerStack);
 		// 
 		// 
-		// TODO: render the GUILayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
-		// but render the GUI seperately from everything in the GUIEditor window.
+		// TODO: render the HUDLayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
+		// but render the HUD seperately from everything in the GUIEditor window.
 
 		GridSystem gridSystem{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #if ENSET_ENABLE_COMPUTE_SHADERS
@@ -132,6 +128,7 @@ namespace Shard3D {
 
 		_EditorBillboardRenderer editorBillboardRenderer{ Singleton::engineDevice, Singleton::mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
+		PhysicsSystem physicsSystem{};
 		PointlightSystem pointlightSystem{};
 		SpotlightSystem spotlightSystem{};
 		DirectionalLightSystem directionalLightSystem{};
@@ -186,13 +183,25 @@ namespace Shard3D {
 			editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic);  //Ortho perspective (not needed 99.99% of the time)
 		}
 
-		GUILayer* layerList[4]{
+		HUDLayer* layerList[4]{
 			guiLayer0,
 			guiLayer1,
 			guiLayer2,
 			guiLayer3
 		};
-		imguiLayer->attachGUIEditorInfo(layerList);
+
+		std::shared_ptr<HUDContainer> h_l_layer = std::make_shared<HUDContainer>();
+		for (int i = 0; i < 4; i++) {
+			if (layerList[i])
+				h_l_layer->hudLayerList
+				.push_back(&layerList[i]->hud);
+		}
+
+		for (int i = 0; i < h_l_layer->getList().size(); i++) {
+			SHARD3D_LOG("HUD Layer {0} has {1} elements", i, h_l_layer->getList().at(i)->elements.size());
+		}
+		DynamicScriptEngine::setHUDContext(h_l_layer.get());
+		imguiLayer->attachGUIEditorInfo(h_l_layer);
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 beginWhileLoop:
@@ -210,9 +219,9 @@ beginWhileLoop:
 			auto possessedPreviewCamera = Singleton::activeLevel->getPossessedPreviewCamera();
 #endif
 
+			if (Singleton::activeLevel->simulationState == PlayState::Simulating) Singleton::activeLevel->tick(frameTime);
 			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice);
 			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
-			if (Singleton::activeLevel->simulationState == PlayState::Simulating) Singleton::activeLevel->tick(frameTime);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().getTranslation(), 
 				possessedCameraActor.getTransform().getRotation());
 

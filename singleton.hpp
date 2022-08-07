@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 
 #include "device.hpp"
 #include "UI/imgui_implementation.hpp"
@@ -10,6 +10,7 @@
 #include "scripts/dynamic_script_engine.hpp"
 namespace Shard3D {
 	// ignore
+	class HUD;
 	class Initializer {
 	private:
 		friend class Singleton;
@@ -47,7 +48,7 @@ namespace Shard3D {
 		inline static VkDescriptorSet previewViewportImage{};
 #endif
 		inline static std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
-
+		inline static std::vector<HUD*> hudList;
 		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
 
 //#ifndef _DEPLOY
@@ -56,7 +57,7 @@ namespace Shard3D {
 			bool V_HIDDEN_MESHES = true;
 			bool V_HIDDEN_BILLBOARDS = true;
 			bool V_GRID = true;
-			bool V_GUI = false;
+			bool V_GUI = true;
 			bool ONLY_GAME;
 		};
 		inline static eps editorPreviewSettings;

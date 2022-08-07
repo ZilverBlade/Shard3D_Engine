@@ -10,5 +10,10 @@
 		SpotlightComponent,
 		DirectionalLightComponent
     };
+
+	public struct PointlightComponent
+    {
+
+    }
 }
 

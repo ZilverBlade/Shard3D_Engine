@@ -1,6 +1,4 @@
 #pragma once
-
-
 namespace Shard3D {
 	class GUID {
 	public:

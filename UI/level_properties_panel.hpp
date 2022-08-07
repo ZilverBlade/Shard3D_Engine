@@ -22,7 +22,7 @@ namespace Shard3D {
 		void displayPreviewCamera(Actor actor);
 		std::shared_ptr<Level> context;
 
-		bool showPreviewCamera;
+		bool showPreviewCamera = false;
 
 		const ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
 	};

@@ -26,7 +26,7 @@ namespace Shard3D {
 		VkExtent2D getExtent() { return { (uint32_t)(width), (uint32_t)(height) }; }
 		bool wasWindowResized() { return framebufferResized; }
 		void resetWindowResizedFlag() { framebufferResized = false; }
-		static GLFWwindow* getGLFWwindow() { return window; }
+		GLFWwindow* getGLFWwindow() { return window; }
 
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		void setWindowMode(WindowType winType);
@@ -43,7 +43,7 @@ namespace Shard3D {
 		bool framebufferResized = false;
 
 		std::string windowName;
-		inline static GLFWwindow* window;
-		inline static GLFWmonitor* monitor = nullptr;
+		GLFWwindow* window;
+		GLFWmonitor* monitor = nullptr;
 	};
 }

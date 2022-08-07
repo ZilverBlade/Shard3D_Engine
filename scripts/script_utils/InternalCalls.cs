@@ -30,19 +30,28 @@ namespace Shard3D.Core
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void SpawnActor(out ulong guid, string name);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void GetActorByTag(out ulong guid, string name);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void KillActor(ulong guid);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void ActorAddComponent(ulong guid, Components _c);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static void ActorRmvComponent(ulong guid, Components _c);
 
         public static void SpawnBlueprint() => LogNoImpl();
+        #endregion
+
+#region SceneManager
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SceneManagerLoadLevel(string levelPath);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SceneManagerLoadHUD(string hudTemplatePath, int layer);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SceneManagerDestroyHUDLayer(int layer);
 #endregion
 
-#region etc
+        #region etc
 
-#endregion
-
-#region etc
-
-#endregion
+        #endregion
     }
 }

@@ -1,5 +1,4 @@
 #version 450
-#extension GL_KHR_vulkan_glsl : enable
 
 layout(location = 0) out float near; //0.01
 layout(location = 1) out float far; //100

@@ -108,14 +108,14 @@
     <Filter Include="shaders\fragment\editor">
       <UniqueIdentifier>{1da3f36a-9f08-408a-80ba-a9fed638a520}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\UI\GUI">
-      <UniqueIdentifier>{19006134-43f1-46b7-b728-84981f89c326}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\UI\GUI">
-      <UniqueIdentifier>{352accfe-5a96-4980-954b-e8d4c98ae8de}</UniqueIdentifier>
-    </Filter>
     <Filter Include="scripts\c++">
       <UniqueIdentifier>{6f67f61a-8614-46bf-834a-44a880019f00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\HUD">
+      <UniqueIdentifier>{352accfe-5a96-4980-954b-e8d4c98ae8de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\HUD">
+      <UniqueIdentifier>{19006134-43f1-46b7-b728-84981f89c326}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -263,11 +263,11 @@
     <ClCompile Include="systems\particle_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="systems\gui_system.cpp">
+    <ClCompile Include="systems\hud_system.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="UI\GUILayer.cpp">
-      <Filter>Source Files\UI\GUI</Filter>
+    <ClCompile Include="UI\HUDLayer.cpp">
+      <Filter>Source Files\UI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="audio.cpp">
       <Filter>Source Files\core</Filter>
@@ -288,7 +288,7 @@
       <Filter>Source Files\systems</Filter>
     </ClCompile>
     <ClCompile Include="UI\ScreenLayer.cpp">
-      <Filter>Source Files\UI\GUI</Filter>
+      <Filter>Source Files\UI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="systems\fullscreen_renderer.cpp">
       <Filter>Source Files\systems</Filter>
@@ -296,10 +296,10 @@
     <ClCompile Include="scripts\dynamic_script_engine_linker.cpp">
       <Filter>scripts</Filter>
     </ClCompile>
-    <ClCompile Include="UI\gui_builder_panel.cpp">
+    <ClCompile Include="UI\hud_builder_panel.cpp">
       <Filter>Source Files\UI\panels</Filter>
     </ClCompile>
-    <ClCompile Include="wb3d\guimgr.cpp">
+    <ClCompile Include="wb3d\hudmgr.cpp">
       <Filter>Source Files\wb3d</Filter>
     </ClCompile>
     <ClCompile Include="cubemap.cpp">
@@ -502,14 +502,14 @@
     <ClInclude Include="systems\particle_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>
-    <ClInclude Include="systems\gui_system.hpp">
+    <ClInclude Include="systems\hud_system.hpp">
       <Filter>Header Files\systems</Filter>
     </ClInclude>
-    <ClInclude Include="gui.hpp">
+    <ClInclude Include="hud.hpp">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="UI\GUILayer.hpp">
-      <Filter>Header Files\UI\GUI</Filter>
+    <ClInclude Include="UI\HUDLayer.hpp">
+      <Filter>Header Files\UI\HUD</Filter>
     </ClInclude>
     <ClInclude Include="audio.hpp">
       <Filter>Header Files\core</Filter>
@@ -533,7 +533,7 @@
       <Filter>Header Files\systems</Filter>
     </ClInclude>
     <ClInclude Include="UI\ScreenLayer.hpp">
-      <Filter>Header Files\UI\GUI</Filter>
+      <Filter>Header Files\UI\HUD</Filter>
     </ClInclude>
     <ClInclude Include="systems\fullscreen_renderer.hpp">
       <Filter>Header Files\systems</Filter>
@@ -547,10 +547,10 @@
     <ClInclude Include="plugins\script_engine_plugin_link.h">
       <Filter>plugins</Filter>
     </ClInclude>
-    <ClInclude Include="UI\gui_builder_panel.hpp">
+    <ClInclude Include="UI\hud_builder_panel.hpp">
       <Filter>Header Files\UI\panels</Filter>
     </ClInclude>
-    <ClInclude Include="wb3d\guimgr.hpp">
+    <ClInclude Include="wb3d\hudmgr.hpp">
       <Filter>Header Files\wb3d</Filter>
     </ClInclude>
     <ClInclude Include="cubemap.hpp">
@@ -559,28 +559,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="compile.bat" />
-    <None Include="shaders\directional_light.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
     <None Include="shaders\basic_shader.frag">
       <Filter>shaders\fragment</Filter>
     </None>
-    <None Include="shaders\pointlight.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="shaders\directional_light.vert">
-      <Filter>shaders\vertex</Filter>
-    </None>
     <None Include="shaders\basic_shader.vert">
-      <Filter>shaders\vertex</Filter>
-    </None>
-    <None Include="shaders\pointlight.vert">
-      <Filter>shaders\vertex</Filter>
-    </None>
-    <None Include="shaders\spotlight.frag">
-      <Filter>shaders\fragment</Filter>
-    </None>
-    <None Include="shaders\spotlight.vert">
       <Filter>shaders\vertex</Filter>
     </None>
     <None Include="shaders\pbr_shader.frag">
@@ -610,10 +592,10 @@
     <None Include="shaders\_editor\grid.frag">
       <Filter>shaders\fragment\editor</Filter>
     </None>
-    <None Include="shaders\gui_element.vert">
+    <None Include="shaders\hud_element.vert">
       <Filter>shaders\vertex</Filter>
     </None>
-    <None Include="shaders\gui_element.frag">
+    <None Include="shaders\hud_element.frag">
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="shaders\_output_img.vert">
@@ -622,6 +604,7 @@
     <None Include="shaders\_output_img.frag">
       <Filter>shaders\fragment</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Shard3D.rc">

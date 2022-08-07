@@ -7,6 +7,8 @@
 #include "bpmgr.hpp"
 #include "assetmgr.hpp"
 #include "../scripts/dynamic_script_engine.hpp"
+#include "../singleton.hpp"
+#include "../hud.hpp"
 namespace Shard3D {
 	namespace wb3d {
 		Level::Level(const std::string &lvlName) : name(lvlName) {}
@@ -92,16 +94,6 @@ namespace Shard3D {
 			if (actorKillQueue.size() != 0) {
 				for (int i = 0; i < actorKillQueue.size(); i++) {
 					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
-					if (simulationState == PlayState::Simulating) {
-						{
-							registry.view<Components::CppScriptComponent>().each([&](auto actor, auto& csc) {
-								csc.Inst->killEvent();
-							});
-						}
-						{
-							DynamicScriptEngine::actorScript().killEvent();
-						}
-					}
 					if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
 						actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
 							vkDeviceWaitIdle(device.device());
@@ -239,6 +231,10 @@ namespace Shard3D {
 					DynamicScriptEngine::actorScript().beginEvent({ actor, this });
 				});
 			}
+			{
+				for (HUD* hud : Singleton::hudList) for (auto& element : hud->elements)
+						DynamicScriptEngine::hudScript().begin(element.second.get());
+			}
 			SHARD3D_INFO("Beginning simulation");
 		}
 
@@ -279,11 +275,17 @@ namespace Shard3D {
 		void Level::end() {
 			SHARD3D_INFO("Ending Level Simulation");
 			simulationState = PlayState::Stopped;
-			registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
-				csc.Inst->endEvent();
-			});
+			{
+				registry.view<Components::CppScriptComponent>().each([=](auto actor, auto& csc) {
+					csc.Inst->endEvent();
+				}); 
+			}
 			{
 				DynamicScriptEngine::actorScript().endEvent();
+			}
+			{
+				for (HUD* hud : Singleton::hudList) for (auto& element : hud->elements)
+					DynamicScriptEngine::hudScript().end(element.second.get());
 			}
 			DynamicScriptEngine::runtimeStop();
 			setPossessedCameraActor(0);
@@ -293,11 +295,18 @@ namespace Shard3D {
 
 		void Level::killActor(Actor actor) {
 			actorKillQueue.emplace_back(actor);
-			if (actor.hasComponent<Components::CppScriptComponent>()) {
-				if (actor.getComponent<Components::CppScriptComponent>().Inst) {
-					actor.getComponent<Components::CppScriptComponent>().Inst->killEvent();
-					actor.getComponent<Components::CppScriptComponent>().killScript(&actor.getComponent<Components::CppScriptComponent>());
-				}
+			if (simulationState == PlayState::Simulating) {
+				if (!actor.hasComponent<Components::CppScriptComponent>()) goto next;
+				{
+					if (actor.getComponent<Components::CppScriptComponent>().Inst) {
+						actor.getComponent<Components::CppScriptComponent>().Inst->killEvent();
+						actor.getComponent<Components::CppScriptComponent>().killScript(&actor.getComponent<Components::CppScriptComponent>());
+					}
+				}	next:;
+				if (!actor.hasComponent<Components::ScriptComponent>()) goto _next;
+				{
+					DynamicScriptEngine::actorScript().killEvent(actor);
+				}	_next:;
 			}
 		}
 

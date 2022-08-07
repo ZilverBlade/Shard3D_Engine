@@ -85,7 +85,8 @@
   <ItemGroup>
     <Compile Include="Core\Actor.vb" />
     <Compile Include="Core\ECSMgr.vb" />
-    <Compile Include="Example.vb" />
+    <Compile Include="Core\HUD.vb" />
+    <Compile Include="Scripting\Example.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

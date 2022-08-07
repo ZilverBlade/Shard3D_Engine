@@ -11,12 +11,13 @@
 #include <fstream>
 #include "../GUID.hpp"
 #include "../wb3d/actor.hpp"
+#include "../hud.hpp"
 namespace Shard3D {
 
 	struct GlobalScriptEngineData {
 		MonoDomain* rootDomain = nullptr;
 		wb3d::Level* levelContext{};
-
+		HUDContainer* hudContext{};
 	};
 
 	struct ScriptEngineData {
@@ -29,6 +30,10 @@ namespace Shard3D {
 		DynamicScriptClass actorClass;
 		std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> actorClasses;
 		std::unordered_map<GUID, std::shared_ptr<DynamicScriptInstance>> actorInstances;
+
+		DynamicScriptClass hudClass;
+		std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> hudClasses;
+		std::unordered_map<GUID, std::shared_ptr<HUDScriptInstance>> hudInstances;
 	};
 
 	static ScriptEngineData* scriptEngineData;
@@ -115,7 +120,6 @@ namespace Shard3D {
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 		MonoClass* actorClass = mono_class_from_name(image, "Shard3D.Core", "Actor");
-
 		
 		for (int32_t i = 0; i < numTypes; i++) {
 			uint32_t cols[MONO_TYPEDEF_SIZE];
@@ -134,6 +138,28 @@ namespace Shard3D {
 			std::shared_ptr<DynamicScriptClass> ptr = std::make_shared<DynamicScriptClass>(nameSpace, name, (int)data->lang);
 			if (isActor) {
 				data->actorClasses[fullname] = ptr;
+			}
+			//SHARD3D_LOG("is {0} part? {1} ({2})", fullname, isActor, data->lang == ScriptLanguage::CSharp ? "C#" : "VB");
+		}
+
+		MonoClass* hudClass = mono_class_from_name(image, "Shard3D.Core", "HUD");
+		for (int32_t i = 0; i < numTypes; i++) {
+			uint32_t cols[MONO_TYPEDEF_SIZE];
+			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+
+			const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
+			const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
+
+			std::string fullname = fmt::format("{}.{}", nameSpace, name);
+
+			MonoClass* monoClass{};
+			monoClass = mono_class_from_name(image, nameSpace, name);
+			if (monoClass == actorClass) continue;
+			if (strUtils::hasStarting(nameSpace, "My") || strUtils::hasStarting(name, "MyWebServices") || strUtils::hasStarting(name, "Thread")) continue; // dont log core stuff
+			bool isHUD = mono_class_is_subclass_of(monoClass, hudClass, false);
+			std::shared_ptr<DynamicScriptClass> ptr = std::make_shared<DynamicScriptClass>(nameSpace, name, (int)data->lang);
+			if (isHUD) {
+				data->hudClasses[fullname] = ptr;
 			}
 			//SHARD3D_LOG("is {0} part? {1} ({2})", fullname, isActor, data->lang == ScriptLanguage::CSharp ? "C#" : "VB");
 		}
@@ -171,6 +197,8 @@ namespace Shard3D {
 
 		scriptEngineData->actorClass = DynamicScriptClass("Shard3D.Core", "Actor", 0);
 		vbScriptEngineData->actorClass = DynamicScriptClass("Shard3D.Core", "Actor", 1);
+		scriptEngineData->hudClass = DynamicScriptClass("Shard3D.Core", "HUD", 0);
+		vbScriptEngineData->hudClass = DynamicScriptClass("Shard3D.Core", "HUD", 1);
 
 		loadAssemblyClasses(scriptEngineData);
 		loadAssemblyClasses(vbScriptEngineData);
@@ -207,15 +235,30 @@ namespace Shard3D {
 
 		scriptEngineData->actorInstances.clear();
 		vbScriptEngineData->actorInstances.clear();
+		scriptEngineData->hudInstances.clear();
+		vbScriptEngineData->hudInstances.clear();
 	}
 
-	bool DynamicScriptEngine::doesClassExist(const std::string& fullClassName, int lang) {
+	void DynamicScriptEngine::setHUDContext(HUDContainer* container) {
+		globalData->hudContext = container;
+	}
+
+	inline bool DynamicScriptEngine::doesClassExist(const std::string& fullClassName, int lang) {
 		return !lang ? scriptEngineData->actorClasses.find(fullClassName) != scriptEngineData->actorClasses.end() : 
 			vbScriptEngineData->actorClasses.find(fullClassName) != vbScriptEngineData->actorClasses.end();
 	}
 
+	inline bool DynamicScriptEngine::doesHUDClassExist(const std::string& fullClassName, int lang) {
+		return !lang ? scriptEngineData->hudClasses.find(fullClassName) != scriptEngineData->hudClasses.end() :
+			vbScriptEngineData->hudClasses.find(fullClassName) != vbScriptEngineData->hudClasses.end();
+	}
+
 	wb3d::Level* DynamicScriptEngine::getContext() {
-		return 	globalData->levelContext;
+		return	globalData->levelContext;
+	}
+
+	HUDContainer* DynamicScriptEngine::getHUDContext() {
+		return globalData->hudContext;
 	}
 
 	inline void DynamicScriptEngine::_reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang) {
@@ -233,18 +276,18 @@ namespace Shard3D {
 		scriptEngine->appDomain = nullptr;
 	}
 
-	void DynamicScriptEngine::_e::beginEvent(wb3d::Actor _a) {
-		const auto& scr = _a.getComponent<Components::ScriptComponent>();
+	void DynamicScriptEngine::_a::beginEvent(wb3d::Actor __a) {
+		const auto& scr = __a.getComponent<Components::ScriptComponent>();
 		
 		if (doesClassExist("Shard3D.Scripts." + scr.name, scr.lang)) {
 			auto& data = !scr.lang ? scriptEngineData : vbScriptEngineData;
-			std::shared_ptr<DynamicScriptInstance> instance = std::make_shared<DynamicScriptInstance>(data->actorClasses["Shard3D.Scripts." + scr.name], scr.lang, _a);
-			data->actorInstances[_a.getGUID()] = instance;
+			std::shared_ptr<DynamicScriptInstance> instance = std::make_shared<DynamicScriptInstance>(data->actorClasses["Shard3D.Scripts." + scr.name], scr.lang, __a);
+			data->actorInstances[__a.getGUID()] = instance;
 			instance->invokeEvent().beginEvent();
 		}
 	}
 
-	void DynamicScriptEngine::_e::endEvent() {
+	void DynamicScriptEngine::_a::endEvent() {
 		{ // C#
 			for (auto& actor : scriptEngineData->actorInstances) {
 				actor.second->invokeEvent().endEvent();
@@ -257,7 +300,7 @@ namespace Shard3D {
 		}
 	}
 
-	void DynamicScriptEngine::_e::tickEvent(float __dt) {
+	void DynamicScriptEngine::_a::tickEvent(float __dt) {
 		{ // C#
 			for (auto& actor : scriptEngineData->actorInstances) {
 				actor.second->invokeEvent().tickEvent(__dt);
@@ -270,32 +313,87 @@ namespace Shard3D {
 		}
 	}
 
-	void DynamicScriptEngine::_e::spawnEvent() {
+	void DynamicScriptEngine::_a::spawnEvent(wb3d::Actor actor) {
 		{ // C#
-			for (auto& actor : scriptEngineData->actorInstances) {
-				actor.second->invokeEvent().spawnEvent();
+			const auto guid = actor.getGUID();
+			if (scriptEngineData->actorInstances.find(guid) != scriptEngineData->actorInstances.end()) 
+				scriptEngineData->actorInstances[guid]->invokeEvent().spawnEvent();
+		}
+		{ // Visual Basic
+			const auto guid = actor.getGUID();
+			if (vbScriptEngineData->actorInstances.find(guid) != vbScriptEngineData->actorInstances.end())
+				vbScriptEngineData->actorInstances[guid]->invokeEvent().spawnEvent();
+		}
+	}
+
+	void DynamicScriptEngine::_a::killEvent(wb3d::Actor actor) {
+		{ // C#
+			const auto guid = actor.getGUID();
+			if (scriptEngineData->actorInstances.find(guid) != scriptEngineData->actorInstances.end()) {
+				scriptEngineData->actorInstances[guid]->invokeEvent().killEvent();
+				scriptEngineData->actorInstances.erase(guid);
 			}
 		}
 		{ // Visual Basic
-			for (auto& actor : vbScriptEngineData->actorInstances) {
-				actor.second->invokeEvent().spawnEvent();
+			const auto guid = actor.getGUID();
+			if (vbScriptEngineData->actorInstances.find(guid) != vbScriptEngineData->actorInstances.end()) {
+				vbScriptEngineData->actorInstances[guid]->invokeEvent().killEvent();
+				vbScriptEngineData->actorInstances.erase(guid);
 			}
 		}
 	}
 
-	void DynamicScriptEngine::_e::killEvent() {
+	void DynamicScriptEngine::_h::begin(HUDElement* __h) {
+		const std::string& scr = __h->scriptmodule;
+		const int& scrl = __h->scriptlang;
+
+		if (doesHUDClassExist("Shard3D.UI." + scr, scrl)) {
+			auto& data = !scrl ? scriptEngineData : vbScriptEngineData;
+			std::shared_ptr<HUDScriptInstance> instance = std::make_shared<HUDScriptInstance>(data->hudClasses["Shard3D.UI." + scr], scrl, __h);
+			data->hudInstances[__h->guid] = instance;
+		}
+	}
+	void DynamicScriptEngine::_h::end(HUDElement* __h) {
+
+	}
+	void DynamicScriptEngine::_h::hoverEvent(HUDElement* __h, float __dt) {
 		{ // C#
-			for (auto& actor : scriptEngineData->actorInstances) {
-				actor.second->invokeEvent().killEvent();
-			}
+			const auto guid = __h->guid;
+			if (scriptEngineData->hudInstances.find(guid) != scriptEngineData->hudInstances.end())
+				scriptEngineData->hudInstances[guid]->invokeEvent().hoverEvent(__dt);
 		}
 		{ // Visual Basic
-			for (auto& actor : vbScriptEngineData->actorInstances) {
-				actor.second->invokeEvent().killEvent();
-			}
+			const auto guid = __h->guid;
+			if (vbScriptEngineData->hudInstances.find(guid) != vbScriptEngineData->hudInstances.end())
+				vbScriptEngineData->hudInstances[guid]->invokeEvent().hoverEvent(__dt);
 		}
 	}
 
+	void DynamicScriptEngine::_h::pressEvent(HUDElement* __h, float __dt) {
+		{ // C#
+			const auto guid = __h->guid;
+			if (scriptEngineData->hudInstances.find(guid) != scriptEngineData->hudInstances.end())
+				scriptEngineData->hudInstances[guid]->invokeEvent().pressEvent(__dt);
+		}
+		{ // Visual Basic
+			const auto guid = __h->guid;
+			if (vbScriptEngineData->hudInstances.find(guid) != vbScriptEngineData->hudInstances.end())
+				vbScriptEngineData->hudInstances[guid]->invokeEvent().pressEvent(__dt);
+		}
+	}
+
+	void DynamicScriptEngine::_h::clickEvent(HUDElement* __h) {
+		{ // C#
+			const auto guid = __h->guid;
+			if (scriptEngineData->hudInstances.find(guid) != scriptEngineData->hudInstances.end())
+				scriptEngineData->hudInstances[guid]->invokeEvent().clickEvent();
+		}
+		{ // Visual Basic
+			const auto guid = __h->guid;
+			if (vbScriptEngineData->hudInstances.find(guid) != vbScriptEngineData->hudInstances.end())
+				vbScriptEngineData->hudInstances[guid]->invokeEvent().clickEvent();
+		}
+	}
 }
 namespace Shard3D {
 	DynamicScriptClass::DynamicScriptClass(const std::string& c_ns, const std::string& c_n, int _lang) : classNamespace(c_ns), className(c_n), lang(_lang) {
@@ -338,4 +436,25 @@ namespace Shard3D {
 	void DynamicScriptInstance::ScriptEvents::tickEvent(float dt) { void* param = &dt; s_c->invokeMethod(_i, tickEventMethod, &param); }
 	void DynamicScriptInstance::ScriptEvents::spawnEvent() { s_c->invokeMethod(_i, spawnEventMethod); }
 	void DynamicScriptInstance::ScriptEvents::killEvent() { s_c->invokeMethod(_i, killEventMethod); }
+
+	HUDScriptInstance::HUDScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, HUDElement* element) : scriptClass(s_class) {
+		instance = s_class->inst();
+
+		constructor = (!lang ? scriptEngineData : vbScriptEngineData)->hudClass.getMethod(".ctor", 1);
+		scriptEvents = ScriptEvents(s_class, instance);
+		{
+			uint64_t guid = element->guid;
+			void* param = &guid;
+			scriptClass->invokeMethod(instance, constructor, &param);
+		}
+	}
+	HUDScriptInstance::ScriptEvents HUDScriptInstance::invokeEvent() { return scriptEvents; }
+	HUDScriptInstance::ScriptEvents::ScriptEvents(std::shared_ptr<DynamicScriptClass> ptr, MonoObject* i) : s_c(ptr), _i(i) {
+		hoverEventMethod = s_c->getMethod("HoverEvent", 1);
+		pressEventMethod = s_c->getMethod("PressEvent", 1);
+		clickEventMethod = s_c->getMethod("ClickEvent", 0);
+	}
+	void HUDScriptInstance::ScriptEvents::hoverEvent(float dt) { void* param = &dt; s_c->invokeMethod(_i, hoverEventMethod, &param); }
+	void HUDScriptInstance::ScriptEvents::pressEvent(float dt) { void* param = &dt; s_c->invokeMethod(_i, pressEventMethod, &param); }
+	void HUDScriptInstance::ScriptEvents::clickEvent() { s_c->invokeMethod(_i, clickEventMethod); }
 }

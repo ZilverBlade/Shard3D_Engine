@@ -6,7 +6,7 @@ namespace Shard3D::CppScripts {
 		const float basePitch = 0.1f;
 	public:
 		wb3d::Actor camAct;
-
+		float exponent;
 		glm::vec3 moveVector;
 		void beginEvent() override {
 			thisActor.getComponent<Components::TransformComponent>().setTranslation({ 0.f, 0.f,  0.2f });
@@ -22,7 +22,6 @@ namespace Shard3D::CppScripts {
 				light.getComponent<Components::TransformComponent>().setTranslation({ 5.f,
 																					25.f + i * 15.f,
 																					 4.1f});
-
 			}
 			for (int i = 0; i < 17; i++) {
 				auto light = getActiveLevel()->createActor("spotlight" + std::to_string(i));
@@ -58,24 +57,27 @@ namespace Shard3D::CppScripts {
 			float yaw = thisActor.getComponent<Components::TransformComponent>().getRotation().z + glm::radians(-90.f);
 			const glm::vec3 forwardDir{ sin(yaw), cos(yaw), -sin(0) };
 			
-			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_D) == GLFW_PRESS)
+			if (glfwGetKey(Singleton::engineWindow.getGLFWwindow(), GLFW_KEY_D) == GLFW_PRESS)
 				rotation.z += 0.8f * dt;
-			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_A) == GLFW_PRESS)
+			if (glfwGetKey(Singleton::engineWindow.getGLFWwindow(), GLFW_KEY_A) == GLFW_PRESS)
 				rotation.z -= 0.8f * dt;
-			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_S) == GLFW_PRESS)
+			if (glfwGetKey(Singleton::engineWindow.getGLFWwindow(), GLFW_KEY_S) == GLFW_PRESS)
 				moveVector -= dt;
-			if (glfwGetKey(EngineWindow::getGLFWwindow(), GLFW_KEY_W) == GLFW_PRESS) {
-				moveVector += dt * 0.125f * glm::clamp((0.1f / moveVector.y) * 100, 0.f, 10000.f) * 0.008;
+			if (glfwGetKey(Singleton::engineWindow.getGLFWwindow(), GLFW_KEY_W) == GLFW_PRESS) {
+				moveVector += exponent * 0.008f;
+				exponent += dt * 0.005f * glm::clamp(0.1f / moveVector.z, 0.f, 10.f);
 				thisActor.getComponent<Components::AudioComponent>().properties.volume = 5.f;
-			}
-			else {
+			} else {
 				moveVector.x -= dt * 0.0098f;
 				moveVector.y -= dt * 0.0098f;
+				exponent -= 0.05f * dt;
+				if (exponent < 0) exponent = 0.0001f;
 				if (moveVector.x < 0) moveVector.x = 0.f;
-				if (moveVector.z < 0) moveVector.y = 0.f;
+				if (moveVector.y < 0) moveVector.y = 0.f;
 				thisActor.getComponent<Components::AudioComponent>().properties.volume = 3.f;
 			}
 			translation += moveVector * forwardDir;
+
 			updateCameraPos();
 			thisActor.getComponent<Components::AudioComponent>().properties.relativePos = translation;
 			thisActor.getComponent<Components::AudioComponent>().properties.pitch = basePitch + moveVector.y * 3.f;

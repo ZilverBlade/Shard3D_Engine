@@ -95,7 +95,6 @@ namespace Shard3D {
 				nullptr,
 				nullptr
 			);
-			delete mode;
 			glfwSetWindowPos(window, 0, 0);
 			SHARD3D_INFO("Set Borderless Fullscreen");
 		}
