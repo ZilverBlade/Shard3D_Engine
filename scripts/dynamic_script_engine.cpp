@@ -143,6 +143,10 @@ namespace Shard3D {
 		return !lang ? scriptEngineData->coreAssemblyImage : vbScriptEngineData->coreAssemblyImage;
 	}
 
+	MonoDomain* DynamicScriptEngine::getDomain() {
+		return globalData->rootDomain;
+	}
+
 	MonoObject* DynamicScriptEngine::instClass(MonoClass* monoClass, ScriptLanguage lang) {
 		MonoObject* instance = mono_object_new(!lang ? scriptEngineData->appDomain : vbScriptEngineData->appDomain, monoClass);
 		mono_runtime_object_init(instance);

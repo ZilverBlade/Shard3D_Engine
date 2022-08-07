@@ -22,16 +22,6 @@ namespace Shard3D {
 	class wb3d::Blueprint;
 	class LevelPropertiesPanel;
 	namespace Components {
-		enum class ComponentsList {
-			CameraComponent,
-			BillboardComponent,
-			MeshComponent,
-			AudioComponent,
-			PointlightComponent,
-			SpotlightComponent,
-			DirectionalLightComponent
-		};
-
 		struct GUIDComponent {
 			GUID id;
 
@@ -102,12 +92,12 @@ namespace Shard3D {
 * Near clip distance (meters)
 */
 			void setNearClip(float _d) { nearClip = _d; setProjection(); }
-			float getNearClip() { return fov; }
+			float getNearClip() { return nearClip; }
 			/* *
 * Far clip distance (meters)
 */
 			void setFarClip(float _d) { farClip = _d; setProjection();}
-			float getFarClip() { return fov; }
+			float getFarClip() { return farClip; }
 			/* *
 * Aspect ratio (width/height)
 */
@@ -163,10 +153,10 @@ namespace Shard3D {
 		};
 		struct AudioComponent {
 		private:
-			EngineAudio* audioEngine;
+			EngineAudio* audioEngine{};
 		public:
 			std::string file{};
-			EngineAudio::AudioProperties properties{};
+			AudioProperties properties{};
 			
 			void play() {
 				audioEngine = new EngineAudio();

@@ -77,6 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera.cs" />
     <Compile Include="Core\Actor.cs" />
     <Compile Include="Core\Components.cs" />
     <Compile Include="Core\ECSMgr.cs" />

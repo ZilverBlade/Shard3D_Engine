@@ -14,7 +14,7 @@ Namespace Shard3D.Core
 
         Public Function HasComponent(Of T As {Component, New})() As Boolean
             Dim componentType As Type = GetType(T)
-            Return InternalCalls.Actor_HasComponent(ID, componentType, 0)
+            Return InternalCalls.Actor_HasComponent(ID, componentType, 1)
         End Function
 
         Public Function GetComponent(Of T As {Component, New})() As T
@@ -36,7 +36,7 @@ Namespace Shard3D.Core
             End If
 
             Dim componentType As Type = GetType(T)
-            InternalCalls.Actor_AddComponent(ID, componentType, 0)
+            InternalCalls.Actor_AddComponent(ID, componentType, 1)
             Dim component As T = New T() With {
                 ._Actor = Me
             }
@@ -50,7 +50,7 @@ Namespace Shard3D.Core
             End If
 
             Dim componentType As Type = GetType(T)
-            InternalCalls.Actor_RmvComponent(ID, componentType, 0)
+            InternalCalls.Actor_RmvComponent(ID, componentType, 1)
         End Sub
     End Class
 End Namespace

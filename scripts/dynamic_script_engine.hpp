@@ -7,6 +7,7 @@ extern "C" {
 	typedef struct _MonoMethod MonoMethod;
 	typedef struct _MonoAssembly MonoAssembly;
 	typedef struct _MonoImage MonoImage;
+	typedef struct _MonoDomain MonoDomain;
 }
 
 namespace Shard3D {
@@ -40,7 +41,7 @@ namespace Shard3D {
 		static wb3d::Level* getContext();
 		static _e actorScript() { return _e(); }
 		static MonoImage* getCoreAssemblyImage(ScriptLanguage lang);
-
+		static MonoDomain* getDomain();
 	private:
 
 		inline static void _reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang);

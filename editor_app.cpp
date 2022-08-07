@@ -356,23 +356,24 @@ beginWhileLoop:
 	}
 
 	void EditorApp::loadGameObjects() {
-
 		wb3d::LevelManager levelman(Singleton::activeLevel);
-		levelman.load("assets/leveldata/drivecartest.wbl", true);
-		
-		wb3d::Actor car = Singleton::activeLevel->createActorWithGUID(43827493259, "Car");
-		wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
-		car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
-		
-		car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
-		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-		car.addComponent<Components::AudioComponent>().file = 
-			"assets/audiodata/race_engine_nb.wav";
-
-		//car.addComponent<Components::ScriptComponent>();
-
-		wb3d::Actor light = Singleton::activeLevel->createActor("bling");
-		light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
-		light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
+		levelman.load("assets/leveldata/sandboox.wbl", true);
+		//wb3d::LevelManager levelman(Singleton::activeLevel);
+		//levelman.load("assets/leveldata/drivecartest.wbl", true);
+		//
+		//wb3d::Actor car = Singleton::activeLevel->createActorWithGUID(43827493259, "Car");
+		//wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
+		//car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
+		//
+		//car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
+		//car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
+		//car.addComponent<Components::AudioComponent>().file = 
+		//	"assets/audiodata/race_engine_nb.wav";
+		//
+		////car.addComponent<Components::ScriptComponent>();
+		//
+		//wb3d::Actor light = Singleton::activeLevel->createActor("bling");
+		//light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
+		//light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
 	}
 }

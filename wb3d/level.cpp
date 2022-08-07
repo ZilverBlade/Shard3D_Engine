@@ -165,24 +165,23 @@ namespace Shard3D {
 
 		void Level::setPossessedCameraActor(Actor actor) {
 			if (!actor.hasComponent<Components::CameraComponent>()) {
-				SHARD3D_ERROR("Can't possess a non camera actor!!");
+				SHARD3D_ERROR("Cannot possess an actor without a camera!!");
 				return;
 			}
 			possessedCameraActorGUID = actor.getGUID();
 		}
 
 		void Level::setPossessedCameraActor(GUID guid) {
+			if (!getActorFromGUID(guid).hasComponent<Components::CameraComponent>()) {
+				SHARD3D_ERROR("Cannot possess an actor without a camera!!");
+				return;
+			}
 			possessedCameraActorGUID = guid;
 		}
 
 		Actor Level::getPossessedCameraActor() {
-			auto guidView = registry.view<Components::GUIDComponent>();
-			for (auto actor : guidView) {
-				if (guidView.get<Components::GUIDComponent>(actor).id == possessedCameraActorGUID) {
-					//std::cout << "Using possessed: 0x" << &camView.get<Components::CameraComponent>(actor).camera << "\n";
-					return Actor{actor, this}; 
-				}
-			}
+			Actor actor = getActorFromGUID(possessedCameraActorGUID);
+			if (actor.getGUID() != 1) return actor;
 			SHARD3D_FATAL("No possessed camera found!!!!\nAttempted to find GUID: " + possessedCameraActorGUID);
 		}
 
