@@ -541,7 +541,7 @@ namespace Shard3D {
             }
             if (ImGui::MenuItem("Load Level...", "Ctrl+O")) {
                 if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
-                    std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_FILE_OPTIONS);
+                    std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_LEVELFILE_OPTIONS);
                     if (!filepath.empty()) {
                         levelTreePanel.clearSelectedActor();
                         Singleton::activeLevel->killEverything();
@@ -558,7 +558,7 @@ namespace Shard3D {
                 levelMan.save(Singleton::activeLevel->currentpath, true);
             }
             if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
-                std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_FILE_OPTIONS);
+                std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_LEVELFILE_OPTIONS);
                 if (!filepath.empty()) {
                     wb3d::LevelManager levelMan(Singleton::activeLevel);
                     levelMan.save(filepath, false);

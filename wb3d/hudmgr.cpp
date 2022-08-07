@@ -93,7 +93,7 @@ namespace Shard3D {
 			saveLayer(out, mHud, layer);
 			out << YAML::EndMap;
 			std::string newPath = destinationPath;
-			if (!strUtils::hasEnding(destinationPath, ".wbgt")) newPath = destinationPath + ".wbgt";
+			if (!strUtils::hasEnding(destinationPath, ".wbht")) newPath = destinationPath + ".wbht";
 			if (encryptLevel) {
 				std::ofstream fout(newPath);
 				fout << encrypt(out.c_str());

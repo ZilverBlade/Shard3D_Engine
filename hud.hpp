@@ -21,9 +21,9 @@ namespace Shard3D {
 
 		std::string tag = "Some kind of HUD";
 
-		std::string default_texture;
-		std::string hover_texture;
-		std::string press_texture;
+		std::string default_texture	= "assets/_engine/tex/null_tex.png";
+		std::string hover_texture	= "assets/_engine/tex/null_tex.png";
+		std::string press_texture	= "assets/_engine/tex/null_tex.png";
 	private:
 		std::string _design_tex;
 		friend class HUDRenderSystem;
@@ -54,12 +54,16 @@ namespace Shard3D {
 				hudLayerList.at(layer)->elements = object->elements;
 			}
 		}
-		void merge(int layer, std::shared_ptr<HUDElement> object) {
+		void insert(int layer, std::shared_ptr<HUDElement> object) {
 			hudLayerList.at(layer)->elements.try_emplace(object->guid, object);
+		}
+		void remove(int layer, std::shared_ptr<HUDElement> object) {
+			hudLayerList.at(layer)->elements.erase(object->guid);
 		}
 		void wipe(int layer) {
 			hudLayerList.at(layer)->elements.clear();
 		}
+
 	private:
 		std::vector<HUD*> hudLayerList;
 		friend class EditorApp;

@@ -12,7 +12,16 @@
 namespace Shard3D {
 	//HUDBuilderPanel::HUDBuilderPanel() {}
 
+    std::vector<std::shared_ptr<HUDElement>> killQueue_Element;
+    std::vector<int> killQueue_Layer;
+
 	HUDBuilderPanel::~HUDBuilderPanel() {}
+
+    void HUDBuilderPanel::cleanup() {
+        for (int i = 0; i < killQueue_Element.size(); i++) {
+            hudLayerInfo->remove( killQueue_Layer.at(i), killQueue_Element.at(i));
+        }
+    }
 
     void HUDBuilderPanel::setContext(std::shared_ptr<HUDContainer> gctnr) {
         hudLayerInfo = gctnr;
@@ -63,36 +72,52 @@ namespace Shard3D {
     }
     void HUDBuilderPanel::renderGUIBuilderToolbar() {
         ImGui::Begin("HUD List");
-        for (int i = 0; i < hudLayerInfo->getList().size(); i++) {
-            if (ImGui::TreeNode(std::string("Layer " + std::to_string(i)).c_str())) {
+        for (int layer = 0; layer < hudLayerInfo->getList().size(); layer++) {
+            if (ImGui::TreeNode(std::string("Layer " + std::to_string(layer)).c_str())) {
                 if (ImGui::Button("Save Layer")) {
-                    wb3d::HUDManager guiman(hudLayerInfo.get());
-                    guiman.save("assets/huddata/test.wbgt", i);
+                    std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_HUDFILE_OPTIONS);
+                    if (!filepath.empty()) {
+                        wb3d::HUDManager hudMan(hudLayerInfo.get());
+                        hudMan.save(filepath, false);
+                    }
                 }
                 if (ImGui::Button("Load Layer")) {
-                    wb3d::HUDManager guiman(hudLayerInfo.get());
-                    guiman.load("assets/huddata/test.wbgt", i);
+                    if (MessageDialogs::show("This will overwrite the current layer, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
+                        std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_HUDFILE_OPTIONS);
+                        if (!filepath.empty()) {
+                            wb3d::HUDManager hudMan(hudLayerInfo.get());
+                            hudLayerInfo->wipe(layer);
+                            hudMan.load(filepath, layer, true);
+                        }
+                    }
                 }
                 if (ImGui::Button("Wipe Layer")) {
-                    if (MessageDialogs::show("This will delete everything in this layer. Are you sure you want to continue?", "Warning!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) hudLayerInfo->wipe(i);
+                    if (MessageDialogs::show("This will delete everything in this layer. Are you sure you want to continue?", "Warning!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) hudLayerInfo->wipe(layer);
                 }
                 if (ImGui::Button("Add Element")) {
                     std::shared_ptr<HUDElement> hudElement = std::make_shared<HUDElement>();
                     hudElement->guid = GUID();
                     hudElement->scale = { 0.1f, 0.1f };
-                    hudLayerInfo->getList().at(i)->elements.emplace(hudElement->guid, hudElement);
+                    hudLayerInfo->getList().at(layer)->elements.emplace(hudElement->guid, hudElement);
                 }
-                for (auto& hudEl : hudLayerInfo->getList().at(i)->elements) {
-                    renderGUIElementProperties(hudEl.second);
+                for (auto& hudEl : hudLayerInfo->getList().at(layer)->elements) {
+                    renderGUIElementProperties(hudEl.second, layer);
                 }
+                cleanup();
                 ImGui::TreePop();
             }
         }
         ImGui::End();
     }
 
-    void HUDBuilderPanel::renderGUIElementProperties(std::shared_ptr<HUDElement> element) {
-        if (ImGui::TreeNodeEx((void*)(element.get()), nodeFlags, element->tag.c_str())) {
+    void HUDBuilderPanel::renderGUIElementProperties(std::shared_ptr<HUDElement> element, int layer) {
+        bool expanded = ImGui::TreeNodeEx((void*)(element.get()), nodeFlags, element->tag.c_str());
+        bool elementExists = true;
+        if (ImGui::BeginPopupContextItem()) {
+            if (ImGui::MenuItem("Remove Element")) elementExists = false;
+            ImGui::EndPopup();
+        }
+        if (expanded) {
             {
                 auto& tag = element->tag;
                 char tagBuffer[256];
@@ -203,6 +228,10 @@ namespace Shard3D {
             }
 
             ImGui::TreePop();
+        }
+        if (!elementExists) {
+            killQueue_Layer.push_back(layer);
+            killQueue_Element.push_back(element);
         }
     }
 }
