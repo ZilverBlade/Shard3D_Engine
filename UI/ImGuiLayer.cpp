@@ -146,7 +146,7 @@ namespace Shard3D {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ax::NodeEditor::SetCurrentEditor(nodeEditorContext);
+        //ax::NodeEditor::SetCurrentEditor(nodeEditorContext);
         static bool visible = true;
 
         //ImGui::ShowDemoWindow(&visible);

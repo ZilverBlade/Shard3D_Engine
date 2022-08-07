@@ -1,61 +1,41 @@
-﻿namespace Shard3D.Core
+﻿using System;
+
+namespace Shard3D.Core
 {
     public class Actor
     {
-        protected Actor()  {  ID = 1;  }
+        protected Actor() { ID = 1; }
         internal Actor(ulong _id) { ID = _id; }
 
         public readonly ulong ID;
-#region Transform
-        public Vector3 Translation
-        {
-            get
-            {
-                InternalCalls.GetTranslation(ID, out Vector3 _translation);
-                return _translation;
-            }
-            set
-            {
-                InternalCalls.SetTranslation(ID, ref value);
-            }
-        }
-        public Vector3 Rotation
-        {
-            get
-            {
-                InternalCalls.GetRotation(ID, out Vector3 _rotation);
-                return _rotation;
-            }
-            set
-            {
-                InternalCalls.SetRotation(ID, ref value);
-            }
-        }
-        public Vector3 Scale
-        {
-            get
-            {
-                InternalCalls.GetScale(ID, out Vector3 _scale);
-                return _scale;
-            }
-            set
-            {
-                InternalCalls.SetScale(ID, ref value);
-            }
-        }
-#endregion
 
-
-#region ECS
-        public void AddComponent(Components _component)
+        #region ECS
+        public bool HasComponent<T>() where T : Component, new()
         {
-            InternalCalls.ActorAddComponent(ID, _component);
+            Type componentType = typeof(T);
+            return InternalCalls.Actor_HasComponent(ID, componentType, 0);
         }
-        public void RmvComponent(Components _component)
+        public T GetComponent<T>() where T : Component, new()
         {
-            InternalCalls.ActorRmvComponent(ID, _component);
+            if (!HasComponent<T>()) { InternalCalls.Log("Tried to get component that does not exist!", LogSeverity.Error); return null; }
+            T component = new T() { _Actor = this };
+            return component;
         }
-#endregion
+        public T AddComponent<T>() where T : Component, new()
+        {
+            if (HasComponent<T>()) { InternalCalls.Log("Tried to add existing component!", LogSeverity.Warn); return null; }
+            Type componentType = typeof(T);
+            InternalCalls.Actor_AddComponent(ID, componentType, 0);
+            T component = new T() { _Actor = this };
+            return component;
+        }
+        public void KillComponent<T>() where T : Component, new()
+        {
+            if (!HasComponent<T>()) { InternalCalls.Log("Tried to remove component that does not exist!", LogSeverity.Warn); return; }
+            Type componentType = typeof(T);
+            InternalCalls.Actor_RmvComponent(ID, componentType, 0);
+        }
+        #endregion
 
 
     }

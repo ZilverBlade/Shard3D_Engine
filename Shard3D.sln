@@ -12,8 +12,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shadercompmgr", "shader_compiler_manager64\shadercompmgr.csproj", "{01497360-F264-47BE-83E6-F210320F3AD7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shard3D Script CS", "scripts\cs\shard3d-csscript-core64\Shard3D Script CS.csproj", "{D281BE64-B259-42EC-A0B5-533F2ED6245E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584} = {CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}
+	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Shard3D Script VB", "scripts\vb\shard3d-vbscript-core64\Shard3D Script VB.vbproj", "{C152C0EE-5A9F-4BAF-A863-74AD1A194968}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584} = {CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "videoplayback", "videoplayback\videoplayback.vcxproj", "{49C63812-C440-478D-BFAB-C5F75FDC3F79}"
 EndProject
@@ -143,7 +149,7 @@ Global
 		{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584} = {228EAB1C-965D-4010-BDD6-7FBBC6D821E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		BuildVersion_StartDate = 2000/1/1
 		SolutionGuid = {FD8CA4F0-B794-4F2F-B1B6-A2F8EEEE5906}
+		BuildVersion_StartDate = 2000/1/1
 	EndGlobalSection
 EndGlobal

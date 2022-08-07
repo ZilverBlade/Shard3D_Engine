@@ -72,7 +72,6 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
-    <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
@@ -83,10 +82,14 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scripting\Camera.vb" />
     <Compile Include="Core\Actor.vb" />
+    <Compile Include="Core\Components.vb" />
     <Compile Include="Core\ECSMgr.vb" />
     <Compile Include="Core\HUD.vb" />
     <Compile Include="Scripting\Example.vb" />
+    <Compile Include="Scripting\Template.vb" />
+    <Compile Include="Scripting\muuusic.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

@@ -1,4 +1,6 @@
-﻿Namespace Shard3D.Core
+﻿Imports System
+
+Namespace Shard3D.Core
     Public Class Actor
         Protected Sub New()
             ID = 1
@@ -9,48 +11,46 @@
         End Sub
 
         Public ReadOnly ID As ULong
-#Region "Transform"
-        Public Property Translation As Vector3
-            Get
-                Dim _translation As Vector3 = Nothing
-                InternalCalls.GetTranslation(ID, _translation)
-                Return _translation
-            End Get
-            Set(ByVal value As Vector3)
-                InternalCalls.SetTranslation(ID, value)
-            End Set
-        End Property
 
-        Public Property Rotation As Vector3
-            Get
-                Dim _rotation As Vector3 = Nothing
-                InternalCalls.GetRotation(ID, _rotation)
-                Return _rotation
-            End Get
-            Set(ByVal value As Vector3)
-                InternalCalls.SetRotation(ID, value)
-            End Set
-        End Property
+        Public Function HasComponent(Of T As {Component, New})() As Boolean
+            Dim componentType As Type = GetType(T)
+            Return InternalCalls.Actor_HasComponent(ID, componentType, 1)
+        End Function
 
-        Public Property Scale As Vector3
-            Get
-                Dim _scale As Vector3 = Nothing
-                InternalCalls.GetScale(ID, _scale)
-                Return _scale
-            End Get
-            Set(ByVal value As Vector3)
-                InternalCalls.SetScale(ID, value)
-            End Set
-        End Property
-#End Region
-#Region "ECS"
-        Public Sub AddComponent(ByVal _component As Components)
-            InternalCalls.ActorAddComponent(ID, _component)
+        Public Function GetComponent(Of T As {Component, New})() As T
+            If Not HasComponent(Of T)() Then
+                InternalCalls.Log("Tried to get component that does not exist!", LogSeverity.[Error])
+                Return Nothing
+            End If
+
+            Dim component As T = New T() With {
+                ._Actor = Me
+            }
+            Return component
+        End Function
+
+        Public Function AddComponent(Of T As {Component, New})() As T
+            If HasComponent(Of T)() Then
+                InternalCalls.Log("Tried to add existing component!", LogSeverity.Warn)
+                Return Nothing
+            End If
+
+            Dim componentType As Type = GetType(T)
+            InternalCalls.Actor_AddComponent(ID, componentType, 1)
+            Dim component As T = New T() With {
+                ._Actor = Me
+            }
+            Return component
+        End Function
+
+        Public Sub KillComponent(Of T As {Component, New})()
+            If Not HasComponent(Of T)() Then
+                InternalCalls.Log("Tried to remove component that does not exist!", LogSeverity.Warn)
+                Return
+            End If
+
+            Dim componentType As Type = GetType(T)
+            InternalCalls.Actor_RmvComponent(ID, componentType, 1)
         End Sub
-
-        Public Sub RmvComponent(ByVal _component As Components)
-            InternalCalls.ActorRmvComponent(ID, _component)
-        End Sub
-#End Region
     End Class
 End Namespace

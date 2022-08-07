@@ -120,5 +120,5 @@ ALPHA:
 		- Added scripting ability for HUD
 		- Added ability to load and destroy HUD from scripts
 		- Added proper HUD buttons that can change texture depending if being hovered over, pressed, or idle
-
+		- Added C# and VB Generics for components
 		:: TODO, add editor layouts, add working HUD builder, finalize script engine, switch to clang

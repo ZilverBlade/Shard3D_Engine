@@ -77,12 +77,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scripting\Camera.cs" />
     <Compile Include="Core\HUD.cs" />
     <Compile Include="Core\Actor.cs" />
+    <Compile Include="Core\Components.cs" />
     <Compile Include="Core\ECSMgr.cs" />
     <Compile Include="Scripting\Example.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HUD\ExampleHUD.cs" />
+    <Compile Include="Scripting\HUDSpawn.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -93,13 +93,14 @@
       <AdditionalOptions>/permissive- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
       <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
       <ControlFlowGuard>
       </ControlFlowGuard>
       <CompileAs>CompileAsCpp</CompileAs>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,11 +149,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -193,11 +195,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <DisableSpecificWarnings>26812;4244;4996;4005</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dtpch.h</PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

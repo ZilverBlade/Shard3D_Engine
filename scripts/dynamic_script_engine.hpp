@@ -7,9 +7,13 @@ extern "C" {
 	typedef struct _MonoMethod MonoMethod;
 	typedef struct _MonoAssembly MonoAssembly;
 	typedef struct _MonoImage MonoImage;
+	typedef struct _MonoDomain MonoDomain;
 }
 
 namespace Shard3D {
+	typedef int ScriptLanguage;
+#define ScriptLanguage_CSharp 0
+#define ScriptLanguage_VBasic 1
 	struct ScriptEngineData;
 	class DynamicScriptClass;
 	namespace wb3d {
@@ -20,10 +24,6 @@ namespace Shard3D {
 	class HUDContainer;
 	class DynamicScriptEngine {
 	public:	
-		enum class ScriptLanguage {
-			CSharp,
-			VisualBasic
-		};
 		struct _a {
 			void beginEvent(wb3d::Actor __a);
 			void endEvent();
@@ -42,7 +42,9 @@ namespace Shard3D {
 		static void init();
 		static void destroy();
 		static void reloadAssembly(ScriptLanguage lang);
-		static std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> getActorClasses(int lang);
+		static MonoImage* getCoreAssemblyImage(ScriptLanguage lang);
+		static MonoDomain* getDomain();
+		static std::unordered_map<std::string, std::shared_ptr<DynamicScriptClass>> getActorClasses(ScriptLanguage lang);
 		static void runtimeStart(wb3d::Level* level);
 		static void runtimeStop();
 		static void setHUDContext(HUDContainer* container);
@@ -56,15 +58,17 @@ namespace Shard3D {
 		static void _reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang);
 		static void destroyMono(ScriptEngineData* scriptEngine);
 
-		static MonoObject* instClass(MonoClass* monoClass, int lang);
+		static MonoObject* instClass(MonoClass* monoClass, ScriptLanguage lang);
 		static void loadAssemblyClasses(ScriptEngineData* data);
 		friend class DynamicScriptClass;
+		friend class DynamicScriptEngineLinker;
+		friend struct MonoTypeCombo;
 	};
 
 	class DynamicScriptClass {
 	public:
 		DynamicScriptClass() = default;
-		DynamicScriptClass(const std::string& c_ns, const std::string& c_n, int _lang);
+		DynamicScriptClass(const std::string& c_ns, const std::string& c_n, ScriptLanguage _lang);
 
 		MonoObject* inst();
 		MonoMethod* getMethod(const std::string& name, int parameterCount);
@@ -84,7 +88,7 @@ namespace Shard3D {
 
 			void spawnEvent();
 			void killEvent();
-			
+
 			MonoMethod* beginEventMethod{};
 			MonoMethod* endEventMethod{};
 			MonoMethod* tickEventMethod{};
@@ -96,7 +100,7 @@ namespace Shard3D {
 		};
 		ScriptEvents scriptEvents;
 	public:	
-		DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, wb3d::Actor actor);
+		DynamicScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, ScriptLanguage lang, wb3d::Actor actor);
 		ScriptEvents invokeEvent();
 	private:
 		std::shared_ptr<DynamicScriptClass> scriptClass;
@@ -120,7 +124,7 @@ namespace Shard3D {
 			MonoObject* _i{};
 		};
 		ScriptEvents scriptEvents;
-	public:
+	public:	
 		HUDScriptInstance(std::shared_ptr<DynamicScriptClass> s_class, int lang, HUDElement* element);
 		ScriptEvents invokeEvent();
 	private:

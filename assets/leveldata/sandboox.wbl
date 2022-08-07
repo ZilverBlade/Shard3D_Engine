@@ -1,0 +1,93 @@
+Shard3D: 1.2.3.r1-alpha
+WorldBuilder3D: 1.3.r0-alpha
+Level: Some kind of level
+Actors:
+  - Actor: 10545228445703845166
+    TagComponent:
+      Tag: Prop
+    TransformComponent:
+      Translation: [0, 0, 0.200000003]
+      Rotation: [0, 0, -1.16762531]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: assets/modeldata/fart.obj
+      MeshFormat: 1
+  - Actor: 1150468159116012086
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Translation: [0, 0, 0.0199999996]
+      Rotation: [0, 0, 0]
+      Scale: [25, 25, 1]
+    MeshComponent:
+      MeshPath: assets/_engine/msh/quad.obj
+      MeshFormat: 1
+  - Actor: 4362977267262825156
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [0, -3.91000009, 4.23999977]
+      Rotation: [0, 0.253072739, -0.399680376]
+      Scale: [1, 1, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 24.1100006]
+      Radius: 12.0299997
+      Angle: [1.04021621, 1.22173047]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 12413108976439534369
+    TagComponent:
+      Tag: Camera Actor
+    TransformComponent:
+      Translation: [-0.25, -4.01999998, 3.1099999]
+      Rotation: [0, 0.319395244, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      Module: CameraRotator
+      Language: C#
+    CameraComponent:
+      ProjectionType: 1
+      FOV: 70
+      NearClipPlane: 0.0500000007
+      FarClipPlane: 70
+      AspectRatio: 1
+    MeshComponent:
+      MeshPath: assets/_engine/msh/camcord.obj
+      MeshFormat: 1
+  - Actor: 16443523693048850932
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [0, 5.09000015, 5.07999992]
+      Rotation: [0, -0.235619441, -0.612610519]
+      Scale: [1, 1, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 9.06000042]
+      Radius: 1
+      Angle: [1.01578164, 1.24267435]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 7300059456137812067
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-2.82999992, 0.0199999996, 1.97000003]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 16653866329688020173
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [2.80999994, 0, 1.89999998]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1.59000003]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]

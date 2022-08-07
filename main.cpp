@@ -23,7 +23,7 @@ int main() {
 #endif
 #endif
     try {
-        app.run();
+      app.run();
     }
     catch (const std::exception& e) {
         SHARD3D_FATAL(e.what());

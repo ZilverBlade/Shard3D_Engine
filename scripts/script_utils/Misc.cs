@@ -10,4 +10,15 @@ namespace Shard3D.Core
         Warn = 2,
         Error = 3
     }
+    public enum CameraProjectionType
+    {
+        Orthographic = 0,
+        Perspective = 1
+    }
+    public struct AudioProperties
+    {
+        public float volume;
+        public float pitch;
+        public Vector3 relativePos;
+    }
 }
