@@ -29,10 +29,6 @@ namespace Shard3D {
 						ImGui::CloseCurrentPopup();
 					}
 #endif
-					if (!tree.selectedActor.hasComponent<Components::CppScriptComponent>()) if (ImGui::MenuItem("C++ Script")) {
-						tree.selectedActor.addComponent<Components::CppScriptComponent>();
-						ImGui::CloseCurrentPopup();
-					}
 					if (!tree.selectedActor.hasComponent<Components::ScriptComponent>()) if (ImGui::MenuItem("C#/VB Script")) {
 						tree.selectedActor.addComponent<Components::ScriptComponent>();
 						ImGui::CloseCurrentPopup();
@@ -55,6 +51,10 @@ namespace Shard3D {
 					}
 					if (!tree.selectedActor.hasComponent<Components::BillboardComponent>()) if (ImGui::MenuItem("Billboard")) {
 						tree.selectedActor.addComponent<Components::BillboardComponent>(ENGINE_ERRTEX);
+						ImGui::CloseCurrentPopup();
+					}
+					if (!tree.selectedActor.hasComponent<Components::AudioComponent>()) if (ImGui::MenuItem("Audio")) {
+						tree.selectedActor.addComponent<Components::AudioComponent>();
 						ImGui::CloseCurrentPopup();
 					}
 					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {

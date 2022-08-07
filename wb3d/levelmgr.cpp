@@ -82,7 +82,18 @@ namespace Shard3D {
 				out << YAML::Key << "AspectRatio" << YAML::Value << actor.getComponent<Components::CameraComponent>().ar;
 				out << YAML::EndMap;
 			}
-
+			// AUDIO
+			if (actor.hasComponent<Components::AudioComponent>()) {
+				out << YAML::Key << "AudioComponent";
+				out << YAML::BeginMap;
+				out << YAML::Key << "File" << YAML::Value << actor.getComponent<Components::AudioComponent>().file;
+				out << YAML::Key << "Properties";
+				out << YAML::BeginMap;
+				out << YAML::Key << "Volume" << YAML::Value << actor.getComponent<Components::AudioComponent>().properties.volume;
+				out << YAML::Key << "Pitch" << YAML::Value << actor.getComponent<Components::AudioComponent>().properties.pitch;
+				out << YAML::EndMap; 
+				out << YAML::EndMap;
+			}
 			// BILLBOARD
 			if (actor.hasComponent<Components::BillboardComponent>()) {
 				out << YAML::Key << "BillboardComponent";
@@ -220,7 +231,14 @@ namespace Shard3D {
 						loadedActor.getComponent<Components::TransformComponent>().setScale(actor["TransformComponent"]["Scale"].as<glm::vec3>());
 
 					}
+					// AUDIO
+					if (actor["AudioComponent"]) {
+						loadedActor.addComponent<Components::AudioComponent>();
 
+						loadedActor.getComponent<Components::AudioComponent>().file = actor["AudioComponent"]["File"].as<std::string>();
+						loadedActor.getComponent<Components::AudioComponent>().properties.volume = actor["AudioComponent"]["Properties"]["Volume"].as<float>();
+						loadedActor.getComponent<Components::AudioComponent>().properties.pitch = actor["AudioComponent"]["Properties"]["Pitch"].as<float>();
+					}
 					// CAMERA
 					if (actor["CameraComponent"]) {
 						loadedActor.addComponent<Components::CameraComponent>();
