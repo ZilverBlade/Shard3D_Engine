@@ -53,6 +53,10 @@ namespace Shard3D {
 						tree.selectedActor.addComponent<Components::BillboardComponent>(ENGINE_ERRTEX);
 						ImGui::CloseCurrentPopup();
 					}
+					if (!tree.selectedActor.hasComponent<Components::AudioComponent>()) if (ImGui::MenuItem("Audio")) {
+						tree.selectedActor.addComponent<Components::AudioComponent>();
+						ImGui::CloseCurrentPopup();
+					}
 					if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
 						tree.selectedActor.addComponent<Components::CameraComponent>();
 						AssetManager::emplaceMesh("assets/_engine/msh/camcord.obj");
