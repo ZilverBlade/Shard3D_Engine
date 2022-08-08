@@ -7,7 +7,7 @@ namespace Shard3D {
 		class ImGuiLayer;
 	}
 	class ImGuiInitter {
-		inline static VkDescriptorPool imGuiDescriptorPool;
+		static inline VkDescriptorPool imGuiDescriptorPool;
 		friend class ImGuiLayer;
 		friend class EditorApp;
 		static void init(bool lightTheme);

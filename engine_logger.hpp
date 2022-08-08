@@ -10,16 +10,16 @@ namespace Shard3D {
 		static void init();
 		static void logFatal(const std::string& message);
 
-		inline static std::shared_ptr<spdlog::logger>& getDebugLogger() { return debugLogger; }
-		inline static std::shared_ptr<spdlog::logger>& getInfoLogger() { return infoLogger; }
-		inline static std::shared_ptr<spdlog::logger>& getWarnLogger() { return warnLogger; }
-		inline static std::shared_ptr<spdlog::logger>& getErrorLogger() { return errorLogger; }
+		static inline std::shared_ptr<spdlog::logger>& getDebugLogger() { return debugLogger; }
+		static inline std::shared_ptr<spdlog::logger>& getInfoLogger() { return infoLogger; }
+		static inline std::shared_ptr<spdlog::logger>& getWarnLogger() { return warnLogger; }
+		static inline std::shared_ptr<spdlog::logger>& getErrorLogger() { return errorLogger; }
 
 	private:
-		inline static std::shared_ptr<spdlog::logger> debugLogger;
-		inline static std::shared_ptr<spdlog::logger> infoLogger;
-		inline static std::shared_ptr<spdlog::logger> warnLogger;
-		inline static std::shared_ptr<spdlog::logger> errorLogger;
+		static inline std::shared_ptr<spdlog::logger> debugLogger;
+		static inline std::shared_ptr<spdlog::logger> infoLogger;
+		static inline std::shared_ptr<spdlog::logger> warnLogger;
+		static inline std::shared_ptr<spdlog::logger> errorLogger;
 	};
 }
 /* Throw a message notifying that a function has not been implemented.

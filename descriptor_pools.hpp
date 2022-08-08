@@ -9,12 +9,12 @@ namespace Shard3D {
 // (0 = global, 1 = per-material static, 2 = per-material dynamic, 3 = per-draw), 
 // https://www.reddit.com/r/gamedev/comments/kybh22/vulkan_material_system_descriptor_management_and/
 
-		inline static std::unique_ptr<EngineDescriptorPool> globalPool{};
-		inline static std::unique_ptr<EngineDescriptorPool> staticMaterialPool{};
-		inline static std::unique_ptr<EngineDescriptorPool> dynamicMaterialPool{};
-		inline static std::vector<std::unique_ptr<EngineDescriptorPool>> drawPools;
+		static inline std::unique_ptr<EngineDescriptorPool> globalPool{};
+		static inline std::unique_ptr<EngineDescriptorPool> staticMaterialPool{};
+		static inline std::unique_ptr<EngineDescriptorPool> dynamicMaterialPool{};
+		static inline std::vector<std::unique_ptr<EngineDescriptorPool>> drawPools;
 
-		inline static void constructPools(EngineDevice& device) {
+		static inline void constructPools(EngineDevice& device) {
 			// Global pool
 			globalPool = EngineDescriptorPool::Builder(device)
 				.setMaxSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -34,7 +34,7 @@ namespace Shard3D {
 			}
 		}
 
-		inline static void destructPools() {
+		static inline void destructPools() {
 			globalPool = nullptr;
 			staticMaterialPool = nullptr;
 			dynamicMaterialPool = nullptr;

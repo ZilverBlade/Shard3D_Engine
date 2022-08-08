@@ -16,8 +16,8 @@ namespace Shard3D {
     };
 
     class EngineAudio {
-        inline static ma_result result;
-        inline static ma_engine engine;
+        static inline ma_result result;
+        static inline ma_engine engine;
 
         ma_sound sound;
         typedef int audio_params_t;

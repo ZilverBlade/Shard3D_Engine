@@ -121,4 +121,6 @@ ALPHA:
 		- Added ability to load and destroy HUD from scripts
 		- Added proper HUD buttons that can change texture depending if being hovered over, pressed, or idle
 		- Added C# and VB Generics for components
-		:: TODO, add editor layouts, add working HUD builder, finalize script engine, switch to clang
+	> Shard3D Torque 1.2.4-alpha
+		- Added stats timing
+		:: TODO, add stats timing and logging, proper events sytem, add editor layouts, finalize script engine, switch to clang

@@ -17,6 +17,8 @@ namespace Shard3D {
 		std::shared_ptr<HUDElement> getSelectedElement();
 		void rmvElement(std::shared_ptr<HUDElement> element);
 		void rmvElement(uint64_t id);
+
+		int layer;
 	private:
 		bool contextRefresh;
 		GLFWwindow* window;

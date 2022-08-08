@@ -29,27 +29,27 @@ namespace Shard3D {
 	};
 	class Singleton {
 	private:
-		inline static constexpr int WIDTH = 1280; //800
-		inline static constexpr int HEIGHT = 720; //600
-		inline static const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
+		static inline constexpr int WIDTH = 1280; //800
+		static inline constexpr int HEIGHT = 720; //600
+		static inline const std::string WINDOW_NAME = "Shard3D Engine"; //engine name
 	public:
 		Singleton() {}
 		~Singleton() {}
-		inline static Initializer _ignore_init;
+		static inline Initializer _ignore_init;
 
-		inline static EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
-		inline static EngineDevice engineDevice{ engineWindow };
-		inline static EngineRenderer engineRenderer{ engineWindow, engineDevice };
-		inline static VkDescriptorSet viewportImage{};
-		inline static OffScreen mainOffScreen{ engineDevice };
+		static inline EngineWindow engineWindow{ WIDTH, HEIGHT, WINDOW_NAME };
+		static inline EngineDevice engineDevice{ engineWindow };
+		static inline EngineRenderer engineRenderer{ engineWindow, engineDevice };
+		static inline VkDescriptorSet viewportImage{};
+		static inline OffScreen mainOffScreen{ engineDevice };
 
 #if ALLOW_PREVIEW_CAMERA
-		inline static OffScreen previewCamOffScreen{ engineDevice };
-		inline static VkDescriptorSet previewViewportImage{};
+		static inline OffScreen previewCamOffScreen{ engineDevice };
+		static inline VkDescriptorSet previewViewportImage{};
 #endif
-		inline static std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
-		inline static std::vector<HUD*> hudList;
-		inline static ImGui_ImplVulkan_InitInfo imgui_init_info{};
+		static inline std::shared_ptr<wb3d::Level> activeLevel, capturedLevel;
+		static inline std::vector<HUD*> hudList;
+		static inline ImGui_ImplVulkan_InitInfo imgui_init_info{};
 
 //#ifndef _DEPLOY
 		struct eps {
@@ -60,10 +60,10 @@ namespace Shard3D {
 			bool V_GUI = true;
 			bool ONLY_GAME;
 		};
-		inline static eps editorPreviewSettings;
+		static inline eps editorPreviewSettings;
 //#endif
-		inline static glm::vec3 testPBR = {1.f, 0.5f, 0.f};
+		static inline glm::vec3 testPBR = {1.f, 0.5f, 0.f};
 
-		inline static Destructor _ignore_destroy;
+		static inline Destructor _ignore_destroy;
 	};
 }

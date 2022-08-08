@@ -11,6 +11,7 @@
 #include "input/editor/editor_mouse_movement_controller.hpp"
 #include "camera.hpp"
 #include "utils/definitions.hpp"
+#include "utils/stats_timing.h"
 #include "wb3d/master_manager.hpp"
 #include "offscreen.hpp"
 
@@ -33,6 +34,7 @@
 #include <video_decode.h>
 #endif
 #include "scripts/dynamic_script_engine_linker.hpp"
+
 
 namespace Shard3D {
 	EditorApp::EditorApp() {
@@ -98,8 +100,6 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 
-
-
 #if ENSET_ENABLE_WORLDBUILDER3D
 		ImGuiLayer* imguiLayer = new ImGuiLayer();
 		layerStack.pushOverlay(imguiLayer);
@@ -108,7 +108,10 @@ namespace Shard3D {
 		HUDLayer* guiLayer1 = new HUDLayer();
 		HUDLayer* guiLayer2 = new HUDLayer();
 		HUDLayer* guiLayer3 = new HUDLayer();
-
+		guiLayer0->layer = 0;
+		guiLayer1->layer = 1;
+		guiLayer2->layer = 2;
+		guiLayer3->layer = 3;
 		layerStack.pushOverlay(guiLayer3);
 		layerStack.pushOverlay(guiLayer2);
 		layerStack.pushOverlay(guiLayer1);
@@ -207,7 +210,11 @@ namespace Shard3D {
 		auto currentTime = std::chrono::high_resolution_clock::now();
 beginWhileLoop:
 		while (!Singleton::engineWindow.shouldClose()) {
+			StatsTimer::dumpIf();
+			StatsTimer::clear();
+			SHARD3D_STAT_RECORD();
 			glfwPollEvents();
+			SHARD3D_STAT_RECORD_END({"Window", "Polling"});
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
@@ -220,12 +227,17 @@ beginWhileLoop:
 			auto possessedPreviewCamera = Singleton::activeLevel->getPossessedPreviewCamera();
 #endif
 
-			if (Singleton::activeLevel->simulationState == PlayState::Simulating) Singleton::activeLevel->tick(frameTime);
+			if (Singleton::activeLevel->simulationState == PlayState::Simulating) {
+				SHARD3D_STAT_RECORD();
+				Singleton::activeLevel->tick(frameTime);
+				SHARD3D_STAT_RECORD_END({ "Level", "Tick" });
+			}
+			SHARD3D_STAT_RECORD();
 			Singleton::activeLevel->runGarbageCollector(Singleton::engineDevice);
 			wb3d::MasterManager::executeQueue(Singleton::activeLevel, Singleton::engineDevice);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().getTranslation(), 
 				possessedCameraActor.getTransform().getRotation());
-			
+			SHARD3D_STAT_RECORD_END({ "Engine", "Garbage Collection" });
 			if (Singleton::activeLevel->simulationState != PlayState::Simulating) {
 				editorCameraControllerKeyboard.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
 				editorCameraControllerMouse.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
@@ -261,6 +273,7 @@ beginWhileLoop:
 					globalDescriptorSets[frameIndex],
 					*SharedPools::drawPools[frameIndex],
 				};
+				SHARD3D_STAT_RECORD();
 				//	update
 				GlobalUbo ubo{};
 				ubo.projection = possessedCamera.getProjection();
@@ -274,7 +287,7 @@ beginWhileLoop:
 				directionalLightSystem.update(frameInfo, ubo, Singleton::activeLevel);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
-
+				SHARD3D_STAT_RECORD_END({"UBO", "Update"});
 				/*
 					this section is great for adding multiple render passes such as :
 					- Begin offscreen shadow pass
@@ -289,8 +302,12 @@ beginWhileLoop:
 					Also order absolutely matters, post processing for example must go last
 				*/
 				//	render
+				
 				Singleton::mainOffScreen.start(frameInfo);
+				SHARD3D_STAT_RECORD();
 				basicRenderSystem.renderGameObjects(frameInfo, Singleton::activeLevel);
+				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Lighting" });
+				SHARD3D_STAT_RECORD();
 				billboardRenderSystem.render(frameInfo, Singleton::activeLevel);
 
 //#ifndef _DEPLOY
@@ -300,9 +317,11 @@ beginWhileLoop:
 					if (Singleton::editorPreviewSettings.V_GRID == true)
 						gridSystem.render(frameInfo);
 				}
+				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Billboards" });
 //#endif
 		//		guiLayer0->update(frameInfo);
 				Singleton::mainOffScreen.end(frameInfo);
+
 #if ENSET_ENABLE_COMPUTE_SHADERS
 				computeSystem.render(frameInfo);
 #endif

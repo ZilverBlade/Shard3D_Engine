@@ -305,6 +305,9 @@
     <ClCompile Include="cubemap.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="utils\stats_timing.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="editor_app.hpp">
@@ -555,6 +558,9 @@
     </ClInclude>
     <ClInclude Include="cubemap.hpp">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\stats_timing.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

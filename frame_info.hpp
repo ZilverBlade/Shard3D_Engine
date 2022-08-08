@@ -8,8 +8,8 @@
 namespace Shard3D {
 	// fix this shit up eventually, only temporary solution
 	struct tempInfo {
-		inline static uint32_t viewportSize[2];
-		inline static float aspectRatioWoH;
+		static inline uint32_t viewportSize[2];
+		static inline float aspectRatioWoH;
 	};
 	struct Pointlight {
 		glm::vec4 position{};

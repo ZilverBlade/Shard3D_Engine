@@ -16,6 +16,7 @@
 
 #include "../audio.hpp"
 #include "../utils/dialogs.h"
+#include "../utils/stats_timing.h"
 #ifndef NDEBUG
 #include <video_decode.h>
 #endif
@@ -26,6 +27,7 @@
 #include "../wb3d/assetmgr.hpp"
 #include "HUDLayer.hpp"
 #include <imgui_internal.h>
+
 
 namespace Shard3D {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
@@ -125,6 +127,7 @@ namespace Shard3D {
     void ImGuiLayer::update(FrameInfo& frameInfo) {
         if (hasBeenDetached) return;
         if (hasBeenDetached) SHARD3D_ERROR("FAILED TO DETACH IMGUI");
+        SHARD3D_STAT_RECORD();
         if (refreshContext) {
             levelTreePanel.setContext(Singleton::activeLevel);
             levelPropertiesPanel.setContext(Singleton::activeLevel);
@@ -430,6 +433,7 @@ namespace Shard3D {
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), frameInfo.commandBuffer);
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
+        SHARD3D_STAT_RECORD_END({ "ImGui", "Rendering" });
     }
 
     void ImGuiLayer::attachGUIEditorInfo(std::shared_ptr<HUDContainer>& container) {
@@ -438,6 +442,7 @@ namespace Shard3D {
 
 
     void ImGuiLayer::renderQuickBar() {
+
         ImGui::Begin("_editor_quickbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
         ImVec2 btnSize = { 48.f, 48.f };
         float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -708,6 +713,7 @@ namespace Shard3D {
         }
 #endif
         if (ImGui::BeginMenu("Actions")) {
+            if (ImGui::MenuItem("Dump current frame's stats", NULL /*make sure to add some sort of shardcut */)) SHARD3D_STAT_DUMP_ALL();
             if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {
                 ShellExecuteA(nullptr, "open", "shadercompmgr.exe", "-o shaders/ shaders/", "/", false);
             }

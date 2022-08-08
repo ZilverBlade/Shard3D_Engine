@@ -20,15 +20,15 @@ namespace Shard3D {
 		PhysicsSystem();
 		~PhysicsSystem();
 		void simulate(FrameInfo& frameInfo, std::shared_ptr<wb3d::Level>& level);
-		JPH::Ref<JPH::Shape> createBoxShape(const JPH::BoxShapeSettings& settings);
-		JPH::Ref<JPH::Shape> createSphereShape(const JPH::SphereShapeSettings& settings);
-		JPH::Ref<JPH::Shape> createConvexHullShape(const JPH::ConvexHullShapeSettings& settings);
-	
-		void dumpShapeToBin(JPH::Ref<JPH::Shape> shape, const std::string& path);
+		//JPH::Ref<JPH::Shape> createBoxShape(const JPH::BoxShapeSettings& settings);
+		//JPH::Ref<JPH::Shape> createSphereShape(const JPH::SphereShapeSettings& settings);
+		//JPH::Ref<JPH::Shape> createConvexHullShape(const JPH::ConvexHullShapeSettings& settings);
+		//
+		//void dumpShapeToBin(JPH::Ref<JPH::Shape> shape, const std::string& path);
 
 	private:
 		// force in m/s^2
 		float gravity = 9.8f; 
-		JPH::PhysicsSystem system;
+		//JPH::PhysicsSystem system;
 	};
 }

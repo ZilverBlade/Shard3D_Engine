@@ -48,8 +48,8 @@ namespace Shard3D {
 		static void runtimeStart(wb3d::Level* level);
 		static void runtimeStop();
 		static void setHUDContext(HUDContainer* container);
-		inline static bool doesClassExist(const std::string& fullClassName, int lang);
-		inline static bool doesHUDClassExist(const std::string& fullClassName, int lang);
+		static inline bool doesClassExist(const std::string& fullClassName, int lang);
+		static inline bool doesHUDClassExist(const std::string& fullClassName, int lang);
 		static wb3d::Level* getContext();
 		static HUDContainer* getHUDContext();
 		static _a actorScript() { return _a(); }

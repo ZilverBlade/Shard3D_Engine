@@ -49,10 +49,10 @@ namespace Shard3D {
 			static std::unordered_map<uint64_t, MaterialSystem::MaterialList>& getMaterialListAssets() { return materialListAssets; }
 #pragma endregion	
 		private:
-			inline static std::unordered_map<std::string, std::shared_ptr<EngineMesh>> meshAssets;
-			inline static std::unordered_map<std::string, std::shared_ptr<EngineTexture>> textureAssets;
-			inline static std::unordered_map<uint64_t, MaterialSystem::Material> materialAssets;
-			inline static std::unordered_map<uint64_t, MaterialSystem::MaterialList> materialListAssets;
+			static inline std::unordered_map<std::string, std::shared_ptr<EngineMesh>> meshAssets;
+			static inline std::unordered_map<std::string, std::shared_ptr<EngineTexture>> textureAssets;
+			static inline std::unordered_map<uint64_t, MaterialSystem::Material> materialAssets;
+			static inline std::unordered_map<uint64_t, MaterialSystem::MaterialList> materialListAssets;
 
 			static void clearAllAssetsAndDontAddDefaults();
 			friend class Shard3D::EditorApp;
@@ -64,9 +64,9 @@ namespace Shard3D {
 		// engine only function, do not call this
 		static void _editor_icons_destroy();
 		// engine only function, do not call this
-		inline static std::unordered_map<std::string, std::shared_ptr<EngineTexture>> _editor_icons;
+		static inline std::unordered_map<std::string, std::shared_ptr<EngineTexture>> _editor_icons;
 
-		inline static const char* _editor_icons_array[][2]{
+		static inline const char* _editor_icons_array[][2]{
 			{"editor.play",						"assets/_engine/tex/_editor/icon_play.png"			},
 			{"editor.pause",					"assets/_engine/tex/_editor/icon_pause.png"			},
 			{"editor.stop",						"assets/_engine/tex/_editor/icon_stop.png"			},		
