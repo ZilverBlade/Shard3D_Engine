@@ -109,9 +109,31 @@ namespace Shard3D {
 		//	0,
 		//	nullptr);
 
-		level->registry.view<Components::MeshComponent, Components::TransformComponent>().each([&](auto mesh, auto transform){
+		auto view = level->registry.view<Components::MeshComponent, Components::TransformComponent>();
+		for (auto obj : view) { wb3d::Actor actor = { obj, level.get() };	
+			auto& transform = actor.getTransform();
 			SimplePushConstantData push{};
-			push.modelMatrix = transform.mat4();
+			push.modelMatrix = level->getParentMat4(actor) * transform.mat4() ;
+			push.normalMatrix = level->getParentNormals(actor) * transform.normalMatrix();
+
+			vkCmdPushConstants(
+				frameInfo.commandBuffer,
+				pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				0,
+				sizeof(SimplePushConstantData),
+				&push
+			);
+
+			auto& model = wb3d::AssetManager::retrieveMesh(actor.getComponent<Components::MeshComponent>().file);
+			model->bind(frameInfo.commandBuffer);
+			model->draw(frameInfo.commandBuffer);	
+		}
+
+		/*level->registry.each([&](auto actorGUID) { Actor actor = { actorGUID, level.get() };
+			auto& transform = actor.getTransform();
+			SimplePushConstantData push{};
+			push.modelMatrix = level->getParentMat4(actor) * transform.mat4();
 			push.normalMatrix = transform.normalMatrix();
 
 			vkCmdPushConstants(
@@ -123,10 +145,10 @@ namespace Shard3D {
 				&push
 			);
 
-			auto& model = wb3d::AssetManager::retrieveMesh(mesh.file);
+			auto& model = wb3d::AssetManager::retrieveMesh(actor.getComponent<Components::MeshComponent>().file);
 			model->bind(frameInfo.commandBuffer);
-			model->draw(frameInfo.commandBuffer);	
-		});
+			model->draw(frameInfo.commandBuffer);
+		});*/
 	}
 
 }

@@ -43,7 +43,7 @@ namespace Shard3D {
 			for (auto e : idView) {
 				GUID guid = srcLvlRegistry.get<Components::GUIDComponent>(e).id;
 				Actor newActor = newLvl->createActorWithGUID(guid, srcLvlRegistry.get<Components::TagComponent>(e).tag);
-				enttMap[guid] = (entt::entity)newActor;
+				enttMap[guid] = newActor.actorHandle;
 			}
 
 			copyComponent<Components::BlueprintComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
@@ -59,7 +59,7 @@ namespace Shard3D {
 			copyComponent<Components::ScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
 			newLvl->possessedCameraActorGUID = other->getPossessedCameraActor().getGUID();
-			
+			//newLvl->actor_parent_comparison = other->actor_parent_comparison;
 			return newLvl;
 		}
 
@@ -180,9 +180,15 @@ namespace Shard3D {
 		 EngineCamera& Level::getPossessedCamera() {
 			return getPossessedCameraActor().getComponent<Components::CameraComponent>().camera;
 		 }
-		 void Level::parentActor(Actor parent, Actor child){
-			 child.parentHandle = parent.actorHandle;	
-			// child.getTransform().parent_mat4 = &parent.getTransform().mat4();
+		 void Level::parentActor(Actor* child, Actor* parent){
+			 actor_parent_comparison.emplace(child->getGUID(), *parent);
+			// child->parentHandle = parent->actorHandle;	
+			 SHARD3D_LOG("Parented actor {0} to {1}", parent->getGUID(), child->getGUID());
+		 }
+		 Actor Level::getParent(Actor child) {
+			 if (actor_parent_comparison.find(child.getGUID()) != actor_parent_comparison.end())
+				return actor_parent_comparison.at(child.getGUID());
+			 return Actor();
 		 }
 #if ENSET_ALLOW_PREVIEW_CAMERA// ONLY FOR DEBUGGING PURPOSES
 		 void Level::setPossessedPreviewCameraActor(Actor actor) {
@@ -323,6 +329,20 @@ namespace Shard3D {
 
 		void Level::reloadTexture(Actor actor) {
 			actorReloadTexQueue.emplace_back(actor);
+		}
+
+		glm::mat4 Level::getParentMat4(Actor& child) {
+			Actor parent = getParent(child);
+			if (!parent.isInvalid())
+				return parent.getTransform().mat4();
+			return glm::mat4(1.f);
+		}
+
+		glm::mat3 Level::getParentNormals(Actor& child) {
+			Actor parent = getParent(child);
+			if (!parent.isInvalid())
+				return parent.getTransform().normalMatrix();
+			return glm::mat3(1.f);
 		}
 
 		void Level::killEverything() {

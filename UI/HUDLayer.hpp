@@ -3,6 +3,7 @@
 #include "Layer.hpp"
 
 #include "../systems/hud_system.hpp"
+#include "../mouse_event.h"
 namespace Shard3D {
 	class HUDLayer : public Shard3D::Layer {
 	public:
@@ -20,6 +21,8 @@ namespace Shard3D {
 
 		int layer;
 	private:
+		void eventEvent(Event& e);
+		bool mouseButtonDownEvent(MouseButtonDownEvent& e);
 		bool contextRefresh;
 		GLFWwindow* window;
 		HUDRenderSystem hudRenderSystem;

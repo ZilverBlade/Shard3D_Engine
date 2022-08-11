@@ -5,9 +5,10 @@
 
 #include "cheat_codes.hpp"
 #include "texture.hpp"
+#include "key_event.h"
+#include "mouse_event.h"
 
 namespace Shard3D {
-
 	EngineWindow::EngineWindow(int w, int h, std::string name) : width{ w }, height{ h }, windowName{ name } {
 		initWindow();
 	}
@@ -44,6 +45,11 @@ namespace Shard3D {
 
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+		glfwSetKeyCallback(window, keyCallback);
+		glfwSetCharCallback(window, charCallback);
+		glfwSetMouseButtonCallback(window, mouseBtnCallback);
+		glfwSetCursorPosCallback(window, mouseMotionCallback);
+		glfwSetScrollCallback(window, mouseScrollCallback);
 
 		Shard3D::CheatCodes::init(window);
 
@@ -62,6 +68,7 @@ namespace Shard3D {
 			//setWindowMode(Windowed);
 		}
 	}
+
 	void EngineWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) {
 		if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
 			SHARD3D_FATAL("Failed to create window surface!");
@@ -105,6 +112,48 @@ namespace Shard3D {
 			glfwSetWindowMonitor(window, monitor, 0, 0, videoMode->width, videoMode->height, videoMode->refreshRate);
 			SHARD3D_INFO("Set Fullscreen");
 		}
+	}
+
+	void EngineWindow::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		wndData& data = reinterpret_cast<EngineWindow*>(glfwGetWindowUserPointer(window))->_wndData;
+		if (action == GLFW_PRESS) {
+			KeyDownEvent _event(key, 0);
+			data.eventCallback(_event);
+		} else if (action == GLFW_RELEASE){
+			KeyReleaseEvent _event(key);
+			data.eventCallback(_event);
+		} else if (action == GLFW_REPEAT) {
+			KeyDownEvent _event(key, true);
+			data.eventCallback(_event);
+		}
+	}
+	void EngineWindow::charCallback(GLFWwindow* window, unsigned int c) {
+		wndData& data = reinterpret_cast<EngineWindow*>(glfwGetWindowUserPointer(window))->_wndData;
+		KeyPressEvent _event(c);
+		data.eventCallback(_event);
+	}
+	void EngineWindow::mouseBtnCallback(GLFWwindow* window, int button, int action, int mods) {
+		wndData& data = reinterpret_cast<EngineWindow*>(glfwGetWindowUserPointer(window))->_wndData;
+		if (action == GLFW_PRESS) {
+			MouseButtonDownEvent _event(button);
+			data.eventCallback(_event);
+		}
+		else if (action == GLFW_RELEASE) {
+			MouseButtonReleaseEvent _event(button);
+			data.eventCallback(_event);
+		}
+	}
+
+	void EngineWindow::mouseMotionCallback(GLFWwindow* window, double xpos, double ypos) {
+		wndData& data = reinterpret_cast<EngineWindow*>(glfwGetWindowUserPointer(window))->_wndData;
+		MouseHoverEvent _event(static_cast<float>(xpos), static_cast<float>(ypos));
+		data.eventCallback(_event);
+	}
+
+	void EngineWindow::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+		wndData& data = reinterpret_cast<EngineWindow*>(glfwGetWindowUserPointer(window))->_wndData;
+		MouseScrollEvent _event(static_cast<float>(xoffset), static_cast<float>(yoffset));
+		data.eventCallback(_event);
 	}
 
 	void EngineWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height) {

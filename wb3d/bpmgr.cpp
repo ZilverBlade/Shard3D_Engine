@@ -111,7 +111,7 @@ namespace Shard3D {
 			if (actor.hasComponent<Components::CameraComponent>()) actor.killComponent<Components::CameraComponent>();
 			if (actor.hasComponent<Components::CppScriptComponent>()) actor.killComponent<Components::CppScriptComponent>();
 			if (actor.hasComponent<Components::DirectionalLightComponent>()) actor.killComponent<Components::DirectionalLightComponent>();
-			if (actor.hasComponent<Components::MeshComponent>()) actor.eLevel->killMesh(actor);
+			if (actor.hasComponent<Components::MeshComponent>()) actor.level->killMesh(actor);
 			if (actor.hasComponent<Components::PointlightComponent>()) actor.killComponent<Components::PointlightComponent>();
 			if (actor.hasComponent<Components::SpotlightComponent>()) actor.killComponent<Components::SpotlightComponent>();
 		}

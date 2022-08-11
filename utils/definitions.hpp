@@ -1,12 +1,12 @@
 #pragma once
 #include <string>
-
+#define BIT(x) (1 << x)
 namespace Shard3D {
 
 //=====================================================================================================================
 //=====================================================================================================================
 
-const static std::string ENGINE_VERSION = "1.2.4.r0-alpha";	// Shard3D {major, minor, patch, revision}-state
+const static std::string ENGINE_VERSION = "1.2.4.r1-alpha";	// Shard3D {major, minor, patch, revision}-state
 const static std::string EDITOR_VERSION = "1.3.r0-alpha";	// WorldEditor3D {major, minor};
 
 #define ENGINE_SETTINGS_PATH		"assets/configdata/engine_settings.ini"

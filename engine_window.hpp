@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include "event.h"
 
 namespace Shard3D {
 	class EngineWindow {
@@ -13,7 +14,7 @@ namespace Shard3D {
 			Fullscreen = 2
 		};
 	private:
-
+		using EventCallbackFunc = std::function<void(Event&)>;
 		friend class GraphicsSettings;
 	public:
 		EngineWindow(int w, int h, std::string name);
@@ -21,6 +22,8 @@ namespace Shard3D {
 		
 		EngineWindow(const EngineWindow&) = delete;
 		EngineWindow& operator=(const EngineWindow&) = delete;
+
+		void setEventCallback(const EventCallbackFunc& cbf) { _wndData.eventCallback = cbf; }
 
 		bool shouldClose() { return glfwWindowShouldClose(window); }
 		VkExtent2D getExtent() { return { (uint32_t)(width), (uint32_t)(height) }; }
@@ -31,19 +34,30 @@ namespace Shard3D {
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		void setWindowMode(WindowType winType);
 	private:
-		static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 		void initWindow();
 
 		int width;
 		int height;
-
-		static inline int windowPosX;
-		static inline int windowPosY;
 
 		bool framebufferResized = false;
 
 		std::string windowName;
 		GLFWwindow* window;
 		GLFWmonitor* monitor = nullptr;
+
+		struct wndData {
+			EventCallbackFunc eventCallback;
+		};
+
+		wndData _wndData;
+		
+		// CALLBACKS
+		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void charCallback(GLFWwindow* window, unsigned int c);
+		static void mouseBtnCallback(GLFWwindow* window, int button, int action, int mods);
+		static void mouseMotionCallback(GLFWwindow* window, double xpos, double ypos);
+		static void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
 	};
 }

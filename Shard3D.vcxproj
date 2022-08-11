@@ -413,18 +413,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dtpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="input\editor\editor_keyboard_movement_controller.cpp">
+    <ClCompile Include="input\editor\editor_movement_controller.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="input\editor\editor_mouse_movement_controller.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dtpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="buffer.cpp" />
     <ClCompile Include="components.cpp" />
@@ -473,8 +465,12 @@
     <ClInclude Include="cheat_codes.hpp" />
     <ClInclude Include="cubemap.hpp" />
     <ClInclude Include="descriptor_pools.hpp" />
+    <ClInclude Include="event.h" />
     <ClInclude Include="graphics_settings.hpp" />
     <ClInclude Include="hud.hpp" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="key_event.h" />
+    <ClInclude Include="mouse_event.h" />
     <ClInclude Include="offscreen.hpp" />
     <ClInclude Include="plugins\script_engine_plugin_link.h" />
     <ClInclude Include="scripts\cpp\carcontroller.hpp" />
@@ -536,16 +532,7 @@
     <ClInclude Include="UI\Layer.hpp" />
     <ClInclude Include="UI\LayerStack.hpp" />
     <ClInclude Include="utils\definitions.hpp" />
-    <ClInclude Include="input\editor\editor_keyboard_movement_controller.hpp" />
-    <ClInclude Include="input\editor\editor_mouse_movement_controller.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</DeploymentContent>
-      <DeploymentContent>false</DeploymentContent>
-    </ClInclude>
+    <ClInclude Include="input\editor\editor_movement_controller.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="buffer.hpp" />

@@ -117,6 +117,9 @@
     <Filter Include="Source Files\UI\HUD">
       <UniqueIdentifier>{19006134-43f1-46b7-b728-84981f89c326}</UniqueIdentifier>
     </Filter>
+    <Filter Include="events\polling">
+      <UniqueIdentifier>{bb6d941f-57bd-4e5f-b0b6-d01e1935f983}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -128,10 +131,7 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files\camera</Filter>
     </ClCompile>
-    <ClCompile Include="input\editor\editor_keyboard_movement_controller.cpp">
-      <Filter>Source Files\controller</Filter>
-    </ClCompile>
-    <ClCompile Include="input\editor\editor_mouse_movement_controller.cpp">
+    <ClCompile Include="input\editor\editor_movement_controller.cpp">
       <Filter>Source Files\controller</Filter>
     </ClCompile>
     <ClCompile Include="components.cpp">
@@ -319,10 +319,7 @@
     <ClInclude Include="camera.hpp">
       <Filter>Header Files\camera</Filter>
     </ClInclude>
-    <ClInclude Include="input\editor\editor_keyboard_movement_controller.hpp">
-      <Filter>Header Files\controller</Filter>
-    </ClInclude>
-    <ClInclude Include="input\editor\editor_mouse_movement_controller.hpp">
+    <ClInclude Include="input\editor\editor_movement_controller.hpp">
       <Filter>Header Files\controller</Filter>
     </ClInclude>
     <ClInclude Include="utils\engine_utils.hpp">
@@ -561,6 +558,18 @@
     </ClInclude>
     <ClInclude Include="utils\stats_timing.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="event.h">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="key_event.h">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse_event.h">
+      <Filter>events</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>events\polling</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

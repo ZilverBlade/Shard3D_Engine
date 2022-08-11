@@ -28,8 +28,9 @@ namespace Shard3D {
 
 		void run();	
 	private:
-		void setupDescriptors();
+		void setWindowCallbacks();
 		void loadGameObjects();
+		void eventEvent(Event& e);
 		LayerStack layerStack;
 };
 

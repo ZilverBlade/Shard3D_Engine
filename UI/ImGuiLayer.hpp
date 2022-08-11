@@ -11,6 +11,9 @@
 #include "asset_explorer_panel.hpp"
 #include "level_gizmo.hpp"
 #include "hud_builder_panel.hpp"
+#include "../mouse_event.h"
+#include "../key_event.h"
+
 namespace Shard3D {
 	class HUDLayer;
 	class HUD;
@@ -23,6 +26,15 @@ namespace Shard3D {
 		void detach() override;
 		void update(FrameInfo& frameInfo) override;
 		void attachGUIEditorInfo(std::shared_ptr<HUDContainer>& container);
+	private:
+		void eventEvent(Event& e);
+		bool mouseButtonDownEvent(MouseButtonDownEvent& e);
+		bool mouseButtonReleaseEvent(MouseButtonReleaseEvent& e);
+		bool mouseHoverEvent(MouseHoverEvent& e);
+		bool mouseScrollEvent(MouseScrollEvent& e);
+		bool keyDownEvent(KeyDownEvent& e);
+		bool keyReleaseEvent(KeyReleaseEvent& e);
+		bool keyPressEvent(KeyPressEvent& e);
 	private:
 		void detachTag() { }
 		void createIcons();

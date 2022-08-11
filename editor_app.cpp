@@ -7,8 +7,7 @@
 #include <glm/gtc/constants.hpp>
 
 //engine
-#include "input/editor/editor_keyboard_movement_controller.hpp"
-#include "input/editor/editor_mouse_movement_controller.hpp"
+#include "input/editor/editor_movement_controller.hpp"
 #include "camera.hpp"
 #include "utils/definitions.hpp"
 #include "utils/stats_timing.h"
@@ -38,6 +37,7 @@
 
 namespace Shard3D {
 	EditorApp::EditorApp() {
+		setWindowCallbacks();
 		CSimpleIniA ini;
 
 		ini.SetUnicode();
@@ -72,11 +72,14 @@ namespace Shard3D {
 	}
 	EditorApp::~EditorApp() { }
 
-	void buttonClickYay() {
-		SHARD3D_NOIMPL;
+	void EditorApp::setWindowCallbacks() {
+		SHARD3D_EVENT_BIND_HANDLER(EditorApp::eventEvent);
 	}
-	void button3ClickYay() {
+
+	void EditorApp::eventEvent(Event& e) {
+		SHARD3D_LOG("{0}", e.toString());
 	}
+
 	void EditorApp::run() {
 		std::vector<std::unique_ptr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
@@ -166,8 +169,7 @@ namespace Shard3D {
 
 		loadGameObjects();
 
-		controller::EditorKeyboardMovementController editorCameraControllerKeyboard{};
-		controller::EditorMouseMovementController editorCameraControllerMouse{};
+		controller::EditorMovementController editorCameraController{};
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
@@ -239,8 +241,7 @@ beginWhileLoop:
 				possessedCameraActor.getTransform().getRotation());
 			SHARD3D_STAT_RECORD_END({ "Engine", "Garbage Collection" });
 			if (Singleton::activeLevel->simulationState != PlayState::Simulating) {
-				editorCameraControllerKeyboard.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
-				editorCameraControllerMouse.moveInPlaneXY(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
+				editorCameraController.tryPoll(Singleton::engineWindow.getGLFWwindow(), frameTime, editor_cameraActor);
 			}
 			possessedCameraActor.getComponent<Components::CameraComponent>().ar = tempInfo::aspectRatioWoH;
 			possessedCamera.setViewYXZ(possessedCameraActor.getTransform().getTranslation(), possessedCameraActor.getTransform().getRotation());
@@ -384,24 +385,28 @@ beginWhileLoop:
 	}
 
 	void EditorApp::loadGameObjects() {
-		wb3d::LevelManager levelman(Singleton::activeLevel);
-		levelman.load("assets/leveldata/sandboox.wbl", true);
 		//wb3d::LevelManager levelman(Singleton::activeLevel);
-		//levelman.load("assets/leveldata/drivecartest.wbl", true);
-		//
-		//wb3d::Actor car = Singleton::activeLevel->createActorWithGUID(43827493259, "Car");
-		//wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
-		//car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
-		//
-		//car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
-		//car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-		//car.addComponent<Components::AudioComponent>().file = 
-		//	"assets/audiodata/race_engine_nb.wav";
-		//
-		////car.addComponent<Components::ScriptComponent>();
-		//
-		//wb3d::Actor light = Singleton::activeLevel->createActor("bling");
-		//light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
-		//light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
+		//levelman.load("assets/leveldata/sandboox.wbl", true);
+
+
+		wb3d::LevelManager levelman(Singleton::activeLevel);
+		levelman.load("assets/leveldata/drivecartest.wbl", true);
+		
+		wb3d::Actor car = Singleton::activeLevel->createActorWithGUID(43827493259, "Car");
+		wb3d::AssetManager::emplaceMesh("assets/modeldata/FART.obj");
+		car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
+		
+		car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
+		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
+		car.addComponent<Components::AudioComponent>().file = 
+			"assets/audiodata/race_engine_nb.wav";
+		
+		//car.addComponent<Components::ScriptComponent>();
+		
+		wb3d::Actor light = Singleton::activeLevel->createActor("thing");
+		light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
+		light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
+		Singleton::activeLevel->parentActor(&light, &car);
 	}
+
 }

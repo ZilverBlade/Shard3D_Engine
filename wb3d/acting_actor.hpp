@@ -32,10 +32,10 @@ namespace Shard3D {
 		
 
 			void possessCameraActor(Actor actor) {
-				thisActor.eLevel->setPossessedCameraActor(actor);
+				thisActor.level->setPossessedCameraActor(actor);
 			}
 			Level* const getActiveLevel() {
-				return thisActor.eLevel;
+				return thisActor.level;
 			}
 			Actor thisActor;
 		private:

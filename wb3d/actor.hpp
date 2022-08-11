@@ -28,7 +28,7 @@ namespace Shard3D {
 					//SHARD3D_FATAL("Tried to add component when component already is present!");
 				}
 #endif
-				return eLevel->registry.emplace<T>(actorHandle, std::forward<Args>(args)...);
+				return level->registry.emplace<T>(actorHandle, std::forward<Args>(args)...);
 			}
 
 			template<typename T>
@@ -39,12 +39,12 @@ namespace Shard3D {
 					SHARD3D_FATAL("Tried to get a component that does not exist!");
 				}
 #endif
-				return eLevel->registry.get<T>(actorHandle);
+				return level->registry.get<T>(actorHandle);
 			}
 
 			template<typename T>
 			bool hasComponent() {
-				return eLevel->registry.all_of<T>(actorHandle);
+				return level->registry.all_of<T>(actorHandle);
 			}
 
 			template<typename T>
@@ -53,13 +53,14 @@ namespace Shard3D {
 					SHARD3D_WARN("Actor {0} does not have component '{1}'!", this->getGUID(), typeid(T).name());
 					return;
 				}
-				eLevel->registry.remove<T>(actorHandle);
+				level->registry.remove<T>(actorHandle);
 			}
 
 			bool isInvalid() {
-				return (getGUID() == 0 || getGUID() == 1 || getGUID() == UINT64_MAX)
+				return actorHandle == entt::null 
+					|| (getGUID() == 0 || getGUID() == 1 || getGUID() == UINT64_MAX)
 					|| !hasComponent<Components::TagComponent>()
-					|| actorHandle == entt::null;
+					|| !hasComponent<Components::GUIDComponent>();
 			}
 			GUID getGUID() { return getComponent<Components::GUIDComponent>().id; }
 			std::string getTag() { return getComponent<Components::TagComponent>().tag; }
@@ -74,7 +75,7 @@ namespace Shard3D {
 			operator uint32_t() const { return (uint32_t)actorHandle; };
 			
 			bool operator==(const Actor& other) const {
-				return actorHandle == other.actorHandle && eLevel == other.eLevel;
+				return actorHandle == other.actorHandle && level == other.level;
 			}
 			bool operator!=(const Actor& other) const {
 				return !(*this == other);
@@ -83,7 +84,7 @@ namespace Shard3D {
 			entt::entity parentHandle{ entt::null };
 		private:
 
-			Level *eLevel = nullptr; // 8 bytes (use it as much as needed)
+			Level *level = nullptr; // 8 bytes (use it as much as needed)
 
 			friend class Level;
 			friend class ActingActor;

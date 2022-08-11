@@ -123,4 +123,5 @@ ALPHA:
 		- Added C# and VB Generics for components
 	> Shard3D Torque 1.2.4-alpha
 		- Added stats timing
+		- Added event system
 		:: TODO, add stats timing and logging, proper events sytem, add editor layouts, finalize script engine, switch to clang

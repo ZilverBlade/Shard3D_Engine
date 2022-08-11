@@ -7,7 +7,7 @@ namespace Shard3D {
 	class CheatCodes {
     public:
         static void init(GLFWwindow* window) {
-            glfwSetKeyCallback(window, key_callback);
+            //glfwSetKeyCallback(window, key_callback);
         }
     private:
         static inline std::string cheatCodeInput;

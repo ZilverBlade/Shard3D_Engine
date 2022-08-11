@@ -37,6 +37,9 @@ namespace Shard3D {
 			void reloadMesh(Actor actor);
 			void reloadTexture(Actor actor);
 
+			glm::mat4 getParentMat4(Actor& child);
+			glm::mat3 getParentNormals(Actor& child);
+
 			void runGarbageCollector(EngineDevice& device);
 
 			Actor getActorFromGUID(GUID guid);
@@ -48,8 +51,8 @@ namespace Shard3D {
 			Actor getPossessedCameraActor();
 			EngineCamera& getPossessedCamera();
 
-			void parentActor(Actor parent, Actor child);
-
+			void parentActor(Actor* child, Actor* parent);
+			Actor getParent(Actor child);
 			/* *
 * Call when level events must begin
 */
@@ -94,6 +97,7 @@ namespace Shard3D {
 
 			// map
 			std::unordered_map<GUID, entt::entity> actorMap;
+			std::unordered_map<GUID, Actor> actor_parent_comparison;
 
 			// queues 
 			std::vector<Actor> actorKillQueue;

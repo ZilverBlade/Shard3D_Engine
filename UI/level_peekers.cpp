@@ -30,7 +30,7 @@ namespace Shard3D {
 		ImGui::Checkbox("Miscellaneous Inspector", &miscInspector);
 		ImGui::End();
 
-		if (actorInspector) peekActorInspector();
+		if (!actorInspector) peekActorInspector();
 		if (lodInspector) peekLODInspector();
 		if (textureInspector) peekTextureInspector();
 		if (materialInspector) peekMaterialInspector();
@@ -52,7 +52,8 @@ namespace Shard3D {
 			wb3d::Actor actor{ actorGUID, Singleton::activeLevel.get() };
 
 			std::string text = actor.getTag() + " (" + std::to_string((uint64_t)actor.getGUID()) + ")" 
-				+ " handle (" + std::to_string((uint32_t)actor.actorHandle) + ")";
+				+ " handle (" + std::to_string((uint32_t)actor.actorHandle) + ")"
+				+ " p_handle (" + std::to_string((uint32_t)Singleton::activeLevel->getParent(actor).actorHandle) + ")";
 			if (actor.isInvalid())
 				ImGui::TextColored({1.f, 0.f, 1.f, 1.f}, text.c_str());
 			else

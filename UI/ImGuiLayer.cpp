@@ -134,6 +134,8 @@ namespace Shard3D {
             levelPeekPanel.setContext(Singleton::activeLevel);
             refreshContext = false;
         }
+        
+        SHARD3D_EVENT_BIND_HANDLER(ImGuiLayer::eventEvent);
 
         CSimpleIniA ini;
         ini.SetUnicode();
@@ -440,7 +442,7 @@ namespace Shard3D {
         hudBuilder.setContext(container);
     }
 
-
+   
     void ImGuiLayer::renderQuickBar() {
 
         ImGui::Begin("_editor_quickbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);
@@ -751,4 +753,71 @@ namespace Shard3D {
         }
         if (ImGui::MenuItem("Credits")) showCredits = true;
     }
+
+
+    void ImGuiLayer::eventEvent(Event& e) {
+        EventDispatcher dispatcher(e);
+        dispatcher.dispatch<MouseButtonDownEvent>(SHARD3D_EVENT_BIND_VOID(ImGuiLayer::mouseButtonDownEvent));
+        dispatcher.dispatch<MouseButtonReleaseEvent>(SHARD3D_EVENT_BIND_VOID(ImGuiLayer::mouseButtonReleaseEvent));
+        dispatcher.dispatch<MouseHoverEvent>(SHARD3D_EVENT_BIND_VOID(ImGuiLayer::mouseHoverEvent));
+        dispatcher.dispatch<MouseScrollEvent>(SHARD3D_EVENT_BIND_VOID(ImGuiLayer::mouseScrollEvent));
+        dispatcher.dispatch<KeyDownEvent>(SHARD3D_EVENT_BIND_VOID(ImGuiLayer::keyDownEvent));
+        dispatcher.dispatch<KeyReleaseEvent>(SHARD3D_EVENT_BIND_VOID(ImGuiLayer::keyReleaseEvent));
+        dispatcher.dispatch<KeyPressEvent>(SHARD3D_EVENT_BIND_VOID(ImGuiLayer::keyPressEvent));
+    }
+
+    bool ImGuiLayer::mouseButtonDownEvent(MouseButtonDownEvent& e) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDown[e.getButtonCode()] = true;
+
+        return false;
+    }
+
+    bool ImGuiLayer::mouseButtonReleaseEvent(MouseButtonReleaseEvent& e)  {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseDown[e.getButtonCode()] = false;
+
+        return false;
+    }
+
+    bool ImGuiLayer::mouseHoverEvent(MouseHoverEvent& e) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MousePos = ImVec2(e.getXPos(), e.getYPos());
+
+        return false;
+    }
+
+    bool ImGuiLayer::mouseScrollEvent(MouseScrollEvent& e) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseWheel += e.getYOffset();
+        io.MouseWheelH += e.getXOffset();
+
+        return false;
+    }
+    
+    bool ImGuiLayer::keyDownEvent(KeyDownEvent& e) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.KeysDown[e.getKeyCode()] = true;
+        io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+        io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+        io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+        io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+        return false;
+    }
+
+    bool ImGuiLayer::keyReleaseEvent(KeyReleaseEvent& e)  {
+        ImGuiIO& io = ImGui::GetIO();
+        io.KeysDown[e.getKeyCode()] = false;
+        return false;
+    }
+
+    bool ImGuiLayer::keyPressEvent(KeyPressEvent& e)  {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddInputCharacter((unsigned short)e.getKeyCode());
+        return false;
+    }
+
+
+
+
 }
