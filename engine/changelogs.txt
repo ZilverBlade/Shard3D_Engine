@@ -139,5 +139,6 @@ ALPHA:
 		- Removed Asset Properties Panel
 		- Removed video playback engine as it's extremely unstable and it's api is susceptible to be removed from windows
 		- Temporarily removed offscreen renderpass as it causes issues
+		- Increased max pointlights and spotlight from 20 to 128
 
 		:: TODO, add stats timing and logging, proper events sytem, add editor layouts, finalize script engine, switch to clang

@@ -26,7 +26,6 @@ namespace Shard3D {
 
 		SHARD3D_INFO("Constructing Level Pointer");
 		level = make_sPtr<ECS::Level>("runtime test lvl");
-		loadStaticObjects();	
 	}
 	EngineApplication::~EngineApplication() { }
 
@@ -129,8 +128,6 @@ namespace Shard3D {
 		SHARD3D_INFO("Loading dummy actor");
 		ECS::Actor dummy = level->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
 
-		loadStaticObjects();
-
 		controller::EditorMovementController editorCameraController{};
 		{
 			CSimpleIniA ini;
@@ -152,6 +149,8 @@ namespace Shard3D {
 				editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic);  //Ortho perspective (not needed 99.99% of the time)
 			}
 		}
+		loadStaticObjects();
+
 		HUDLayer* layerList[4]{
 			hudLayer0,
 			hudLayer1,
