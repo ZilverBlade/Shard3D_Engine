@@ -1,0 +1,606 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{4967092e-c97f-42c9-9863-e6002b76b437}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{ea30afe3-c5e3-49be-9fd1-7705520c23db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\systems">
+      <UniqueIdentifier>{348fd08a-7cd2-41c8-99e8-7d59b2bb12ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\systems\rendering">
+      <UniqueIdentifier>{949693e6-2dcb-4e3b-bf7a-115cb068e2f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\systems\buffers">
+      <UniqueIdentifier>{0a650b5a-4bfd-4c8f-bdf8-4f093d32ef7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\systems\computational">
+      <UniqueIdentifier>{9ccabb2e-2cc9-4a8a-9a2f-405ca389d959}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\systems\rendering\editor">
+      <UniqueIdentifier>{2322ae6a-6108-49f0-8f45-928c73e8c6db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_collections">
+      <UniqueIdentifier>{78eb9002-00d9-4f24-bfa0-cf25cbd5492f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core">
+      <UniqueIdentifier>{c0896e23-791d-42ce-b1be-d8872f0083d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\asset">
+      <UniqueIdentifier>{b8157264-86d1-4b9f-af99-d1772d156b3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{a36e3979-6ac1-4230-8eed-6de22fe641c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\asset">
+      <UniqueIdentifier>{abe71cfa-ab30-4fca-8355-5ce9d166f82e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\audio">
+      <UniqueIdentifier>{a73007e1-041d-4f02-8d01-a7efeb31e3dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\audio">
+      <UniqueIdentifier>{643ec3ca-dad9-4a03-b6b7-37bc250bda4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\ecs">
+      <UniqueIdentifier>{113520fa-7d0a-44a4-8fe0-7c871bcf2685}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\ecs">
+      <UniqueIdentifier>{07d819d8-cee1-4699-a12b-7227534d8b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\misc">
+      <UniqueIdentifier>{1a77edad-1efb-4530-9baa-5a4a3720759c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\misc">
+      <UniqueIdentifier>{6c000355-bf5a-4b6a-9800-39c60c3731d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\rendering">
+      <UniqueIdentifier>{7ea76592-67b8-4efc-b115-05fa1433942a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\rendering">
+      <UniqueIdentifier>{6d7119c2-66fb-48d0-ac31-f1b377cdaa00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\ui">
+      <UniqueIdentifier>{700f5450-d6a4-44dc-982a-3f655bcdb661}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\ui">
+      <UniqueIdentifier>{25053ffa-1978-489b-a572-478ea9605592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core\vkapi">
+      <UniqueIdentifier>{00ecf540-919e-4b56-92a5-280cdf9edb90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\vkapi">
+      <UniqueIdentifier>{3da37308-669c-4e18-8aa4-f4f0bb877a26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\editor">
+      <UniqueIdentifier>{e41d5d94-d27b-40f3-b232-2b40cc7ac3d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\editor\camera">
+      <UniqueIdentifier>{132e9a12-9e89-429d-8686-bfb8f03a5623}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\editor">
+      <UniqueIdentifier>{7c10c444-3f02-4730-9f1e-5b76d826bb2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\editor\camera">
+      <UniqueIdentifier>{9b0d612f-be02-49e4-b7e7-b21f3ba1bbfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\events">
+      <UniqueIdentifier>{3a8ce00a-fad5-4bdf-b4be-5b6845f4037d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\layer">
+      <UniqueIdentifier>{be3e841d-f72d-4c86-9ea8-afcaa843dacb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\layer">
+      <UniqueIdentifier>{412a0e58-d54f-4f41-8ecf-8a576ccd9b71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\plugins">
+      <UniqueIdentifier>{4d44cb1a-672a-41ed-8112-33a548517f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\scripting">
+      <UniqueIdentifier>{e5d78a71-ba63-4163-9c79-547d4b521688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\scripting">
+      <UniqueIdentifier>{e3ae8e3c-c412-4544-b62d-7a1450290268}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{a750edcd-1dbf-4bbe-b097-4957aa615597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\fragment">
+      <UniqueIdentifier>{9f5e3e5a-6164-4adb-a785-b37d1d8af7b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\vertex">
+      <UniqueIdentifier>{8be44975-76b6-47ee-b923-25ff06c823b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\systems">
+      <UniqueIdentifier>{47c1a368-86a6-405a-ba65-97476126f607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\systems\buffers">
+      <UniqueIdentifier>{08a88c4c-e4bf-4fc3-8b5f-bb9fe022bee2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\systems\computational">
+      <UniqueIdentifier>{3681ab32-1328-4ff9-84da-85bd26f7bb5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\systems\rendering">
+      <UniqueIdentifier>{e1e1a7c8-83b8-48ee-8479-7f5506bd629b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\systems\rendering\editor">
+      <UniqueIdentifier>{143035d7-38ff-4516-8f4a-521156b77665}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_config">
+      <UniqueIdentifier>{37d20924-521c-4f70-9b41-0cf79bcfb75d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s3dpch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\stats_timing.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\versioning.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\yaml_ext.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\def_dynamic.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\dialogs.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\engine_utils.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\systems.h">
+      <Filter>Header Files\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\buffers\light_system.h">
+      <Filter>Header Files\systems\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\computational\particle_system.h">
+      <Filter>Header Files\systems\computational</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\computational\physics_system.h">
+      <Filter>Header Files\systems\computational</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\computational\compute_system.h">
+      <Filter>Header Files\systems\computational</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\buffers\material_system.h">
+      <Filter>Header Files\systems\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\rendering\billboard_system.h">
+      <Filter>Header Files\systems\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\rendering\forward_render_system.h">
+      <Filter>Header Files\systems\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\rendering\fullscreen_renderer.h">
+      <Filter>Header Files\systems\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\rendering\hud_system.h">
+      <Filter>Header Files\systems\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\rendering\editor\editor_billboard_renderer.h">
+      <Filter>Header Files\systems\rendering\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\rendering\editor\grid_system.h">
+      <Filter>Header Files\systems\rendering\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs.h">
+      <Filter>_collections</Filter>
+    </ClInclude>
+    <ClInclude Include="s3dstd.h">
+      <Filter>_collections</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan_abstr.h">
+      <Filter>_collections</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>_collections</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset\model.h">
+      <Filter>Header Files\core\asset</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset\texture.h">
+      <Filter>Header Files\core\asset</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset\assetmgr.h">
+      <Filter>Header Files\core\asset</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset\cubemap.h">
+      <Filter>Header Files\core\asset</Filter>
+    </ClInclude>
+    <ClInclude Include="core\audio\audio.h">
+      <Filter>Header Files\core\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\level.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\levelmgr.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\mmgr.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\sactor.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\actor.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\blueprint.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\bpmgr.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ecs\components.h">
+      <Filter>Header Files\core\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rendering\renderer.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rendering\swap_chain.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rendering\window.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rendering\camera.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rendering\offscreen.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ui\hud.h">
+      <Filter>Header Files\core\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ui\hud_layer.h">
+      <Filter>Header Files\core\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ui\hudmgr.h">
+      <Filter>Header Files\core\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ui\screen_layer.h">
+      <Filter>Header Files\core\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="core\vulkan_api\buffer.h">
+      <Filter>Header Files\core\vkapi</Filter>
+    </ClInclude>
+    <ClInclude Include="core\vulkan_api\descriptors.h">
+      <Filter>Header Files\core\vkapi</Filter>
+    </ClInclude>
+    <ClInclude Include="core\vulkan_api\device.h">
+      <Filter>Header Files\core\vkapi</Filter>
+    </ClInclude>
+    <ClInclude Include="core\vulkan_api\pipeline.h">
+      <Filter>Header Files\core\vkapi</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\level_gizmo.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\level_peekers.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\level_properties_panel.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\level_tree_panel.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\asset_explorer_panel.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\hud_builder_panel.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\imgui_glfw_implementation.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\imgui_implementation.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\imgui_initter.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\imgui_layer.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\camera\editor_movement_controller.h">
+      <Filter>Header Files\editor\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="events\event.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="events\input.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="events\key_event.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="events\mouse_event.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="layer\layer_stack.h">
+      <Filter>Header Files\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="layer\layer.h">
+      <Filter>Header Files\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\example_component.h">
+      <Filter>Header Files\plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\plugin_link.h">
+      <Filter>Header Files\plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\script_engine_plugin_link.h">
+      <Filter>Header Files\plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="scripting\script_handler.h">
+      <Filter>Header Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="scripting\dynamic_script_engine.h">
+      <Filter>Header Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="scripting\dynamic_script_engine_linker.h">
+      <Filter>Header Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\simple_ini.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\logger.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="core\misc\cheat_codes.h">
+      <Filter>Header Files\core\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="core\misc\frame_info.h">
+      <Filter>Header Files\core\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="core\misc\graphics_settings.h">
+      <Filter>Header Files\core\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="core\misc\UUID.h">
+      <Filter>Header Files\core\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="dynamic_definitions.h">
+      <Filter>_config</Filter>
+    </ClInclude>
+    <ClInclude Include="static_definitions.h">
+      <Filter>_config</Filter>
+    </ClInclude>
+    <ClInclude Include="workarounds.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="s3dpch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\stats_timing.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset\assetmgr.cpp">
+      <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset\cubemap.cpp">
+      <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset\model.cpp">
+      <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset\texture.cpp">
+      <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ecs\level.cpp">
+      <Filter>Source Files\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ecs\levelmgr.cpp">
+      <Filter>Source Files\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ecs\mmgr.cpp">
+      <Filter>Source Files\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ecs\actor.cpp">
+      <Filter>Source Files\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ecs\blueprint.cpp">
+      <Filter>Source Files\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ecs\bpmgr.cpp">
+      <Filter>Source Files\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ecs\components.cpp">
+      <Filter>Source Files\core\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\audio\audio.cpp">
+      <Filter>Source Files\core\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\offscreen.cpp">
+      <Filter>Source Files\core\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\renderer.cpp">
+      <Filter>Source Files\core\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\swap_chain.cpp">
+      <Filter>Source Files\core\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\window.cpp">
+      <Filter>Source Files\core\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\camera.cpp">
+      <Filter>Source Files\core\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ui\hud_layer.cpp">
+      <Filter>Source Files\core\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ui\hudmgr.cpp">
+      <Filter>Source Files\core\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ui\screen_layer.cpp">
+      <Filter>Source Files\core\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\vulkan_api\pipeline.cpp">
+      <Filter>Source Files\core\vkapi</Filter>
+    </ClCompile>
+    <ClCompile Include="core\vulkan_api\buffer.cpp">
+      <Filter>Source Files\core\vkapi</Filter>
+    </ClCompile>
+    <ClCompile Include="core\vulkan_api\descriptors.cpp">
+      <Filter>Source Files\core\vkapi</Filter>
+    </ClCompile>
+    <ClCompile Include="core\vulkan_api\device.cpp">
+      <Filter>Source Files\core\vkapi</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\imgui_layer.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\level_gizmo.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\level_peekers.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\level_properties_panel.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\level_tree_panel.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\asset_explorer_panel.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\hud_builder_panel.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\imgui_glfw_implementation.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\imgui_implementation.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\imgui_initter.cpp">
+      <Filter>Source Files\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\camera\editor_movement_controller.cpp">
+      <Filter>Source Files\editor\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="layer\layer.cpp">
+      <Filter>Source Files\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="layer\layer_stack.cpp">
+      <Filter>Source Files\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="scripting\dynamic_script_engine_linker.cpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="scripting\dynamic_script_engine.cpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\logger.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="core\misc\UUID.cpp">
+      <Filter>Source Files\core\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="core\misc\graphics_settings.cpp">
+      <Filter>Source Files\core\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\rendering\fullscreen_renderer.cpp">
+      <Filter>Source Files\systems\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\rendering\hud_system.cpp">
+      <Filter>Source Files\systems\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\rendering\billboard_system.cpp">
+      <Filter>Source Files\systems\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\rendering\forward_render_system.cpp">
+      <Filter>Source Files\systems\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\rendering\editor\grid_system.cpp">
+      <Filter>Source Files\systems\rendering\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\rendering\editor\editor_billboard_renderer.cpp">
+      <Filter>Source Files\systems\rendering\editor</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\computational\physics_system.cpp">
+      <Filter>Source Files\systems\computational</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\computational\compute_system.cpp">
+      <Filter>Source Files\systems\computational</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\computational\particle_system.cpp">
+      <Filter>Source Files\systems\computational</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\buffers\material_system.cpp">
+      <Filter>Source Files\systems\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\buffers\light_system.cpp">
+      <Filter>Source Files\systems\buffers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\_editor\grid.vert">
+      <Filter>Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\_editor\editor_svabill.vert">
+      <Filter>Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\_editor\editor_svabill.frag">
+      <Filter>Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\_editor\grid.frag">
+      <Filter>Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\hud_element.frag">
+      <Filter>Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\pbr_shader.frag">
+      <Filter>Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\_output_img.frag">
+      <Filter>Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\basic_shader.frag">
+      <Filter>Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\billboard_sva.frag">
+      <Filter>Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\billboard_sva.vert">
+      <Filter>Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\hud_element.vert">
+      <Filter>Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\pbr_shader.vert">
+      <Filter>Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\_output_img.vert">
+      <Filter>Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\basic_shader.vert">
+      <Filter>Shaders\vertex</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\changelogs.txt" />
+  </ItemGroup>
+</Project>
