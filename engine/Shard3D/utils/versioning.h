@@ -62,13 +62,13 @@ namespace Shard3D {
 		}
 		bool operator <(Version& other) { return major < other.major && minor < other.minor && patch < other.patch && revision < other.revision; }
 		bool operator >(Version& other) { return major > other.major && minor > other.minor && patch > other.patch && revision > other.revision; }
-		bool operator ==(Version& other) { return major == other.major&& minor == other.minor && patch == other.patch && revision == other.revision; }
+		bool operator ==(Version& other) { return major == other.major && minor == other.minor && patch == other.patch && revision == other.revision; }
 		bool operator !=(Version& other) { return !(*this == other); }
 
 		operator int() const { return major & minor & patch & revision; }
-		inline operator std::string () const {  { 
+		inline operator std::string () const {  
 			return toString();
-		}; }
+		}
 	private:
 		unsigned int major, minor, patch, revision;
 		VersionState state = VersionState::PreAlpha;

@@ -110,9 +110,9 @@ namespace Shard3D {
 		// you may initialise this twice, as the engine window is required later on. First initialisation can be with nullptr as argument.
 		static void init(EngineWindow* window);
 		static void read();
-		static const RuntimeInfo getRuntimeInfo() { return r_info; }
+		static RuntimeInfo& getRuntimeInfo() { return r_info; }
 	// as this getter passes the value by reference, you may modify its contents
-	static Settings& get();
+		static Settings& get();
 		static void set(Settings sets);
 		 
 		static void setWindowMode(WindowType winType);

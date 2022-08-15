@@ -7,5 +7,4 @@
 
 namespace Shard3D::TEMPORARY {
 	static std::vector<HUD*> hudList;
-	static VkDescriptorSet viewportImage{};
 }

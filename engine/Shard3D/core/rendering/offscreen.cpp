@@ -3,7 +3,7 @@
 //
 #include "offscreen.h"
 namespace Shard3D {
-	OffScreen::OffScreen(EngineDevice &device) : m_Device{device} {
+	OffScreen::OffScreen(EngineDevice& device) : m_Device{ device } {
 		pass.width = 1280;
 		pass.height = 720;
 
@@ -17,7 +17,7 @@ namespace Shard3D {
 		noEditBgColor[1] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorG"));
 		noEditBgColor[2] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorB"));
 
-		clearValues[0].color = {0.f, 0.f, 0.f, 1.f};//{ noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.f };
+		clearValues[0].color = { 0.f, 0.f, 0.f, 1.f };//{ noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 	}
 
@@ -28,7 +28,7 @@ namespace Shard3D {
 			VK_IMAGE_TILING_OPTIMAL,
 			VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 		// Color attachment
-		VkImageCreateInfo image {};
+		VkImageCreateInfo image{};
 		image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		image.imageType = VK_IMAGE_TYPE_2D;
 		image.format = VK_FORMAT_B8G8R8A8_SRGB;
@@ -113,7 +113,7 @@ namespace Shard3D {
 			SHARD3D_ERROR("Failed to bind memory");
 		}
 
-		VkImageViewCreateInfo depthStencilView {};
+		VkImageViewCreateInfo depthStencilView{};
 		depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		depthStencilView.format = fbDepthFormat;
@@ -133,7 +133,7 @@ namespace Shard3D {
 
 		// Create a separate render pass for the offscreen rendering as it may differ from the one used for scene rendering
 
-		std::array<VkAttachmentDescription, 2> attchmentDescriptions {};
+		std::array<VkAttachmentDescription, 2> attchmentDescriptions{};
 		// Color attachment
 		attchmentDescriptions[0].format = VK_FORMAT_R8G8B8A8_SRGB;
 		attchmentDescriptions[0].samples = VK_SAMPLE_COUNT_1_BIT;
@@ -156,7 +156,7 @@ namespace Shard3D {
 		VkAttachmentReference colorReference = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
 		VkAttachmentReference depthReference = { 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
-		VkSubpassDescription subpassDescription {};
+		VkSubpassDescription subpassDescription{};
 		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subpassDescription.colorAttachmentCount = 1;
 		subpassDescription.pColorAttachments = &colorReference;
@@ -195,11 +195,11 @@ namespace Shard3D {
 			SHARD3D_ERROR("Failed to create render pass");
 		}
 
-		VkImageView attachments[2] {};
+		VkImageView attachments[2]{};
 		attachments[0] = pass.color.view;
 		attachments[1] = pass.depth.view;
 
-		VkFramebufferCreateInfo fbufCreateInfo {};
+		VkFramebufferCreateInfo fbufCreateInfo{};
 		fbufCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		fbufCreateInfo.renderPass = pass.renderPass;
 		fbufCreateInfo.attachmentCount = 2;
@@ -209,7 +209,7 @@ namespace Shard3D {
 		fbufCreateInfo.layers = 1;
 
 		if (vkCreateFramebuffer(m_Device.device(), &fbufCreateInfo, nullptr, &pass.frameBuffer) != VK_SUCCESS) {
-			 SHARD3D_ERROR("Failed to create framebuffer");
+			SHARD3D_ERROR("Failed to create framebuffer");
 		}
 
 		// Fill a descriptor for later use in a descriptor set

@@ -28,6 +28,8 @@ namespace Shard3D {
 		void detach() override;
 		void update(FrameInfo& frameInfo) override;
 		void attachGUIEditorInfo(sPtr<HUDContainer>& container);
+
+		VkDescriptorSet viewportImage{};
 	private:
 		void eventEvent(Events::Event& e);
 		bool mouseButtonDownEvent(Events::MouseButtonDownEvent& e);
@@ -104,7 +106,9 @@ namespace Shard3D {
 				settings,
 				l_save, l_load;
 			
-		} icons;
+		} icons{};
+
+
 	};
 
 }

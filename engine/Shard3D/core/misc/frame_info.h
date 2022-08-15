@@ -8,9 +8,6 @@
 
 namespace Shard3D {
 	// fix this shit up eventually, only temporary solution
-	struct tempInfo {
-		static inline float aspectRatioWoH;
-	};
 	struct Pointlight {
 		glm::vec4 position{};
 		glm::vec4 color{}; 

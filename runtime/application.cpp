@@ -8,7 +8,7 @@
 
 #include <Shard3D/editor/camera/editor_movement_controller.h>
 #include <Shard3D/editor/imgui_layer.h>
-#include <Shard3D/editor/imgui_initter.h>
+#include <Shard3D/editor/imgui_initializer.h>
 
 #include <Shard3D/core/misc/graphics_settings.h>
 
@@ -49,7 +49,6 @@ namespace Shard3D {
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 		ini.LoadFile(EDITOR_SETTINGS_PATH);
-		ImGuiInitter::init(engineDevice, engineWindow, engineRenderer.getSwapChainRenderPass(), ini.GetBoolValue("THEME", "useLightMode"));
 	}
 
 	void EngineApplication::setWindowCallbacks() {
@@ -84,9 +83,21 @@ namespace Shard3D {
 		}
 
 #ifdef ENSET_ENABLE_WORLDBUILDER3D
+		{
+			CSimpleIniA ini;
+			ini.SetUnicode();
+			ini.LoadFile(EDITOR_SETTINGS_PATH);
+
+			ImGuiInitializer::init(engineDevice, engineWindow, engineRenderer.getSwapChainRenderPass(), ini.GetBoolValue("THEME", "useLightMode"));
+		}
 		ImGuiLayer* imguiLayer = new ImGuiLayer();
+		
+		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, mainOffScreen);
+		
 		layerStack.pushOverlay(imguiLayer);
 #endif
+		
+
 		HUDLayer* hudLayer0 = new HUDLayer();
 		HUDLayer* hudLayer1 = new HUDLayer();
 		HUDLayer* hudLayer2 = new HUDLayer();
@@ -106,14 +117,14 @@ namespace Shard3D {
 		// TODO: render the HUDLayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
 		// but render the HUD seperately from everything in the GUIEditor window.
 
-		GridSystem gridSystem { engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		GridSystem gridSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #ifdef ENSET_ENABLE_COMPUTE_SHADERS
 		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
-		ForwardRenderSystem forwardRenderSystem { engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		BillboardRenderSystem billboardRenderSystem { engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		ForwardRenderSystem forwardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		BillboardRenderSystem billboardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
@@ -149,7 +160,7 @@ namespace Shard3D {
 				editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic);  //Ortho perspective (not needed 99.99% of the time)
 			}
 		}
-		loadStaticObjects();
+//		loadStaticObjects();
 
 		HUDLayer* layerList[4]{
 			hudLayer0,
@@ -244,8 +255,7 @@ beginWhileLoop:
 					Also order absolutely matters, post processing for example must go last
 				*/
 				//	render
-				engineRenderer.beginSwapChainRenderPass(commandBuffer);
-				//mainOffScreen.start(frameInfo);
+				mainOffScreen.start(frameInfo);
 				SHARD3D_STAT_RECORD();
 				forwardRenderSystem.renderForward(frameInfo);
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Lighting" });
@@ -260,12 +270,13 @@ beginWhileLoop:
 				}
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Billboards" });
 
-				//mainOffScreen.end(frameInfo);
+				mainOffScreen.end(frameInfo);
 
 #ifdef ENSET_ENABLE_COMPUTE_SHADERS
 				computeSystem.render(frameInfo);
 #endif
 
+				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 				// Layer overlays (use UI here)
 				for (Layer* layer : layerStack) {
 					layer->update(frameInfo);
@@ -295,7 +306,6 @@ beginWhileLoop:
 			layer->detach();
 		}
 		SharedPools::destructPools();
-		TEMPORARY::viewportImage = nullptr;
 
 		level = nullptr;
 	}

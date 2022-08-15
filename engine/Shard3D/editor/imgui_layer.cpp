@@ -17,7 +17,7 @@
 
 #include "../systems/buffers/material_system.h"
 
-#include "imgui_initter.h"
+#include "imgui_initializer.h"
 #include <shellapi.h>
 
 #include "../core/ui/hud_layer.h"
@@ -111,7 +111,7 @@ namespace Shard3D {
         // check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
         if (hasBeenDetached) return;
         vkDeviceWaitIdle(engineDevice->device());
-        vkDestroyDescriptorPool(engineDevice->device(), ImGuiInitter::imGuiDescriptorPool, nullptr);
+        vkDestroyDescriptorPool(engineDevice->device(), ImGuiInitializer::imGuiDescriptorPool, nullptr);
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -156,7 +156,7 @@ namespace Shard3D {
         //ImGui::ShowDemoWindow(&visible);
         
 #pragma region boilerplate dockspace code    
-        static bool opt_fullscreen = false;
+        static bool opt_fullscreen = true;
         static bool opt_padding = true;
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.f, 0.f, 0.f, 0.f));
         static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -201,8 +201,8 @@ namespace Shard3D {
         ImGui::Begin("Viewport");
 
             ImVec2 vSize = ImGui::GetContentRegionAvail();
-            tempInfo::aspectRatioWoH = vSize.x / vSize.y;
-       // ImGui::Image(TEMPORARY::viewportImage, vSize);
+            GraphicsSettings::getRuntimeInfo().aspectRatio = vSize.x / vSize.y;
+        ImGui::Image(viewportImage, vSize);
         if (frameInfo.activeLevel->simulationState == PlayState::Paused) { 
             ImVec2 vMin = ImGui::GetWindowContentRegionMin();
             vMin.x += ImGui::GetWindowPos().x + 8;
@@ -649,7 +649,7 @@ namespace Shard3D {
             }
 
             if (ImGui::MenuItem("Save test material")) {
-                MaterialSystem::Material surfaceMat;
+                Material surfaceMat;
                 surfaceMat.type = SurfaceMaterial;
                 surfaceMat.surfaceMaterial.surfaceProp = SurfaceStandardLit;
                 surfaceMat.surfaceMaterial.surfaceMat = SurfaceOpaqueMaterial;
@@ -659,14 +659,14 @@ namespace Shard3D {
                 MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
             }
             if (ImGui::MenuItem("Save test material list")) {
-                MaterialSystem::Material surfaceMat;
+                Material surfaceMat;
                 surfaceMat.type = SurfaceMaterial;
                 surfaceMat.surfaceMaterial.surfaceProp = SurfaceStandardLit;
                 surfaceMat.surfaceMaterial.surfaceMat = SurfaceOpaqueMaterial;
                 surfaceMat.surfaceMaterial.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
                 surfaceMat.surfaceMaterial.roughnessTex.path = "assets/texturedata/coolroughness.png";
                 MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
-                MaterialSystem::Material surfaceMat2;
+                Material surfaceMat2;
                 surfaceMat2.type = SurfaceMaterial;
                 surfaceMat2.surfaceMaterial.surfaceProp = SurfaceStandardUnlit;
                 surfaceMat2.surfaceMaterial.surfaceMat = SurfaceMaskedMaterial;
