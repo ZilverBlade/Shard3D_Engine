@@ -21,8 +21,8 @@ namespace Shard3D {
 	_ctp(mono_reflection_type_from_name(const_cast<char*>(type_builder.data()), DynamicScriptEngine::getCoreAssemblyImage(0))),
 	_vtp(mono_reflection_type_from_name(const_cast<char*>(type_builder.data()), DynamicScriptEngine::getCoreAssemblyImage(1))) {}
 
-	template <typename/*...*/ Component>
-	void registerComponent(){//([](){
+	template <typename Component>
+	void registerComponent() {
 		std::string_view type_name = typeid(Component).name();
 		size_t pos = type_name.find_last_of(":");
 		std::string_view struct_name = type_name.substr(pos + 1);
@@ -38,7 +38,7 @@ namespace Shard3D {
 		__h_ctr->monoTypeComboRegistryAppenderAddComponent.push_back([](ECS::Actor actor) { actor.addComponent<Component>(); });
 		__h_ctr->monoTypeComboRegistryAppenderRmvComponent.push_back([](ECS::Actor actor) { actor.killComponent<Component>(); });
 		SHARD3D_LOG("Registered component: '{0}'", corrected_typename);
-	}//(), ...);}
+	}
 
 	void DynamicScriptEngineLinker::registerLinker() {
 		registerInternalCalls();
@@ -65,7 +65,6 @@ namespace Shard3D {
 		_S3D_ICALL(SceneManagerLoadLevel);
 		_S3D_ICALL(SceneManagerLoadHUD);
 		_S3D_ICALL(SceneManagerDestroyHUDLayer);
-
 
 		_S3D_ICALL(TransformComponent_SetTranslation);
 		_S3D_ICALL(TransformComponent_GetTranslation);
@@ -133,7 +132,6 @@ namespace Shard3D {
 		_S3D_ICALL(DirectionalLightComponent_SetIntensity);
 		_S3D_ICALL(DirectionalLightComponent_GetSpecularFactor);
 		_S3D_ICALL(DirectionalLightComponent_SetSpecularFactor);
-
 	}
 	void DynamicScriptEngineLinker::registerComponents() {
 		//registerComponent<Components::BlueprintComponent>();

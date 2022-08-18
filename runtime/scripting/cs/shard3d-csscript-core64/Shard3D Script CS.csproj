@@ -64,8 +64,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="s3dcorelib">
-      <HintPath>..\..\s3dcorelib.dll</HintPath>
+    <Reference Include="s3dcorelib, Version=1.0.5.5, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\engine\Shard3D\scripting\s3dcorelib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -82,10 +83,13 @@
     <Compile Include="Core\Actor.cs" />
     <Compile Include="Core\Components.cs" />
     <Compile Include="Core\ECSMgr.cs" />
+    <Compile Include="Scripting\Defaults\AutoPlay.cs" />
+    <Compile Include="Scripting\Defaults\AutoPossess.cs" />
     <Compile Include="Scripting\Example.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HUD\ExampleHUD.cs" />
     <Compile Include="Scripting\HUDSpawn.cs" />
+    <Compile Include="Scripting\trollui.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

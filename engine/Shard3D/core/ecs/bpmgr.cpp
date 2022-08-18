@@ -149,7 +149,7 @@ namespace Shard3D {
 		}
 
 		void BlueprintManager::convertRuntime(const std::string& destinationPath) {
-			assert(false);
+			SHARD3D_ASSERT(false, "");
 		}
 
 		BlueprintMgrResults BlueprintManager::load(const std::string& sourcePath, bool ignoreWarns) {
@@ -248,7 +248,7 @@ namespace Shard3D {
 
 
 		BlueprintMgrResults BlueprintManager::loadRuntime(const std::string& sourcePath) {
-			assert(false);
+			SHARD3D_ASSERT(false, "");
 			return BlueprintMgrResults::ErrorResult;
 		}
 	}

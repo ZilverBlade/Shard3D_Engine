@@ -9,7 +9,6 @@
 namespace Shard3D {
 
 	void AssetExplorerPanel::refreshIterator(std::filesystem::path newPath) {
-		SHARD3D_NOIMPL;
 		directoryEntries.clear();
 		for (auto& dirEnt : std::filesystem::directory_iterator(newPath)) {
 			directoryEntries.push_back(dirEnt);
@@ -33,10 +32,13 @@ namespace Shard3D {
 
 
 	void AssetExplorerPanel::render() {
+		bool refresh_it = false;
+
 		ImGui::Begin("Asset Explorer");
 		if (currentDir != std::filesystem::path(ENGINE_ASSETS_PATH)) {
 			if (ImGui::Button("<= Back")) {
 				currentDir = currentDir.parent_path();
+				refresh_it = true;
 			}
 		}
 		float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -51,17 +53,18 @@ namespace Shard3D {
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4());
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
 			ImGui::ImageButton(dirEnt.is_directory() ? folderIcon : fileIcon, { 96.f, 96.f });
+			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+				if (dirEnt.is_directory()) {
+					currentDir /= dirEntPath.filename();
+					refresh_it = true;
+				}
+			}
 			ImGui::PopStyleVar();
 			ImGui::PopStyleColor();		
 			ImGui::TextWrapped(fileStr.c_str());
 			ImGui::NextColumn();
-			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-				if (dirEnt.is_directory()) { 
-					currentDir /= dirEntPath.filename();
-					refreshIterator(currentDir);
-					break; 
-				}
-			}
+
+			if (refresh_it) { refreshIterator(currentDir); break; }
 		}
 		ImGui::Columns(1);
 		ImGui::End();

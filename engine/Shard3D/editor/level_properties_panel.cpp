@@ -18,7 +18,7 @@ namespace Shard3D {
 	void LevelPropertiesPanel::destroyContext() { context = {}; }
 
 	void LevelPropertiesPanel::render(LevelTreePanel& tree) {
-		assert(context != nullptr && "Context not provided!");
+		SHARD3D_ASSERT(context != nullptr && "Context not provided!");
 		ImGui::Begin("Properties"); ImGui::BeginDisabled(context->simulationState == PlayState::Simulating/*&& ini.canEditDuringSimulation*/);
 		if (tree.selectedActor){ 
 			if (!tree.selectedActor.hasComponent<Components::BlueprintComponent>()) {

@@ -138,7 +138,7 @@ namespace Shard3D {
 			std::string file{};
 			std::string cacheFile{};
 			MeshType type = MeshType::MESH_TYPE_NULL;
-			MaterialSystem::MaterialList materialList;
+			//MaterialSystem::MaterialList materialList;
 			bool hideInGame = false;
 
 			MeshComponent() = default;

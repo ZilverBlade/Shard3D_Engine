@@ -86,7 +86,7 @@ namespace Shard3D {
 	}
 
 	void HUDRenderSystem::createPipeline(VkRenderPass renderPass) {
-		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::pipelineConfig(pipelineConfig)

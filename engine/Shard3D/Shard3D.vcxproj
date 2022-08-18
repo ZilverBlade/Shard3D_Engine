@@ -82,7 +82,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -92,8 +92,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\d;..\extern\joltphysics\lib\d</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mtd.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\d;..\extern\joltphysics\lib\d;..\extern\assimp\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -108,7 +108,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -120,8 +120,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
@@ -132,11 +132,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_DEPLOY;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -148,11 +148,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="core\asset\material.h" />
+    <ClInclude Include="core\asset\matmgr.h" />
+    <ClInclude Include="core\asset\serializer.h" />
     <ClInclude Include="workarounds.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="dynamic_definitions.h" />
@@ -195,7 +198,7 @@
     <ClInclude Include="editor\hud_builder_panel.h" />
     <ClInclude Include="editor\imgui_glfw_implementation.h" />
     <ClInclude Include="editor\imgui_implementation.h" />
-    <ClInclude Include="editor\imgui_initter.h" />
+    <ClInclude Include="editor\imgui_initializer.h" />
     <ClInclude Include="editor\imgui_layer.h" />
     <ClInclude Include="editor\level_gizmo.h" />
     <ClInclude Include="editor\level_peekers.h" />
@@ -247,10 +250,23 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="core\asset\material.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="core\asset\matmgr.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="core\asset\model.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="core\asset\serializer.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="core\asset\texture.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
@@ -410,7 +426,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="editor\imgui_initter.cpp">
+    <ClCompile Include="editor\imgui_initializer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
@@ -516,6 +532,11 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="utils\engine_utils.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="utils\logger.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
@@ -528,14 +549,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\basic_shader.frag" />
-    <None Include="shaders\basic_shader.vert" />
     <None Include="shaders\billboard_sva.frag" />
     <None Include="shaders\billboard_sva.vert" />
     <None Include="shaders\hud_element.frag" />
     <None Include="shaders\hud_element.vert" />
-    <None Include="shaders\pbr_shader.frag" />
-    <None Include="shaders\pbr_shader.vert" />
+    <None Include="shaders\materials\surface_shaded_opaque.frag" />
+    <None Include="shaders\mesh_shader.vert" />
+    <None Include="shaders\surface_shader.frag" />
+    <None Include="shaders\surface_shader.vert" />
     <None Include="shaders\_editor\editor_svabill.frag" />
     <None Include="shaders\_editor\editor_svabill.vert" />
     <None Include="shaders\_editor\grid.frag" />

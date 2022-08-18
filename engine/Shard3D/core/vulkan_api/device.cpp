@@ -157,29 +157,36 @@ void EngineDevice::pickPhysicalDevice() {
   ini.LoadFile(GAME_SETTINGS_PATH);
 
   for (const auto &device : devices) {
-    if (isDeviceSuitable(device)) {
-        physicalDevice_ = device;
-      
-      //MSAA setup
-      assert(msaaSamples >= 1 && "MSAA samples cannot be inferior to 1!");
-      if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { SHARD3D_WARN("MSAA Sample count exceeds device capability, dropping down to device's limit"); }
-      msaaSamples = (VkSampleCountFlagBits)std::min((int)ini.GetLongValue("GRAPHICS", "MSAASamples"), getMaxUsableSampleCount());
-   
-      SHARD3D_INFO("Using {0}x MSAA", msaaSamples);
+      if (isPreferredDevice(device)) {
+          physicalDevice_ = device;
+          goto loadphysdvcprops;
+      }
+  }
+
+  for (const auto& device : devices) {
+      if (isSuitableDevice(device)) {
       break;
     }
   }
-  
+
+loadphysdvcprops:
   if (physicalDevice_ == VK_NULL_HANDLE) {
     SHARD3D_FATAL("Failed to find a suitable GPU!");
   }
 
+
+  //MSAA setup
+  SHARD3D_ASSERT(msaaSamples >= 1, "MSAA samples cannot be inferior to 1!");
+  if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { SHARD3D_WARN("MSAA Sample count exceeds device capability, dropping down to device's limit"); }
+  msaaSamples = (VkSampleCountFlagBits)std::min((int)ini.GetLongValue("GRAPHICS", "MSAASamples"), getMaxUsableSampleCount());
+
+  SHARD3D_INFO("Using {0}x MSAA", msaaSamples);
   vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
   SHARD3D_INFO("physical device: {0}", properties.deviceName);
   if (properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-      SHARD3D_WARN("Graphics device is not discrete. Ignore if you play on a system that only has an integrated gpu, otherwise, check if you are running this engine with the correct graphics card");
+      SHARD3D_WARN("Graphics device is not discrete. Ignore if you play on a system that only has an integrated gpu, otherwise, check if you are running this engine with the correct graphics card selected");
   if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU)
-      SHARD3D_WARN("Graphics are being rendered with CPU, this can cause signicicantly worse performance. Continue at own risk.");
+      SHARD3D_WARN("Graphics are being rendered with CPU, this can cause significant performance drops. Continue at own risk.");
 }
 void EngineDevice::requestDeviceFeatures(VkPhysicalDeviceFeatures& features) {
     features.samplerAnisotropy = VK_TRUE;
@@ -246,24 +253,33 @@ void EngineDevice::createCommandPool() {
 }
 
 void EngineDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
+bool EngineDevice::isPreferredDevice(VkPhysicalDevice device) {
+    if (!isSuitableDevice(device))
+    {
+        return false;
+    }
 
-bool EngineDevice::isDeviceSuitable(VkPhysicalDevice device) {
-  QueueFamilyIndices indices = findQueueFamilies(device);
+    auto props = VkPhysicalDeviceProperties{};
+    vkGetPhysicalDeviceProperties(device, &props);
 
-  bool extensionsSupported = checkDeviceExtensionSupport(device);
-
-  bool swapChainAdequate = false;
-  if (extensionsSupported) {
-    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
-    swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
-  }
-
-  VkPhysicalDeviceFeatures supportedFeatures;
-  vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
-
-  return indices.isComplete() && extensionsSupported && swapChainAdequate &&
-         supportedFeatures.samplerAnisotropy;
+    return props.deviceType == VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
 }
+
+bool EngineDevice::isSuitableDevice(VkPhysicalDevice device) {
+    QueueFamilyIndices indices = findQueueFamilies(device);
+
+    bool extensionsSupported = checkDeviceExtensionSupport(device);
+    bool swapChainAdequate = false;
+    if (extensionsSupported) {
+        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+    }
+    VkPhysicalDeviceFeatures supportedFeatures;
+    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+    return indices.isComplete() && extensionsSupported && swapChainAdequate &&
+        supportedFeatures.samplerAnisotropy;
+}
+
 
 void EngineDevice::populateDebugMessengerCreateInfo(
     VkDebugUtilsMessengerCreateInfoEXT &createInfo) {

@@ -16,7 +16,7 @@ namespace Shard3D {
 	void LevelPeekingPanel::destroyContext() { context = {}; }
 
 	void LevelPeekingPanel::render() {
-		assert(context != nullptr && "Context not provided!");
+		SHARD3D_ASSERT(context != nullptr && "Context not provided!");
 		ImGui::Begin("Level Peeker");
 		ImGui::Checkbox("Actor Inspector", &actorInspector);
 		ImGui::Separator();
@@ -37,10 +37,10 @@ namespace Shard3D {
 
 	void LevelPeekingPanel::peekMaterialInspector() {
 		ImGui::Begin("Material Inspector");
-		for (auto i : AssetManager::getMaterialAssets()) {
-			std::string text = i.second.materialTag + " (" + std::to_string((uint64_t)i.first) + ")";
-			ImGui::Text(text.c_str());
-		}
+		//for (auto i : AssetManager::getMaterialAssets()) {
+		//	std::string text = i.second.materialTag + " (" + std::to_string((uint64_t)i.first) + ")";
+		//	ImGui::Text(text.c_str());
+		//}
 		ImGui::End();
 	}
 

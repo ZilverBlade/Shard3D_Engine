@@ -32,6 +32,7 @@
     <ProjectGuid>{a4968eee-eaaa-48d6-a373-80e130d2612a}</ProjectGuid>
     <RootNamespace>Shard3DGameProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Shard3D Editor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -172,7 +173,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\imgui;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;../engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\imgui;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
@@ -191,7 +192,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\imgui;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;../engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\imgui;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
@@ -200,7 +201,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\engine\Shard3D\bin\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\engine\Shard3D\bin\Release;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Shard3D.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -212,7 +213,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\imgui;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;../engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\imgui;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
@@ -221,7 +222,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\engine\Shard3D\bin\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\engine\Shard3D\bin\Release;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Shard3D.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

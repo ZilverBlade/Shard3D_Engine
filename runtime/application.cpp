@@ -39,10 +39,12 @@ namespace Shard3D {
 		Input::setWindow(engineWindow);
 		setWindowCallbacks();
 
+		
+		SharedPools::constructPools(engineDevice);
+		
 		AssetManager::setDevice(engineDevice);
 		AssetManager::clearAllAssets();
 		_special_assets::_editor_icons_load();
-		SharedPools::constructPools(engineDevice);
 		GraphicsSettings::init(&engineWindow);
 
 		CSimpleIniA ini;
@@ -160,7 +162,7 @@ namespace Shard3D {
 				editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic);  //Ortho perspective (not needed 99.99% of the time)
 			}
 		}
-//		loadStaticObjects();
+		loadStaticObjects();
 
 		HUDLayer* layerList[4]{
 			hudLayer0,

@@ -115,15 +115,6 @@
     <Filter Include="Source Files\scripting">
       <UniqueIdentifier>{e3ae8e3c-c412-4544-b62d-7a1450290268}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{a750edcd-1dbf-4bbe-b097-4957aa615597}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\fragment">
-      <UniqueIdentifier>{9f5e3e5a-6164-4adb-a785-b37d1d8af7b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\vertex">
-      <UniqueIdentifier>{8be44975-76b6-47ee-b923-25ff06c823b0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\systems">
       <UniqueIdentifier>{47c1a368-86a6-405a-ba65-97476126f607}</UniqueIdentifier>
     </Filter>
@@ -141,6 +132,18 @@
     </Filter>
     <Filter Include="_config">
       <UniqueIdentifier>{37d20924-521c-4f70-9b41-0cf79bcfb75d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders">
+      <UniqueIdentifier>{a750edcd-1dbf-4bbe-b097-4957aa615597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\fragment">
+      <UniqueIdentifier>{9f5e3e5a-6164-4adb-a785-b37d1d8af7b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\vertex">
+      <UniqueIdentifier>{8be44975-76b6-47ee-b923-25ff06c823b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\fragment\material">
+      <UniqueIdentifier>{2c5f8343-f0cf-409a-857f-b1bfe2c89ace}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -318,7 +321,7 @@
     <ClInclude Include="editor\imgui_implementation.h">
       <Filter>Header Files\editor</Filter>
     </ClInclude>
-    <ClInclude Include="editor\imgui_initter.h">
+    <ClInclude Include="editor\imgui_initializer.h">
       <Filter>Header Files\editor</Filter>
     </ClInclude>
     <ClInclude Include="editor\imgui_layer.h">
@@ -388,6 +391,15 @@
       <Filter>_config</Filter>
     </ClInclude>
     <ClInclude Include="workarounds.h" />
+    <ClInclude Include="core\asset\material.h">
+      <Filter>Header Files\core\asset</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset\matmgr.h">
+      <Filter>Header Files\core\asset</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset\serializer.h">
+      <Filter>Header Files\core\asset</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s3dpch.cpp">
@@ -495,7 +507,7 @@
     <ClCompile Include="editor\imgui_implementation.cpp">
       <Filter>Source Files\editor</Filter>
     </ClCompile>
-    <ClCompile Include="editor\imgui_initter.cpp">
+    <ClCompile Include="editor\imgui_initializer.cpp">
       <Filter>Source Files\editor</Filter>
     </ClCompile>
     <ClCompile Include="editor\camera\editor_movement_controller.cpp">
@@ -555,49 +567,61 @@
     <ClCompile Include="systems\buffers\light_system.cpp">
       <Filter>Source Files\systems\buffers</Filter>
     </ClCompile>
+    <ClCompile Include="core\asset\material.cpp">
+      <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset\matmgr.cpp">
+      <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\engine_utils.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset\serializer.cpp">
+      <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\_editor\grid.vert">
-      <Filter>Shaders\vertex</Filter>
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\_editor\editor_svabill.vert">
-      <Filter>Shaders\vertex</Filter>
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\_editor\editor_svabill.frag">
-      <Filter>Shaders\fragment</Filter>
+      <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
     <None Include="shaders\_editor\grid.frag">
-      <Filter>Shaders\fragment</Filter>
+      <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
     <None Include="shaders\hud_element.frag">
-      <Filter>Shaders\fragment</Filter>
+      <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
-    <None Include="shaders\pbr_shader.frag">
-      <Filter>Shaders\fragment</Filter>
+    <None Include="shaders\surface_shader.frag">
+      <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
     <None Include="shaders\_output_img.frag">
-      <Filter>Shaders\fragment</Filter>
-    </None>
-    <None Include="shaders\basic_shader.frag">
-      <Filter>Shaders\fragment</Filter>
+      <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
     <None Include="shaders\billboard_sva.frag">
-      <Filter>Shaders\fragment</Filter>
+      <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
     <None Include="shaders\billboard_sva.vert">
-      <Filter>Shaders\vertex</Filter>
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\hud_element.vert">
-      <Filter>Shaders\vertex</Filter>
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
-    <None Include="shaders\pbr_shader.vert">
-      <Filter>Shaders\vertex</Filter>
+    <None Include="shaders\surface_shader.vert">
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\_output_img.vert">
-      <Filter>Shaders\vertex</Filter>
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
-    <None Include="shaders\basic_shader.vert">
-      <Filter>Shaders\vertex</Filter>
+    <None Include="shaders\materials\surface_shaded_opaque.frag">
+      <Filter>Resource Files\Shaders\fragment\material</Filter>
+    </None>
+    <None Include="shaders\mesh_shader.vert">
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

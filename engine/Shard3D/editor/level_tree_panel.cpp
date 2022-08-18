@@ -17,7 +17,7 @@ namespace Shard3D {
 	void LevelTreePanel::clearSelectedActor() { selectedActor = {}; }
 
 	void LevelTreePanel::render() {
-		assert(context != nullptr && "Context not provided!");
+		SHARD3D_ASSERT(context != nullptr, "Context not provided!");
 		ImGui::Begin(std::string("Level Tree (" + context->name + ")").c_str());
 		context->registry.each([&](auto actorGUID) {
 			ECS::Actor actor{ actorGUID, context.get() };	

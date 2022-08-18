@@ -21,6 +21,8 @@ namespace Shard3D {
 			static void clearTextureAssets();
 			//Clears meshAssets
 			static void clearMeshAssets();
+			//Clears materialAssets
+			static void clearMaterialAssets();
 			//Clears all of the asset maps
 			static void clearAllAssets();
 			/* Loads all of the materials in use by the level into the asset maps.
@@ -52,13 +54,22 @@ namespace Shard3D {
 #endif
 			}
 
+			static void emplaceMaterial(sPtr<SurfaceMaterial>, const std::string& materialPath);
+			static inline sPtr<SurfaceMaterial> retrieveMaterial(const std::string& path) {
+#ifndef ENSET_CONFIDENT_ASSETS
+				return retrieveSurafaceMaterial_NENSET_CONFIDENT_ASSETS(path);
+#else
+				return make_sPtr<SurfaceMaterial>();
+#endif
+			}
+
 #pragma region Material shenanigans
-			static void loadMaterialsFromList(MaterialSystem::MaterialList& matlist);
-			static void emplaceMaterial(MaterialSystem::Material& material);
-			static MaterialSystem::Material retrieveMaterialByGUID(uint64_t guid);
-			static MaterialSystem::Material retrieveMaterialByPath(const std::string& path);
-			static hashMap<uint64_t, MaterialSystem::Material>& getMaterialAssets() { return materialAssets; }
-			static hashMap<uint64_t, MaterialSystem::MaterialList>& getMaterialListAssets() { return materialListAssets; }
+			//static void loadMaterialsFromList(MaterialSystem::MaterialList& matlist);
+			//static void emplaceMaterial(Material& material);
+			//static Material retrieveMaterialByGUID(uint64_t guid);
+			//static Material retrieveMaterialByPath(const std::string& path);
+			//static hashMap<uint64_t, Material>& getMaterialAssets() { return materialAssets; }
+			//static hashMap<uint64_t, MaterialSystem::MaterialList>& getMaterialListAssets() { return materialListAssets; }
 #pragma endregion	
 
 			static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
@@ -67,11 +78,11 @@ namespace Shard3D {
 			static sPtr<EngineTexture>& retrieveTexture_NENSET_CONFIDENT_ASSETS(const std::string& path);
 			static sPtr<EngineMesh>& retrieveMesh_ENSET_CONFIDENT_ASSETS(const std::string& path);
 			static sPtr<EngineMesh>& retrieveMesh_NENSET_CONFIDENT_ASSETS(const std::string& path);
+			static sPtr<SurfaceMaterial>& retrieveSurafaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path);
 
 			static inline hashMap<std::string, sPtr<EngineMesh>> meshAssets;
 			static inline hashMap<std::string, sPtr<EngineTexture>> textureAssets;
-			static inline hashMap<uint64_t, MaterialSystem::Material> materialAssets;
-			static inline hashMap<uint64_t, MaterialSystem::MaterialList> materialListAssets;
+			static inline hashMap<std::string, sPtr<SurfaceMaterial>> surfaceMaterialAssets;
 
 			static inline EngineDevice* engineDevice{};
 

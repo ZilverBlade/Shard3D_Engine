@@ -22,11 +22,19 @@ namespace Shard3D {
 	}
 
 	void OffScreen::createImages() {
+
+
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
 		// Find a suitable depth format
-		VkFormat fbDepthFormat = m_Device.findSupportedFormat(
-			{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-			VK_IMAGE_TILING_OPTIMAL,
-			VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		VkFormat fbDepthFormat{};
+		if (ini.GetBoolValue("RENDERING", "HighPrecisionDBuffer"))
+			fbDepthFormat = m_Device.findSupportedFormat(
+				{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+				VK_IMAGE_TILING_OPTIMAL,
+				VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		else fbDepthFormat = VK_FORMAT_D24_UNORM_S8_UINT;
 		// Color attachment
 		VkImageCreateInfo image{};
 		image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -66,7 +74,7 @@ namespace Shard3D {
 		VkImageViewCreateInfo colorImageView = {};
 		colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		colorImageView.format = VK_FORMAT_R8G8B8A8_SRGB;
+		colorImageView.format = VK_FORMAT_B8G8R8A8_SRGB;
 		colorImageView.subresourceRange = {};
 		colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		colorImageView.subresourceRange.baseMipLevel = 0;
@@ -135,7 +143,7 @@ namespace Shard3D {
 
 		std::array<VkAttachmentDescription, 2> attchmentDescriptions{};
 		// Color attachment
-		attchmentDescriptions[0].format = VK_FORMAT_R8G8B8A8_SRGB;
+		attchmentDescriptions[0].format = VK_FORMAT_B8G8R8A8_SRGB;
 		attchmentDescriptions[0].samples = VK_SAMPLE_COUNT_1_BIT;
 		attchmentDescriptions[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		attchmentDescriptions[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;

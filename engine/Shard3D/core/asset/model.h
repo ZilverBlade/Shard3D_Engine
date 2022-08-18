@@ -1,6 +1,12 @@
 #pragma once
 #include "../../vulkan_abstr.h"
+#include "../../systems/buffers/material_system.h"
 
+extern "C" {
+	struct aiNode;
+	struct aiScene;
+	struct aiMesh;
+}
 namespace Shard3D {
 	enum class MeshType {
 		MESH_TYPE_NULL = 0,
@@ -27,11 +33,27 @@ namespace Shard3D {
 			}
 		};
 
-		struct Builder {
+		struct SubmeshData {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
 
-			void loadIndexedMesh(const std::string& filepath, MeshType modelType);
+			std::string material{}; // Material path
+		};
+
+		struct SubmeshBuffers {
+			sPtr<EngineBuffer> indexBuffer{};
+			sPtr<EngineBuffer> vertexBuffer{};
+			bool hasIndexBuffer = false;
+
+			sPtr<SurfaceMaterial> material;
+		};
+
+		struct Builder {
+			//    <Material Slot> <Submesh>
+			hashMap<std::string, SubmeshData> submeshes;
+			void loadScene(const std::string& filepath);
+			void processNode(aiNode* node, const aiScene* scene);
+			void loadSubmesh(aiMesh* mesh, const aiScene* scene);
 		};
 
 		EngineMesh(EngineDevice& dvc, const EngineMesh::Builder &builder);
@@ -46,19 +68,20 @@ namespace Shard3D {
 			MeshType modelType
 		);
 
-		void bind(VkCommandBuffer commandBuffer);
-		void draw(VkCommandBuffer commandBuffer);
+		void bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
+		void draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
+
+		//			<Buffer Data>
+		std::vector<SubmeshBuffers> buffers{};
 
 	private:
-		void createVertexBuffers(const std::vector<Vertex> &vertices);
-		void createIndexBuffers(const std::vector<uint32_t> &indices);
+		void createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
+		void createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
+		void createMaterialBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
 
-		uPtr<EngineBuffer> vertexBuffer;
-		uint32_t vertexCount;
+		uint32_t vertexCount{};
 
-		bool hasIndexBuffer = false;
-		uPtr<EngineBuffer> indexBuffer;
-		uint32_t indexCount;
+		uint32_t indexCount{};
 		EngineDevice* device;
 	};
 }

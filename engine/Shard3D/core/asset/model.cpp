@@ -1,14 +1,16 @@
 #include "../../s3dpch.h" 
 #include <glm/gtx/hash.hpp>
 
-//object loaders
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
-
 #include "model.h"
 
 #include "../../core.h"
 #include "../../ecs.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>           
+#include <assimp/postprocess.h>     
+#include <fstream>
+#include "matmgr.h"
 
 namespace std {
 	template <>
@@ -24,8 +26,15 @@ namespace std {
 namespace Shard3D {
 
 	EngineMesh::EngineMesh(EngineDevice& dvc, const EngineMesh::Builder &builder) : device(&dvc) {
-		createVertexBuffers(builder.vertices);
-		createIndexBuffers(builder.indices);
+		for (auto& submesh : builder.submeshes) {
+			if (submesh.first == "<null::material>") continue;
+			SHARD3D_INFO("Loading {0}", submesh.first);
+			SubmeshBuffers _buffers{};
+			createVertexBuffers(submesh.second, _buffers);
+			createIndexBuffers(submesh.second, _buffers);
+			//createMaterialBuffers(submesh.second, _buffers);
+			buffers.push_back(_buffers);
+		}
 	}
 	EngineMesh::~EngineMesh() {}
 
@@ -39,18 +48,23 @@ namespace Shard3D {
 		std::ifstream f(filepath.c_str());
 		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", filepath); return uPtr<EngineMesh>(nullptr); };
 
-		builder.loadIndexedMesh(filepath, modelType);
+
+		builder.loadScene(filepath);
+		
 		if (ini.GetBoolValue("LOGGING", "log.MeshLoadInfo") == true) {
-			SHARD3D_INFO("Loaded model: '{0}'\n\t\tMesh vertex count: {1}", filepath, builder.vertices.size());
-		}	
+			uint64_t vcount{};
+			for (auto& primitive : builder.submeshes)
+				vcount += primitive.second.vertices.size();
+			SHARD3D_INFO("Loaded model: '{0}'\n\t\tMesh vertex count: {1}", filepath, vcount);
+		}
 		return make_uPtr<EngineMesh>(dvc, builder);
 	}
 
-	void EngineMesh::createVertexBuffers(const std::vector<Vertex>& vertices) {
-		vertexCount = (uint32_t)(vertices.size());
-		assert(vertexCount >= 3 && "Vertex count must be at least 3");
-		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
-		uint32_t vertexSize = sizeof(vertices[0]);
+	void EngineMesh::createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
+		vertexCount = (uint32_t)(submesh.vertices.size());
+		SHARD3D_ASSERT(vertexCount >= 3 && "Vertex count must be at least 3");
+		VkDeviceSize bufferSize = sizeof(submesh.vertices[0]) * vertexCount;
+		uint32_t vertexSize = sizeof(submesh.vertices[0]);
 
 		EngineBuffer stagingBuffer{
 			*device,
@@ -61,25 +75,26 @@ namespace Shard3D {
 		};
 
 		stagingBuffer.map();
-		stagingBuffer.writeToBuffer((void*)vertices.data());
+		stagingBuffer.writeToBuffer((void*)submesh.vertices.data());
 
-		vertexBuffer = make_uPtr<EngineBuffer>(
+		_buffers.vertexBuffer = make_sPtr<EngineBuffer>(
 			*device,
 			vertexSize,
 			vertexCount,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
-		device->copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
+		device->copyBuffer(stagingBuffer.getBuffer(), _buffers.vertexBuffer->getBuffer(), bufferSize);
 	}
 
-	void EngineMesh::createIndexBuffers(const std::vector<uint32_t> &indices) {
-		indexCount = (uint32_t)(indices.size());
-		hasIndexBuffer = indexCount > 0;
+	void EngineMesh::createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
+		indexCount = static_cast<uint32_t>(submesh.indices.size());
 
-		if (!hasIndexBuffer) { return; }
-		VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
-		uint32_t indexSize = sizeof(indices[0]);
+		_buffers.hasIndexBuffer = indexCount > 0;
+
+		if (!_buffers.hasIndexBuffer) { return; }
+		VkDeviceSize bufferSize = sizeof(submesh.indices[0]) * indexCount;
+		uint32_t indexSize = sizeof(submesh.indices[0]);
 
 		EngineBuffer stagingBuffer{
 			*device,
@@ -90,31 +105,37 @@ namespace Shard3D {
 		};
 
 		stagingBuffer.map();
-		stagingBuffer.writeToBuffer((void*)indices.data());
-	
-		indexBuffer = make_uPtr<EngineBuffer>(
+		stagingBuffer.writeToBuffer((void*)submesh.indices.data());
+		
+		_buffers.indexBuffer = make_sPtr<EngineBuffer>(
 			*device,
 			indexSize,
 			indexCount,
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-			);
+		);
 
-		device->copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
+		device->copyBuffer(stagingBuffer.getBuffer(), _buffers.indexBuffer->getBuffer(), bufferSize);
 	}
 
-	void EngineMesh::bind(VkCommandBuffer commandBuffer) {
-		VkBuffer buffers[] = { vertexBuffer->getBuffer() };
+	void EngineMesh::createMaterialBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
+		_buffers.material = AssetManager::retrieveMaterial(submesh.material);
+		_buffers.material->createMaterialDescriptors(SharedPools::staticMaterialPool);
+	}
+
+	void EngineMesh::bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
+		VkBuffer _buffers[] = { buffers.vertexBuffer->getBuffer() };
 		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
-
-		if (hasIndexBuffer) {
-			vkCmdBindIndexBuffer(commandBuffer, indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, _buffers, offsets);
+		if (buffers.hasIndexBuffer) {
+			vkCmdBindIndexBuffer(commandBuffer, buffers.indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		}
+		//SHARD3D_ASSERT(buffers.material != nullptr && "Cannot bind a mesh without a material!");
+		//buffers.material->bind(commandBuffer);	// Not as optimised, but can be improved with previous suggestions
 	}
 
-	void EngineMesh::draw(VkCommandBuffer commandBuffer) {
-		if (hasIndexBuffer) {
+	void EngineMesh::draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
+		if (buffers.hasIndexBuffer) {
 			vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 		} else {
 			vkCmdDraw(commandBuffer, vertexCount, 1, 0, 0);
@@ -135,61 +156,115 @@ namespace Shard3D {
 		return attributeDescriptions;
 	}
 	
-	void EngineMesh::Builder::loadIndexedMesh(const std::string& filepath, MeshType modelType) {
+	void EngineMesh::Builder::loadScene(const std::string& filepath) {
 		auto newTime = std::chrono::high_resolution_clock::now();
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFile(filepath,
+			aiProcess_Triangulate |
+			aiProcess_GenNormals |
+			aiProcess_OptimizeMeshes
+		);
 
-		tinyobj::attrib_t attrib;
-		std::vector<tinyobj::shape_t> shapes;
-		std::vector<tinyobj::material_t> materials;
-		std::string warn, err;
-
-		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-			SHARD3D_FATAL(warn + err);
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+			SHARD3D_ERROR("Error importing file '{0}': {1}", filepath, importer.GetErrorString());
+			return;
 		}
-		
-		vertices.clear();
-		indices.clear();
+		submeshes.clear();
+		processNode(scene->mRootNode, scene);
+		submeshes.emplace("<null::material>", SubmeshData());
 
-		hashMap<Vertex, uint32_t> uniqueVertices{};
-		for (const auto &shape : shapes) {
-			indices.reserve(shape.mesh.indices.size()); //preallocate
-			for (const auto &index : shape.mesh.indices) {
-				Vertex vertex{};
-				if (index.vertex_index >= 0) {
-					vertex.position = {
-						attrib.vertices[3 * index.vertex_index],		//X
-						attrib.vertices[3 * index.vertex_index + 2],	//Z, but is actually Y
-						attrib.vertices[3 * index.vertex_index + 1], 	//Y, but is actually Z		
-					};													
-					vertex.color = {
-						attrib.colors[3 * index.vertex_index],
-						attrib.colors[3 * index.vertex_index + 1],
-						attrib.colors[3 * index.vertex_index + 2],
-					};		
-				}
-				if (index.normal_index >= 0) {
-					vertex.normal = {
-						attrib.normals[3 * index.normal_index],			//X
-						attrib.normals[3 * index.normal_index + 2],		//Z, but is actually Y
-						attrib.normals[3 * index.normal_index + 1],		//Y, but is actually Z
-					};
-				}
-				if (index.texcoord_index >= 0) {
-					vertex.uv = {
-						attrib.texcoords[2 * index.texcoord_index],
-						attrib.texcoords[2 * index.texcoord_index + 1],
-					};
-				}
-
-				if (uniqueVertices.count(vertex) == 0) {
-					uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-					vertices.push_back(vertex);
-				}
-				indices.push_back(uniqueVertices[vertex]);
-			}
-		}
-		SHARD3D_LOG("Duration of loading vertices: {0} ms", 
+		SHARD3D_LOG("Duration of loading {0}: {1} ms", filepath,
 			std::chrono::duration<float, std::chrono::milliseconds::period>
 			(std::chrono::high_resolution_clock::now() - newTime).count());
+	}
+
+	void EngineMesh::Builder::processNode(aiNode* node, const aiScene* scene) {
+		// process all the node's meshes (if any)
+		for (uint32_t i = 0; i < node->mNumMeshes; i++) {
+			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			loadSubmesh(mesh, scene);
+		}
+		// then do the same for each of its children
+		for (uint32_t i = 0; i < node->mNumChildren; i++) {
+			processNode(node->mChildren[i], scene);
+		}
+	}
+
+	// experiments
+
+#define CombineMaterials
+#define CustomIndexing
+
+	void EngineMesh::Builder::loadSubmesh(aiMesh* mesh, const aiScene* scene) {
+		const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		const std::string& materialSlot = 
+#ifndef CombineMaterials
+			material->GetName().C_Str();
+#endif
+#ifdef CombineMaterials
+		"material";
+#endif
+		if (submeshes.find(materialSlot) == submeshes.end()) { // create new slot if none exist
+			SubmeshData submesh{}; 
+			submeshes[materialSlot] = submesh;
+		}
+#ifndef CustomIndexing
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			for (unsigned int j = 0; j < face.mNumIndices; j++)
+				submeshes[materialSlot].indices.push_back(face.mIndices[j]);
+		}
+#endif
+		hashMap<Vertex, uint32_t> uniqueVertices{};
+		for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
+			Vertex vertex{};
+			vertex.color = { 1.f, 1.f, 1.f };
+			vertex.position = {
+				mesh->mVertices[i].x,
+				mesh->mVertices[i].z,
+				mesh->mVertices[i].y
+			};
+			vertex.normal = {
+				mesh->mNormals[i].x,
+				mesh->mNormals[i].z,
+				mesh->mNormals[i].y
+			};
+			if (mesh->mTextureCoords[0])
+				vertex.uv = {
+					mesh->mTextureCoords[0][i].x,
+					mesh->mTextureCoords[0][i].y
+				};
+			else vertex.uv = { 0.f, 0.f };
+#ifdef CustomIndexing
+			if (uniqueVertices.count(vertex) == 0) {
+				uniqueVertices[vertex] = static_cast<uint32_t>(submeshes[materialSlot].vertices.size());
+#endif
+				submeshes[materialSlot].vertices.push_back(vertex);
+#ifdef CustomIndexing
+			}
+			submeshes[materialSlot].indices.push_back(uniqueVertices[vertex]);
+#endif
+		}
+	
+		aiColor4D color{};
+		aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color);
+		float specular{};
+		aiGetMaterialFloat(material, AI_MATKEY_SPECULAR_FACTOR, &specular);
+		float shininess{}; { float roughness{};
+		aiGetMaterialFloat(material, AI_MATKEY_ROUGHNESS_FACTOR, &roughness); shininess = 1.f - roughness; }
+		float metallic{};
+		aiGetMaterialFloat(material, AI_MATKEY_METALLIC_FACTOR, &metallic);
+		
+		sPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_sPtr<SurfaceMaterial_ShadedOpaque>();
+		grid_material->diffuseColor = { color.r, color.g, color.b, 1.f };
+		grid_material->diffuseTex = ENGINE_WHTTEX;
+		grid_material->specular = specular; 
+		grid_material->shininess = shininess;
+		grid_material->metallic = metallic;
+
+//		AssetManager::emplaceMaterial(grid_material, std::string("assets/materialdata/" + materialSlot + ".wbmat"));
+
+		SHARD3D_WARN("Loaded material slot {0}", materialSlot);
 	}
 }

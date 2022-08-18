@@ -1,6 +1,7 @@
 #pragma once
 #include <sys/stat.h>
 #include <string>
+#include <vector>
 namespace Shard3D {
 	// from: https://stackoverflow.com/a/57595105
 	template <typename T, typename... Rest>
@@ -27,6 +28,12 @@ namespace Shard3D {
 		static inline bool hasStarting(std::string const& fullString, std::string const& starting) {
 			return (fullString.rfind(starting, 0) == 0);
 		}
+	};
+
+	class IOUtils {
+	public:
+		static void writeStackBinary(void* data, size_t object_size, const std::string& path);
+		static void* readBinary(const std::string& path);
 	};
 } 
 

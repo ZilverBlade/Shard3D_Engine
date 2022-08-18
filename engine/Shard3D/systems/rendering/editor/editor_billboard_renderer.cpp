@@ -47,11 +47,12 @@ namespace Shard3D {
 	}
 
 	void _EditorBillboardRenderer::createPipeline(VkRenderPass renderPass) {
-		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::pipelineConfig(pipelineConfig)
-			.defaultPipelineConfigInfo();
+			.defaultPipelineConfigInfo()
+			.setCullingMode(VK_CULL_MODE_FRONT_BIT);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;

@@ -58,7 +58,7 @@ namespace Shard3D {
      * @return VkResult of the buffer mapping call
      */
     VkResult EngineBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
-        assert(buffer && memory && "Called map on buffer before create");
+        SHARD3D_ASSERT(buffer && memory && "Called map on buffer before create");
         return vkMapMemory(engineDevice.device(), memory, offset, size, 0, &mapped);
     }
 
@@ -84,7 +84,7 @@ namespace Shard3D {
      *
      */
     void EngineBuffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset) {
-        assert(mapped && "Cannot copy to unmapped buffer");
+        SHARD3D_ASSERT(mapped && "Cannot copy to unmapped buffer");
 
         if (size == VK_WHOLE_SIZE) {
             memcpy(mapped, data, bufferSize);

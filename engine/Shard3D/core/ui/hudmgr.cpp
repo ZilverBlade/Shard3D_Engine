@@ -110,7 +110,7 @@ namespace Shard3D {
 		}
 
 		void HUDManager::saveRuntime(const std::string& destinationPath) {
-			assert(false);
+			SHARD3D_ASSERT(false, "");
 		}
 
 		HUDMgrResults HUDManager::load(const std::string& sourcePath, int layer, bool ignoreWarns) {
@@ -183,7 +183,7 @@ namespace Shard3D {
 		}
 
 		HUDMgrResults HUDManager::loadRuntime(const std::string& sourcePath) {
-			assert(false);
+			SHARD3D_ASSERT(false, "");
 			return HUDMgrResults::ErrorResult;
 		}
 	}

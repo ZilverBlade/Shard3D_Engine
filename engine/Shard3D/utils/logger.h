@@ -44,3 +44,14 @@ namespace Shard3D {
 Unlike the other logging macros, this only takes a string value.
 */ 
 #define SHARD3D_FATAL(...)	Shard3D::LOGGER::logFatal(__VA_ARGS__)
+
+/*
+* Assert a statement, also shows a message box as well as an exception, ending the program
+(use for catching potential mistakes in debugging).
+Unlike the other logging macros, this only takes a string value.
+*/
+#ifndef SHARD3D_NO_ASSERT
+#define SHARD3D_ASSERT(__EXPRESSION__) if (!(__EXPRESSION__)) Shard3D::LOGGER::logFatal("Assertion failed! '"#__EXPRESSION__"'")
+#elif
+#define SHARD3D_ASSERT(__EXPRESSION__, __MESSAGE__)
+#endif

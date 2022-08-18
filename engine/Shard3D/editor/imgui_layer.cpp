@@ -233,10 +233,8 @@ namespace Shard3D {
         if (showTest) {
             ImGui::Begin("Material editor", &showTest);
             ImGui::DragFloat("Specular", &GraphicsSettings::get().GlobalMaterialSettings.x, 0.01f, 0.f, 2.f);
-            ImGui::DragFloat("Roughness", &GraphicsSettings::get().GlobalMaterialSettings.y, 0.01f, 0.f, 1.f);
-            ImGui::BeginDisabled(!enset.pbr);
+            ImGui::DragFloat("Shininness", &GraphicsSettings::get().GlobalMaterialSettings.y, 0.01f, 0.f, 1.f);
             ImGui::DragFloat("Metallic", &GraphicsSettings::get().GlobalMaterialSettings.z, 0.01f, 0.f, 1.f);
-            ImGui::EndDisabled();
             //ax::NodeEditor::Begin("Matedit BP");
             //int uniqueId = 1;
             //
@@ -638,7 +636,7 @@ namespace Shard3D {
 #endif
             ImGui::EndMenu();
         }
-#ifndef NDEBUG
+#ifdef hhDEBUG
         if (ImGui::BeginMenu("Debug")) {
             ImGui::TextDisabled("Shard3D Debug menu");
             ImGui::Checkbox("Stylizer", &showStylizersWindow);

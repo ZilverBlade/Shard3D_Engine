@@ -53,7 +53,7 @@ namespace Shard3D {
 	}
 
 	void ForwardRenderSystem::createPipeline(VkRenderPass renderPass) {
-		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+		SHARD3D_ASSERT(pipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::pipelineConfig(pipelineConfig)
@@ -65,23 +65,16 @@ namespace Shard3D {
 		CSimpleIniA ini;
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 		ini.SetUnicode();
-		if (ini.GetBoolValue("RENDERING", "PBR"))
-			enginePipeline = make_uPtr<EnginePipeline>(
-				engineDevice,
-				"assets/shaderdata/pbr_shader.vert.spv",
-				"assets/shaderdata/pbr_shader.frag.spv",
-				pipelineConfig
-			);
-		else 
-			enginePipeline = make_uPtr<EnginePipeline>(
-				engineDevice,
-				"assets/shaderdata/basic_shader.vert.spv",
-				"assets/shaderdata/basic_shader.frag.spv",
-				pipelineConfig
-			);
+		
+		enginePipeline = make_uPtr<EnginePipeline>(
+			engineDevice,
+			"assets/shaderdata/surface_shader.vert.spv",
+			"assets/shaderdata/surface_shader.frag.spv",
+			pipelineConfig
+		);
 	}
 
-	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {
+	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {;
 		enginePipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
@@ -94,6 +87,7 @@ namespace Shard3D {
 			0,
 			nullptr
 		);
+		
 		//auto imageInfo = wb3d::AssetManager::retrieveTexture("assets/_engine/tex/cubemaps/sky0/yes.png")->getImageInfo();
 		//VkDescriptorSet descriptorSet1;
 		//EngineDescriptorWriter(*skyboxLayout, frameInfo.perDrawDescriptorPool)
@@ -127,8 +121,10 @@ namespace Shard3D {
 			);
 
 			auto& model = AssetManager::retrieveMesh(actor.getComponent<Components::MeshComponent>().file);
-			model->bind(frameInfo.commandBuffer);
-			model->draw(frameInfo.commandBuffer);	
+			for (auto& buffer : model->buffers) {
+				model->bind(frameInfo.commandBuffer, buffer);
+				model->draw(frameInfo.commandBuffer, buffer);
+			}
 		}
 
 		/*level->registry.each([&](auto actorGUID) { Actor actor = { actorGUID, level.get() };

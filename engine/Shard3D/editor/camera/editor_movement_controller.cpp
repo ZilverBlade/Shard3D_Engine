@@ -43,7 +43,7 @@ namespace Shard3D {
 
 				// Prevents camera from jumping on the first click
 				if (firstClick) {
-					glfwSetCursorPos(window, (width / 2), (height / 2));
+					glfwSetCursorPos(window, (width / 2.f), (height / 2.f));
 					firstClick = false;
 				}
 
@@ -63,7 +63,7 @@ namespace Shard3D {
 				orientation = glm::rotate(orientation, glm::radians(rotY), glm::normalize(glm::cross(orientation, upVec)));
 
 				// force the roll to be pi*2 radians
-				orientation.z = 6.28318530718f;
+				orientation.z = 6.283185482f;
 
 				glfwSetCursorPos(window, (width / 2.f), (height / 2.f));
 			}
@@ -121,13 +121,13 @@ namespace Shard3D {
 				double mouseY;
 				glfwGetCursorPos(window, &mouseX, &mouseY);
 
-				float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
-				float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
+				float rotX = sensitivity * static_cast<float>(mouseY - (height / 2.f)) / height;
+				float rotY = sensitivity * static_cast<float>(mouseX - (width / 2.f)) / width;
 
 				// up down rotation
 				orientation = glm::rotate(orientation, glm::radians(rotX), upVec);
 				// to make sure it doesnt over-rotate			
-				orientation.x = glm::clamp(orientation.x, -1.57079632679f, 1.57079632679f);
+				orientation.x = glm::clamp(orientation.x, -1.57f, 1.57f);
 
 				// left right rotation
 				orientation = glm::rotate(orientation, glm::radians(rotY), glm::normalize(glm::cross(orientation, upVec)));
@@ -136,10 +136,8 @@ namespace Shard3D {
 
 				glfwSetCursorPos(window, (width / 2), (height / 2));
 			} else { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); firstClick = true; }
-
-			if (glm::dot(orientation, orientation) > std::numeric_limits<float>::epsilon()) {
-				actor.getComponent<Components::TransformComponent>().setRotation({ orientation.x, orientation.z, orientation.y });
-			}
+			
+			actor.getComponent<Components::TransformComponent>().setRotation({ orientation.x, orientation.z, orientation.y });
 			return false;
 		}
 		bool EditorMovementController::mouseScrollEvent(Events::MouseScrollEvent& e) {

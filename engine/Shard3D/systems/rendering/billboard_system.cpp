@@ -48,12 +48,13 @@ namespace Shard3D {
 	}
 
 	void BillboardRenderSystem::createPipeline(VkRenderPass renderPass) {
-		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::pipelineConfig(pipelineConfig)
 			.defaultPipelineConfigInfo()
-			.enableAlphaBlending(VK_BLEND_OP_ADD);
+			//.enableAlphaBlending(VK_BLEND_OP_ADD)
+			.setCullingMode(VK_CULL_MODE_FRONT_BIT);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout; // support only view plane aligned atm
@@ -99,7 +100,7 @@ namespace Shard3D {
 
 			BillboardPushConstants push{};
 			push.translation = glm::vec4(t.x, t.z, t.y, 1.f);
-			push.scale = glm::vec4(s.x, 0.f, s.y, 1.f);
+			push.scale = glm::vec4(s.x, s.z, 0.f, 1.f);
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,

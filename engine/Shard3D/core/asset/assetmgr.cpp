@@ -1,8 +1,9 @@
 #include "../../s3dpch.h" 
 #include "assetmgr.h"
 #include "../../core.h"
-
+#include <fstream>
 #include <filesystem>
+#include "matmgr.h"
 namespace Shard3D {
 	static std::string& castToAssetString(const std::string& input) {
 		std::string output = input.substr(input.rfind("assets\\" - 7));
@@ -13,31 +14,48 @@ namespace Shard3D {
 		return output;
 	}
 
-	void AssetManager::clearAllAssetsAndDontAddDefaults() { textureAssets.clear(); meshAssets.clear(); materialAssets.clear(); }
+	void AssetManager::clearAllAssetsAndDontAddDefaults() { textureAssets.clear(); meshAssets.clear(); /*materialAssets.clear(); */}
 	void AssetManager::clearTextureAssets() {
-		SHARD3D_WARN("Clearing all texture assets, may cause unexpected crash!");
-
+		SHARD3D_INFO("Clearing all texture assets");
 		vkDeviceWaitIdle(engineDevice->device());
 		textureAssets.clear();
 		emplaceTexture(ENGINE_ERRTEX, VK_FILTER_NEAREST);
-		emplaceTexture(ENGINE_ERRMAT, VK_FILTER_NEAREST);
+		emplaceTexture(ENGINE_ERRMTX, VK_FILTER_NEAREST);
 	}	
 	void AssetManager::clearMeshAssets() {
-		SHARD3D_WARN("Clearing all mesh assets, may cause unexpected crash!");
+		SHARD3D_INFO("Clearing all mesh assets");
 		vkDeviceWaitIdle(engineDevice->device());
 		meshAssets.clear();
 		emplaceMesh(ENGINE_ERRMSH);
 		emplaceMesh(ENGINE_DEFAULT_MODEL_FILE);
 	}
+	void AssetManager::clearMaterialAssets() {
+		SHARD3D_INFO("Clearing all material assets");
+		vkDeviceWaitIdle(engineDevice->device());
+		
+		//sPtr<SurfaceMaterial_ShadedOpaque> defaultMaterial = make_sPtr<SurfaceMaterial_ShadedOpaque>();
+		//
+		//defaultMaterial->diffuseTex = ENGINE_ERRMAT;
+		//defaultMaterial->shininess = 0.f;
+		//defaultMaterial->specular = 0.1f;
+		//
+		//IOUtils::writeStackBinary(defaultMaterial.get(), sizeof(SurfaceMaterial_ShadedOpaque), "assets/test.bin");
+//		//defaultMaterial->createMaterialDescriptors(SharedPools::staticMaterialPool.get());
+
+		//surfaceMaterialAssets[defaultMaterial->materialTag] = defaultMaterial;
+
+
+		//MaterialManager::saveMaterial(defaultMaterial, "assets/_engine/mat/grid.wbasset");
+	}
 	void AssetManager::clearAllAssets() {
 		clearTextureAssets();
 		clearMeshAssets();
-		materialAssets.clear();
+		clearMaterialAssets();
 	}
 	void AssetManager::loadLevelAssets() {
 		for (const auto& file : std::filesystem::recursive_directory_iterator("assets/materialdata")) { 
-			auto material = MaterialSystem::loadMaterial(file.path().string());
-			materialAssets[material.guid] = material;
+			//auto material = MaterialSystem::loadMaterial(file.path().string());
+			//materialAssets[1] = material;
 		}
 	}
 #pragma region Mesh
@@ -71,7 +89,6 @@ namespace Shard3D {
 #pragma region Texture
 	void AssetManager::emplaceTexture(const std::string& texturePath, int filter) {
 		std::string _texturePath = texturePath;
-
 		for (const auto& i : textureAssets)
 			if (i.first.find(_texturePath) != std::string::npos && _texturePath.find(i.first) != std::string::npos) {
 				SHARD3D_WARN("Texture at path '{0}' already exists! Texture will be ignored...", texturePath);
@@ -85,6 +102,8 @@ namespace Shard3D {
 		SHARD3D_LOG("Loaded texture to asset map '{0}'", _texturePath);
 		textureAssets[_texturePath] = texture;
 	}
+
+	
 	sPtr<EngineTexture>& AssetManager::retrieveTexture_ENSET_CONFIDENT_ASSETS(const std::string& path) {
 		return textureAssets.at(path);
 	}
@@ -94,32 +113,20 @@ namespace Shard3D {
 		return textureAssets.at(ENGINE_ERRTEX);
 	}
 #pragma endregion
-	void AssetManager::loadMaterialsFromList(MaterialSystem::MaterialList& matlist) {
-		for (MaterialSystem::Material material : matlist.list) {
-			materialAssets.emplace(material.guid, material);
-		}
-	}
-	void AssetManager::emplaceMaterial(MaterialSystem::Material& material) {
-		for (const auto& i : materialAssets)
-			if (i.second.path == material.path) { 
-				SHARD3D_WARN("Material at path '{0}' already exists! Material will be overwritten.", material.path); 
-				materialAssets.erase(i.first);
-				materialAssets[material.guid] = material;
-				return; //prevent entries in unordered map with same path
-			}
-		SHARD3D_LOG("Saved material '{0}'", material.path);
-		materialAssets[material.guid] = material;
+
+#pragma region Material
+	void AssetManager::emplaceMaterial(sPtr<SurfaceMaterial>, const std::string& materialPath) {
+
 	}
 
-	MaterialSystem::Material AssetManager::retrieveMaterialByGUID(uint64_t guid) {
-		return materialAssets.at(guid);
+
+	sPtr<SurfaceMaterial>& AssetManager::retrieveSurafaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path) {
+		if (surfaceMaterialAssets.find(path) != surfaceMaterialAssets.cend())
+			return surfaceMaterialAssets.at(path);
+		return surfaceMaterialAssets.at(ENGINE_ERRMAT);
 	}
-	MaterialSystem::Material AssetManager::retrieveMaterialByPath(const std::string& path) {
-		for (const auto& i : materialAssets)
-			if (i.second.path == path)			
-				return i.second;
-		SHARD3D_ERROR("Couldn't find material from path '{0}'.", path);
-	}
+#pragma endregion
+	
 }
 
 #pragma region special

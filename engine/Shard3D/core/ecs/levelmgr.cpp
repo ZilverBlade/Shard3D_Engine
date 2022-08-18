@@ -174,7 +174,7 @@ namespace Shard3D {
 		}
 
 		void LevelManager::saveRuntime(const std::string& destinationPath) {
-			assert(false);
+			SHARD3D_ASSERT(false);
 		}
 
 		LevelMgrResults LevelManager::load(const std::string& sourcePath, bool ignoreWarns) {
@@ -302,7 +302,7 @@ namespace Shard3D {
 		}
 
 		LevelMgrResults LevelManager::loadRuntime(const std::string& sourcePath) {
-			assert(false);
+			SHARD3D_ASSERT(false);
 			return LevelMgrResults::ErrorResult;
 		}
 	}
