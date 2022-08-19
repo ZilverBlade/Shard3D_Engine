@@ -22,6 +22,7 @@ namespace Shard3D {
 		alignas(16) glm::vec2 angle{}; //x = outer, y = inner
 		glm::vec4 attenuationMod{};
 		alignas(16)float specularMod{};
+		float radius{};
 	};
 	struct DirectionalLight {
 		glm::vec4 position{};

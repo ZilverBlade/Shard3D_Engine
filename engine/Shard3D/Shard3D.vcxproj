@@ -85,6 +85,9 @@
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -553,7 +556,9 @@
     <None Include="shaders\billboard_sva.vert" />
     <None Include="shaders\hud_element.frag" />
     <None Include="shaders\hud_element.vert" />
+    <None Include="shaders\materials\surface_shaded_masked.frag" />
     <None Include="shaders\materials\surface_shaded_opaque.frag" />
+    <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
     <None Include="shaders\surface_shader.frag" />
     <None Include="shaders\surface_shader.vert" />

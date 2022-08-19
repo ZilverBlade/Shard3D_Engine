@@ -30,6 +30,7 @@ namespace Shard3D {
 				ubo.spotlights[lightIndex].angle = glm::vec2(light.outerAngle, light.innerAngle);
 				ubo.spotlights[lightIndex].attenuationMod = glm::vec4(light.attenuationMod, 0.f);
 				ubo.spotlights[lightIndex].specularMod = light.specularMod;
+				ubo.spotlights[lightIndex].radius = light.radius;
 				lightIndex += 1;
 			});
 			ubo.numSpotlights = lightIndex;

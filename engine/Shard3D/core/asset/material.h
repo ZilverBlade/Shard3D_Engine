@@ -30,12 +30,12 @@ namespace Shard3D {
 		VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
 		VkCullModeFlags culling = VK_CULL_MODE_NONE;
 	};
-	struct SurfaceMaterialShaderConfigInfo {
+	struct SurfaceMaterialShaderDescriptorInfo {
 		VkDescriptorSet factors{};
 		VkDescriptorSet textures{};
 
 		uPtr<EngineDescriptorSetLayout> factorLayout{};
-		uPtr<EngineDescriptorSetLayout> imageLayout{};
+		uPtr<EngineDescriptorSetLayout> textureLayout{};
 	};
 
 	struct MaterialPipelineConfigInfo {
@@ -53,13 +53,14 @@ namespace Shard3D {
 
 		DrawData drawData{};
 
-		virtual void createMaterialDescriptors(uPtr<EngineDescriptorPool>& descriptorPool) = 0;
+		virtual void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) = 0;
 
-		void bind(VkCommandBuffer commandBuffer);
+		void bind(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet);
+		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig->pipelineLayout; }
 	protected:
-
-		MaterialPipelineConfigInfo* materialPipelineConfig;
-		SurfaceMaterialShaderConfigInfo materialDescriptorInfo;
+		bool built = false;
+		MaterialPipelineConfigInfo* materialPipelineConfig{};
+		SurfaceMaterialShaderDescriptorInfo materialDescriptorInfo{};
 	};	
 
 	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
@@ -83,18 +84,67 @@ namespace Shard3D {
 		std::string metallicTex = ENGINE_WHTTEX;
 
 		static void setupMaterialShaderPipeline(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-		void createMaterialDescriptors(uPtr<EngineDescriptorPool>& descriptorPool) override;
-	private:					
-		static inline MaterialPipelineConfigInfo surfaceShadedOpaque;
+		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
+	private:
+		MaterialPipelineConfigInfo surfaceShadedOpaque;
 	};
+	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
+	class SurfaceMaterial_ShadedMasked : public SurfaceMaterial {
+	public:
+		std::string normalTex = ENGINE_NRMTEX;
+		std::string maskTex = ENGINE_WHTTEX;
 
+		glm::vec4 emissiveColor{ 0.f };
+		std::string emissiveTex = ENGINE_WHTTEX;
+
+		glm::vec4 diffuseColor{ 1.f };
+		std::string diffuseTex = ENGINE_ERRTEX;
+
+		float specular = 0.5f;
+		std::string specularTex = ENGINE_WHTTEX;
+
+		float shininess = 0.5f;
+		std::string shininessTex = ENGINE_WHTTEX;
+
+		float metallic = 0.f;
+		std::string metallicTex = ENGINE_WHTTEX;
+
+		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
+	private:
+		MaterialPipelineConfigInfo surfaceShadedMasked;
+	};
+	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
+	class SurfaceMaterial_ShadedTranslucent : public SurfaceMaterial {
+	public:
+		std::string normalTex = ENGINE_NRMTEX;
+		float opacity = 1.0f;
+
+		glm::vec4 emissiveColor{ 0.f };
+		std::string emissiveTex = ENGINE_WHTTEX;
+
+		glm::vec4 diffuseColor{ 1.f };
+		std::string diffuseTex = ENGINE_ERRTEX;
+
+		float specular = 0.5f;
+		std::string specularTex = ENGINE_WHTTEX;
+
+		float shininess = 0.5f;
+		std::string shininessTex = ENGINE_WHTTEX;
+
+		float clarity = 0.f;
+		std::string clarityTex = ENGINE_WHTTEX;
+
+		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
+	private:
+		MaterialPipelineConfigInfo surfaceShadedTranslucent;
+	};
 	/*
 	*	Material that can be used for projecting textures onto meshes.
 	*	It will overlay whatever previous material with it's properties and render over it.
 	*/
 	class DecalMaterial {
 	public:
-		virtual void createMaterialDescriptors(EngineDescriptorPool& descriptorPool) = 0;
+		virtual void createMaterialShader(EngineDevice& device, EngineDescriptorPool& descriptorPool) = 0;
 
 		void bind(VkCommandBuffer commandBuffer);
 	};

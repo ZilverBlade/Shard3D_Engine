@@ -23,7 +23,7 @@ namespace Shard3D {
 		EngineDevice& engineDevice;
 
 		uPtr<EnginePipeline> enginePipeline;
-		VkPipelineLayout pipelineLayout;
+
 		uPtr<EngineDescriptorSetLayout> skyboxLayout;
 	};
 

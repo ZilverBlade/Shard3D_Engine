@@ -1,9 +1,12 @@
 #include "../../s3dpch.h" 
-#include "assetmgr.h"
 #include "../../core.h"
+
+#include "assetmgr.h"
+#include "matmgr.h"
+
 #include <fstream>
 #include <filesystem>
-#include "matmgr.h"
+
 namespace Shard3D {
 	static std::string& castToAssetString(const std::string& input) {
 		std::string output = input.substr(input.rfind("assets\\" - 7));
@@ -21,6 +24,9 @@ namespace Shard3D {
 		textureAssets.clear();
 		emplaceTexture(ENGINE_ERRTEX, VK_FILTER_NEAREST);
 		emplaceTexture(ENGINE_ERRMTX, VK_FILTER_NEAREST);
+		emplaceTexture(ENGINE_WHTTEX, VK_FILTER_NEAREST);
+		emplaceTexture(ENGINE_BLKTEX, VK_FILTER_NEAREST);
+		emplaceTexture(ENGINE_NRMTEX, VK_FILTER_NEAREST);
 	}	
 	void AssetManager::clearMeshAssets() {
 		SHARD3D_INFO("Clearing all mesh assets");
@@ -40,7 +46,7 @@ namespace Shard3D {
 		//defaultMaterial->specular = 0.1f;
 		//
 		//IOUtils::writeStackBinary(defaultMaterial.get(), sizeof(SurfaceMaterial_ShadedOpaque), "assets/test.bin");
-//		//defaultMaterial->createMaterialDescriptors(SharedPools::staticMaterialPool.get());
+//		//defaultMaterial->createMaterialShader(SharedPools::staticMaterialPool.get());
 
 		//surfaceMaterialAssets[defaultMaterial->materialTag] = defaultMaterial;
 
@@ -115,15 +121,15 @@ namespace Shard3D {
 #pragma endregion
 
 #pragma region Material
-	void AssetManager::emplaceMaterial(sPtr<SurfaceMaterial>, const std::string& materialPath) {
-
+	void AssetManager::emplaceMaterial(sPtr<SurfaceMaterial> material, const std::string& materialPath) {
+		surfaceMaterialAssets[materialPath] = material;
 	}
 
 
-	sPtr<SurfaceMaterial>& AssetManager::retrieveSurafaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path) {
-		if (surfaceMaterialAssets.find(path) != surfaceMaterialAssets.cend())
+	sPtr<SurfaceMaterial>& AssetManager::retrieveSurfaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path) {
+		//if (surfaceMaterialAssets.find(path) != surfaceMaterialAssets.cend())
 			return surfaceMaterialAssets.at(path);
-		return surfaceMaterialAssets.at(ENGINE_ERRMAT);
+		//return surfaceMaterialAssets.at(ENGINE_ERRMAT);
 	}
 #pragma endregion
 	

@@ -176,6 +176,8 @@
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\imgui;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

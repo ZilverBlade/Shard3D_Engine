@@ -1,6 +1,6 @@
 #pragma once
 #include "../../vulkan_abstr.h"
-#include "../../systems/buffers/material_system.h"
+#include "material.h"
 
 extern "C" {
 	struct aiNode;
@@ -21,7 +21,6 @@ namespace Shard3D {
 	public:
 		struct Vertex {
 			glm::vec3 position{};
-			glm::vec3 color{};
 			glm::vec3 normal{};
 			glm::vec2 uv{};
 
@@ -29,7 +28,7 @@ namespace Shard3D {
 			static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
 
 			bool operator==(const Vertex &other) const {
-				return position == other.position && color == other.color && normal == other.normal && uv == other.uv;
+				return position == other.position && normal == other.normal && uv == other.uv;
 			}
 		};
 
@@ -69,8 +68,10 @@ namespace Shard3D {
 		);
 
 		void bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
+		void bindMaterial(VkCommandBuffer commandBuffer, VkDescriptorSet globalDescriptorSet, SubmeshBuffers buffers);
 		void draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
 
+		VkPipelineLayout getMaterialPipelineLayout(SubmeshBuffers buffers) { return buffers.material->getPipelineLayout(); }
 		//			<Buffer Data>
 		std::vector<SubmeshBuffers> buffers{};
 

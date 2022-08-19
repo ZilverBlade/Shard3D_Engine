@@ -38,12 +38,11 @@ namespace Shard3D {
 		Events::setWindow(&engineWindow);
 		Input::setWindow(engineWindow);
 		setWindowCallbacks();
-
 		
 		SharedPools::constructPools(engineDevice);
 		
 		AssetManager::setDevice(engineDevice);
-		AssetManager::clearAllAssets();
+
 		_special_assets::_editor_icons_load();
 		GraphicsSettings::init(&engineWindow);
 
@@ -124,6 +123,8 @@ namespace Shard3D {
 		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		AssetManager::clearAllAssets();
+
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };

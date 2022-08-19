@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../systems/buffers/material_system.h"
+#include "material.h"
 #include "../../s3dstd.h"
 #include "texture.h"
 #include "model.h"
@@ -54,10 +54,10 @@ namespace Shard3D {
 #endif
 			}
 
-			static void emplaceMaterial(sPtr<SurfaceMaterial>, const std::string& materialPath);
+			static void emplaceMaterial(sPtr<SurfaceMaterial> material, const std::string& materialPath);
 			static inline sPtr<SurfaceMaterial> retrieveMaterial(const std::string& path) {
 #ifndef ENSET_CONFIDENT_ASSETS
-				return retrieveSurafaceMaterial_NENSET_CONFIDENT_ASSETS(path);
+				return retrieveSurfaceMaterial_NENSET_CONFIDENT_ASSETS(path);
 #else
 				return make_sPtr<SurfaceMaterial>();
 #endif
@@ -78,7 +78,7 @@ namespace Shard3D {
 			static sPtr<EngineTexture>& retrieveTexture_NENSET_CONFIDENT_ASSETS(const std::string& path);
 			static sPtr<EngineMesh>& retrieveMesh_ENSET_CONFIDENT_ASSETS(const std::string& path);
 			static sPtr<EngineMesh>& retrieveMesh_NENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<SurfaceMaterial>& retrieveSurafaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path);
+			static sPtr<SurfaceMaterial>& retrieveSurfaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path);
 
 			static inline hashMap<std::string, sPtr<EngineMesh>> meshAssets;
 			static inline hashMap<std::string, sPtr<EngineTexture>> textureAssets;

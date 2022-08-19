@@ -77,7 +77,7 @@ namespace Shard3D {
 		}
 
 		Actor Level::createActorWithGUID(UUID guid, const std::string& name) {
-			SHARD3D_ASSERT(this != nullptr, "Level does not exist! Cannot create actors!");
+			SHARD3D_ASSERT(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { registry.create(), this };
 			actor.addComponent<Components::UUIDComponent>(guid);
 			actor.addComponent<Components::TagComponent>().tag = name;

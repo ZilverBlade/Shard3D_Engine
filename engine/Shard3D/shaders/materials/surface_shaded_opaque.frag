@@ -20,6 +20,7 @@ struct Spotlight {
 	vec2 angle; //outer, inner
 	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
 	float specularMod;
+	float radius;
 };
 struct DirectionalLight {
 	vec4 position;
@@ -43,16 +44,18 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 	int numDirectionalLights;
 } ubo;
 
-layout(set = 1, binding = 1) uniform vec4 diffuse_factor;
-layout(set = 1, binding = 2) uniform float specular_factor;
-layout(set = 1, binding = 3) uniform float shininess_factor;
-layout(set = 1, binding = 4) uniform float metallic_factor;
+layout(set = 1, binding = 1) uniform MaterialFactor{
+	vec4 diffuse;
+	float specular;
+	float shininess;
+	float metallic;
+} factor;
 
-layout(set = 2, binding = 1) uniform sampler2D diffuse_tex;
-layout(set = 2, binding = 2) uniform sampler2D specular_tex;
-layout(set = 2, binding = 3) uniform sampler2D shininess_tex;
-layout(set = 2, binding = 4) uniform sampler2D metallic_tex;
-layout(set = 2, binding = 5) uniform sampler2D normal_tex;
+layout(set = 2, binding = 1) uniform sampler2D tex_diffuse;
+layout(set = 2, binding = 2) uniform sampler2D tex_specular;
+layout(set = 2, binding = 3) uniform sampler2D tex_shininess;
+layout(set = 2, binding = 4) uniform sampler2D tex_metallic;
+layout(set = 2, binding = 5) uniform sampler2D tex_normal;
 
 
 layout(set = 1, binding = 1) uniform MaterialTex {
@@ -98,49 +101,58 @@ vec3 fresnelSchlick(float cosTheta, vec3 baseSpec) {
 float specularExponent(float dotNH, float shine, float PGS, float sourceRadius){
  return pow(max(dotNH, 0) * (1 + sourceRadius / 100), shine * 512 + 4) * PGS;
 }
-#define LIGHT_RADIUS 1
 
+vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint, vec3 lightPos, vec4 l_Color, float l_Radius, vec3 m_Color, float m_Specular, float m_Shininess, float m_Metallic) {
+	vec3 L = normalize(lightPos - fragPosWorld);
+	vec3 H = normalize(L + viewpoint);
+
+	float dist = length(lightPos - fragPosWorld);
+	float attenuation = 1.0 / (dist * dist);
+	vec3 radiance = l_Color.xyz * l_Color.w * attenuation;
+	
+	float diffuseLight = max(dot(normal, L), 0);	
+	
+	vec3 diffuse = incolor * radiance * diffuseLight;
+
+	float G   = PseudoGeometrySmith(normal, viewpoint, m_Shininess);
+	vec3 F = fresnelSchlick(clamp(dot(H, viewpoint), 0.0, 1.0), baseSpecular);
+	float specularLight = specularExponent(dot(normal, H), m_Shininess, G, l_Radius);
+
+	vec3 specular = m_Specular * radiance * specularLight;
+
+	vec3 Kd = vec3(1.0);
+	
+	Kd *= 1.0 - m_Metallic;
+
+	return Kd * diffuse + specular * max(F, 0);
+}
+	
 // shader code
 void main(){
-	float material_specular = texture(specular_tex, fragUV).x * specular_factor;
-	float material_shininess = texture(shininess_tex, fragUV).x * shininess_factor;
-	float material_metallic = texture(metallic_tex, fragUV).x * metallic_factor;
-	vec3 fragColor = texture(diffuse_tex, fragUV).xyz * diffuse_factor.xyz;
+	float material_specular = texture(tex_specular, fragUV).x * factor.specular;
+	float material_shininess = texture(tex_shininess, fragUV).x * factor.shininess;
+	float material_metallic = texture(tex_metallic, fragUV).x * factor.metallic;
+	vec3 fragColor = texture(tex_diffuse, fragUV).xyz * factor.diffuse.xyz;
+	
+	vec3 N = normalize(fragNormalWorld);
+
+
+	vec3 cameraPosWorld = ubo.invView[3].xyz;
+	vec3 V = normalize(cameraPosWorld - fragPosWorld);
+
+	vec3 lightOutput = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
 
 	vec3 F0 = vec3(1.0); // base specular
 	F0 = mix(F0, fragColor, material_metallic);
 
-	vec3 cameraPosWorld = ubo.invView[3].xyz;
-	
-	vec3 N = normalize(fragNormalWorld);
-	vec3 V = normalize(cameraPosWorld - fragPosWorld);
-	
-	vec3 lightOutput = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
-	
 	for (int i = 0; i < ubo.numPointlights; i++) {
 		Pointlight light = ubo.pointlights[i];
-		vec3 L = normalize(light.position.xyz - fragPosWorld);
-		vec3 H = normalize(L + V);
 
-		float dist = length(light.position.xyz - fragPosWorld);
-		float attenuation = 1.0 / (dist * dist);
-		vec3 radiance = light.color.xyz * light.color.w * attenuation;
-		
-		float diffuseLight = max(dot(N, L), 0);	
-		
-		vec3 diffuse = fragColor * radiance * diffuseLight;
-
-		float G   = PseudoGeometrySmith(N, V, material_shininess);
-		vec3 F = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
-		float specularLight = specularExponent(dot(N, H), material_shininess, G, light.radius);
-
-		vec3 specular = material_specular * radiance * specularLight;
-
-		vec3 Kd = vec3(1.0);
-	   
-		Kd *= 1.0 - material_metallic;
-
-		lightOutput += Kd * diffuse + specular * max(F, 0); 
+		lightOutput += 
+		calculateLight(fragColor, F0, N, V, 
+			light.position.xyz, light.color, light.radius, 
+			fragColor, material_specular, material_shininess, material_metallic
+		);
 	}
 
 	for (int i = 0; i < ubo.numSpotlights; i++) {
@@ -153,26 +165,10 @@ void main(){
 			float epsilon  = cos(light.angle.y) - outerCosAngle;
 			float intensity = clamp((theta - outerCosAngle) / epsilon, 0.0, 1.0); 
 	
-			vec3 H = normalize(L + V);
-			float dist = length(light.position.xyz - fragPosWorld);
-			float attenuation = 1.0 / (dist * dist);
-			vec3 radiance = light.color.xyz * light.color.w * attenuation;
-			
-			float diffuseLight = max(dot(N, L), 0);	
-		
-			vec3 diffuse = fragColor * radiance * diffuseLight;
-
-			float G   = PseudoGeometrySmith(N, V, material_shininess);
-			vec3 F = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
-			float specularLight = specularExponent(dot(N, H), material_shininess, G, LIGHT_RADIUS);
-
-			vec3 specular = material_specular * radiance * specularLight;
-
-			vec3 Kd = vec3(1.0);
-	   
-			Kd *= 1.0 - material_metallic;
-
-			lightOutput += (Kd * diffuse  + specular * max(F, 0)) * intensity; 
+			lightOutput += 	intensity * calculateLight(fragColor, F0, N, V, 
+				light.position.xyz, light.color, light.radius, 
+				fragColor, material_specular, material_shininess, material_metallic
+			); 
 		}
 	}
 	

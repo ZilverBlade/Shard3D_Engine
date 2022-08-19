@@ -1,8 +1,8 @@
 #version 450
 
-layout(location = 0) in vec3 fragColor;
-layout(location = 1) in vec3 fragPosWorld;
-layout(location = 2) in vec3 fragNormalWorld;
+layout(location = 0) in vec3 fragPosWorld;
+layout(location = 1) in vec3 fragNormalWorld;
+layout(location = 2) in vec2 fragUV;
 
 layout (location = 0) out vec4 outColor;
 
@@ -42,9 +42,38 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 	int numPointlights;
 	int numSpotlights;
 	int numDirectionalLights;
+} ubo;
+
+layout(set = 1, binding = 1) uniform MaterialFactor{
+	vec4 diffuse;
+	float specular;
+	float shininess;
+	float clarity;
+} factor;
+
+layout(set = 2, binding = 1) uniform sampler2D tex_diffuse;
+layout(set = 2, binding = 2) uniform sampler2D tex_specular;
+layout(set = 2, binding = 3) uniform sampler2D tex_shininess;
+layout(set = 2, binding = 4) uniform sampler2D tex_clarity;
+layout(set = 2, binding = 5) uniform sampler2D tex_normal;
+
+
+layout(set = 1, binding = 1) uniform MaterialTex {
+	mat4 projection;
+	mat4 view;
+	mat4 invView;
+
+	vec4 ambientLightColor;			//	sky/ambient
+	
+	Pointlight pointlights[128];
+	Spotlight spotlights[128];
+	DirectionalLight directionalLights[6];
+	int numPointlights;
+	int numSpotlights;
+	int numDirectionalLights;
 
 	vec3 materialSettings;
-} ubo;
+} material_tex;
 
 layout(push_constant) uniform Push {
 	mat4 modelMatrix; 
@@ -73,7 +102,7 @@ float specularExponent(float dotNH, float shine, float PGS, float sourceRadius){
  return pow(max(dotNH, 0) * (1 + sourceRadius / 100), shine * 512 + 4) * PGS;
 }
 
-vec3 calculateLight(vec3 baseSpecular, vec3 normal, vec3 viewpoint, vec3 lightPos, vec4 l_Color, float l_Radius, vec3 m_Color, float m_Specular, float m_Shininess, float m_Metallic) {
+vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint, vec3 lightPos, vec4 l_Color, float l_Radius, vec3 m_Color, float m_Specular, float m_Shininess, float m_Metallic) {
 	vec3 L = normalize(lightPos - fragPosWorld);
 	vec3 H = normalize(L + viewpoint);
 
@@ -83,7 +112,7 @@ vec3 calculateLight(vec3 baseSpecular, vec3 normal, vec3 viewpoint, vec3 lightPo
 	
 	float diffuseLight = max(dot(normal, L), 0);	
 	
-	vec3 diffuse = fragColor * radiance * diffuseLight;
+	vec3 diffuse = incolor * radiance * diffuseLight;
 
 	float G   = PseudoGeometrySmith(normal, viewpoint, m_Shininess);
 	vec3 F = fresnelSchlick(clamp(dot(H, viewpoint), 0.0, 1.0), baseSpecular);
@@ -97,28 +126,30 @@ vec3 calculateLight(vec3 baseSpecular, vec3 normal, vec3 viewpoint, vec3 lightPo
 
 	return Kd * diffuse + specular * max(F, 0);
 }
-
+	
 // shader code
-void main(){
-	vec3 cameraPosWorld = ubo.invView[3].xyz;
+void main() {
+	float material_specular = texture(tex_specular, fragUV).x * factor.specular;
+	float material_shininess = texture(tex_shininess, fragUV).x * factor.shininess;
+	float material_metallic = texture(tex_clarity, fragUV).x * factor.clarity;
+	vec3 fragColor = texture(tex_diffuse, fragUV).xyz * factor.diffuse.xyz;
 	
 	vec3 N = normalize(fragNormalWorld);
+
+
+	vec3 cameraPosWorld = ubo.invView[3].xyz;
 	vec3 V = normalize(cameraPosWorld - fragPosWorld);
-	
-	float material_specular = ubo.materialSettings.x;
-	float material_shininess = ubo.materialSettings.y;
-	float material_metallic = ubo.materialSettings.z;
 
 	vec3 lightOutput = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
 
 	vec3 F0 = vec3(1.0); // base specular
-	F0 = mix(F0, fragColor, ubo.materialSettings.z);
+	F0 = mix(F0, fragColor, material_metallic);
 
 	for (int i = 0; i < ubo.numPointlights; i++) {
 		Pointlight light = ubo.pointlights[i];
 
 		lightOutput += 
-		calculateLight(F0, N, V, 
+		calculateLight(fragColor, F0, N, V, 
 			light.position.xyz, light.color, light.radius, 
 			fragColor, material_specular, material_shininess, material_metallic
 		);
@@ -134,7 +165,7 @@ void main(){
 			float epsilon  = cos(light.angle.y) - outerCosAngle;
 			float intensity = clamp((theta - outerCosAngle) / epsilon, 0.0, 1.0); 
 	
-			lightOutput += 	intensity * calculateLight(F0, N, V, 
+			lightOutput += 	intensity * calculateLight(fragColor, F0, N, V, 
 				light.position.xyz, light.color, light.radius, 
 				fragColor, material_specular, material_shininess, material_metallic
 			); 
@@ -150,5 +181,5 @@ void main(){
 		lightOutput += lightIntensity * color_intensity;
 	}
 
-	outColor = vec4(lightOutput, 1.0); //RGBA
+	outColor = vec4(lightOutput, factor.diffuse.w); //RGBA
 }
