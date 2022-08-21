@@ -153,6 +153,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="editor\imgui_initializer.h" />
     <ClInclude Include="workarounds.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="dynamic_definitions.h" />
@@ -195,7 +196,6 @@
     <ClInclude Include="editor\hud_builder_panel.h" />
     <ClInclude Include="editor\imgui_glfw_implementation.h" />
     <ClInclude Include="editor\imgui_implementation.h" />
-    <ClInclude Include="editor\imgui_initter.h" />
     <ClInclude Include="editor\imgui_layer.h" />
     <ClInclude Include="editor\level_gizmo.h" />
     <ClInclude Include="editor\level_peekers.h" />
@@ -410,9 +410,9 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="editor\imgui_initter.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
+    <ClCompile Include="editor\imgui_initializer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="editor\imgui_layer.cpp">

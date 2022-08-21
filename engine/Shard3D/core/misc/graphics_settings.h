@@ -59,7 +59,7 @@ namespace Shard3D {
 			//	[GRAPHICS]
 //Samples used by the renderer. Keep at 1, as this is deprecated and should not be used. 
 			//@return (requires restart)
-			int	MSAASamples = 1;
+			VkSampleCountFlagBits MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 			//	[GRAPHICS]
 /*LOD Coef. Quality will range from graphics settings :
 			@param Poor: Always lowest LODs

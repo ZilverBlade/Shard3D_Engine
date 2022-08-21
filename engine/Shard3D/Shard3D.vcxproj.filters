@@ -318,9 +318,6 @@
     <ClInclude Include="editor\imgui_implementation.h">
       <Filter>Header Files\editor</Filter>
     </ClInclude>
-    <ClInclude Include="editor\imgui_initter.h">
-      <Filter>Header Files\editor</Filter>
-    </ClInclude>
     <ClInclude Include="editor\imgui_layer.h">
       <Filter>Header Files\editor</Filter>
     </ClInclude>
@@ -388,6 +385,9 @@
       <Filter>_config</Filter>
     </ClInclude>
     <ClInclude Include="workarounds.h" />
+    <ClInclude Include="editor\imgui_initializer.h">
+      <Filter>Header Files\editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s3dpch.cpp">
@@ -495,9 +495,6 @@
     <ClCompile Include="editor\imgui_implementation.cpp">
       <Filter>Source Files\editor</Filter>
     </ClCompile>
-    <ClCompile Include="editor\imgui_initter.cpp">
-      <Filter>Source Files\editor</Filter>
-    </ClCompile>
     <ClCompile Include="editor\camera\editor_movement_controller.cpp">
       <Filter>Source Files\editor\camera</Filter>
     </ClCompile>
@@ -554,6 +551,9 @@
     </ClCompile>
     <ClCompile Include="systems\buffers\light_system.cpp">
       <Filter>Source Files\systems\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\imgui_initializer.cpp">
+      <Filter>Source Files\editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

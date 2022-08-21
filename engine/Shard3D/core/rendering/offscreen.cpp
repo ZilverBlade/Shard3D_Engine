@@ -2,10 +2,11 @@
 // Created by lukas on 27/11/2021
 //
 #include "offscreen.h"
+#include "../misc/graphics_settings.h"
 namespace Shard3D {
 	OffScreen::OffScreen(EngineDevice& device) : m_Device{ device } {
-		pass.width = 1280;
-		pass.height = 720;
+		pass.width = 1920;
+		pass.height = 1080;
 
 		createImages();
 
@@ -19,6 +20,7 @@ namespace Shard3D {
 
 		clearValues[0].color = { 0.f, 0.f, 0.f, 1.f };//{ noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
+		//clearValues[2].color = { 0.f, 0.f, 0.f, 1.f };
 	}
 
 	void OffScreen::createImages() {
@@ -37,7 +39,7 @@ namespace Shard3D {
 		image.extent.depth = 1;
 		image.mipLevels = 1;
 		image.arrayLayers = 1;
-		image.samples = VK_SAMPLE_COUNT_1_BIT;
+		image.samples = GraphicsSettings::get().MSAASamples;
 		image.tiling = VK_IMAGE_TILING_OPTIMAL;
 		// We will sample directly from the color attachment
 		image.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT
@@ -49,33 +51,65 @@ namespace Shard3D {
 		memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		VkMemoryRequirements memReqs;
 
-		if (vkCreateImage(m_Device.device(), &image, nullptr, &pass.color.image) != VK_SUCCESS) {
-			SHARD3D_ERROR("Failed to create image");
-		}
-		vkGetImageMemoryRequirements(m_Device.device(), pass.color.image, &memReqs);
-		memAlloc.allocationSize = memReqs.size;
-		memAlloc.memoryTypeIndex = m_Device.findMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		//memAlloc.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		if (vkAllocateMemory(m_Device.device(), &memAlloc, nullptr, &pass.color.mem) != VK_SUCCESS) {
-			SHARD3D_ERROR("Failed to allocate memory");
-		}
-		if (vkBindImageMemory(m_Device.device(), pass.color.image, pass.color.mem, 0) != VK_SUCCESS) {
-			SHARD3D_ERROR("Failed to bind memory");
-		}
+		{
+			if (vkCreateImage(m_Device.device(), &image, nullptr, &pass.color.image) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to create image");
+			}
+			vkGetImageMemoryRequirements(m_Device.device(), pass.color.image, &memReqs);
+			memAlloc.allocationSize = memReqs.size;
+			memAlloc.memoryTypeIndex = m_Device.findMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+			if (vkAllocateMemory(m_Device.device(), &memAlloc, nullptr, &pass.color.mem) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to allocate memory");
+			}
+			if (vkBindImageMemory(m_Device.device(), pass.color.image, pass.color.mem, 0) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to bind memory");
+			}
 
-		VkImageViewCreateInfo colorImageView = {};
-		colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		colorImageView.format = VK_FORMAT_R8G8B8A8_SRGB;
-		colorImageView.subresourceRange = {};
-		colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		colorImageView.subresourceRange.baseMipLevel = 0;
-		colorImageView.subresourceRange.levelCount = 1;
-		colorImageView.subresourceRange.baseArrayLayer = 0;
-		colorImageView.subresourceRange.layerCount = 1;
-		colorImageView.image = pass.color.image;
-		if (vkCreateImageView(m_Device.device(), &colorImageView, nullptr, &pass.color.view) != VK_SUCCESS) {
-			SHARD3D_ERROR("Failed to create color image view");
+			VkImageViewCreateInfo colorImageView = {};
+			colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			colorImageView.format = VK_FORMAT_B8G8R8A8_SRGB;
+			colorImageView.subresourceRange = {};
+			colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			colorImageView.subresourceRange.baseMipLevel = 0;
+			colorImageView.subresourceRange.levelCount = 1;
+			colorImageView.subresourceRange.baseArrayLayer = 0;
+			colorImageView.subresourceRange.layerCount = 1;
+			colorImageView.image = pass.color.image;
+			if (vkCreateImageView(m_Device.device(), &colorImageView, nullptr, &pass.color.view) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to create color image view");
+			}
+
+		}
+		{
+			image.samples = VK_SAMPLE_COUNT_1_BIT;
+			if (vkCreateImage(m_Device.device(), &image, nullptr, &pass.colorResolve.image) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to create image");
+			}
+			vkGetImageMemoryRequirements(m_Device.device(), pass.colorResolve.image, &memReqs);
+			memAlloc.allocationSize = memReqs.size;
+			memAlloc.memoryTypeIndex = m_Device.findMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+			if (vkAllocateMemory(m_Device.device(), &memAlloc, nullptr, &pass.colorResolve.mem) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to allocate memory");
+			}
+			if (vkBindImageMemory(m_Device.device(), pass.colorResolve.image, pass.colorResolve.mem, 0) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to bind memory");
+			}
+
+			VkImageViewCreateInfo colorImageView = {};
+			colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			colorImageView.format = VK_FORMAT_B8G8R8A8_SRGB;
+			colorImageView.subresourceRange = {};
+			colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			colorImageView.subresourceRange.baseMipLevel = 0;
+			colorImageView.subresourceRange.levelCount = 1;
+			colorImageView.subresourceRange.baseArrayLayer = 0;
+			colorImageView.subresourceRange.layerCount = 1;
+			colorImageView.image = pass.colorResolve.image;
+			if (vkCreateImageView(m_Device.device(), &colorImageView, nullptr, &pass.colorResolve.view) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to create color image view");
+			}
 		}
 
 		// Create sampler to sample from the attachment in the fragment shader
@@ -99,6 +133,7 @@ namespace Shard3D {
 		// Depth stencil attachment
 		image.format = fbDepthFormat;
 		image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		image.samples = GraphicsSettings::get().MSAASamples;
 
 		if (vkCreateImage(m_Device.device(), &image, nullptr, &pass.depth.image) != VK_SUCCESS) {
 			SHARD3D_ERROR("Failed to create image");
@@ -133,19 +168,19 @@ namespace Shard3D {
 
 		// Create a separate render pass for the offscreen rendering as it may differ from the one used for scene rendering
 
-		std::array<VkAttachmentDescription, 2> attchmentDescriptions{};
+		std::array<VkAttachmentDescription, 3> attchmentDescriptions{};
 		// Color attachment
-		attchmentDescriptions[0].format = VK_FORMAT_R8G8B8A8_SRGB;
-		attchmentDescriptions[0].samples = VK_SAMPLE_COUNT_1_BIT;
+		attchmentDescriptions[0].format = VK_FORMAT_B8G8R8A8_SRGB;
+		attchmentDescriptions[0].samples = GraphicsSettings::get().MSAASamples;
 		attchmentDescriptions[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		attchmentDescriptions[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 		attchmentDescriptions[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		attchmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		attchmentDescriptions[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		attchmentDescriptions[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		attchmentDescriptions[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Depth attachment
 		attchmentDescriptions[1].format = fbDepthFormat;
-		attchmentDescriptions[1].samples = VK_SAMPLE_COUNT_1_BIT;
+		attchmentDescriptions[1].samples = GraphicsSettings::get().MSAASamples;
 		attchmentDescriptions[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		attchmentDescriptions[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		attchmentDescriptions[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -153,14 +188,27 @@ namespace Shard3D {
 		attchmentDescriptions[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		attchmentDescriptions[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
+		// Color attachment resolve
+		attchmentDescriptions[2].format = VK_FORMAT_B8G8R8A8_SRGB;
+		attchmentDescriptions[2].samples = VK_SAMPLE_COUNT_1_BIT;
+		attchmentDescriptions[2].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attchmentDescriptions[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		attchmentDescriptions[2].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attchmentDescriptions[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		attchmentDescriptions[2].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		attchmentDescriptions[2].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
 		VkAttachmentReference colorReference = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
 		VkAttachmentReference depthReference = { 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+		VkAttachmentReference colorResolveReference = { 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
+
 
 		VkSubpassDescription subpassDescription{};
 		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subpassDescription.colorAttachmentCount = 1;
 		subpassDescription.pColorAttachments = &colorReference;
 		subpassDescription.pDepthStencilAttachment = &depthReference;
+		subpassDescription.pResolveAttachments = &colorResolveReference;
 
 		// Use subpass dependencies for layout transitions
 		std::array<VkSubpassDependency, 2> dependencies;
@@ -195,14 +243,15 @@ namespace Shard3D {
 			SHARD3D_ERROR("Failed to create render pass");
 		}
 
-		VkImageView attachments[2]{};
+		VkImageView attachments[3]{};
 		attachments[0] = pass.color.view;
 		attachments[1] = pass.depth.view;
+		attachments[2] = pass.colorResolve.view;
 
 		VkFramebufferCreateInfo fbufCreateInfo{};
 		fbufCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		fbufCreateInfo.renderPass = pass.renderPass;
-		fbufCreateInfo.attachmentCount = 2;
+		fbufCreateInfo.attachmentCount = 3;
 		fbufCreateInfo.pAttachments = attachments;
 		fbufCreateInfo.width = pass.width;
 		fbufCreateInfo.height = pass.height;
@@ -214,7 +263,7 @@ namespace Shard3D {
 
 		// Fill a descriptor for later use in a descriptor set
 		pass.descriptor.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		pass.descriptor.imageView = pass.color.view;
+		pass.descriptor.imageView = pass.colorResolve.view;
 		pass.descriptor.sampler = pass.sampler;
 	}
 

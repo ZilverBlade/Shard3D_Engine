@@ -648,37 +648,7 @@ namespace Shard3D {
                 audio.play("assets/audiodata/thou-3.mp3");
             }
 
-            if (ImGui::MenuItem("Save test material")) {
-                Material surfaceMat;
-                surfaceMat.type = SurfaceMaterial;
-                surfaceMat.surfaceMaterial.surfaceProp = SurfaceStandardLit;
-                surfaceMat.surfaceMaterial.surfaceMat = SurfaceOpaqueMaterial;
-                surfaceMat.surfaceMaterial.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
-                surfaceMat.surfaceMaterial.roughnessTex.path = "assets/texturedata/coolroughness.png";
-
-                MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
-            }
-            if (ImGui::MenuItem("Save test material list")) {
-                Material surfaceMat;
-                surfaceMat.type = SurfaceMaterial;
-                surfaceMat.surfaceMaterial.surfaceProp = SurfaceStandardLit;
-                surfaceMat.surfaceMaterial.surfaceMat = SurfaceOpaqueMaterial;
-                surfaceMat.surfaceMaterial.diffuseColor = { 1.f, 0.f, 1.f, 1.f };
-                surfaceMat.surfaceMaterial.roughnessTex.path = "assets/texturedata/coolroughness.png";
-                MaterialSystem::saveMaterial(surfaceMat, "assets/materialdata/mycoolmat");
-                Material surfaceMat2;
-                surfaceMat2.type = SurfaceMaterial;
-                surfaceMat2.surfaceMaterial.surfaceProp = SurfaceStandardUnlit;
-                surfaceMat2.surfaceMaterial.surfaceMat = SurfaceMaskedMaterial;
-                surfaceMat2.surfaceMaterial.diffuseTex.path = "assets/texturedata/grid.png";
-                surfaceMat2.surfaceMaterial.maskTex.path = "assets/texturedata/gridmask.png";
-                MaterialSystem::saveMaterial(surfaceMat2, "assets/materialdata/mycoolgridmat2");
-
-                MaterialSystem::MaterialList matlist;
-                matlist.list.push_back(surfaceMat);
-                matlist.list.push_back(surfaceMat2);
-                MaterialSystem::saveList(matlist, "assets/material-listdata/mycoollist");
-            }
+            
             if (ImGui::MenuItem("Encrypt string")) {
                 std::string originalString = "Hello World! ABCDabcd0123<> /\\[]+=.;'`~óòçñ";
                 char c;

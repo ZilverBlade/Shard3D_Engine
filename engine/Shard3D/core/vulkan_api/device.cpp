@@ -76,6 +76,7 @@ int EngineDevice::getMaxUsableSampleCount() {
     if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
     if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
     if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
+
     return VK_SAMPLE_COUNT_1_BIT;
 }
 
@@ -164,7 +165,9 @@ void EngineDevice::pickPhysicalDevice() {
       assert(msaaSamples >= 1 && "MSAA samples cannot be inferior to 1!");
       if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { SHARD3D_WARN("MSAA Sample count exceeds device capability, dropping down to device's limit"); }
       msaaSamples = (VkSampleCountFlagBits)std::min((int)ini.GetLongValue("GRAPHICS", "MSAASamples"), getMaxUsableSampleCount());
-   
+
+      GraphicsSettings::get().MSAASamples = msaaSamples;
+
       SHARD3D_INFO("Using {0}x MSAA", msaaSamples);
       break;
     }

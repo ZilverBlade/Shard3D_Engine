@@ -30,10 +30,10 @@ namespace Shard3D {
 
 			_pipeline_cfg defaultPipelineConfigInfo();
 			_pipeline_cfg enableVertexDescriptions();
-			_pipeline_cfg enableAlphaBlending(VkBlendOp blendOp);
+			_pipeline_cfg enableAlphaBlending(VkBlendOp blendOp = VK_BLEND_OP_ADD);
 			_pipeline_cfg lineRasterizer(float thickness = 1.0f);
 			_pipeline_cfg discardRasterizer();
-
+			_pipeline_cfg forceSampleCount(VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
 		private:
 			PipelineConfigInfo& configInfo;
 		};
