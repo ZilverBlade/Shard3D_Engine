@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../core/ecs/level.h"
-
+#include "../core/misc/frame_info.h"
 using namespace Shard3D::ECS;
 namespace Shard3D {
 	class LevelPeekingPanel {
@@ -13,11 +13,11 @@ namespace Shard3D {
 		void setContext(const sPtr<Level>& levelContext);
 		void destroyContext();
 
-		void render();
+		void render(FrameInfo& frameInfo);
 
 	private:
 		static inline bool textureInspector, materialInspector, actorInspector, lodInspector, miscInspector;
-
+		
 		void peekTextureInspector();
 		void peekMaterialInspector();
 		void peekActorInspector();

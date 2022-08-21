@@ -15,28 +15,28 @@ namespace Shard3D::CppScripts {
 
 			camAct.getComponent<Components::TransformComponent>().setRotation({ 0.3f, 0.f, 0.f });
 
-			for (int i = 0; i < 17; i++) {
+			for (int i = 0; i < 125; i++) {
 				auto light = getActiveLevel()->createActor("pointlight" + std::to_string(i));
 				light.addComponent<Components::PointlightComponent>().lightIntensity = 3.f;
-				light.getComponent<Components::PointlightComponent>().color = { glm::clamp(i * 0.1f, 0.f, 3.f), glm::clamp(i * 0.15f, 0.f, 3.f), glm::clamp(i * 0.2f, 0.f, 3.f) };
+				light.getComponent<Components::PointlightComponent>().color = { 0.8f, 0.9, 1.f };
 				light.getComponent<Components::TransformComponent>().setTranslation({ 5.f,
-																					25.f + i * 15.f,
-																					 4.1f});
+																					25.f + i * 30.f,
+																					 5.1f});
 			}
-			for (int i = 0; i < 17; i++) {
+			for (int i = 0; i < 125; i++) {
 				auto light = getActiveLevel()->createActor("spotlight" + std::to_string(i));
 				light.addComponent<Components::SpotlightComponent>().lightIntensity = 6.f;
-				light.getComponent<Components::SpotlightComponent>().color = { glm::clamp(i * 0.1f, 0.f, 3.f), glm::clamp(i * 0.15f, 0.f, 3.f), glm::clamp(i * 0.2f, 0.f, 3.f) };
+				light.getComponent<Components::SpotlightComponent>().color = { 0.8f, 0.9, 1.f };
 				light.getComponent<Components::TransformComponent>().setRotationZ(-0.1f);
 
 				light.getComponent<Components::TransformComponent>().setTranslation({ 5.f,
-																					25.f + 17.f * 15.f + i * 15.f,
-																					4.1f });
+																					25.f + 125.f * 30.f + i * 15.f,
+																					5.1f });
 			}
 
 			thisActor.getComponent<Components::AudioComponent>().play();
 			thisActor.getComponent<Components::AudioComponent>().properties.pitch = basePitch;
-			thisActor.getComponent<Components::AudioComponent>().properties.volume = 2.f;
+			thisActor.getComponent<Components::AudioComponent>().properties.volume = 0.5f;
 
 			//camAct.getComponent<Components::CameraComponent>().fov = 60.f;
 			camAct.getComponent<Components::CameraComponent>().camera.setViewYXZ(
@@ -66,7 +66,7 @@ namespace Shard3D::CppScripts {
 			if (Input::isKeyDown(GLFW_KEY_W)) {
 				moveVector += exponent * 0.008f;
 				exponent += dt * 0.005f * glm::clamp(0.1f / moveVector.z, 0.f, 10.f);
-				thisActor.getComponent<Components::AudioComponent>().properties.volume = 5.f;
+				thisActor.getComponent<Components::AudioComponent>().properties.volume = 1.0f;
 			} else {
 				moveVector.x -= dt * 0.0098f;
 				moveVector.y -= dt * 0.0098f;
@@ -74,7 +74,7 @@ namespace Shard3D::CppScripts {
 				if (exponent < 0) exponent = 0.0001f;
 				if (moveVector.x < 0) moveVector.x = 0.f;
 				if (moveVector.y < 0) moveVector.y = 0.f;
-				thisActor.getComponent<Components::AudioComponent>().properties.volume = 3.f;
+				thisActor.getComponent<Components::AudioComponent>().properties.volume = 0.5f;
 			}
 			translation += moveVector * forwardDir;
 

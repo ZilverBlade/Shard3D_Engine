@@ -7,8 +7,11 @@
 void initEngineFeatures() {
     Shard3D::LOGGER::init();
 }
-
+#ifdef _DEPLOY
+int invoke_main() {
+#elif !_DEPLOY
 int main() {
+#endif
     initEngineFeatures();
 
 #ifdef _WIN32

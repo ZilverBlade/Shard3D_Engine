@@ -58,23 +58,6 @@ layout(set = 2, binding = 4) uniform sampler2D tex_clarity;
 layout(set = 2, binding = 5) uniform sampler2D tex_normal;
 
 
-layout(set = 1, binding = 1) uniform MaterialTex {
-	mat4 projection;
-	mat4 view;
-	mat4 invView;
-
-	vec4 ambientLightColor;			//	sky/ambient
-	
-	Pointlight pointlights[128];
-	Spotlight spotlights[128];
-	DirectionalLight directionalLights[6];
-	int numPointlights;
-	int numSpotlights;
-	int numDirectionalLights;
-
-	vec3 materialSettings;
-} material_tex;
-
 layout(push_constant) uniform Push {
 	mat4 modelMatrix; 
 	mat4 normalMatrix;
@@ -99,7 +82,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 baseSpec) {
 }
 
 float specularExponent(float dotNH, float shine, float PGS, float sourceRadius){
- return pow(max(dotNH, 0) * (1 + sourceRadius / 100), shine * 512 + 4) * PGS;
+	return pow(max(dotNH, 0) * (1 + sourceRadius / 100), shine * 256 + 2) * PGS;
 }
 
 vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint, vec3 lightPos, vec4 l_Color, float l_Radius, vec3 m_Color, float m_Specular, float m_Shininess, float m_Metallic) {
@@ -126,7 +109,7 @@ vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint
 
 	return Kd * diffuse + specular * max(F, 0);
 }
-	
+
 // shader code
 void main() {
 	float material_specular = texture(tex_specular, fragUV).x * factor.specular;
@@ -178,7 +161,9 @@ void main() {
 		float lightIntensity = max(dot(N, normalize(directionalLight.direction.xyz)), 0) ;
 		vec3 color_intensity = directionalLight.color.xyz * directionalLight.color.w ;
 	
-		lightOutput += lightIntensity * color_intensity;
+		float Kd = 1.0;
+		Kd *= 1.0 - material_metallic;
+		lightOutput += lightIntensity * color_intensity * fragColor * Kd;
 	}
 
 	outColor = vec4(lightOutput, factor.diffuse.w); //RGBA

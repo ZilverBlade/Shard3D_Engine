@@ -33,9 +33,10 @@ namespace Shard3D {
 			//unlike other assets, textures and meshs should use a path as a key, 
 			//since they directly load from there, rather than load into a wrapper/struct
 
-			static hashMap<std::string, sPtr<EngineMesh>>& getMeshAssets() { return meshAssets; }
-			static hashMap<std::string, sPtr<EngineTexture>>& getTextureAssets() { return textureAssets; }
-				   
+			static auto& getMeshAssets() { return meshAssets; }
+			static auto& getTextureAssets() { return textureAssets; }
+			static auto& getSurfaceMaterialAssets() { return surfaceMaterialAssets; }
+
 			static void emplaceMesh(const std::string& meshPath, MeshType meshType = MeshType::MESH_TYPE_OBJ);
 			static inline sPtr<EngineMesh>& retrieveMesh(const std::string& path) {
 #ifndef ENSET_CONFIDENT_ASSETS

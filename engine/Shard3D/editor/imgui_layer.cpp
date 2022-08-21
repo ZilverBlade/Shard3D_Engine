@@ -224,7 +224,7 @@ namespace Shard3D {
         hudBuilder.render();
         levelTreePanel.render();
         levelPropertiesPanel.render(levelTreePanel);
-        levelPeekPanel.render();
+        levelPeekPanel.render(frameInfo);
         AssetExplorerPanel.render();
        
         //levelGizmo.render(level, levelTreePanel);

@@ -123,6 +123,7 @@ namespace Shard3D {
 #pragma region Material
 	void AssetManager::emplaceMaterial(sPtr<SurfaceMaterial> material, const std::string& materialPath) {
 		surfaceMaterialAssets[materialPath] = material;
+		material->createMaterialShader(*engineDevice, SharedPools::staticMaterialPool);
 	}
 
 

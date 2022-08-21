@@ -16,17 +16,15 @@ namespace Shard3D {
 	};
 
 	ForwardRenderSystem::ForwardRenderSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
+		MaterialSystem::setCurrentDevice(device);
 		MaterialSystem::setRenderPassContext(renderPass);
 		MaterialSystem::setGlobalSetLayout(globalSetLayout);
 		//std::shared_ptr<EngineCubemap> cubemap = 
 		//	EngineCubemap::createCubemapFromFolder(device, "assets/_engine/tex/cubemaps/sky0", VK_FILTER_LINEAR);
-
-		SurfaceMaterial_ShadedOpaque::setupMaterialShaderPipeline(device, renderPass, globalSetLayout);
 	}
 	ForwardRenderSystem::~ForwardRenderSystem() {
 		
 	}
-
 
 	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {;
 
@@ -46,7 +44,6 @@ namespace Shard3D {
 		//	&descriptorSet1,
 		//	0,
 		//	nullptr);
-
 		auto view = frameInfo.activeLevel->registry.view<Components::MeshComponent, Components::TransformComponent>();
 		for (auto obj : view) { ECS::Actor actor = { obj, frameInfo.activeLevel.get() };
 			auto& transform = actor.getTransform();

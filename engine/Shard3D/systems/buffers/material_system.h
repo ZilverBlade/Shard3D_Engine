@@ -8,23 +8,23 @@ namespace Shard3D {
 	public:
 		static void setRenderPassContext(VkRenderPass renderPass) { mRenderPass = renderPass; }
 		static void setGlobalSetLayout(VkDescriptorSetLayout globalSetLayout) { mGlobalSetLayout = globalSetLayout; }
-
+		static void setCurrentDevice(EngineDevice& device) { mDevice = &device; }
 		static void createSurfacePipelineLayout(
-			EngineDevice& device,
 			VkDescriptorSetLayout factorLayout,
 			VkDescriptorSetLayout textureLayout,
 			VkPipelineLayout* pipelineLayout
 		);
 
 		static void createSurfacePipeline(
-			EngineDevice& device,
 			uPtr<EnginePipeline>* pipeline,
 			VkPipelineLayout pipelineLayout,
 			PipelineConfigInfo& pipelineConfig,
 			const std::string& fragment_shader
 		);
 
+		static void destroyPipelineLayout(VkPipelineLayout pipelineLayout);
 	private:
+		static inline EngineDevice* mDevice;
 		static inline VkRenderPass mRenderPass{};
 		static inline VkDescriptorSetLayout mGlobalSetLayout{};
 	};

@@ -39,7 +39,7 @@ namespace Shard3D {
 	};
 
 	struct MaterialPipelineConfigInfo {
-		VkPipelineLayout pipelineLayout{};
+		VkPipelineLayout shaderPipelineLayout{};
 		uPtr<EnginePipeline> shaderPipeline{};
 	};
 
@@ -49,6 +49,9 @@ namespace Shard3D {
 	*/ 
 	class SurfaceMaterial {
 	public:
+		SurfaceMaterial();
+		~SurfaceMaterial();
+
 		std::string materialTag = "Some kind of material";
 
 		DrawData drawData{};
@@ -56,11 +59,12 @@ namespace Shard3D {
 		virtual void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) = 0;
 
 		void bind(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet);
-		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig->pipelineLayout; }
+		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig->shaderPipelineLayout; }
 	protected:
 		bool built = false;
-		MaterialPipelineConfigInfo* materialPipelineConfig{};
+		uPtr<MaterialPipelineConfigInfo> materialPipelineConfig{};
 		SurfaceMaterialShaderDescriptorInfo materialDescriptorInfo{};
+		uPtr<EngineBuffer> factorsBuffer;
 	};	
 
 	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
@@ -68,11 +72,11 @@ namespace Shard3D {
 	public:
 		std::string normalTex = ENGINE_NRMTEX;
 
-		glm::vec4 emissiveColor{ 0.f };
+		glm::vec3 emissiveColor{ 0.f };
 		std::string emissiveTex = ENGINE_WHTTEX;
 
-		glm::vec4 diffuseColor{ 1.f };
-		std::string diffuseTex = ENGINE_ERRTEX;
+		glm::vec3 diffuseColor{ 1.f };
+		std::string diffuseTex = ENGINE_WHTTEX;
 
 		float specular = 0.5f;
 		std::string specularTex = ENGINE_WHTTEX;
@@ -83,10 +87,7 @@ namespace Shard3D {
 		float metallic = 0.f;
 		std::string metallicTex = ENGINE_WHTTEX;
 
-		static void setupMaterialShaderPipeline(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-	private:
-		MaterialPipelineConfigInfo surfaceShadedOpaque;
 	};
 	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
 	class SurfaceMaterial_ShadedMasked : public SurfaceMaterial {
@@ -94,11 +95,11 @@ namespace Shard3D {
 		std::string normalTex = ENGINE_NRMTEX;
 		std::string maskTex = ENGINE_WHTTEX;
 
-		glm::vec4 emissiveColor{ 0.f };
+		glm::vec3 emissiveColor{ 0.f };
 		std::string emissiveTex = ENGINE_WHTTEX;
 
-		glm::vec4 diffuseColor{ 1.f };
-		std::string diffuseTex = ENGINE_ERRTEX;
+		glm::vec3 diffuseColor{ 1.f };
+		std::string diffuseTex = ENGINE_WHTTEX;
 
 		float specular = 0.5f;
 		std::string specularTex = ENGINE_WHTTEX;
@@ -110,8 +111,6 @@ namespace Shard3D {
 		std::string metallicTex = ENGINE_WHTTEX;
 
 		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-	private:
-		MaterialPipelineConfigInfo surfaceShadedMasked;
 	};
 	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
 	class SurfaceMaterial_ShadedTranslucent : public SurfaceMaterial {
@@ -119,11 +118,11 @@ namespace Shard3D {
 		std::string normalTex = ENGINE_NRMTEX;
 		float opacity = 1.0f;
 
-		glm::vec4 emissiveColor{ 0.f };
+		glm::vec3 emissiveColor{ 0.f };
 		std::string emissiveTex = ENGINE_WHTTEX;
 
-		glm::vec4 diffuseColor{ 1.f };
-		std::string diffuseTex = ENGINE_ERRTEX;
+		glm::vec3 diffuseColor{ 1.f };
+		std::string diffuseTex = ENGINE_WHTTEX;
 
 		float specular = 0.5f;
 		std::string specularTex = ENGINE_WHTTEX;
@@ -135,9 +134,19 @@ namespace Shard3D {
 		std::string clarityTex = ENGINE_WHTTEX;
 
 		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-	private:
-		MaterialPipelineConfigInfo surfaceShadedTranslucent;
 	};
+
+	// emissive
+	class SurfaceMaterial_UnshadedWireframe : public SurfaceMaterial {
+	public:
+		glm::vec3 emissiveColor{ 0.f };
+		std::string emissiveTex = ENGINE_WHTTEX;
+
+		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
+	};
+
+
+
 	/*
 	*	Material that can be used for projecting textures onto meshes.
 	*	It will overlay whatever previous material with it's properties and render over it.

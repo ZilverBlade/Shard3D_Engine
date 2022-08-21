@@ -328,7 +328,7 @@ beginWhileLoop:
 		car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
 		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
 		car.addComponent<Components::AudioComponent>().file = 
-			"assets/audiodata/race_engine_nb.wav";
+			"assets/audiodata/race_scream.wav";
 		
 		//car.addComponent<Components::ScriptComponent>();
 		

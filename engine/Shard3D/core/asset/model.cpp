@@ -26,9 +26,6 @@ namespace std {
 namespace Shard3D {
 
 	EngineMesh::EngineMesh(EngineDevice& dvc, const EngineMesh::Builder &builder) : device(&dvc) {
-
-		//SHARD3D_INFO("Loading {0}", submesh.first);
-
 		for (auto& submesh : builder.submeshes) {
 			SubmeshBuffers _buffers{};
 			auto& data = submesh.second;
@@ -37,8 +34,6 @@ namespace Shard3D {
 			createMaterialBuffers(data, _buffers);
 			buffers.push_back(_buffers);
 		}
-
-
 	}
 	EngineMesh::~EngineMesh() {}
 
@@ -204,9 +199,9 @@ namespace Shard3D {
 
 	void EngineMesh::Builder::loadSubmesh(aiMesh* mesh, const aiScene* scene) {
 		const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		const std::string& materialSlot = 
+		const std::string& materialSlot =
 #ifndef CombineMaterials
-			material->GetName().C_Str();
+			 material->GetName().C_Str();
 #endif
 #ifdef CombineMaterials
 		"material";
@@ -255,7 +250,6 @@ namespace Shard3D {
 
 		SHARD3D_INFO("vertices {0} {1}", materialSlot, submeshes[materialSlot].vertices.size());
 		SHARD3D_INFO("indexCount {0} {1}", materialSlot, submeshes[materialSlot].indices.size());
-
 		aiColor4D color{};
 		aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color);
 		float specular{};
@@ -264,19 +258,15 @@ namespace Shard3D {
 		aiGetMaterialFloat(material, AI_MATKEY_ROUGHNESS_FACTOR, &roughness); shininess = 1.f - roughness; }
 		float metallic{};
 		aiGetMaterialFloat(material, AI_MATKEY_METALLIC_FACTOR, &metallic);
-		
-		sPtr<SurfaceMaterial_ShadedTranslucent> grid_material = make_sPtr<SurfaceMaterial_ShadedTranslucent>();
+
+	// We just create a simple default grid texture for all meshes
+		sPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_sPtr<SurfaceMaterial_ShadedOpaque>();
 		grid_material->materialTag = materialSlot;
-		grid_material->diffuseColor = { 0.7f, 0.7f, 1.f, 1.f };//{ color.r, color.g, color.b, 1.f };
+		grid_material->diffuseColor = { 1.f, 1.f, 1.f };
 		grid_material->diffuseTex = ENGINE_ERRMTX;
-		grid_material->specular = 0.8f; 
-		AssetManager::emplaceTexture("assets/_engine/tex/rough_surface_mat.png");
-		grid_material->shininessTex = "assets/_engine/tex/rough_surface_mat.png";
-		grid_material->shininess = 0.7f;
-		grid_material->clarity = 0.8f;
-		grid_material->opacity = 0.4f;
-		AssetManager::emplaceTexture("assets/_engine/tex/masktest.png");
-		//grid_material->maskTex = "assets/_engine/tex/masktest.png";
+		grid_material->specular = 1.0f;
+		grid_material->shininess = 0.5f;
+		
 		submeshes[materialSlot].material = std::string("assets/materialdata/" + materialSlot + ".wbmat");
 		AssetManager::emplaceMaterial(grid_material, std::string("assets/materialdata/" + materialSlot + ".wbmat"));
 

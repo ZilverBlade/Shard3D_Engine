@@ -5,8 +5,10 @@
 #include <fstream>
 
 namespace Shard3D {
-	void MaterialSystem::createSurfacePipelineLayout(EngineDevice& device, VkDescriptorSetLayout factorLayout, VkDescriptorSetLayout textureLayout, VkPipelineLayout* pipelineLayout) {
-		SHARD3D_ASSERT(mGlobalSetLayout != VK_NULL_HANDLE && "Material system context not set!");
+	void MaterialSystem::createSurfacePipelineLayout(VkDescriptorSetLayout factorLayout, VkDescriptorSetLayout textureLayout, VkPipelineLayout* pipelineLayout) {
+		SHARD3D_ASSERT(mRenderPass != VK_NULL_HANDLE && mGlobalSetLayout != VK_NULL_HANDLE && mDevice != VK_NULL_HANDLE && "Material system context not set!");
+
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "No pipeline layout provided!");
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{
 			mGlobalSetLayout,
 			factorLayout,
@@ -24,21 +26,25 @@ namespace Shard3D {
 		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-		if (vkCreatePipelineLayout(device.device(), &pipelineLayoutInfo, nullptr, pipelineLayout) != VK_SUCCESS) {
+		if (vkCreatePipelineLayout(mDevice->device(), &pipelineLayoutInfo, nullptr, pipelineLayout) != VK_SUCCESS) {
 			SHARD3D_FATAL("failed to create pipeline layout!");
 		}
 	}
-	void MaterialSystem::createSurfacePipeline(EngineDevice& device, uPtr<EnginePipeline>* pipeline, VkPipelineLayout pipelineLayout, PipelineConfigInfo& pipelineConfig, const std::string& fragment_shader) {
+	void MaterialSystem::createSurfacePipeline(uPtr<EnginePipeline>* pipeline, VkPipelineLayout pipelineLayout, PipelineConfigInfo& pipelineConfig, const std::string& fragment_shader) {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		pipelineConfig.renderPass = mRenderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 
 		*pipeline = make_uPtr<EnginePipeline>(
-			device,
+			*mDevice,
 			"assets/shaderdata/mesh_shader.vert.spv",
 			fragment_shader,
 			pipelineConfig
 		);
+	}
+
+	void MaterialSystem::destroyPipelineLayout(VkPipelineLayout pipelineLayout) {
+		vkDestroyPipelineLayout(mDevice->device(), pipelineLayout, nullptr);	
 	}
 }
