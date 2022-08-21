@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\Scripting">
+      <UniqueIdentifier>{69cb7579-106f-4f72-8e3b-b9200bc05e90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripting\C++">
+      <UniqueIdentifier>{26f2a978-2bb0-43f2-b367-60b3b89422e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\camera">
+      <UniqueIdentifier>{5cfd91dd-b75d-4efb-a135-f10c74d174b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\camera">
+      <UniqueIdentifier>{6cd7617a-f00e-4549-ae66-e327de1c1b6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\panels">
+      <UniqueIdentifier>{ff0c83a4-fdfc-46cf-a6fc-7aae484bf4a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\imgui">
+      <UniqueIdentifier>{105cb265-bfdb-4626-bc45-f39e2aa8a319}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\imgui">
+      <UniqueIdentifier>{fb4bac47-024f-4404-9d5b-ea902760b8a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\panels">
+      <UniqueIdentifier>{4d382f5b-4fd5-4c47-92c4-e7cc3d6417aa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="camera\editor_movement_controller.cpp">
+      <Filter>Source Files\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_glfw_implementation.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_implementation.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_initializer.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_layer.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\level_tree_panel.cpp">
+      <Filter>Source Files\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\asset_explorer_panel.cpp">
+      <Filter>Source Files\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\hud_builder_panel.cpp">
+      <Filter>Source Files\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\level_peekers.cpp">
+      <Filter>Source Files\panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\level_properties_panel.cpp">
+      <Filter>Source Files\panels</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scripting\cpp\carcontroller.h">
+      <Filter>Resource Files\Scripting\C++</Filter>
+    </ClInclude>
+    <ClInclude Include="scripting\cpp\example_script.h">
+      <Filter>Resource Files\Scripting\C++</Filter>
+    </ClInclude>
+    <ClInclude Include="scripting\script_link.h">
+      <Filter>Resource Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="camera\editor_movement_controller.h">
+      <Filter>Header Files\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_glfw_implementation.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_implementation.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_initializer.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_layer.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\hud_builder_panel.h">
+      <Filter>Header Files\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\level_peekers.h">
+      <Filter>Header Files\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\level_properties_panel.h">
+      <Filter>Header Files\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\level_tree_panel.h">
+      <Filter>Header Files\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\asset_explorer_panel.h">
+      <Filter>Header Files\panels</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

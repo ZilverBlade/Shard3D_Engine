@@ -196,17 +196,6 @@
     <ClInclude Include="core\vulkan_api\descriptors.h" />
     <ClInclude Include="core\vulkan_api\device.h" />
     <ClInclude Include="core\vulkan_api\pipeline.h" />
-    <ClInclude Include="editor\asset_explorer_panel.h" />
-    <ClInclude Include="editor\camera\editor_movement_controller.h" />
-    <ClInclude Include="editor\hud_builder_panel.h" />
-    <ClInclude Include="editor\imgui_glfw_implementation.h" />
-    <ClInclude Include="editor\imgui_implementation.h" />
-    <ClInclude Include="editor\imgui_initializer.h" />
-    <ClInclude Include="editor\imgui_layer.h" />
-    <ClInclude Include="editor\level_gizmo.h" />
-    <ClInclude Include="editor\level_peekers.h" />
-    <ClInclude Include="editor\level_properties_panel.h" />
-    <ClInclude Include="editor\level_tree_panel.h" />
     <ClInclude Include="events\event.h" />
     <ClInclude Include="events\input.h" />
     <ClInclude Include="events\key_event.h" />
@@ -404,61 +393,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="editor\asset_explorer_panel.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\camera\editor_movement_controller.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\hud_builder_panel.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\imgui_glfw_implementation.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\imgui_implementation.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\imgui_initializer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\imgui_layer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\level_gizmo.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\level_peekers.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\level_properties_panel.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="editor\level_tree_panel.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="layer\layer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
@@ -569,9 +503,6 @@
     <None Include="shaders\_editor\grid.vert" />
     <None Include="shaders\_output_img.frag" />
     <None Include="shaders\_output_img.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\changelogs.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

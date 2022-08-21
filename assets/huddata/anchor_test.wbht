@@ -1,0 +1,158 @@
+Shard3D: 1.2.3.r2-alpha
+WorldBuilder3D: 1.3.r0-alpha
+GUI_Template: Some kind of template
+Layer: 0
+Elements:
+  - Element: 15003766960487350823
+    Info:
+      Tag: Top Left
+    Transform2D:
+      Position: [-0.899999976, 0.899999976]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [-0.5, -0.5]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 2733860511835020081
+    Info:
+      Tag: Top Center
+    Transform2D:
+      Position: [0, 0.899999976]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [0, -0.5]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 4734708515873105267
+    Info:
+      Tag: Top Right
+    Transform2D:
+      Position: [0.899999976, 0.899999976]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [0.5, -0.5]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 8009047182011130312
+    Info:
+      Tag: Center Left
+    Transform2D:
+      Position: [-0.899999976, 0]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [-0.5, 0]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 8569551745806830128
+    Info:
+      Tag: Center
+    Transform2D:
+      Position: [0, 0]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [0, 0]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 16631956462699850048
+    Info:
+      Tag: Center Right
+    Transform2D:
+      Position: [0.899999976, 0]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [0.5, 0]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 10588247487247804591
+    Info:
+      Tag: Bottom Left
+    Transform2D:
+      Position: [-0.899999976, -0.899999976]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [-0.5, 0.5]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 11468389801139832617
+    Info:
+      Tag: Bottom Center
+    Transform2D:
+      Position: [0, -0.899999976]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [0, 0.5]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true
+  - Element: 12240193899834457780
+    Info:
+      Tag: Bottom Right
+    Transform2D:
+      Position: [0.899999976, -0.899999976]
+      Scale: [0.100000001, 0.100000001]
+      Rotation: 0
+      Zpos: 0
+      Anchor: [0.5, 0.5]
+    Texture:
+      DefaultTex: "assets/_engine/tex/null_tex.png"
+      HoverTex: "assets/_engine/tex/null_tex.png"
+      PressTex: "assets/_engine/tex/null_tex.png"
+    Script:
+      Module: ""
+      Language: VB
+      Static: true

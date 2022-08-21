@@ -1,0 +1,27 @@
+Shard3D: 1.0.9.r0
+WorldBuilder3D: 0.1
+Level: Some kind of level
+Actors:
+  - Actor: 6296842314059923289
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [0, -0.889999986, 0]
+      Rotation: [-0.0226892792, 0.095993109, -0.0471238904]
+      Scale: [1, 1, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Angle: [0.647517145, 0.647517145]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 11036842560105029603
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [99, 0.0799999982, 99]
+    MeshComponent:
+      MeshPath: assets/modeldata/engineModels/cube.obj
+      MeshFormat: 1

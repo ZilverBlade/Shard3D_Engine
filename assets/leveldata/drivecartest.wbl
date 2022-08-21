@@ -1,0 +1,85 @@
+Shard3D: 1.2.3.r1-alpha
+WorldBuilder3D: 1.3.r0-alpha
+Level: Some kind of level
+Actors:
+  - Actor: 8697261477626909249
+    TagComponent:
+      Tag: bling
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 17404735231192878213
+    TagComponent:
+      Tag: road
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 24.7999992, 0.180000007]
+    MeshComponent:
+      MeshPath: assets/_engine/msh/cube.obj
+      MeshFormat: 1
+  - Actor: 2483818142968549181
+    TagComponent:
+      Tag: road2
+    TransformComponent:
+      Translation: [3.16000009, 27.4200001, 0]
+      Rotation: [0, 0, -0.771435559]
+      Scale: [4.76000023, 1, 0.180000007]
+    MeshComponent:
+      MeshPath: assets/_engine/msh/cube.obj
+      MeshFormat: 1
+  - Actor: 6892523644857338036
+    TagComponent:
+      Tag: Some kind of actor
+    TransformComponent:
+      Translation: [5, 2429.95996, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2, 2400, 0.180000007]
+    MeshComponent:
+      MeshPath: assets/_engine/msh/cube.obj
+      MeshFormat: 1
+  - Actor: 7150228180825533700
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [2.26999998, 1.96000004, 1.58000004]
+      Rotation: [-0.132645026, -0.1134464, -0.24085544]
+      Scale: [1, 1, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 2.88000011]
+      Radius: 1
+      Angle: [0.802851439, 0.968657732]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 2784833615538243943
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0, 22.2199993, 2.04999995]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 10052469902407152097
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0, 12.4099998, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 796966202166450684
+    TagComponent:
+      Tag: bling
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]

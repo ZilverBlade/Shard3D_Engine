@@ -1,0 +1,50 @@
+Shard3D: 1.2.1.r4-alpha
+WorldBuilder3D: 1.2.r0-alpha
+Level: Some kind of level
+Actors:
+  - Actor: 16355569976627356128
+    TagComponent:
+      Tag: Fade transparency
+    TransformComponent:
+      Translation: [0, 1.25999999, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    BillboardComponent:
+      TexPath: assets/_engine/tex/fadetest.png
+      BillboardOrientation: 0
+  - Actor: 1
+    TagComponent:
+      Tag: Dummy Actor (SYSTEM RESERVED)
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 11030478437998212736
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0.00100000005, 0]
+      Rotation: [0, 0, 0]
+      Scale: [100, 1, 100]
+    MeshComponent:
+      MeshPath: assets/_engine/msh/quad.obj
+      MeshFormat: 1
+  - Actor: 11639721106146633387
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0, 0.600000024, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 1
+    TagComponent:
+      Tag: Dummy Actor (SYSTEM RESERVED)
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
