@@ -15,6 +15,7 @@
 
 #include <Shard3D/events/mouse_event.h>
 #include <Shard3D/events/key_event.h>
+#include "../panels/settings_panel.h"
 
 namespace Shard3D {
 	class HUDLayer;
@@ -90,7 +91,8 @@ namespace Shard3D {
 		LevelTreePanel levelTreePanel;
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
-		AssetExplorerPanel AssetExplorerPanel;
+		AssetExplorerPanel assetExplorerPanel;
+		SettingsPanel settingsPanel;
 		HUDBuilderPanel hudBuilder;
 		bool refreshContext;
 //Gizmo levelGizmo;
