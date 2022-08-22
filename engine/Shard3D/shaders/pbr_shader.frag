@@ -42,6 +42,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 	int numDirectionalLights;
 
     vec3 materialSettings;
+    float cameraExposure;
 } ubo;
 
 layout(push_constant) uniform Push {
@@ -49,7 +50,9 @@ layout(push_constant) uniform Push {
 	mat4 normalMatrix;
 } push;
 
-float PI = 3.1415926;
+#define PI 3.1415926
+#define gamma 2.2
+#define invGamma 0.454545455
 
 vec3 F0 = vec3(0.0); // base reflectiveness
 
@@ -147,9 +150,9 @@ void main(){
         specular = 2 * (numerator / denominator) * ubo.materialSettings.x;
 
         // kS is equal to Fresnel
-       // vec3 kS = F;
+        vec3 kS = F;
 
-        vec3 kD = vec3(1.0);// - kS;
+        vec3 kD = vec3(1.0) - kS;
        
         kD *= 1.0 - ubo.materialSettings.z;
 
@@ -157,7 +160,7 @@ void main(){
         float NdotL = max(dot(N, L), 0.0);
 
         // add to outgoing radiance Lo
-        Lo += (kD * fragColor / PI + specular) * radiance * NdotL * 100;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD / PI + specular) * fragColor * radiance * NdotL * 100;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
 
     for (int i = 0; i < ubo.numSpotlights; i++) {
@@ -186,9 +189,9 @@ void main(){
             specular = (numerator / denominator) * ubo.materialSettings.x;
 
             // kS is equal to Fresnel
-            // vec3 kS = F;
+            vec3 kS = F;
 
-            vec3 kD = vec3(1.0);// - kS;
+            vec3 kD = vec3(1.0) - kS;
        
             kD *= 1.0 - ubo.materialSettings.z;
 
@@ -196,12 +199,19 @@ void main(){
             float NdotL = max(dot(N, L), 0.0);
 
             // add to outgoing radiance Lo
-            Lo += (kD * fragColor / PI + specular) * radiance * NdotL * 100 * intensity;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+            Lo += (kD / PI + specular) * fragColor * radiance * NdotL * 100 * intensity;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
         }
     }
     
 	vec3 fogColor = vec3(0.01, 0.01, 0.01);
-	    outColor = vec4(mix((ubo.ambientLightColor.xyz + Lo) 
-        * ubo.ambientLightColor.w, fogColor, getFogFactor(distance(cameraPosWorld, fragPosWorld))), 
-        1.0); //RGBA
+	   vec3 outputColor = mix((ubo.ambientLightColor.xyz + Lo) 
+        * ubo.ambientLightColor.w, fogColor, getFogFactor(distance(cameraPosWorld, fragPosWorld))); 
+
+    // exposure tone mapping
+    vec3 mapped = vec3(1.0) - exp(-outputColor * ubo.cameraExposure);
+    // gamma correction 
+    mapped = pow(mapped, vec3(invGamma));
+  
+    outColor = vec4(mapped, 1.0);
+        //RGBA
 }

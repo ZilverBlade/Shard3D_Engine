@@ -88,6 +88,8 @@ namespace Shard3D {
 			GraphicsEnum ReflectionQuality = Medium;
 
 			glm::vec3 GlobalMaterialSettings = { 1.f, 0.5f, 0.f };
+
+			float exposure = 1.f;
 		};
 
 		struct EditorPreviewSettings {

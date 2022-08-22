@@ -231,12 +231,13 @@ namespace Shard3D {
 
 
         if (showTest) {
-            ImGui::Begin("Material editor", &showTest);
+            ImGui::Begin("Camera editor", &showTest);
             ImGui::DragFloat("Specular", &GraphicsSettings::get().GlobalMaterialSettings.x, 0.01f, 0.f, 2.f);
             ImGui::DragFloat("Roughness", &GraphicsSettings::get().GlobalMaterialSettings.y, 0.01f, 0.f, 1.f);
             ImGui::BeginDisabled(!enset.pbr);
             ImGui::DragFloat("Metallic", &GraphicsSettings::get().GlobalMaterialSettings.z, 0.01f, 0.f, 1.f);
             ImGui::EndDisabled();
+            ImGui::DragFloat("Exposure", &GraphicsSettings::get().exposure, 0.01f, 0.f, 10.f);
             //ax::NodeEditor::Begin("Matedit BP");
             //int uniqueId = 1;
             //

@@ -42,7 +42,11 @@ layout(set = 0, binding = 0) uniform GlobalUbo{
 	int numDirectionalLights;
 
 	vec3 materialSettings;
+	float cameraExposure;
 } ubo;
+
+#define gamma 2.2
+#define invGamma 0.454545455
 
 layout(push_constant) uniform Push {
 	mat4 modelMatrix; 
@@ -151,6 +155,13 @@ void main() {
 
 	vec3 fogColor =  vec3(0.01, 0.01, 0.01);
 		// multiply fragColor by specular only if material is metallic
-	outColor = vec4(mix(diffuseLight * fragColor + specularLight, fogColor, getFogFactor(distance(cameraPosWorld, fragPosWorld))), 1.0); //RGBA
-	//outColor = vec4(diffuseLight * fragColor + specularLight, 1.0); //RGBA
+	vec3 outputColor =mix(diffuseLight * fragColor + specularLight, fogColor, getFogFactor(distance(cameraPosWorld, fragPosWorld)));
+	
+	    // exposure tone mapping
+    vec3 mapped = vec3(1.0) - exp(-outputColor * ubo.cameraExposure);
+    // gamma correction 
+    mapped = pow(mapped, vec3(invGamma));
+  
+    outColor = vec4(mapped, 1.0);
+
 }

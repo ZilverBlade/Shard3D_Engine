@@ -8,7 +8,7 @@ namespace Shard3D {
 
 // Definitions are engine only, requires recompiling static library to take effect
 
-const static Version ENGINE_VERSION = { VersionState::Alpha, 1, 2, 5, 1 };	// Shard3D 
+const static Version ENGINE_VERSION = { VersionState::Alpha, 1, 2, 6, 0 };	// Shard3D 
 const static Version EDITOR_VERSION = { VersionState::Alpha, 1, 3, 0, 0 };	// WorldBuilder3D
 
 #define ENGINE_SETTINGS_PATH						"assets/configdata/engine_settings.ini"

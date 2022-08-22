@@ -33,7 +33,7 @@ namespace Shard3D {
 		VkImageCreateInfo image{};
 		image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		image.imageType = VK_IMAGE_TYPE_2D;
-		image.format = VK_FORMAT_B8G8R8A8_SRGB;
+		image.format = VK_FORMAT_R32G32B32A32_SFLOAT;
 		image.extent.width = pass.width;
 		image.extent.height = pass.height;
 		image.extent.depth = 1;
@@ -68,7 +68,7 @@ namespace Shard3D {
 			VkImageViewCreateInfo colorImageView = {};
 			colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			colorImageView.format = VK_FORMAT_B8G8R8A8_SRGB;
+			colorImageView.format = VK_FORMAT_R32G32B32A32_SFLOAT;
 			colorImageView.subresourceRange = {};
 			colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			colorImageView.subresourceRange.baseMipLevel = 0;
@@ -99,7 +99,7 @@ namespace Shard3D {
 			VkImageViewCreateInfo colorImageView = {};
 			colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			colorImageView.format = VK_FORMAT_B8G8R8A8_SRGB;
+			colorImageView.format = VK_FORMAT_R32G32B32A32_SFLOAT;
 			colorImageView.subresourceRange = {};
 			colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			colorImageView.subresourceRange.baseMipLevel = 0;
@@ -170,7 +170,7 @@ namespace Shard3D {
 
 		std::array<VkAttachmentDescription, 3> attchmentDescriptions{};
 		// Color attachment
-		attchmentDescriptions[0].format = VK_FORMAT_B8G8R8A8_SRGB;
+		attchmentDescriptions[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
 		attchmentDescriptions[0].samples = GraphicsSettings::get().MSAASamples;
 		attchmentDescriptions[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		attchmentDescriptions[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -189,7 +189,7 @@ namespace Shard3D {
 		attchmentDescriptions[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		// Color attachment resolve
-		attchmentDescriptions[2].format = VK_FORMAT_B8G8R8A8_SRGB;
+		attchmentDescriptions[2].format = VK_FORMAT_R32G32B32A32_SFLOAT;
 		attchmentDescriptions[2].samples = VK_SAMPLE_COUNT_1_BIT;
 		attchmentDescriptions[2].loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		attchmentDescriptions[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;

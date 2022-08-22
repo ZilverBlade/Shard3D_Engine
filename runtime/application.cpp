@@ -235,7 +235,7 @@ beginWhileLoop:
 				ubo.view = possessedCamera.getView();
 				ubo.inverseView = possessedCamera.getInverseView();
 
-				ubo.materialSettings = GraphicsSettings::get().GlobalMaterialSettings;
+				ubo.cameraSettings = { GraphicsSettings::get().GlobalMaterialSettings,  GraphicsSettings::get().exposure};
 
 				lightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
