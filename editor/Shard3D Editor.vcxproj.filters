@@ -75,6 +75,9 @@
     <ClCompile Include="panels\level_properties_panel.cpp">
       <Filter>Source Files\panels</Filter>
     </ClCompile>
+    <ClCompile Include="panels\settings_panel.cpp">
+      <Filter>Source Files\panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">
@@ -117,6 +120,9 @@
       <Filter>Header Files\panels</Filter>
     </ClInclude>
     <ClInclude Include="panels\asset_explorer_panel.h">
+      <Filter>Header Files\panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\settings_panel.h">
       <Filter>Header Files\panels</Filter>
     </ClInclude>
   </ItemGroup>

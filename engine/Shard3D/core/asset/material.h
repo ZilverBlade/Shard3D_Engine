@@ -2,7 +2,7 @@
 
 #include "../../core.h"
 #include "../../vulkan_abstr.h"
-
+#include "../misc/assetid.h"
 /*
 * Shard 3D Material system
 * 
@@ -70,82 +70,25 @@ namespace Shard3D {
 	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
 	class SurfaceMaterial_ShadedOpaque : public SurfaceMaterial {
 	public:
-		std::string normalTex = ENGINE_NRMTEX;
+		AssetID normalTex = std::string(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
 
 		glm::vec3 emissiveColor{ 0.f };
-		std::string emissiveTex = ENGINE_WHTTEX;
+		AssetID emissiveTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 
 		glm::vec3 diffuseColor{ 1.f };
-		std::string diffuseTex = ENGINE_WHTTEX;
+		AssetID diffuseTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 
 		float specular = 0.5f;
-		std::string specularTex = ENGINE_WHTTEX;
+		AssetID specularTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 
 		float shininess = 0.5f;
-		std::string shininessTex = ENGINE_WHTTEX;
+		AssetID shininessTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 
 		float metallic = 0.f;
-		std::string metallicTex = ENGINE_WHTTEX;
+		AssetID metallicTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 
 		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
 	};
-	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
-	class SurfaceMaterial_ShadedMasked : public SurfaceMaterial {
-	public:
-		std::string normalTex = ENGINE_NRMTEX;
-		std::string maskTex = ENGINE_WHTTEX;
-
-		glm::vec3 emissiveColor{ 0.f };
-		std::string emissiveTex = ENGINE_WHTTEX;
-
-		glm::vec3 diffuseColor{ 1.f };
-		std::string diffuseTex = ENGINE_WHTTEX;
-
-		float specular = 0.5f;
-		std::string specularTex = ENGINE_WHTTEX;
-
-		float shininess = 0.5f;
-		std::string shininessTex = ENGINE_WHTTEX;
-
-		float metallic = 0.f;
-		std::string metallicTex = ENGINE_WHTTEX;
-
-		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-	};
-	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
-	class SurfaceMaterial_ShadedTranslucent : public SurfaceMaterial {
-	public:
-		std::string normalTex = ENGINE_NRMTEX;
-		float opacity = 1.0f;
-
-		glm::vec3 emissiveColor{ 0.f };
-		std::string emissiveTex = ENGINE_WHTTEX;
-
-		glm::vec3 diffuseColor{ 1.f };
-		std::string diffuseTex = ENGINE_WHTTEX;
-
-		float specular = 0.5f;
-		std::string specularTex = ENGINE_WHTTEX;
-
-		float shininess = 0.5f;
-		std::string shininessTex = ENGINE_WHTTEX;
-
-		float clarity = 0.f;
-		std::string clarityTex = ENGINE_WHTTEX;
-
-		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-	};
-
-	// emissive
-	class SurfaceMaterial_UnshadedWireframe : public SurfaceMaterial {
-	public:
-		glm::vec3 emissiveColor{ 0.f };
-		std::string emissiveTex = ENGINE_WHTTEX;
-
-		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-	};
-
-
 
 	/*
 	*	Material that can be used for projecting textures onto meshes.

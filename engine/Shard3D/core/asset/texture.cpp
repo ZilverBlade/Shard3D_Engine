@@ -10,15 +10,17 @@
 #include "../misc/graphics_settings.h"
 
 namespace Shard3D {
-    EngineTexture::EngineTexture(EngineDevice& device, const std::string& textureFilepath, VkFilter filter) : mDevice{ device } {
-        mFilter = filter;
+    EngineTexture::EngineTexture(EngineDevice& device, const std::string& textureFilepath, TextureLoadInfo loadInfo) : mDevice{ device } {
+        mLoadInfo = loadInfo;
         createTextureImage(textureFilepath);
         createTextureImageView(VK_IMAGE_VIEW_TYPE_2D);
         createTextureSampler();
         updateDescriptor();
     }
     EngineTexture::EngineTexture(EngineDevice& device) : mDevice{ device } { 
-        mFilter = VK_FILTER_LINEAR;
+        mLoadInfo.filter = VK_FILTER_LINEAR;
+        mLoadInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        mLoadInfo.addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
         createBlankTextureImage();
         updateDescriptor();
     }
@@ -31,8 +33,8 @@ namespace Shard3D {
     }
 
     uPtr<EngineTexture> EngineTexture::createTextureFromFile(
-        EngineDevice& device, const std::string& filepath, VkFilter filter) {
-        return make_uPtr<EngineTexture>(device, filepath, filter);
+        EngineDevice& device, const std::string& filepath, TextureLoadInfo loadInfo) {
+        return make_uPtr<EngineTexture>(device, filepath, loadInfo);
     }
 
     uPtr<EngineTexture> EngineTexture::createEmptyTexture(EngineDevice& device)
@@ -116,7 +118,7 @@ namespace Shard3D {
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
         if (!pixels) {
-            SHARD3D_FATAL(std::string("failed to load texture image! Tried to load " + filepath));
+            SHARD3D_FATAL(std::string("failed to load texture image! Tried to load '" + filepath + "'"));
         }
 
         // mMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
@@ -212,12 +214,12 @@ namespace Shard3D {
     void EngineTexture::createTextureSampler() {
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.magFilter = mFilter;
-        samplerInfo.minFilter = mFilter;
+        samplerInfo.magFilter = mLoadInfo.filter;
+        samplerInfo.minFilter = mLoadInfo.filter;
 
-        samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        samplerInfo.addressModeU = mLoadInfo.addressMode;
+        samplerInfo.addressModeV = mLoadInfo.addressMode;
+        samplerInfo.addressModeW = mLoadInfo.addressMode;
 
         samplerInfo.anisotropyEnable = VK_TRUE;
         samplerInfo.maxAnisotropy = static_cast<float>(GraphicsSettings::get().maxAnisotropy);
@@ -230,7 +232,7 @@ namespace Shard3D {
         samplerInfo.compareEnable = VK_FALSE;
         samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
-        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerInfo.mipmapMode = mLoadInfo.mipmapMode;
         samplerInfo.mipLodBias = 0.0f;
         samplerInfo.minLod = 0.0f;
         samplerInfo.maxLod = static_cast<float>(mMipLevels);

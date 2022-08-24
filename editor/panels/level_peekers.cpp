@@ -86,7 +86,9 @@ namespace Shard3D {
 
 	void LevelPeekingPanel::peekMaterialInspector() {
 		ImGui::Begin("Material Inspector");
-		for (auto& i : AssetManager::getSurfaceMaterialAssets()) {
+		/*
+		
+		for (auto& i : ResourceHandler::getSurfaceMaterialAssets()) {
 			std::string text = i.second->materialTag + " (" + i.first + ")";
 			if (ImGui::TreeNode(text.c_str())) {
 				if (typeid(*i.second).raw_name() == typeid(SurfaceMaterial_ShadedOpaque).raw_name()) {
@@ -143,37 +145,7 @@ namespace Shard3D {
 					int cullMode = static_cast<int>(surfaceMaterial->drawData.culling);
 					ImGui::Combo("Cull Mode", &cullMode, "VK_CULL_MODE_NONE\0VK_CULL_MODE_FRONT_BIT\0VK_CULL_MODE_BACK_BIT\0");
 					surfaceMaterial->drawData.culling = cullMode;
-					if (ImGui::Button("Switch to masked")) {
-						const std::string& name = i.second->materialTag;
-						i.second = make_sPtr<SurfaceMaterial_ShadedMasked>();
-						i.second->materialTag = name;
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					if (ImGui::Button("Switch to translucent")) {
-						const std::string& name = i.second->materialTag;
-						i.second = make_sPtr<SurfaceMaterial_ShadedTranslucent>();
-						i.second->materialTag = name;
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					ImGui::Checkbox("Live Rebuild", &liveRebuild);
-					if (ImGui::Button("Rebuild Material")) {
-						AssetManager::emplaceTexture(surfaceMaterial->diffuseTex);
-						AssetManager::emplaceTexture(surfaceMaterial->specularTex);
-						AssetManager::emplaceTexture(surfaceMaterial->shininessTex);
-						AssetManager::emplaceTexture(surfaceMaterial->metallicTex);
-						AssetManager::emplaceTexture(surfaceMaterial->normalTex);
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}										
-					if (liveRebuild) {
-						if (timeSinceLastSecond > 0.5f) { timeSinceLastSecond = 0.f;  
-							AssetManager::emplaceTexture(surfaceMaterial->diffuseTex);
-							AssetManager::emplaceTexture(surfaceMaterial->specularTex);
-							AssetManager::emplaceTexture(surfaceMaterial->shininessTex);
-							AssetManager::emplaceTexture(surfaceMaterial->metallicTex);
-							AssetManager::emplaceTexture(surfaceMaterial->normalTex);
-							AssetManager::emplaceMaterial(i.second, i.first);
-						}
-					}
+					
 				}
 
 				if (typeid(*i.second).raw_name() == typeid(SurfaceMaterial_ShadedMasked).raw_name()) {
@@ -239,40 +211,7 @@ namespace Shard3D {
 					int cullMode = static_cast<int>(surfaceMaterial->drawData.culling);
 					ImGui::Combo("Cull Mode", &cullMode, "VK_CULL_MODE_NONE\0VK_CULL_MODE_FRONT_BIT\0VK_CULL_MODE_BACK_BIT\0");
 					surfaceMaterial->drawData.culling = cullMode;
-					if (ImGui::Button("Switch to opaque")) {
-						const std::string& name = i.second->materialTag;
-						i.second = make_sPtr<SurfaceMaterial_ShadedOpaque>();
-						i.second->materialTag = name;
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					if (ImGui::Button("Switch to translucent")) {
-						const std::string& name = i.second->materialTag;
-						i.second = make_sPtr<SurfaceMaterial_ShadedTranslucent>();
-						i.second->materialTag = name;
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					ImGui::Checkbox("Live Rebuild", &liveRebuild);
-					if (ImGui::Button("Rebuild Material")) {
-						AssetManager::emplaceTexture(surfaceMaterial->diffuseTex);
-						AssetManager::emplaceTexture(surfaceMaterial->specularTex);
-						AssetManager::emplaceTexture(surfaceMaterial->shininessTex);
-						AssetManager::emplaceTexture(surfaceMaterial->metallicTex);
-						AssetManager::emplaceTexture(surfaceMaterial->normalTex);
-						AssetManager::emplaceTexture(surfaceMaterial->maskTex);
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					if (liveRebuild) {
-						if (timeSinceLastSecond > 0.5f) {
-							timeSinceLastSecond = 0.f;
-							AssetManager::emplaceTexture(surfaceMaterial->diffuseTex);
-							AssetManager::emplaceTexture(surfaceMaterial->specularTex);
-							AssetManager::emplaceTexture(surfaceMaterial->shininessTex);
-							AssetManager::emplaceTexture(surfaceMaterial->metallicTex);
-							AssetManager::emplaceTexture(surfaceMaterial->normalTex);
-							AssetManager::emplaceTexture(surfaceMaterial->maskTex);
-							AssetManager::emplaceMaterial(i.second, i.first);
-						}
-					}
+					
 				}
 
 				if (typeid(*i.second).raw_name() == typeid(SurfaceMaterial_ShadedTranslucent).raw_name()) {
@@ -330,43 +269,13 @@ namespace Shard3D {
 					int cullMode = static_cast<int>(surfaceMaterial->drawData.culling);
 					ImGui::Combo("Cull Mode", &cullMode, "VK_CULL_MODE_NONE\0VK_CULL_MODE_FRONT_BIT\0VK_CULL_MODE_BACK_BIT\0");
 					surfaceMaterial->drawData.culling = cullMode;
-					if (ImGui::Button("Switch to masked")) {
-						const std::string& name = i.second->materialTag;
-						i.second = make_sPtr<SurfaceMaterial_ShadedMasked>();
-						i.second->materialTag = name;
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					if (ImGui::Button("Switch to opaque")) {
-						const std::string& name = i.second->materialTag;
-						i.second = make_sPtr<SurfaceMaterial_ShadedOpaque>();
-						i.second->materialTag = name;
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					ImGui::Checkbox("Live Rebuild", &liveRebuild);
-					if (ImGui::Button("Rebuild Material")) {
-						AssetManager::emplaceTexture(surfaceMaterial->diffuseTex);
-						AssetManager::emplaceTexture(surfaceMaterial->specularTex);
-						AssetManager::emplaceTexture(surfaceMaterial->shininessTex);
-						AssetManager::emplaceTexture(surfaceMaterial->clarityTex);
-						AssetManager::emplaceTexture(surfaceMaterial->normalTex);
-						AssetManager::emplaceMaterial(i.second, i.first);
-					}
-					if (liveRebuild) {
-						if (timeSinceLastSecond > 0.5f) {
-							timeSinceLastSecond = 0.f;
-							AssetManager::emplaceTexture(surfaceMaterial->diffuseTex);
-							AssetManager::emplaceTexture(surfaceMaterial->specularTex);
-							AssetManager::emplaceTexture(surfaceMaterial->shininessTex);
-							AssetManager::emplaceTexture(surfaceMaterial->clarityTex);
-							AssetManager::emplaceTexture(surfaceMaterial->normalTex);
-							AssetManager::emplaceMaterial(i.second, i.first);
-						}
-					}
+					
 				}
 
 				ImGui::TreePop();
 			}
 		}
+		*/
 		ImGui::End();
 	}
 
@@ -388,27 +297,27 @@ namespace Shard3D {
 
 	void LevelPeekingPanel::peekTextureInspector() {
 		ImGui::Begin("Texture Inspector");
-		ImGui::Text((std::string("Texture count: " + std::to_string(AssetManager::getTextureAssets().size())).c_str()));
+		ImGui::Text((std::string("Texture count: " + std::to_string(ResourceHandler::getTextureAssets().size())).c_str()));
 		if (ImGui::Button("Force delete all textures (dangerous)")) {
 			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous if assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
-				AssetManager::clearTextureAssets();
+				ResourceHandler::clearTextureAssets();
 			}
 		}
-		for (const auto& tex : AssetManager::getTextureAssets())
-		ImGui::Text(std::string(tex.first).c_str());
+		//for (const auto& tex : ResourceHandler::getTextureAssets())
+		//ImGui::Text(std::string(tex.first).c_str());
 		ImGui::End();
 	}
 	void LevelPeekingPanel::peekLODInspector() {
 		ImGui::Begin("Mesh & LOD Inspector");
-		ImGui::Text((std::string("Mesh count: " + std::to_string(AssetManager::getMeshAssets().size())).c_str()));
+		ImGui::Text((std::string("Mesh count: " + std::to_string(ResourceHandler::getMeshAssets().size())).c_str()));
 		if (ImGui::Button("Force delete all models (dangerous)")) {
 			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous if assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
-				AssetManager::clearMeshAssets();
+				ResourceHandler::clearMeshAssets();
 			}
 		}
 
-		for (const auto& model : AssetManager::getMeshAssets())
-		ImGui::Text(std::string(model.first).c_str());
+		//for (const auto& model : ResourceHandler::getMeshAssets())
+		//ImGui::Text(std::string(model.first).c_str());
 		ImGui::End();
 	}
 

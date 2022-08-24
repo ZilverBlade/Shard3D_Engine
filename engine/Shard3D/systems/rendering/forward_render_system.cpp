@@ -29,7 +29,7 @@ namespace Shard3D {
 	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {;
 
 		
-		//auto imageInfo = wb3d::AssetManager::retrieveTexture("assets/_engine/tex/cubemaps/sky0/yes.png")->getImageInfo();
+		//auto imageInfo = wb3d::ResourceHandler::retrieveTexture("assets/_engine/tex/cubemaps/sky0/yes.png")->getImageInfo();
 		//VkDescriptorSet descriptorSet1;
 		//EngineDescriptorWriter(*skyboxLayout, frameInfo.perDrawDescriptorPool)
 		//	.writeImage(20, &imageInfo)
@@ -44,6 +44,10 @@ namespace Shard3D {
 		//	&descriptorSet1,
 		//	0,
 		//	nullptr);
+
+		const auto& material = ResourceHandler::retrieveMaterial(std::string("world_grid"));
+		material->bind(frameInfo.commandBuffer, frameInfo.globalDescriptorSet);
+
 		auto view = frameInfo.activeLevel->registry.view<Components::MeshComponent, Components::TransformComponent>();
 		for (auto obj : view) { ECS::Actor actor = { obj, frameInfo.activeLevel.get() };
 			auto& transform = actor.getTransform();
@@ -51,12 +55,12 @@ namespace Shard3D {
 			push.modelMatrix = frameInfo.activeLevel->getParentMat4(actor) * transform.mat4() ;
 			push.normalMatrix = frameInfo.activeLevel->getParentNormals(actor) * transform.normalMatrix();
 
-			auto& model = AssetManager::retrieveMesh(actor.getComponent<Components::MeshComponent>().file);
+			auto& model = ResourceHandler::retrieveMesh(actor.getComponent<Components::MeshComponent>().asset);
 			for (auto& buffer : model->buffers) {
-				model->bindMaterial(frameInfo.commandBuffer, frameInfo.globalDescriptorSet, buffer);		
+				//actor.getComponent<Components::MeshComponent>().bindMaterial(frameInfo.commandBuffer, frameInfo.globalDescriptorSet, buffer);
 				vkCmdPushConstants(
 					frameInfo.commandBuffer,
-					model->getMaterialPipelineLayout(buffer),
+					material->getPipelineLayout(),
 					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 					0,
 					sizeof(MeshPushConstantData),
@@ -82,7 +86,7 @@ namespace Shard3D {
 				&push
 			);
 
-			auto& model = wb3d::AssetManager::retrieveMesh(actor.getComponent<Components::MeshComponent>().file);
+			auto& model = wb3d::ResourceHandler::retrieveMesh(actor.getComponent<Components::MeshComponent>().file);
 			model->bind(frameInfo.commandBuffer);
 			model->draw(frameInfo.commandBuffer);
 		});*/

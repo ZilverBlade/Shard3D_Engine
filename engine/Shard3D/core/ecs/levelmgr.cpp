@@ -97,7 +97,7 @@ namespace Shard3D {
 			if (actor.hasComponent<Components::BillboardComponent>()) {
 				out << YAML::Key << "BillboardComponent";
 				out << YAML::BeginMap;
-				out << YAML::Key << "TexPath" << YAML::Value << actor.getComponent<Components::BillboardComponent>().file;
+				out << YAML::Key << "TextureAsset" << YAML::Value << actor.getComponent<Components::BillboardComponent>().asset.getID();
 				out << YAML::Key << "BillboardOrientation" << YAML::Value << (int)actor.getComponent<Components::BillboardComponent>().orientation;
 				out << YAML::EndMap;
 			}
@@ -106,8 +106,7 @@ namespace Shard3D {
 			if (actor.hasComponent<Components::MeshComponent>()) {
 				out << YAML::Key << "MeshComponent";
 				out << YAML::BeginMap;
-					out << YAML::Key << "MeshPath" << YAML::Value << actor.getComponent<Components::MeshComponent>().file;
-					out << YAML::Key << "MeshFormat" << YAML::Value << (int)actor.getComponent<Components::MeshComponent>().type;
+					out << YAML::Key << "MeshAsset" << YAML::Value << actor.getComponent<Components::MeshComponent>().asset.getID();
 				out << YAML::EndMap;
 			}
 
@@ -145,7 +144,7 @@ namespace Shard3D {
 			YAML::Emitter out;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION.toString();
-			out << YAML::Key << "WorldBuilder3D" << YAML::Value << EDITOR_VERSION.toString();
+			out << YAML::Key << "SHARD3D" << YAML::Value << EDITOR_VERSION.toString();
 			out << YAML::Key << "Level" << YAML::Value << "Some kind of level";
 			out << YAML::Key << "Actors" << YAML::Value << YAML::BeginSeq;
 
@@ -178,23 +177,12 @@ namespace Shard3D {
 		}
 
 		LevelMgrResults LevelManager::load(const std::string& sourcePath, bool ignoreWarns) {
-			AssetManager::clearAllAssets(); // remove since new stuff will be loaded into memory
+			ResourceHandler::clearAllAssets(); // remove since new stuff will be loaded into memory
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
 
-#ifdef _DEPLOY
-			//YAML::Node data = YAML::Load(decrypt(strStream.str()));
 			YAML::Node data = YAML::Load(strStream.str());
-#ifdef ENSET_BETA_DEBUG_TOOLS
-			std::ofstream fout(sourcePath + ".dcr");
-			fout << decrypt(strStream.str());
-			fout.flush();
-			fout.close();
-#endif
-#else
-			YAML::Node data = YAML::Load(strStream.str());
-#endif
 
 			if (ignoreWarns == false) {
 				if (!data["Level"]) return LevelMgrResults::WrongFileResult;
@@ -203,7 +191,7 @@ namespace Shard3D {
 					SHARD3D_WARN("Incorrect engine version");
 					return LevelMgrResults::OldEngineVersionResult;
 				}// change this to check if the version is less or more
-				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION.toString()) {
+				if (data["SHARD3D"].as<std::string>() != EDITOR_VERSION.toString()) {
 					SHARD3D_WARN("Incorrect editor version");
 					return LevelMgrResults::OldEditorVersionResult;
 				}// change this to check if the version is less or more
@@ -246,11 +234,11 @@ namespace Shard3D {
 						loadedActor.getComponent<Components::CameraComponent>().ar = actor["CameraComponent"]["AspectRatio"].as<float>();
 					}
 					if (actor["BillboardComponent"]) {
-						AssetManager::emplaceTexture(
-							actor["BillboardComponent"]["TexPath"].as<std::string>()						
+						ResourceHandler::loadTexture(
+							actor["BillboardComponent"]["TextureAsset"].as<std::string>()						
 						);
 						loadedActor.addComponent<Components::BillboardComponent>(
-							actor["BillboardComponent"]["TexPath"].as<std::string>());
+							actor["BillboardComponent"]["TextureAsset"].as<std::string>());
 					}
 					if (actor["ScriptComponent"]) {
 						loadedActor.addComponent<Components::ScriptComponent>();
@@ -260,9 +248,8 @@ namespace Shard3D {
 					}
 
 					if (actor["MeshComponent"]) {
-						AssetManager::emplaceMesh(
-							actor["MeshComponent"]["MeshPath"].as<std::string>(),
-							(MeshType)actor["MeshComponent"]["MeshFormat"].as<int>()
+						ResourceHandler::loadMesh(
+							actor["MeshComponent"]["MeshPath"].as<std::string>()
 						);
 						loadedActor.addComponent<Components::MeshComponent>(
 							actor["MeshComponent"]["MeshPath"].as<std::string>());

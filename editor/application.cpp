@@ -42,6 +42,7 @@ namespace Shard3D {
 		SharedPools::constructPools(engineDevice);
 		
 		AssetManager::setDevice(engineDevice);
+		ResourceHandler::setDevice(engineDevice);
 
 		_special_assets::_editor_icons_load();
 		GraphicsSettings::init(&engineWindow);
@@ -83,7 +84,6 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 
-#ifdef ENSET_ENABLE_WORLDBUILDER3D
 		{
 			CSimpleIniA ini;
 			ini.SetUnicode();
@@ -96,8 +96,6 @@ namespace Shard3D {
 		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, mainOffScreen);
 		
 		layerStack.pushOverlay(imguiLayer);
-#endif
-		
 
 		HUDLayer* hudLayer0 = new HUDLayer();
 		HUDLayer* hudLayer1 = new HUDLayer();
@@ -123,7 +121,7 @@ namespace Shard3D {
 		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		AssetManager::clearAllAssets();
+		ResourceHandler::clearAllAssets();
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
@@ -208,6 +206,7 @@ beginWhileLoop:
 			}
 			SHARD3D_STAT_RECORD();
 			level->runGarbageCollector(engineDevice);
+			ResourceHandler::runGarbageCollector();
 			ECS::MasterManager::executeQueue(level, engineDevice);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().getTranslation(), 
 				possessedCameraActor.getTransform().getRotation());
@@ -301,7 +300,7 @@ beginWhileLoop:
 		DynamicScriptEngine::destroy();
 		vkDeviceWaitIdle(engineDevice.device());
 
-		AssetManager::clearAllAssetsAndDontAddDefaults();
+		ResourceHandler::destroy();
 		_special_assets::_editor_icons_destroy();
 		
 		for (Layer* layer : layerStack) {
@@ -313,33 +312,28 @@ beginWhileLoop:
 	}
 
 	void EngineApplication::loadStaticObjects() {
-		//wb3d::LevelManager levelman(Singleton::activeLevel);
-		//levelman.load("assets/leveldata/sandboox.wbl", true);
+		//ECS::LevelManager levelman(level);
+		//levelman.load("assets/leveldata/drivecartest.wbl", true);
+		//
+		//ECS::Actor car = level->createActorWithGUID(43827493259, "Car");
+		//AssetManager::emplaceMesh("assets/modeldata/FART.obj");
+		//car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
+		//
+		//car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
+		//car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
+		//car.addComponent<Components::AudioComponent>().file = 
+		//	"assets/audiodata/race_scream.wav";
+		//
+		////car.addComponent<Components::ScriptComponent>();
+		//
+		//ECS::Actor light = level->createActor("thing");
+		//light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
+		//light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
+		//level->parentActor(&light, &car);
 
+		auto actor = level->createActor("Cube"); actor.addComponent<Components::MeshComponent>(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
+		actor.addComponent<Components::DirectionalLightComponent>();
+		actor.getTransform().setRotation({ 1.f, 1.f, 3.f });
 
-		ECS::LevelManager levelman(level);
-		levelman.load("assets/leveldata/drivecartest.wbl", true);
-		
-		ECS::Actor car = level->createActorWithGUID(43827493259, "Car");
-		AssetManager::emplaceMesh("assets/modeldata/FART.obj");
-		car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
-		
-		car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
-		car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-		car.addComponent<Components::AudioComponent>().file = 
-			"assets/audiodata/race_scream.wav";
-		
-		//car.addComponent<Components::ScriptComponent>();
-		
-		ECS::Actor light = level->createActor("thing");
-		light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
-		light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
-		level->parentActor(&light, &car);
 	}
-
-	// bind CppScript components
-	void EngineApplication::bindNativeScripts()
-	{
-	}
-
 }

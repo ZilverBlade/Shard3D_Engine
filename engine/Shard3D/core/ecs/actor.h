@@ -19,7 +19,7 @@ namespace Shard3D {
 
 			template<typename T, typename... Args>
 			T& addComponent(Args&&... args) {
-#ifndef ENSET_CONFIDENT_COMPONENTS
+#ifndef ENSET_UNSAFE_COMPONENTS
 				if (hasComponent<T>()) {	// return getComponent if component exists
 					SHARD3D_ERROR("Actor {0} already has component {1}!", this->getUUID(), typeid(T).name());
 					return getComponent<T>();
@@ -31,7 +31,7 @@ namespace Shard3D {
 
 			template<typename T>
 			T& getComponent() {
-#ifndef ENSET_CONFIDENT_COMPONENTS
+#ifndef ENSET_UNSAFE_COMPONENTS
 				if (!hasComponent<T>()) { // is error since it will very likely cause a crash
 					SHARD3D_ERROR("Actor {0} does not have component '{1}'!", this->getUUID(), typeid(T).name());
 					SHARD3D_FATAL("Tried to get a component that does not exist!");
@@ -47,7 +47,7 @@ namespace Shard3D {
 
 			template<typename T>
 			void killComponent() { // is warn since it has the chance of not causing a crash or undefined behaviour
-				if (!hasComponent<T>()) { // no #if !ENSET_CONFIDENT_COMPONENTS because this error is negligible;
+				if (!hasComponent<T>()) { // no #if !ENSET_UNSAFE_COMPONENTS because this error is negligible;
 					SHARD3D_WARN("Actor {0} does not have component '{1}'!", this->getUUID(), typeid(T).name());
 					return;
 				}

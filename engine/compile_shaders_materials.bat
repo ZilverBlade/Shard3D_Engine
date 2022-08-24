@@ -1,4 +1,4 @@
 @echo off
-shadercompmgr.exe -o Shard3D/shaders/materials/ ../runtime/assets/shaderdata/materials/
+shadercompmgr.exe -o Shard3D/shaders/materials/ ../assets/shaderdata/materials/
 
 pause

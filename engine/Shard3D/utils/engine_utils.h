@@ -23,6 +23,7 @@ namespace Shard3D {
 	class strUtils {
 	public:
 		static inline bool hasEnding(std::string const& fullString, std::string const& ending) {
+			if ((fullString.length() < ending.length())) return false;
 			return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
 		}
 		static inline bool hasStarting(std::string const& fullString, std::string const& starting) {
@@ -33,6 +34,7 @@ namespace Shard3D {
 	class IOUtils {
 	public:
 		static void writeStackBinary(void* data, size_t object_size, const std::string& path);
+		static std::vector<uint8_t> getStackBinary(void* data, size_t object_size);
 		static void* readBinary(const std::string& path);
 	};
 } 

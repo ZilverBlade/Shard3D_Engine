@@ -9,7 +9,6 @@ namespace Shard3D {
 	class EngineApplication;
 	namespace ECS {
 		class Actor;
-		class Blueprint;
 		class LevelTreePanel;
 		enum class PlayState {
 			Stopped = 0, // no scripts have been instantiated. outside of the editor this should only be this state when loading levels.
@@ -26,8 +25,6 @@ namespace Shard3D {
 			~Level();
 
 			static sPtr<Level> copy(sPtr<Level> other);
-
-			Blueprint createBlueprint(Actor actor, std::string path, std::string name = "Some kind of blueprint");
 
 			Actor createActor(const std::string& name= "Some kind of actor");
 			
@@ -93,10 +90,6 @@ namespace Shard3D {
 
 			// queues 
 			std::vector<Actor> actorKillQueue;
-			std::vector<Actor> actorKillTexQueue;
-			std::vector<Actor> actorReloadTexQueue;
-			std::vector<Actor> actorKillMeshQueue;
-			std::vector<Actor> actorReloadMeshQueue;
 
 			friend class Shard3D::EngineApplication;
 			friend class Actor;

@@ -100,12 +100,12 @@ namespace Shard3D {
 			.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 			.build();
 
-		VkDescriptorImageInfo diffuseTex_imageInfo = AssetManager::retrieveTexture(diffuseTex)->getImageInfo();
-		VkDescriptorImageInfo specularTex_imageInfo = AssetManager::retrieveTexture(specularTex)->getImageInfo();
-		VkDescriptorImageInfo shininessTex_imageInfo = AssetManager::retrieveTexture(shininessTex)->getImageInfo();
-		VkDescriptorImageInfo metallicTex_imageInfo = AssetManager::retrieveTexture(metallicTex)->getImageInfo();
+		VkDescriptorImageInfo diffuseTex_imageInfo = ResourceHandler::retrieveTexture(diffuseTex)->getImageInfo();
+		VkDescriptorImageInfo specularTex_imageInfo = ResourceHandler::retrieveTexture(specularTex)->getImageInfo();
+		VkDescriptorImageInfo shininessTex_imageInfo = ResourceHandler::retrieveTexture(shininessTex)->getImageInfo();
+		VkDescriptorImageInfo metallicTex_imageInfo = ResourceHandler::retrieveTexture(metallicTex)->getImageInfo();
 
-		VkDescriptorImageInfo normalTex_imageInfo = AssetManager::retrieveTexture(normalTex)->getImageInfo();
+		VkDescriptorImageInfo normalTex_imageInfo = ResourceHandler::retrieveTexture(normalTex)->getImageInfo();
 
 		EngineDescriptorWriter(*materialDescriptorInfo.textureLayout, *descriptorPool)
 				.writeImage(1, &diffuseTex_imageInfo)
@@ -135,216 +135,11 @@ namespace Shard3D {
 	}
 
 
-	void SurfaceMaterial_ShadedMasked::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
-		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
-		
-		factorsBuffer =
-			make_uPtr<EngineBuffer>(
-				device,
-				sizeof(SurfaceMaterial_ShadedOpaque_Factors),
-				1,
-				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-				);
-
-		factorsBuffer->map();
-
-		materialDescriptorInfo.factorLayout = EngineDescriptorSetLayout::Builder(device)
-			.addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.build();
-
-		VkDescriptorBufferInfo bufferInfo = factorsBuffer->descriptorInfo();
-		EngineDescriptorWriter(*materialDescriptorInfo.factorLayout, *SharedPools::staticMaterialPool)
-			.writeBuffer(1, &bufferInfo)
-			.build(materialDescriptorInfo.factors);
-
-		SurfaceMaterial_ShadedOpaque_Factors factors{};
-		factors.diffuse = { diffuseColor.x, diffuseColor.y, diffuseColor.z, 1.f };
-		factors.SSM = { specular, shininess, metallic };
-		factorsBuffer->writeToBuffer(&factors);
-		factorsBuffer->flush();
-
-
-		materialDescriptorInfo.textureLayout = EngineDescriptorSetLayout::Builder(device)
-			.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.build();
-
-		VkDescriptorImageInfo diffuseTex_imageInfo = AssetManager::retrieveTexture(diffuseTex)->getImageInfo();
-		VkDescriptorImageInfo specularTex_imageInfo = AssetManager::retrieveTexture(specularTex)->getImageInfo();
-		VkDescriptorImageInfo shininessTex_imageInfo = AssetManager::retrieveTexture(shininessTex)->getImageInfo();
-		VkDescriptorImageInfo metallicTex_imageInfo = AssetManager::retrieveTexture(metallicTex)->getImageInfo();
-
-		VkDescriptorImageInfo normalTex_imageInfo = AssetManager::retrieveTexture(normalTex)->getImageInfo();
-		VkDescriptorImageInfo maskTex_imageInfo = AssetManager::retrieveTexture(maskTex)->getImageInfo();
-
-		EngineDescriptorWriter(*materialDescriptorInfo.textureLayout, *descriptorPool)
-			.writeImage(1, &diffuseTex_imageInfo)
-			.writeImage(2, &specularTex_imageInfo)
-			.writeImage(3, &shininessTex_imageInfo)
-			.writeImage(4, &metallicTex_imageInfo)
-			.writeImage(5, &normalTex_imageInfo)
-			.writeImage(6, &maskTex_imageInfo)
-			.build(materialDescriptorInfo.textures);
-
-		materialPipelineConfig = make_uPtr<MaterialPipelineConfigInfo>();
-		MaterialSystem::createSurfacePipelineLayout(
-			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
-			materialDescriptorInfo.textureLayout->getDescriptorSetLayout(),
-			&materialPipelineConfig->shaderPipelineLayout
-		);
-		PipelineConfigInfo pipelineConfigInfo{};
-		EnginePipeline::pipelineConfig(pipelineConfigInfo)
-			.defaultPipelineConfigInfo()
-			.enableVertexDescriptions();
-		MaterialSystem::createSurfacePipeline(
-			&materialPipelineConfig->shaderPipeline, 
-			materialPipelineConfig->shaderPipelineLayout, 
-			pipelineConfigInfo, 
-			"assets/shaderdata/materials/surface_shaded_masked.frag.spv");
-
-		built = true;
-	}
-
-	void SurfaceMaterial_ShadedTranslucent::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
-		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
-
-		factorsBuffer =
-			make_uPtr<EngineBuffer>(
-				device,
-				sizeof(SurfaceMaterial_ShadedOpaque_Factors),
-				1,
-				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-			);
-
-		factorsBuffer->map();
-
-		materialDescriptorInfo.factorLayout = EngineDescriptorSetLayout::Builder(device)
-			.addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.build();
-
-		VkDescriptorBufferInfo bufferInfo = factorsBuffer->descriptorInfo();
-		EngineDescriptorWriter(*materialDescriptorInfo.factorLayout, *SharedPools::staticMaterialPool)
-			.writeBuffer(1, &bufferInfo)
-			.build(materialDescriptorInfo.factors);
-
-		SurfaceMaterial_ShadedOpaque_Factors factors{};
-		factors.diffuse = { diffuseColor.x, diffuseColor.y, diffuseColor.z, opacity };
-		factors.SSM = { specular, shininess, clarity };
-		factorsBuffer->writeToBuffer(&factors);
-		factorsBuffer->flush();
-
-		materialDescriptorInfo.textureLayout = EngineDescriptorSetLayout::Builder(device)
-			.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.build();
-
-		VkDescriptorImageInfo diffuseTex_imageInfo = AssetManager::retrieveTexture(diffuseTex)->getImageInfo();
-		VkDescriptorImageInfo specularTex_imageInfo = AssetManager::retrieveTexture(specularTex)->getImageInfo();
-		VkDescriptorImageInfo shininessTex_imageInfo = AssetManager::retrieveTexture(shininessTex)->getImageInfo();
-		VkDescriptorImageInfo clarityTex_imageInfo = AssetManager::retrieveTexture(clarityTex)->getImageInfo();
-
-		VkDescriptorImageInfo normalTex_imageInfo = AssetManager::retrieveTexture(normalTex)->getImageInfo();
-
-		EngineDescriptorWriter(*materialDescriptorInfo.textureLayout, *descriptorPool)
-			.writeImage(1, &diffuseTex_imageInfo)
-			.writeImage(2, &specularTex_imageInfo)
-			.writeImage(3, &shininessTex_imageInfo)
-			.writeImage(4, &clarityTex_imageInfo)
-			.writeImage(5, &normalTex_imageInfo)
-			.build(materialDescriptorInfo.textures);
-
-		materialPipelineConfig = make_uPtr<MaterialPipelineConfigInfo>();
-		MaterialSystem::createSurfacePipelineLayout(
-			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
-			materialDescriptorInfo.textureLayout->getDescriptorSetLayout(),
-			&materialPipelineConfig->shaderPipelineLayout
-		);
-		PipelineConfigInfo pipelineConfigInfo{};
-		EnginePipeline::pipelineConfig(pipelineConfigInfo)
-			.defaultPipelineConfigInfo()
-			.enableAlphaBlending(VK_BLEND_OP_ADD)
-			.enableVertexDescriptions(); 
-		MaterialSystem::createSurfacePipeline(
-			&materialPipelineConfig->shaderPipeline, 
-			materialPipelineConfig->shaderPipelineLayout, 
-			pipelineConfigInfo, 
-			"assets/shaderdata/materials/surface_shaded_translucent.frag.spv");
-
-		built = true;
-	}
 #pragma endregion
 #pragma region SurfaceUnshaded
 
 
 #pragma endregion
 #pragma endregion
-
-
-	void SurfaceMaterial_UnshadedWireframe::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
-		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
-
-		factorsBuffer =
-			make_uPtr<EngineBuffer>(
-				device,
-				sizeof(SurfaceMaterial_ShadedOpaque_Factors),
-				1,
-				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-				);
-
-		factorsBuffer->map();
-
-		materialDescriptorInfo.factorLayout = EngineDescriptorSetLayout::Builder(device)
-			.addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.build();
-
-		VkDescriptorBufferInfo bufferInfo = factorsBuffer->descriptorInfo();
-		EngineDescriptorWriter(*materialDescriptorInfo.factorLayout, *SharedPools::staticMaterialPool)
-			.writeBuffer(1, &bufferInfo)
-			.build(materialDescriptorInfo.factors);
-
-		SurfaceMaterial_Unshaded_Factors factors{};
-		factors.emissive = { emissiveColor.x, emissiveColor.y, emissiveColor.z, 1.f };
-		factorsBuffer->writeToBuffer(&factors);
-		factorsBuffer->flush();
-
-		materialDescriptorInfo.textureLayout = EngineDescriptorSetLayout::Builder(device)
-			.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.build();
-
-		VkDescriptorImageInfo emissiveTex_imageInfo = AssetManager::retrieveTexture(emissiveTex)->getImageInfo();
-
-		EngineDescriptorWriter(*materialDescriptorInfo.textureLayout, *descriptorPool)
-			.writeImage(1, &emissiveTex_imageInfo)
-			.build(materialDescriptorInfo.textures);
-
-		materialPipelineConfig = make_uPtr<MaterialPipelineConfigInfo>();
-		MaterialSystem::createSurfacePipelineLayout(
-			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
-			materialDescriptorInfo.textureLayout->getDescriptorSetLayout(),
-			&materialPipelineConfig->shaderPipelineLayout
-		);
-		PipelineConfigInfo pipelineConfigInfo{};
-		EnginePipeline::pipelineConfig(pipelineConfigInfo)
-			.defaultPipelineConfigInfo()
-			.lineRasterizer()
-			.enableVertexDescriptions();
-		MaterialSystem::createSurfacePipeline(
-			&materialPipelineConfig->shaderPipeline,
-			materialPipelineConfig->shaderPipelineLayout,
-			pipelineConfigInfo,
-			"assets/shaderdata/materials/surface_unshaded_wireframe.frag.spv");
-
-		built = true;
-	}
 
 }

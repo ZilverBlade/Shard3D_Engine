@@ -16,7 +16,7 @@ namespace Shard3D {
 	void LevelTreePanel::clearSelectedActor() { selectedActor = {}; }
 
 	void LevelTreePanel::render() {
-		SHARD3D_ASSERT(context != nullptr, "Context not provided!");
+		SHARD3D_ASSERT(context != nullptr && "Context not provided!");
 		ImGui::Begin(std::string("Level Tree (" + context->name + ")").c_str());
 		context->registry.each([&](auto actorGUID) {
 			ECS::Actor actor{ actorGUID, context.get() };	
@@ -35,19 +35,19 @@ namespace Shard3D {
 				auto actor = context->createActor("Camera Actor"); 
 				actor.addComponent<Components::CameraComponent>(); 
 				if (!actor.hasComponent<Components::MeshComponent>()) {
-					AssetManager::emplaceMesh("assets/_engine/msh/camcord.obj");
-					actor.addComponent<Components::MeshComponent>("assets/_engine/msh/camcord.obj");
+					ResourceHandler::loadMesh(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+					actor.addComponent<Components::MeshComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
 				}
 				selectedActor = actor;
 			}
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Billboard Actor")) { auto actor = context->createActor("Billboard"); SHARD3D_NOIMPL; }
+			if (ImGui::MenuItem("New Billboard Actor")) { auto actor = context->createActor("Billboard"); actor.addComponent<Components::BillboardComponent>(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));}
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); SHARD3D_NOIMPL; }
+			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); actor.addComponent<Components::MeshComponent>(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX)); }
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
@@ -76,13 +76,7 @@ namespace Shard3D {
 		bool actorExists = true;
 		if (ImGui::BeginPopupContextItem()) {
 			if (ImGui::MenuItem("Remove Actor")) actorExists = false;
-			if (!actor.hasComponent<Components::BlueprintComponent>())
-				if (ImGui::MenuItem("Convert to Blueprint")) {
-					std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_ASSETFILE_OPTIONS);
-					if (!filepath.empty()) {
-					//	context->createBlueprint(selectedActor, filepath);
-					}
-				}	
+
 			ImGui::EndPopup();
 		}
 

@@ -8,141 +8,275 @@
 #include <filesystem>
 
 namespace Shard3D {
-	static std::string& castToAssetString(const std::string& input) {
-		std::string output = input.substr(input.rfind("assets\\" - 7));
-		std::for_each(output.begin(), output.end(), [](char& c) {
-			c = ::tolower(c);
-		});
-		std::replace(output.begin(), output.end(), '\\', '/');
-		return output;
+	std::string AssetUtils::truncatePath(const std::string& total) {
+		return total.substr(total.find_last_of("\\"));
 	}
 
-	void AssetManager::clearAllAssetsAndDontAddDefaults() { textureAssets.clear(); meshAssets.clear(); /*materialAssets.clear(); */}
-	void AssetManager::clearTextureAssets() {
+	AssetType AssetUtils::discoverAssetType(const std::string& assetPath) {
+		if (strUtils::hasEnding(assetPath, ".s3dlevel")) return AssetType::Level;
+		return AssetType::Unknown;
+		std::ifstream input{ assetPath };
+		input.open(assetPath);
+		std::stringstream stream; stream << input.rdbuf();
+		std::string file = stream.str();
+		{
+			std::string itemType = file.substr(sizeof("<asset_type>"), file.find("<asset_file>") - 2 - sizeof("<asset_type>"));
+			if (itemType == "mesh3d") {
+				input.close();
+				return AssetType::Mesh3D;
+			}
+			if (itemType == "texture") {
+				input.close();
+				return AssetType::Texture;
+			}
+			if (itemType == "mesh3d") {
+				input.close();
+				return AssetType::Mesh3D;
+			}
+			if (itemType == "material") {
+				input.close();
+				return AssetType::Material;
+			}
+		}
+		return AssetType::Unknown;
+	}
+
+	void ResourceHandler::destroy() {
+		textureAssets.clear(); 
+		meshAssets.clear(); 
+		surfaceMaterialAssets.clear(); 
+	}
+	void ResourceHandler::clearTextureAssets() {
 		SHARD3D_INFO("Clearing all texture assets");
 		vkDeviceWaitIdle(engineDevice->device());
 		textureAssets.clear();
-		emplaceTexture(ENGINE_ERRTEX, VK_FILTER_NEAREST);
-		emplaceTexture(ENGINE_ERRMTX, VK_FILTER_NEAREST);
-		emplaceTexture(ENGINE_WHTTEX, VK_FILTER_NEAREST);
-		emplaceTexture(ENGINE_BLKTEX, VK_FILTER_NEAREST);
-		emplaceTexture(ENGINE_NRMTEX, VK_FILTER_NEAREST);
-	}	
-	void AssetManager::clearMeshAssets() {
+	    loadTexture(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
+	    loadTexture(AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX));
+	    loadTexture(AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX));
+	    loadTexture(AssetID(ENGINE_BLKTEX ENGINE_ASSET_SUFFIX));
+	    loadTexture(AssetID(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX));
+	}
+	void ResourceHandler::clearMeshAssets() {
 		SHARD3D_INFO("Clearing all mesh assets");
 		vkDeviceWaitIdle(engineDevice->device());
 		meshAssets.clear();
-		emplaceMesh(ENGINE_ERRMSH);
-		emplaceMesh(ENGINE_DEFAULT_MODEL_FILE);
+		loadMesh(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
+		loadMesh(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
 	}
-	void AssetManager::clearMaterialAssets() {
+	void ResourceHandler::clearMaterialAssets() {
 		SHARD3D_INFO("Clearing all material assets");
 		vkDeviceWaitIdle(engineDevice->device());
-		
-		//sPtr<SurfaceMaterial_ShadedOpaque> defaultMaterial = make_sPtr<SurfaceMaterial_ShadedOpaque>();
-		//
-		//defaultMaterial->diffuseTex = ENGINE_ERRMAT;
-		//defaultMaterial->shininess = 0.f;
-		//defaultMaterial->specular = 0.1f;
-		//
-		//IOUtils::writeStackBinary(defaultMaterial.get(), sizeof(SurfaceMaterial_ShadedOpaque), "assets/test.bin");
-//		//defaultMaterial->createMaterialShader(SharedPools::staticMaterialPool.get());
 
-		//surfaceMaterialAssets[defaultMaterial->materialTag] = defaultMaterial;
+		rPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_rPtr<SurfaceMaterial_ShadedOpaque>();
+		grid_material->materialTag = "world_grid";
+		grid_material->diffuseColor = { 1.f, 1.f, 1.f };
+		grid_material->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
+		grid_material->specular = 0.5f;
+		grid_material->shininess = 0.2f;
 
-
-		//MaterialManager::saveMaterial(defaultMaterial, "assets/_engine/mat/grid.wbasset");
+		loadMaterial(grid_material, "world_grid");
 	}
-	void AssetManager::clearAllAssets() {
+	void ResourceHandler::clearAllAssets() {
 		clearTextureAssets();
 		clearMeshAssets();
 		clearMaterialAssets();
 	}
-	void AssetManager::loadLevelAssets() {
-		for (const auto& file : std::filesystem::recursive_directory_iterator("assets/materialdata")) { 
-			//auto material = MaterialSystem::loadMaterial(file.path().string());
-			//materialAssets[1] = material;
+
+//========================================================================================================================
+
+	void AssetManager::importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info) {
+		if (!(strUtils::hasStarting(destpath, "assets/") || strUtils::hasStarting(destpath, "assets\\"))) {
+			SHARD3D_ERROR("Cannot emplace a texture outside of the assets folder!");
+			return;
 		}
+		std::ifstream ifile(destpath);
+		if (!ifile.good()) std::filesystem::copy_file(sourcepath, destpath);
+
+		std::ofstream out(destpath +  ENGINE_ASSET_SUFFIX);
+		out << "<asset_type>:texture\n";
+		out << "<asset_file>:" << destpath << "\n";
+		out << "<asset_orig>:" << sourcepath << "\n";
+						   
+		out << "<properties>:\n";
+
+		TextureLoadInfo _info[1] = { info };
+		std::vector<uint8_t> data = IOUtils::getStackBinary(_info, sizeof(TextureLoadInfo));
+		for (auto& byte : data) out << byte;
+
+		out.flush();
+		out.close();
 	}
+
+	void AssetManager::importMesh(const std::string& sourcepath, const std::string& destpath, MeshLoadInfo info) {
+		if (!(strUtils::hasStarting(destpath, "assets/") || strUtils::hasStarting(destpath, "assets\\"))) {
+			SHARD3D_ERROR("Cannot emplace a texture outside of the assets folder!");
+			return;
+		}
+		std::ifstream ifile(destpath);
+		if (!ifile.good()) std::filesystem::copy_file(sourcepath, destpath);
+
+		std::ofstream out(destpath +  ENGINE_ASSET_SUFFIX);
+		out << "<asset_type>:mesh3d\n";
+		out << "<asset_file>:" << destpath << "\n";
+		out << "<asset_orig>:" << sourcepath << "\n";
+
+		out << "<properties>:\n";
+
+		MeshLoadInfo _info[1] = { info };
+		std::vector<uint8_t> data = IOUtils::getStackBinary(_info, sizeof(MeshLoadInfo));
+		for (auto& byte : data) out << byte;
+
+		out.flush();
+		out.close();
+	}
+
+	void AssetManager::createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material) {
+
+	}
+
 #pragma region Mesh
-	void AssetManager::emplaceMesh(const std::string& meshPath, MeshType meshType) {	
-		//cast to lowercase, otherwise upper case paths (which are the same as lowercase) will get treated as diff
-		std::string _meshPath = meshPath;
 
-		for (const auto& i : meshAssets) 
-			if (i.first.find(_meshPath) != std::string::npos && _meshPath.find(i.first) != std::string::npos) {
-				SHARD3D_WARN("Mesh at path '{0}' already exists! Mesh will be ignored...", _meshPath);
-				return;		
-		/*	meshAssets.erase(i.first);
-			meshAssets[mesh->fpath] = mesh;
-			return; //prevent entries in unordered map with same path */			
+	void ResourceHandler::_loadMesh(const AssetID& assetPath) {
+		std::fstream input{ assetPath.getFile(), std::ios::binary | std::ios::in };
+		std::streampos fileSize;
+		input.unsetf(std::ios::skipws);
+
+		input.seekg(0, std::ios::end);
+		fileSize = input.tellg();
+		input.seekg(0, std::ios::beg);
+
+		std::string bytes;
+		bytes.reserve(fileSize);
+
+		bytes.insert(bytes.begin(),
+			std::istream_iterator<uint8_t>(input),
+			std::istream_iterator<uint8_t>());
+
+		{
+			std::string itemType = bytes.substr(sizeof("<asset_type>"), bytes.find("<asset_file>") - 2 - sizeof("<asset_type>"));
+			if (itemType != "mesh3d") {
+				SHARD3D_ERROR("Trying to load non mesh asset!");
+				return;
 			}
+		}
+		// Hacky binary read
+		MeshLoadInfo loadInfo = *reinterpret_cast<MeshLoadInfo*>(reinterpret_cast<uintptr_t>(bytes.substr(bytes.find("<properties>") + sizeof("<properties>  ")).data()));
 
-		sPtr<EngineMesh> mesh = EngineMesh::createMeshFromFile(*engineDevice, _meshPath, meshType);
+		// Hacky entry reading
+		size_t entryBegin = bytes.find("<asset_file>") + sizeof("<asset_file>");
+		std::string meshFile = bytes.substr(entryBegin, bytes.find("<asset_orig>") - 2 - entryBegin);
+		AssetID meshAsset = assetPath;
+		input.close();
+		if (meshAssets.find(meshAsset) != meshAssets.end()) {
+			SHARD3D_WARN("Mesh at path '{0}' (ID {1}) already exists! Mesh will be ignored...", meshAsset.getFile(), meshAsset.getID());
+			return;
+		}
+
+		rPtr<EngineMesh> mesh = EngineMesh::loadMeshFromFile(*engineDevice, meshFile, loadInfo);
 		if (!mesh) return;
-		SHARD3D_LOG("Loaded mesh to asset map '{0}'", _meshPath);
-		meshAssets[_meshPath] = mesh;
+		SHARD3D_LOG("Loaded asset to resource map '{0}'", meshAsset.getFile());
+		meshAssets[meshAsset] = mesh;
 	}
-	sPtr<EngineMesh>& AssetManager::retrieveMesh_ENSET_CONFIDENT_ASSETS(const std::string& path) {
-		return meshAssets.at(path);
+	void ResourceHandler::loadMesh(const AssetID& asset) {
+		reloadMeshQueue.push_back(asset);
 	}
-	sPtr<EngineMesh>& AssetManager::retrieveMesh_NENSET_CONFIDENT_ASSETS(const std::string& path) {
-		if (meshAssets.find(path) != meshAssets.cend())
-			return meshAssets.at(path);
-		return meshAssets.at(ENGINE_ERRMSH);
+	rPtr<EngineMesh>& ResourceHandler::retrieveMesh_unsafe(const AssetID& asset) {
+		return meshAssets.at(asset);
+	}
+	rPtr<EngineMesh>& ResourceHandler::retrieveMesh_safe(const AssetID& asset) {
+		if (meshAssets.find(asset) != meshAssets.cend())
+			return meshAssets.at(asset);
+		return meshAssets.at(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
 	}
 #pragma endregion
 #pragma region Texture
-	void AssetManager::emplaceTexture(const std::string& texturePath, int filter) {
-		std::string _texturePath = texturePath;
-		for (const auto& i : textureAssets)
-			if (i.first.find(_texturePath) != std::string::npos && _texturePath.find(i.first) != std::string::npos) {
-				SHARD3D_WARN("Texture at path '{0}' already exists! Texture will be ignored...", texturePath);
+	void ResourceHandler::loadTexture(const AssetID& assetPath) {
+		std::fstream input{ assetPath.getFile(), std::ios::binary | std::ios::in };
+		std::streampos fileSize;
+		input.unsetf(std::ios::skipws);
+
+		input.seekg(0, std::ios::end);
+		fileSize = input.tellg();
+		input.seekg(0, std::ios::beg);
+
+		std::string bytes; 
+		bytes.reserve(fileSize);
+		
+		bytes.insert(bytes.begin(),
+			std::istream_iterator<uint8_t>(input),
+			std::istream_iterator<uint8_t>());
+
+		{
+			std::string itemType = bytes.substr(sizeof("<asset_type>"), bytes.find("<asset_file>") - 2 - sizeof("<asset_type>"));
+			if (itemType != "texture") {
+				SHARD3D_ERROR("Trying to load non texture asset!");
 				return;
-				/*	meshAssets.erase(i.first);
-					meshAssets[mesh->fpath] = mesh;
-					return; //prevent entries in unordered map with same path */
 			}
-		sPtr<EngineTexture> texture = EngineTexture::createTextureFromFile(*engineDevice, _texturePath, static_cast<VkFilter>(filter));
+		}
+		// Hacky binary read
+		TextureLoadInfo loadInfo = *reinterpret_cast<TextureLoadInfo*>(reinterpret_cast<uintptr_t>(bytes.substr(bytes.find("<properties>") + sizeof("<properties>  ")).data()));
+
+		// Hacky entry reading
+		size_t entryBegin = bytes.find("<asset_file>") + sizeof("<asset_file>");
+		std::string textureFile = bytes.substr(entryBegin, bytes.find("<asset_orig>") - 2 - entryBegin);
+		AssetID textureAsset = assetPath;
+		input.close();
+		if (textureAssets.find(textureAsset) != textureAssets.end()) {
+			SHARD3D_WARN("Texture at path '{0}' (ID {1}) already exists! Texture will be ignored...", textureAsset.getFile(), textureAsset.getID());
+			return;
+		}
+		rPtr<EngineTexture> texture = EngineTexture::createTextureFromFile(*engineDevice, textureFile, loadInfo);
 		if (!texture) return;
-		SHARD3D_LOG("Loaded texture to asset map '{0}'", _texturePath);
-		textureAssets[_texturePath] = texture;
+		SHARD3D_LOG("Loaded texture to resource map '{0}'", textureAsset.getFile());
+		textureAssets[textureAsset] = texture;
 	}
 
-	
-	sPtr<EngineTexture>& AssetManager::retrieveTexture_ENSET_CONFIDENT_ASSETS(const std::string& path) {
-		return textureAssets.at(path);
+
+	void ResourceHandler::runGarbageCollector() {
+		if (reloadMeshQueue.size() != 0) {
+			vkDeviceWaitIdle(engineDevice->device());
+			for (AssetID& file : reloadMeshQueue) {
+				_loadMesh(file);
+			}
+			reloadMeshQueue.clear();
+			return;
+		}	
 	}
-	sPtr<EngineTexture>& AssetManager::retrieveTexture_NENSET_CONFIDENT_ASSETS(const std::string& path) {
-		if (textureAssets.find(path) != textureAssets.cend())
-			return textureAssets.at(path);
-		return textureAssets.at(ENGINE_ERRTEX);
+
+	rPtr<EngineTexture>& ResourceHandler::retrieveTexture_unsafe(const AssetID& asset) {
+		return textureAssets.at(asset);
+	}
+	rPtr<EngineTexture>& ResourceHandler::retrieveTexture_safe(const AssetID& asset) {
+		if (textureAssets.find(asset) != textureAssets.cend())
+			return textureAssets.at(asset);
+		return textureAssets.at(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
 	}
 #pragma endregion
 
 #pragma region Material
-	void AssetManager::emplaceMaterial(sPtr<SurfaceMaterial> material, const std::string& materialPath) {
-		surfaceMaterialAssets[materialPath] = material;
+	void ResourceHandler::loadMaterial(rPtr<SurfaceMaterial> material, const std::string& materialPath) {
+		surfaceMaterialAssets[AssetID(materialPath)] = material;
 		material->createMaterialShader(*engineDevice, SharedPools::staticMaterialPool);
 	}
 
-
-	sPtr<SurfaceMaterial>& AssetManager::retrieveSurfaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path) {
-		//if (surfaceMaterialAssets.find(path) != surfaceMaterialAssets.cend())
-			return surfaceMaterialAssets.at(path);
-		//return surfaceMaterialAssets.at(ENGINE_ERRMAT);
+	rPtr<SurfaceMaterial>& ResourceHandler::retrieveSurfaceMaterial_safe(const AssetID& asset) {
+		if (surfaceMaterialAssets.find(asset) != surfaceMaterialAssets.cend())
+			return surfaceMaterialAssets.at(asset); return surfaceMaterialAssets.at(asset);
+		return surfaceMaterialAssets.at(AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX));
 	}
 #pragma endregion
-	
+
 }
 
 #pragma region special
 void Shard3D::_special_assets::_editor_icons_load() {
 	for (auto icon : _editor_icons_array) {
 		auto& readIco = icon[1];
-		sPtr<EngineTexture> tex = 
+		TextureLoadInfo loadInfo{};
+		loadInfo.filter = (readIco == "assets/_engine/tex/_editor/icon_null") ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+		rPtr<EngineTexture> tex =
 			EngineTexture::createTextureFromFile(*AssetManager::engineDevice, icon[1],
-				(readIco == "assets/_engine/tex/_editor/icon_null") ? VK_FILTER_NEAREST : VK_FILTER_LINEAR);
+				loadInfo);
 		_editor_icons[icon[0]] = tex;
 	}
 }

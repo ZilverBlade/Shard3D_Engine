@@ -159,6 +159,7 @@
     <ClInclude Include="core\asset\material.h" />
     <ClInclude Include="core\asset\matmgr.h" />
     <ClInclude Include="core\asset\serializer.h" />
+    <ClInclude Include="core\misc\assetid.h" />
     <ClInclude Include="workarounds.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="dynamic_definitions.h" />
@@ -172,8 +173,6 @@
     <ClInclude Include="core\asset\texture.h" />
     <ClInclude Include="core\audio\audio.h" />
     <ClInclude Include="core\ecs\actor.h" />
-    <ClInclude Include="core\ecs\blueprint.h" />
-    <ClInclude Include="core\ecs\bpmgr.h" />
     <ClInclude Include="core\ecs\components.h" />
     <ClInclude Include="core\ecs\level.h" />
     <ClInclude Include="core\ecs\levelmgr.h" />
@@ -278,16 +277,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="core\ecs\blueprint.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ecs\bpmgr.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="core\ecs\components.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
@@ -307,6 +296,11 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="core\misc\assetid.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="core\misc\graphics_settings.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>

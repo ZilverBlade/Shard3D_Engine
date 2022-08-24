@@ -1,20 +1,15 @@
 #pragma once
 #include "../../vulkan_abstr.h"
 #include "material.h"
-
+#include "../misc/assetid.h"
 extern "C" {
 	struct aiNode;
 	struct aiScene;
 	struct aiMesh;
 }
 namespace Shard3D {
-	enum class MeshType {
-		MESH_TYPE_NULL = 0,
-		
-		MESH_TYPE_OBJ = 1,
-		MESH_TYPE_COLLADA = 2,
-		MESH_TYPE_GLTF = 3,
-		MESH_TYPE_FBX = 4
+	struct MeshLoadInfo {
+		int x;
 	};
 
 	class EngineMesh {
@@ -35,24 +30,23 @@ namespace Shard3D {
 		struct SubmeshData {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
-
-			std::string material{}; // Material path
 		};
 
 		struct SubmeshBuffers {
 			sPtr<EngineBuffer> indexBuffer{};
 			sPtr<EngineBuffer> vertexBuffer{};
-			bool hasIndexBuffer = false;
 
-			sPtr<SurfaceMaterial> material;
+			uint32_t vertexCount{};
+			uint32_t indexCount{};
+			bool hasIndexBuffer = false;
 		};
 
 		struct Builder {
 			//    <Material Slot> <Submesh>
 			hashMap<std::string, SubmeshData> submeshes;
-			void loadScene(const std::string& filepath);
-			void processNode(aiNode* node, const aiScene* scene);
-			void loadSubmesh(aiMesh* mesh, const aiScene* scene);
+			void loadScene(const std::string& filepath, bool createMaterials);
+			void processNode(aiNode* node, const aiScene* scene, bool createMaterials);
+			void loadSubmesh(aiMesh* mesh, const aiScene* scene, bool createMaterials);
 		};
 
 		EngineMesh(EngineDevice& dvc, const EngineMesh::Builder &builder);
@@ -64,14 +58,16 @@ namespace Shard3D {
 		static uPtr<EngineMesh> createMeshFromFile(
 			EngineDevice& dvc,
 			const std::string& filepath, 
-			MeshType modelType
+			MeshLoadInfo loadInfo
 		);
-
+		static uPtr<EngineMesh> loadMeshFromFile(
+			EngineDevice& dvc,
+			const AssetID& asset,
+			MeshLoadInfo loadInfo
+		);
 		void bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
-		void bindMaterial(VkCommandBuffer commandBuffer, VkDescriptorSet globalDescriptorSet, SubmeshBuffers buffers);
 		void draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
 
-		VkPipelineLayout getMaterialPipelineLayout(SubmeshBuffers buffers) { return buffers.material->getPipelineLayout(); }
 		//			<Buffer Data>
 		std::vector<SubmeshBuffers> buffers{};
 
@@ -80,9 +76,7 @@ namespace Shard3D {
 		void createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
 		void createMaterialBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
 
-		uint32_t vertexCount{};
 
-		uint32_t indexCount{};
 		EngineDevice* device;
 	};
 }

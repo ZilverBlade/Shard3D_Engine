@@ -80,7 +80,7 @@ namespace Shard3D {
 			nullptr);
 
 		frameInfo.activeLevel->registry.view<Components::BillboardComponent, Components::TransformComponent>().each([&](auto billboard, auto transform) {
-			auto imageInfo = AssetManager::retrieveTexture(billboard.file)->getImageInfo();
+			auto imageInfo = ResourceHandler::retrieveTexture(billboard.asset)->getImageInfo();
 			VkDescriptorSet descriptorSet1;
 			EngineDescriptorWriter(*billboardSystemLayout, frameInfo.perDrawDescriptorPool)
 				.writeImage(0, &imageInfo)

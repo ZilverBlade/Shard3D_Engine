@@ -16,6 +16,16 @@ namespace Shard3D {
 		output.flush();
 		output.close();
 	}
+	std::vector<uint8_t> IOUtils::getStackBinary(void* data, size_t object_size) {
+		std::vector<uint8_t> output;
+		uint8_t* raw_data = reinterpret_cast<uint8_t*>(data);
+
+		for (size_t i = 0; i < object_size; i++) {
+			output.push_back(raw_data[i]);
+		}
+
+		return output;
+	}
 	void* IOUtils::readBinary(const std::string& path) {
 		std::fstream input{ path, std::ios::binary | std::ios::in };
 		input.unsetf(std::ios::skipws);

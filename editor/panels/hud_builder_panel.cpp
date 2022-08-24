@@ -71,7 +71,7 @@ namespace Shard3D {
         for (int layer = 0; layer < hudLayerInfo->getList().size(); layer++) {
             if (ImGui::TreeNode(std::string("Layer " + std::to_string(layer)).c_str())) {
                 if (ImGui::Button("Save Layer")) {
-                    std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_HUDFILE_OPTIONS);
+                    std::string filepath = FileDialogs::saveFile(ENGINE_SHARD3D_HUDFILE_OPTIONS);
                     if (!filepath.empty()) {
                         ECS::HUDManager hudMan(hudLayerInfo.get());
                         hudMan.save(filepath, false);
@@ -79,7 +79,7 @@ namespace Shard3D {
                 }
                 if (ImGui::Button("Load Layer")) {
                     if (MessageDialogs::show("This will overwrite the current layer, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
-                        std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_HUDFILE_OPTIONS);
+                        std::string filepath = FileDialogs::openFile(ENGINE_SHARD3D_HUDFILE_OPTIONS);
                         if (!filepath.empty()) {
                             ECS::HUDManager hudMan(hudLayerInfo.get());
                             hudLayerInfo->wipe(layer);
@@ -137,7 +137,7 @@ namespace Shard3D {
                         std::ifstream ifile(tag);
                         if (ifile.good()) {
                             SHARD3D_LOG("Reloading texture '{0}'", tag);
-                            AssetManager::emplaceTexture(tag);
+                            ResourceHandler::loadTexture(tag);
                             element->default_texture = tag;
                         }
                         else SHARD3D_WARN("File '{0}' does not exist!", tag);
@@ -156,7 +156,7 @@ namespace Shard3D {
                         std::ifstream ifile(tag);
                         if (ifile.good()) {
                             SHARD3D_LOG("Reloading texture '{0}'", tag);
-                            AssetManager::emplaceTexture(tag);
+                            ResourceHandler::loadTexture(tag);
                             element->hover_texture = tag;
                         }
                         else SHARD3D_WARN("File '{0}' does not exist!", tag);
@@ -175,7 +175,7 @@ namespace Shard3D {
                         std::ifstream ifile(tag);
                         if (ifile.good()) {
                             SHARD3D_LOG("Reloading texture '{0}'", tag);
-                            AssetManager::emplaceTexture(tag);
+                            ResourceHandler::loadTexture(tag);
                             element->press_texture = tag;
                         }
                         else SHARD3D_WARN("File '{0}' does not exist!", tag);

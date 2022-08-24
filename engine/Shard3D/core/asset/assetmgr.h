@@ -4,105 +4,115 @@
 #include "../../s3dstd.h"
 #include "texture.h"
 #include "model.h"
-#include <vulkan/vulkan_core.h>
+
+#include "../misc/assetid.h"
 
 namespace Shard3D {
-	class EngineApplication;
-		class AssetManager {
-		protected:
-			enum LOD_Level {
-				HighDetail = 0,
-				MediumDetal = 1,
-				LowDetail = 2,
-				Invisible = -1
-			};
-		public:
-			//Clears textureAssets
-			static void clearTextureAssets();
-			//Clears meshAssets
-			static void clearMeshAssets();
-			//Clears materialAssets
-			static void clearMaterialAssets();
-			//Clears all of the asset maps
-			static void clearAllAssets();
-			/* Loads all of the materials in use by the level into the asset maps.
-			Make sure to clear before loading, since you dont want to waste resources pointing to unused assets!
-			*/
-			static void loadLevelAssets();
+	enum class AssetType {
+		Unknown, Texture, Mesh3D, Material, Level
+	};
+	class AssetUtils {
+	public:
+		static std::string truncatePath(const std::string& total);
+		static AssetType discoverAssetType(const std::string& assetPath);
+	};
 
-			//unlike other assets, textures and meshs should use a path as a key, 
-			//since they directly load from there, rather than load into a wrapper/struct
+	class AssetManager {
+	public:
+		static void loadLevelAssets();
 
-			static auto& getMeshAssets() { return meshAssets; }
-			static auto& getTextureAssets() { return textureAssets; }
-			static auto& getSurfaceMaterialAssets() { return surfaceMaterialAssets; }
+		static void importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info);
+		static void importMesh(const std::string& sourcepath, const std::string& destpath, MeshLoadInfo info);
+		static void createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material);
+		
+		static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
+	private:
+		static inline EngineDevice* engineDevice{};
 
-			static void emplaceMesh(const std::string& meshPath, MeshType meshType = MeshType::MESH_TYPE_OBJ);
-			static inline sPtr<EngineMesh>& retrieveMesh(const std::string& path) {
-#ifndef ENSET_CONFIDENT_ASSETS
-				return retrieveMesh_NENSET_CONFIDENT_ASSETS(path);
+		friend class _special_assets;
+	};
+	class ResourceHandler {
+	public:
+		//Clears textureAssets
+		static void clearTextureAssets();
+		//Clears meshAssets
+		static void clearMeshAssets();
+		//Clears materialAssets
+		static void clearMaterialAssets();
+		//Clears all of the asset maps
+		static void clearAllAssets();
+		/* Loads all of the materials in use by the level into the asset maps.
+		Make sure to clear before loading, since you dont want to waste resources pointing to unused assets!
+		*/
+
+		// Destroys all assets and doesnt keep the core engine ones either
+		static void destroy();
+
+		static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
+
+		static void loadMesh(const AssetID& asset);
+		static inline rPtr<EngineMesh>& retrieveMesh(const AssetID& asset) {
+#ifndef ENSET_UNSAFE_ASSETS
+			return retrieveMesh_safe(asset);
 #else			
-				return retrieveMesh_ENSET_CONFIDENT_ASSETS(path);
+			return retrieveMesh_unsafe(asset);
 #endif
-			}
+		}
 
-			static void emplaceTexture(const std::string& texturePath, int filter = VK_FILTER_LINEAR);
-			static inline sPtr<EngineTexture>& retrieveTexture(const std::string& path) {
-#ifndef ENSET_CONFIDENT_ASSETS
-				return retrieveTexture_NENSET_CONFIDENT_ASSETS(path);
+		static void loadTexture(const AssetID& assetPath);
+		static inline rPtr<EngineTexture>& retrieveTexture(const AssetID& asset) {
+#ifndef ENSET_UNSAFE_ASSETS
+			return retrieveTexture_safe(asset);
 #else
-				return retrieveTexture_ENSET_CONFIDENT_ASSETS(path);
+			return retrieveTexture_unsafe(asset);
 #endif
-			}
+		}
 
-			static void emplaceMaterial(sPtr<SurfaceMaterial> material, const std::string& materialPath);
-			static inline sPtr<SurfaceMaterial> retrieveMaterial(const std::string& path) {
-#ifndef ENSET_CONFIDENT_ASSETS
-				return retrieveSurfaceMaterial_NENSET_CONFIDENT_ASSETS(path);
+		static void loadMaterial(rPtr<SurfaceMaterial> material, const std::string& materialPath);
+		static inline rPtr<SurfaceMaterial> retrieveMaterial(const AssetID& asset) {
+#ifndef ENSET_UNSAFE_ASSETS
+			return retrieveSurfaceMaterial_safe(asset);
 #else
-				return make_sPtr<SurfaceMaterial>();
+			return make_rPtr<SurfaceMaterial>();
 #endif
-			}
+		}
 
-#pragma region Material shenanigans
-			//static void loadMaterialsFromList(MaterialSystem::MaterialList& matlist);
-			//static void emplaceMaterial(Material& material);
-			//static Material retrieveMaterialByGUID(uint64_t guid);
-			//static Material retrieveMaterialByPath(const std::string& path);
-			//static hashMap<uint64_t, Material>& getMaterialAssets() { return materialAssets; }
-			//static hashMap<uint64_t, MaterialSystem::MaterialList>& getMaterialListAssets() { return materialListAssets; }
-#pragma endregion	
+		static auto& getMeshAssets() { return meshAssets; }
+		static auto& getTextureAssets() { return textureAssets; }
+		static auto& getSurfaceMaterialAssets() { return surfaceMaterialAssets; }
 
-			static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
-		private:			
-			static sPtr<EngineTexture>& retrieveTexture_ENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<EngineTexture>& retrieveTexture_NENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<EngineMesh>& retrieveMesh_ENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<EngineMesh>& retrieveMesh_NENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<SurfaceMaterial>& retrieveSurfaceMaterial_NENSET_CONFIDENT_ASSETS(const std::string& path);
+		static void runGarbageCollector();
+	private:
+		static inline std::vector<AssetID> actorReloadTexQueue;
+		static inline std::vector<AssetID> reloadMeshQueue;
+		static void _loadMesh(const AssetID& asset);
 
-			static inline hashMap<std::string, sPtr<EngineMesh>> meshAssets;
-			static inline hashMap<std::string, sPtr<EngineTexture>> textureAssets;
-			static inline hashMap<std::string, sPtr<SurfaceMaterial>> surfaceMaterialAssets;
+		static rPtr<EngineTexture>& retrieveTexture_unsafe			(const AssetID& asset);
+		static rPtr<EngineTexture>& retrieveTexture_safe			(const AssetID& asset);
+		static rPtr<EngineMesh>& retrieveMesh_unsafe				(const AssetID& asset);
+		static rPtr<EngineMesh>& retrieveMesh_safe					(const AssetID& asset);
+		static rPtr<SurfaceMaterial>& retrieveSurfaceMaterial_safe	(const AssetID& asset);
 
-			static inline EngineDevice* engineDevice{};
+		static inline hashMap<AssetKey, rPtr<EngineMesh>> meshAssets;
+		static inline hashMap<AssetKey, rPtr<EngineTexture>> textureAssets;
+		static inline hashMap<AssetKey, rPtr<SurfaceMaterial>> surfaceMaterialAssets;
 
-			static void clearAllAssetsAndDontAddDefaults();
-			friend class Shard3D::EngineApplication;
-			friend class _special_assets;
-		};
+		static inline EngineDevice* engineDevice{};
+		friend class _special_assets;
+	};
 	class _special_assets {
+	public:
 		// engine only function, do not call this
 		static void _editor_icons_load();
 		// engine only function, do not call this
 		static void _editor_icons_destroy();
 		// engine only function, do not call this
-		static inline hashMap<std::string, sPtr<EngineTexture>> _editor_icons;
+		static inline hashMap<std::string, rPtr<EngineTexture>> _editor_icons;
 
 		static inline const char* _editor_icons_array[][2]{
 			{"editor.play",						"assets/_engine/tex/_editor/icon_play.png"			},
 			{"editor.pause",					"assets/_engine/tex/_editor/icon_pause.png"			},
-			{"editor.stop",						"assets/_engine/tex/_editor/icon_stop.png"			},		
+			{"editor.stop",						"assets/_engine/tex/_editor/icon_stop.png"			},
 			{"editor.save",						"assets/_engine/tex/_editor/icon_save.png"			},
 			{"editor.load",						"assets/_engine/tex/_editor/icon_load.png"			},
 			{"editor.pref",						"assets/_engine/tex/_editor/icon_pref.png"			},
@@ -113,8 +123,9 @@ namespace Shard3D {
 			{"editor.level",					"assets/_engine/tex/_editor/icon_level.png"			},
 			{"editor.browser.folder",			"assets/_engine/tex/_editor/icon_folder.png"		},
 			{"editor.browser.file",				"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.tex",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.msh",			"assets/_engine/tex/_editor/icon_file.png"			},
+			{"editor.browser.file.tex",			"assets/_engine/tex/_editor/icon_texture.png"		},
+			{"editor.browser.file.msh",			"assets/_engine/tex/_editor/icon_mesh.png"			},
+			{"editor.browser.file.lvl",			"assets/_engine/tex/_editor/icon_level_old.png"		},
 			{"editor.browser.file.cpp",			"assets/_engine/tex/_editor/icon_file.png"			},
 			{"editor.browser.file.csh",			"assets/_engine/tex/_editor/icon_file.png"			},
 			{"editor.browser.file.vba",			"assets/_engine/tex/_editor/icon_file.png"			},
@@ -125,10 +136,5 @@ namespace Shard3D {
 			{"component.audio",					"assets/_engine/tex/_editor/icon_null"				},
 			{"component.camera",				"assets/_engine/tex/_editor/icon_null"				},
 		};
-
-		friend class EngineApplication;
-		friend class _EditorBillboardRenderer;
-		friend class AssetExplorerPanel;
-		friend class ImGuiLayer;
 	};
 }

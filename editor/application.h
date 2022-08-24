@@ -29,8 +29,6 @@ namespace Shard3D {
 		
 		void loadStaticObjects();
 
-		void bindNativeScripts();
-
 		void eventEvent(Events::Event& e);
 
 		// Engine components

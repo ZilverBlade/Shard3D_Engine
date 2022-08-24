@@ -21,8 +21,8 @@ namespace Shard3D {
     public:
         MaterialManager(SurfaceMaterial& material);
     
-        static void saveMaterial(const sPtr<SurfaceMaterial>& material, const std::string& destPath, bool ignoreWarns = false);
-        static sPtr<SurfaceMaterial> loadSurfaceMaterial(const std::string& sourcePath, bool ignoreWarns = false);
+        static void saveMaterial(const rPtr<SurfaceMaterial>& material, const std::string& destPath, bool ignoreWarns = false);
+        static rPtr<SurfaceMaterial> loadSurfaceMaterial(const std::string& sourcePath, bool ignoreWarns = false);
 
     private:
     	const int WB3D_CIPHER_KEY = ENSET_WB3DLEVEL_CIPHER_KEY;

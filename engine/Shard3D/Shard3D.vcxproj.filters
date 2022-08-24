@@ -237,12 +237,6 @@
     <ClInclude Include="core\ecs\actor.h">
       <Filter>Header Files\core\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="core\ecs\blueprint.h">
-      <Filter>Header Files\core\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="core\ecs\bpmgr.h">
-      <Filter>Header Files\core\ecs</Filter>
-    </ClInclude>
     <ClInclude Include="core\ecs\components.h">
       <Filter>Header Files\core\ecs</Filter>
     </ClInclude>
@@ -355,6 +349,9 @@
     <ClInclude Include="core\asset\serializer.h">
       <Filter>Header Files\core\asset</Filter>
     </ClInclude>
+    <ClInclude Include="core\misc\assetid.h">
+      <Filter>Header Files\core\misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s3dpch.cpp">
@@ -385,12 +382,6 @@
       <Filter>Source Files\core\ecs</Filter>
     </ClCompile>
     <ClCompile Include="core\ecs\actor.cpp">
-      <Filter>Source Files\core\ecs</Filter>
-    </ClCompile>
-    <ClCompile Include="core\ecs\blueprint.cpp">
-      <Filter>Source Files\core\ecs</Filter>
-    </ClCompile>
-    <ClCompile Include="core\ecs\bpmgr.cpp">
       <Filter>Source Files\core\ecs</Filter>
     </ClCompile>
     <ClCompile Include="core\ecs\components.cpp">
@@ -500,6 +491,9 @@
     </ClCompile>
     <ClCompile Include="core\asset\serializer.cpp">
       <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="core\misc\assetid.cpp">
+      <Filter>Source Files\core\misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

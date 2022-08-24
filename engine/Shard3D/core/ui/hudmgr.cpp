@@ -87,7 +87,7 @@ namespace Shard3D {
 			YAML::Emitter out;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION.toString();
-			out << YAML::Key << "WorldBuilder3D" << YAML::Value << EDITOR_VERSION.toString();
+			out << YAML::Key << "SHARD3D" << YAML::Value << EDITOR_VERSION.toString();
 			out << YAML::Key << "GUI_Template" << YAML::Value << "Some kind of template";
 			out << YAML::Key << "Layer" << YAML::Value << layer;
 			saveLayer(out, mHud, layer);
@@ -138,7 +138,7 @@ namespace Shard3D {
 					SHARD3D_WARN("Incorrect engine version");
 					return HUDMgrResults::OldEngineVersionResult;
 				}// change this to check if the version is less or more
-				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION.toString()) {
+				if (data["SHARD3D"].as<std::string>() != EDITOR_VERSION.toString()) {
 					SHARD3D_WARN("Incorrect editor version");
 					return HUDMgrResults::OldEditorVersionResult;
 				}// change this to check if the version is less or more
@@ -168,11 +168,11 @@ namespace Shard3D {
 					loadedElement->anchorOffset = element["Transform2D"]["Anchor"].as<glm::vec2>();
 
 					loadedElement->default_texture = element["Texture"]["DefaultTex"].as<std::string>();
-					AssetManager::emplaceTexture(loadedElement->default_texture);
+					ResourceHandler::loadTexture(loadedElement->default_texture);
 					loadedElement->hover_texture = element["Texture"]["HoverTex"].as<std::string>();
-					AssetManager::emplaceTexture(loadedElement->hover_texture);
+					ResourceHandler::loadTexture(loadedElement->hover_texture);
 					loadedElement->press_texture = element["Texture"]["PressTex"].as<std::string>();
-					AssetManager::emplaceTexture(loadedElement->press_texture);
+					ResourceHandler::loadTexture(loadedElement->press_texture);
 					loadedElement->scriptmodule = element["Script"]["Module"].as<std::string>();
 					loadedElement->scriptlang = element["Script"]["Language"].as<std::string>() == "C#" ? 0 : 1;
 					loadedElement->isActive = !element["Script"]["Static"].as<bool>();

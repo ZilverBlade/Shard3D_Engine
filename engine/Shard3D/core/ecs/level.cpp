@@ -1,9 +1,9 @@
 #include "../../s3dpch.h"
 #include "level.h"
 #include "sactor.h" // also includes "actor.h"
-#include "blueprint.h"
+
 #include "mmgr.h"
-#include "bpmgr.h"
+
 #include "../asset/assetmgr.h"
 #include "../../scripting/dynamic_script_engine.h"
 #include "../ui/hud.h"
@@ -45,7 +45,6 @@ namespace Shard3D {
 				enttMap[guid] = newActor.actorHandle;
 			}
 
-			copyComponent<Components::BlueprintComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::TransformComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::BillboardComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::MeshComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
@@ -60,16 +59,6 @@ namespace Shard3D {
 			newLvl->possessedCameraActorGUID = other->getPossessedCameraActor().getUUID();
 			//newLvl->actor_parent_comparison = other->actor_parent_comparison;
 			return newLvl;
-		}
-
-		Blueprint Level::createBlueprint(Actor actor, std::string path, std::string name) {
-			
-			Blueprint blueprint = { actor, path, name };
-			BlueprintManager bpMan = actor;
-			blueprint.attach(actor);
-			bpMan.convert(path, blueprint);
-
-			return blueprint;
 		}
 
 		Actor Level::createActor(const std::string& name) {
@@ -89,48 +78,19 @@ namespace Shard3D {
 		}
 
 		void Level::runGarbageCollector(EngineDevice& device) {
-			if (actorKillQueue.size() != 0) {
-				for (int i = 0; i < actorKillQueue.size(); i++) {
-					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
-					if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
-						actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
-							vkDeviceWaitIdle(device.device());
-					actorMap.erase(actorKillQueue.at(i).getUUID());
-					registry.destroy(actorKillQueue.at(i));
-				}
-				actorKillQueue.clear();
-				return;
-			}
-			if (actorReloadMeshQueue.size() != 0) {
-				for (int i = 0; i < actorReloadMeshQueue.size(); i++) {
-					vkDeviceWaitIdle(device.device());
-					actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().reapplyMesh(actorReloadMeshQueue.at(i).getComponent<Components::MeshComponent>().cacheFile);
-				}
-				actorReloadMeshQueue.clear();
-				return;
-			}
-			if (actorKillMeshQueue.size() != 0) {
-				for (int i = 0; i < actorKillMeshQueue.size(); i++) {
-					vkDeviceWaitIdle(device.device());
-					registry.remove<Components::MeshComponent>(actorKillMeshQueue.at(i));
-				}
-				actorKillMeshQueue.clear();
-			}
-			if (actorReloadTexQueue.size() != 0) {
-				for (int i = 0; i < actorReloadTexQueue.size(); i++) {
-					vkDeviceWaitIdle(device.device());
-					actorReloadTexQueue.at(i).getComponent<Components::BillboardComponent>().reapplyTexture(actorReloadTexQueue.at(i).getComponent<Components::BillboardComponent>().cacheFile);
-				}
-				actorReloadTexQueue.clear();
-				return;
-			}
-			if (actorKillTexQueue.size() != 0) {
-				for (int i = 0; i < actorKillTexQueue.size(); i++) {
-					vkDeviceWaitIdle(device.device());
-					registry.remove<Components::BillboardComponent>(actorKillMeshQueue.at(i));
-				}
-				actorKillMeshQueue.clear();
-			}
+			//if (actorKillQueue.size() != 0) {
+			//	for (int i = 0; i < actorKillQueue.size(); i++) {
+			//		SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
+			//		if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
+			//			actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
+			//				vkDeviceWaitIdle(device.device());
+			//		actorMap.erase(actorKillQueue.at(i).getUUID());
+			//		registry.destroy(actorKillQueue.at(i));
+			//	}
+			//	actorKillQueue.clear();
+			//	return;
+			//}
+			
 		}
 
 		Actor Level::getActorFromGUID(UUID guid) {
@@ -287,19 +247,19 @@ namespace Shard3D {
 		}
 
 		void Level::killMesh(Actor actor) {
-			actorKillMeshQueue.emplace_back(actor);
+			//actorKillMeshQueue.emplace_back(actor);
 		}
 
 		void Level::killTexture(Actor actor) {
-			actorKillTexQueue.emplace_back(actor);
+			//actorKillTexQueue.emplace_back(actor);
 		}
 
 		void Level::reloadMesh(Actor actor) {
-			actorReloadMeshQueue.emplace_back(actor);
+			//actorReloadMeshQueue.emplace_back(actor);
 		}
 
 		void Level::reloadTexture(Actor actor) {
-			actorReloadTexQueue.emplace_back(actor);
+			//actorReloadTexQueue.emplace_back(actor);
 		}
 
 		glm::mat4 Level::getParentMat4(Actor& child) {

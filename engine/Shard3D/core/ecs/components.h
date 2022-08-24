@@ -5,16 +5,13 @@
 
 #include "../../core/asset/assetmgr.h"
 #include "../../core/misc/UUID.h"
+#include "../../core/misc/assetid.h"
 #include "../rendering/camera.h"
 
 #include "../audio/audio.h"
 #include "../../systems/computational/particle_system.h"
 
 namespace Shard3D {
-	namespace ECS {
-		class Blueprint;
-	}
-	class ECS::Blueprint;
 	class LevelPropertiesPanel;
 	namespace Components {
 		struct UUIDComponent {
@@ -30,10 +27,6 @@ namespace Shard3D {
 			TagComponent() = default;
 			TagComponent(const TagComponent&) = default;
 			operator std::string() { return tag; };
-		};
-
-		struct BlueprintComponent {
-			ECS::Blueprint* blueprint;
 		};
 
 		struct TransformComponent {
@@ -119,8 +112,8 @@ namespace Shard3D {
 			friend class LevelPropertiesPanel;
 		};
 		struct BillboardComponent {
-			std::string file{};
-			std::string cacheFile{};
+			AssetID asset{ 0 };
+
 			enum class BillboardOrientation {
 				SCREEN_VIEW_ALIGNED,
 				VIEW_POINT_ALIGNED,
@@ -131,20 +124,16 @@ namespace Shard3D {
 
 			BillboardComponent() = default;
 			BillboardComponent(const BillboardComponent&) = default;
-			BillboardComponent(const std::string& tex);
-			void reapplyTexture(const std::string& tex);
+			BillboardComponent(const AssetID& tex);
 		};
 		struct MeshComponent {
-			std::string file{};
-			std::string cacheFile{};
-			MeshType type = MeshType::MESH_TYPE_NULL;
-			//MaterialSystem::MaterialList materialList;
+			AssetID asset{ 0 };
+
 			bool hideInGame = false;
 
 			MeshComponent() = default;
 			MeshComponent(const MeshComponent&) = default;
-			MeshComponent(const std::string& mdl);
-			void reapplyMesh(const std::string& mdl);
+			MeshComponent(const AssetID& mdl);
 		};
 		struct AudioComponent {
 		private:

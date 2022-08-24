@@ -64,24 +64,7 @@ namespace Shard3D {
 					invScale.z * (c1 * c2),
 				}, };
 		}
-
-		MeshComponent::MeshComponent(const std::string& mdl) {
-			cacheFile = mdl; // cacheFile is to be used to store future possible model
-			file = mdl;
-
-		}
-		void MeshComponent::reapplyMesh(const std::string& mdl) {
-			file = mdl;
-			AssetManager::emplaceMesh(cacheFile);
-
-		}
-		BillboardComponent::BillboardComponent(const std::string& tex) {
-			cacheFile = tex; // cacheFile is to be used to store future possible model
-			file = tex;
-		}
-		void BillboardComponent::reapplyTexture(const std::string& tex) {
-			file = tex;
-			AssetManager::emplaceTexture(cacheFile);
-		}
+		MeshComponent::MeshComponent(const AssetID& mdl) : asset(mdl.getFile()) {}
+		BillboardComponent::BillboardComponent(const AssetID& tex) : asset(tex.getFile()) {}
 	}
 }

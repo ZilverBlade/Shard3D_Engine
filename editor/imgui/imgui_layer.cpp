@@ -368,7 +368,7 @@ namespace Shard3D {
 
     void ImGuiLayer::renderMenuBar(FrameInfo& frameInfo) {
         if (ImGui::BeginMenu("File")) {
-            ImGui::TextDisabled("WorldBuilder3D 0.1");
+            ImGui::TextDisabled("SHARD3D 0.1");
             ImGui::Separator();
             ImGui::BeginDisabled(frameInfo.activeLevel->simulationState != PlayState::Stopped);
             if (ImGui::MenuItem("New Level", "Ctrl+N")) {
@@ -380,7 +380,7 @@ namespace Shard3D {
             }
             if (ImGui::MenuItem("Load Level...", "Ctrl+O")) {
                 if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
-                    std::string filepath = FileDialogs::openFile(ENGINE_WORLDBUILDER3D_LEVELFILE_OPTIONS);
+                    std::string filepath = FileDialogs::openFile(ENGINE_SHARD3D_LEVELFILE_OPTIONS);
                     if (!filepath.empty()) {
                         levelTreePanel.clearSelectedActor();
                         frameInfo.activeLevel->killEverything();
@@ -397,7 +397,7 @@ namespace Shard3D {
                 levelMan.save(frameInfo.activeLevel->currentpath, true);
             }
             if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
-                std::string filepath = FileDialogs::saveFile(ENGINE_WORLDBUILDER3D_LEVELFILE_OPTIONS);
+                std::string filepath = FileDialogs::saveFile(ENGINE_SHARD3D_LEVELFILE_OPTIONS);
                 if (!filepath.empty()) {
                     ECS::LevelManager levelMan(frameInfo.activeLevel);
                     levelMan.save(filepath, false);
@@ -409,7 +409,7 @@ namespace Shard3D {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Edit")) {
-            ImGui::TextDisabled("WorldBuilder3D 0.1");
+            ImGui::TextDisabled("SHARD3D 0.1");
             ImGui::Separator();
             if (ImGui::BeginMenu("Level Simulation")) {
                 ImGui::BeginDisabled(frameInfo.activeLevel->simulationState != PlayState::Stopped || frameInfo.activeLevel->simulationState == PlayState::Paused);
@@ -545,10 +545,10 @@ namespace Shard3D {
             // Disabling fullscreen would allow the window to be moved to the front of other windows,
             // which we can't undo at the moment without finer window depth/z control.
 
-            ImGui::TextDisabled("WorldBuilder3D 0.1");
+            ImGui::TextDisabled("SHARD3D 0.1");
             ImGui::Separator();
             if (ImGui::MenuItem("Engine Settings", NULL /*make sure to add some sort of shardcut */)) { showEngineSettingsWindow = true; }
-            if (ImGui::MenuItem("WorldBuilder3D Settings", NULL /*make sure to add some sort of shardcut */)) { /*show editor win*/ }
+            if (ImGui::MenuItem("SHARD3D Settings", NULL /*make sure to add some sort of shardcut */)) { /*show editor win*/ }
             ImGui::Separator();
             if (ImGui::MenuItem("Game Graphics Settings", NULL /*make sure to add some sort of shardcut */)) { showGraphicsSettingsWindow = true; }
             ImGui::Separator();
@@ -563,7 +563,7 @@ namespace Shard3D {
 #ifdef WIN32
             if (ImGui::MenuItem("Main Website")) { ShellExecuteA(nullptr, "open", "https://www.shard3d.com", nullptr, nullptr, false); }
             if (ImGui::MenuItem("Documentation")) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com", nullptr, nullptr, false); }
-            if (ImGui::MenuItem("WorldBuilder3D")) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com/worldbuilder3d.html", nullptr, nullptr, false); }
+            if (ImGui::MenuItem("SHARD3D")) { ShellExecuteA(nullptr, "open", "https://docs.shard3d.com/SHARD3D.html", nullptr, nullptr, false); }
 #endif  
 #ifdef __linux__ 
             ImGui::MenuItem("Unsupported");

@@ -323,37 +323,37 @@ namespace Shard3D::InternalScriptCalls {
 	}
 
 	void MeshComponent_GetFile(uint64_t actorID, MonoString* string) {
-		string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>().file.c_str());
+	//	string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>().file.c_str());
 	}
 
 	void MeshComponent_SetFile(uint64_t actorID, MonoString* string) {
 		char* t = mono_string_to_utf8(string);
 		std::string text(t);
 
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>().cacheFile = text;
+		//DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>().cacheFile = text;
 		mono_free(t);
 	}
 
 	void MeshComponent_Load(uint64_t actorID) {
-		auto& c = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>();
-		c.reapplyMesh(c.cacheFile);
+		//auto& c = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>();
+		//c.reapplyMesh(c.cacheFile);
 	}
 
 	void BillboardComponent_GetFile(uint64_t actorID, MonoString* string) {
-		string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>().file.c_str());
+		//string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>().file.c_str());
 	}
 
 	void BillboardComponent_SetFile(uint64_t actorID, MonoString* string) {
 		char* t = mono_string_to_utf8(string);
 		std::string text(t);
 
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>().cacheFile = text;
+		//DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>().cacheFile = text;
 		mono_free(t);
 	}
 
 	void BillboardComponent_Load(uint64_t actorID) {
-		auto& c = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>();
-		c.reapplyTexture(c.cacheFile);
+		//auto& c = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>();
+		//c.reapplyTexture(c.cacheFile);
 	}
 
 	void PointlightComponent_GetColor(uint64_t actorID, glm::vec3* v) {

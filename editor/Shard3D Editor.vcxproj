@@ -198,6 +198,7 @@
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <DisableSpecificWarnings>4996;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -219,6 +220,7 @@
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include\Jolt;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <DisableSpecificWarnings>4996;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -242,6 +244,7 @@
     <ClCompile Include="panels\level_peekers.cpp" />
     <ClCompile Include="panels\level_properties_panel.cpp" />
     <ClCompile Include="panels\level_tree_panel.cpp" />
+    <ClCompile Include="panels\settings_panel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -255,6 +258,7 @@
     <ClInclude Include="panels\level_peekers.h" />
     <ClInclude Include="panels\level_properties_panel.h" />
     <ClInclude Include="panels\level_tree_panel.h" />
+    <ClInclude Include="panels\settings_panel.h" />
     <ClInclude Include="scripting\cpp\carcontroller.h" />
     <ClInclude Include="scripting\cpp\example_script.h" />
     <ClInclude Include="scripting\script_link.h" />
