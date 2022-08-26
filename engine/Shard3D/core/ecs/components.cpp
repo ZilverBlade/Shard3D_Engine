@@ -64,7 +64,12 @@ namespace Shard3D {
 					invScale.z * (c1 * c2),
 				}, };
 		}
-		MeshComponent::MeshComponent(const AssetID& mdl) : asset(mdl.getFile()) {}
+		MeshComponent::MeshComponent(const AssetID& mdl) : asset(mdl.getFile()) {
+			auto& model = ResourceHandler::retrieveMesh(mdl);
+			for (auto& material : model->materials) {
+				materials.push_back(material);
+			}
+		}
 		BillboardComponent::BillboardComponent(const AssetID& tex) : asset(tex.getFile()) {}
 	}
 }

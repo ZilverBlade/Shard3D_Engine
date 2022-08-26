@@ -8,8 +8,7 @@ namespace Shard3D {
 
 // Definitions are engine only, requires recompiling static library to take effect
 
-const static Version ENGINE_VERSION = { VersionState::Alpha, 1, 2, 6, 4 };	// Shard3D 
-const static Version EDITOR_VERSION = { VersionState::Alpha, 1, 3, 0, 0 };	// SHARD3D
+const static Version ENGINE_VERSION = { VersionState::Alpha, 1, 2, 6, 5 };	// Shard3D 
 
 #define ENGINE_SETTINGS_PATH						"assets/configdata/engine_settings.ini"
 #define EDITOR_SETTINGS_PATH						"assets/configdata/editor_settings.ini"
@@ -24,7 +23,7 @@ const static Version EDITOR_VERSION = { VersionState::Alpha, 1, 3, 0, 0 };	// SH
 
 #define ENGINE_ERRMSH								"assets/_engine/msh/null_mdl.obj"	// obj model
 
-#define ENGINE_ERRMAT								"assets/_engine/mat/grid.wbmat"		// opaque surface material (world grid)
+#define ENGINE_ERRMAT								"assets/_engine/mat/world_grid"		// opaque surface material (world grid)
 
 #define ENGINE_ASSETS_PATH							"assets"
 #define ENGINE_ASSET_SUFFIX							".s3dasset"

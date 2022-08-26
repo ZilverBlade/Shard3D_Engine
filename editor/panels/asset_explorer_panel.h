@@ -9,10 +9,10 @@ namespace Shard3D {
 	class AssetExplorerPanel {
 		struct AssetIteratorCombo {
 			std::vector<std::filesystem::directory_entry> entries;
-			std::vector<VkDescriptorSet*> types;
+			std::vector<VkDescriptorSet*> icons;
+			std::vector<AssetType> types;
 		};
 	public:
-
 		AssetExplorerPanel();
 		~AssetExplorerPanel();
 
@@ -23,9 +23,11 @@ namespace Shard3D {
 		VkDescriptorSet mesh3dIcon;
 		VkDescriptorSet textureIcon; 
 		VkDescriptorSet levelIcon;
+		VkDescriptorSet smatIcon;
 
 		void refreshIterator(std::filesystem::path newPath);
 		std::filesystem::path currentDir;
+		std::filesystem::path currentContextMenu;
 		AssetIteratorCombo directoryEntries;
 	};
 }

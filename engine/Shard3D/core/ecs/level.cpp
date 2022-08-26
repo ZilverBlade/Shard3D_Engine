@@ -41,7 +41,7 @@ namespace Shard3D {
 			auto idView = srcLvlRegistry.view<Components::UUIDComponent>();
 			for (auto e : idView) {
 				UUID guid = srcLvlRegistry.get<Components::UUIDComponent>(e).id;
-				Actor newActor = newLvl->createActorWithGUID(guid, srcLvlRegistry.get<Components::TagComponent>(e).tag);
+				Actor newActor = newLvl->createActorWithUUID(guid, srcLvlRegistry.get<Components::TagComponent>(e).tag);
 				enttMap[guid] = newActor.actorHandle;
 			}
 
@@ -62,10 +62,10 @@ namespace Shard3D {
 		}
 
 		Actor Level::createActor(const std::string& name) {
-			return createActorWithGUID(UUID(), name);
+			return createActorWithUUID(UUID(), name);
 		}
 
-		Actor Level::createActorWithGUID(UUID guid, const std::string& name) {
+		Actor Level::createActorWithUUID(UUID guid, const std::string& name) {
 			SHARD3D_ASSERT(this != nullptr && "Level does not exist! Cannot create actors!");
 			Actor actor = { registry.create(), this };
 			actor.addComponent<Components::UUIDComponent>(guid);
@@ -78,22 +78,21 @@ namespace Shard3D {
 		}
 
 		void Level::runGarbageCollector(EngineDevice& device) {
-			//if (actorKillQueue.size() != 0) {
-			//	for (int i = 0; i < actorKillQueue.size(); i++) {
-			//		SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
-			//		if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
-			//			actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
-			//				vkDeviceWaitIdle(device.device());
-			//		actorMap.erase(actorKillQueue.at(i).getUUID());
-			//		registry.destroy(actorKillQueue.at(i));
-			//	}
-			//	actorKillQueue.clear();
-			//	return;
-			//}
-			
+			if (actorKillQueue.size() != 0) {
+				for (int i = 0; i < actorKillQueue.size(); i++) {
+					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
+					//if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
+					//	actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
+					//		vkDeviceWaitIdle(device.device());
+					actorMap.erase(actorKillQueue.at(i).getUUID());
+					registry.destroy(actorKillQueue.at(i));
+				}
+				actorKillQueue.clear();
+				return;
+			}		
 		}
 
-		Actor Level::getActorFromGUID(UUID guid) {
+		Actor Level::getActorFromUUID(UUID guid) {
 			if (actorMap.find(guid) != actorMap.end()) {
 				return { actorMap.at(guid), this };
 			} else {
@@ -122,7 +121,7 @@ namespace Shard3D {
 		}
 
 		void Level::setPossessedCameraActor(UUID guid) {
-			if (!getActorFromGUID(guid).hasComponent<Components::CameraComponent>()) {
+			if (!getActorFromUUID(guid).hasComponent<Components::CameraComponent>()) {
 				SHARD3D_ERROR("Cannot possess an actor without a camera!!");
 				return;
 			}
@@ -130,7 +129,7 @@ namespace Shard3D {
 		}
 
 		Actor Level::getPossessedCameraActor() {
-			Actor actor = getActorFromGUID(possessedCameraActorGUID);
+			Actor actor = getActorFromUUID(possessedCameraActorGUID);
 			if (actor.getUUID() != 1) return actor;
 			SHARD3D_FATAL("No possessed camera found!!!!\nAttempted to find UUID: " + possessedCameraActorGUID);
 		}
@@ -244,22 +243,6 @@ namespace Shard3D {
 					DynamicScriptEngine::actorScript().killEvent(actor);
 				}	_next:;
 			}
-		}
-
-		void Level::killMesh(Actor actor) {
-			//actorKillMeshQueue.emplace_back(actor);
-		}
-
-		void Level::killTexture(Actor actor) {
-			//actorKillTexQueue.emplace_back(actor);
-		}
-
-		void Level::reloadMesh(Actor actor) {
-			//actorReloadMeshQueue.emplace_back(actor);
-		}
-
-		void Level::reloadTexture(Actor actor) {
-			//actorReloadTexQueue.emplace_back(actor);
 		}
 
 		glm::mat4 Level::getParentMat4(Actor& child) {

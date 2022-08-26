@@ -5,7 +5,7 @@
 
 #include "../../core/asset/assetmgr.h"
 #include "../../core/misc/UUID.h"
-#include "../../core/misc/assetid.h"
+#include "../../core/asset/assetid.h"
 #include "../rendering/camera.h"
 
 #include "../audio/audio.h"
@@ -111,8 +111,22 @@ namespace Shard3D {
 			
 			friend class LevelPropertiesPanel;
 		};
+		
+		struct MeshComponent {
+			AssetID asset{ "" };
+			std::vector<AssetID> materials;
+
+			bool hideInGame = false;
+
+			MeshComponent() = default;
+			MeshComponent(const MeshComponent&) = default;
+			MeshComponent(const AssetID& mdl);
+		};
+
 		struct BillboardComponent {
-			AssetID asset{ 0 };
+			AssetID asset{ "" };
+			
+			bool hideInGame = false;
 
 			enum class BillboardOrientation {
 				SCREEN_VIEW_ALIGNED,
@@ -126,15 +140,7 @@ namespace Shard3D {
 			BillboardComponent(const BillboardComponent&) = default;
 			BillboardComponent(const AssetID& tex);
 		};
-		struct MeshComponent {
-			AssetID asset{ 0 };
 
-			bool hideInGame = false;
-
-			MeshComponent() = default;
-			MeshComponent(const MeshComponent&) = default;
-			MeshComponent(const AssetID& mdl);
-		};
 		struct AudioComponent {
 		private:
 			EngineAudio* audioEngine{};

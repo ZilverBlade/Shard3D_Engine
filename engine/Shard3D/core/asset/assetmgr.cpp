@@ -1,8 +1,10 @@
 #include "../../s3dpch.h" 
-#include "../../core.h"
 
 #include "assetmgr.h"
 #include "matmgr.h"
+
+#include "../../core.h"
+#include "../../utils/yaml_ext.h"
 
 #include <fstream>
 #include <filesystem>
@@ -14,31 +16,28 @@ namespace Shard3D {
 
 	AssetType AssetUtils::discoverAssetType(const std::string& assetPath) {
 		if (strUtils::hasEnding(assetPath, ".s3dlevel")) return AssetType::Level;
-		return AssetType::Unknown;
-		std::ifstream input{ assetPath };
-		input.open(assetPath);
-		std::stringstream stream; stream << input.rdbuf();
-		std::string file = stream.str();
+
+		std::ifstream stream(assetPath);
+		std::stringstream strStream;
+		strStream << stream.rdbuf();
+
+		YAML::Node data = YAML::Load(strStream.str());
+		stream.close();
+		std::string itemType = data["AssetType"].as<std::string>();
 		{
-			std::string itemType = file.substr(sizeof("<asset_type>"), file.find("<asset_file>") - 2 - sizeof("<asset_type>"));
-			if (itemType == "mesh3d") {
-				input.close();
-				return AssetType::Mesh3D;
-			}
-			if (itemType == "texture") {
-				input.close();
+			if (itemType == "texture") 
 				return AssetType::Texture;
-			}
-			if (itemType == "mesh3d") {
-				input.close();
+			if (itemType == "mesh3d") 
 				return AssetType::Mesh3D;
-			}
-			if (itemType == "material") {
-				input.close();
-				return AssetType::Material;
-			}
+			if (itemType == "surface_material") 
+				return AssetType::SurfaceMaterial;
 		}
 		return AssetType::Unknown;
+	}
+
+	bool Shard3D::AssetManager::doesAssetExist(const std::string& assetPath) {
+		std::ifstream ifile(assetPath);
+		return ifile.good();
 	}
 
 	void ResourceHandler::destroy() {
@@ -67,19 +66,13 @@ namespace Shard3D {
 		SHARD3D_INFO("Clearing all material assets");
 		vkDeviceWaitIdle(engineDevice->device());
 
-		rPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_rPtr<SurfaceMaterial_ShadedOpaque>();
-		grid_material->materialTag = "world_grid";
-		grid_material->diffuseColor = { 1.f, 1.f, 1.f };
-		grid_material->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
-		grid_material->specular = 0.5f;
-		grid_material->shininess = 0.2f;
-
-		loadMaterial(grid_material, "world_grid");
+		loadSurfaceMaterial(AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX));
 	}
 	void ResourceHandler::clearAllAssets() {
 		clearTextureAssets();
 		clearMeshAssets();
 		clearMaterialAssets();
+		runGarbageCollector();
 	}
 
 //========================================================================================================================
@@ -92,19 +85,25 @@ namespace Shard3D {
 		std::ifstream ifile(destpath);
 		if (!ifile.good()) std::filesystem::copy_file(sourcepath, destpath);
 
-		std::ofstream out(destpath +  ENGINE_ASSET_SUFFIX);
-		out << "<asset_type>:texture\n";
-		out << "<asset_file>:" << destpath << "\n";
-		out << "<asset_orig>:" << sourcepath << "\n";
-						   
-		out << "<properties>:\n";
+		
+		std::ofstream fout(destpath + ENGINE_ASSET_SUFFIX);
 
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION.toString();
+		out << YAML::Key << "AssetType" << YAML::Value << "texture";
+		out << YAML::Key << "AssetFile" << YAML::Value << destpath;
+		out << YAML::Key << "AssetOrig" << YAML::Value << sourcepath;
 		TextureLoadInfo _info[1] = { info };
 		std::vector<uint8_t> data = IOUtils::getStackBinary(_info, sizeof(TextureLoadInfo));
-		for (auto& byte : data) out << byte;
 
-		out.flush();
-		out.close();
+		out << YAML::Key << "Properties" << YAML::Value << YAML::Binary(data.data(), sizeof(TextureLoadInfo));
+		out << YAML::EndMap;
+
+		fout << out.c_str();
+
+		fout.flush();
+		fout.close();
 	}
 
 	void AssetManager::importMesh(const std::string& sourcepath, const std::string& destpath, MeshLoadInfo info) {
@@ -115,71 +114,104 @@ namespace Shard3D {
 		std::ifstream ifile(destpath);
 		if (!ifile.good()) std::filesystem::copy_file(sourcepath, destpath);
 
-		std::ofstream out(destpath +  ENGINE_ASSET_SUFFIX);
-		out << "<asset_type>:mesh3d\n";
-		out << "<asset_file>:" << destpath << "\n";
-		out << "<asset_orig>:" << sourcepath << "\n";
+		std::ofstream fout(destpath + ENGINE_ASSET_SUFFIX);
 
-		out << "<properties>:\n";
+		uPtr<EngineMesh> tempreadInfo = EngineMesh::createMeshFromFile(*engineDevice, destpath, MeshLoadInfo());
 
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION.toString();
+		out << YAML::Key << "AssetType" << YAML::Value << "mesh3d";
+		out << YAML::Key << "AssetFile" << YAML::Value << destpath;
+		out << YAML::Key << "AssetOrig" << YAML::Value << sourcepath;
+		
 		MeshLoadInfo _info[1] = { info };
 		std::vector<uint8_t> data = IOUtils::getStackBinary(_info, sizeof(MeshLoadInfo));
-		for (auto& byte : data) out << byte;
 
-		out.flush();
-		out.close();
+		out << YAML::Key << "Properties" << YAML::Value << YAML::Binary(data.data(), sizeof(MeshLoadInfo));
+		out << YAML::EndMap;
+
+		fout << out.c_str();
+
+		fout.flush();
+		fout.close();
 	}
 
 	void AssetManager::createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material) {
+		std::string& dest = const_cast<std::string&>(destpath);
+		std::replace(dest.begin(), dest.end(), '\\', '/');
 
+		MaterialManager::saveMaterial(material, dest, true);
+	}
+
+	void AssetManager::purgeAsset(const std::string& assetPath) {
+		if (std::filesystem::remove(assetPath))
+			std::cout << "file " << assetPath << " deleted.\n";
+		else
+			std::cout << "file " << assetPath << " not found.\n";
+	}
+
+	void ResourceHandler::runGarbageCollector() {
+		//if (reloadMeshQueue.size() != 0) {
+		//	vkDeviceWaitIdle(engineDevice->device());
+		//	for (AssetID& file : reloadMeshQueue) {
+		//		_loadMesh(file);
+		//	}
+		//	reloadMeshQueue.clear();
+		//}
+		//if (reloadTexQueue.size() != 0) {
+		//	vkDeviceWaitIdle(engineDevice->device());
+		//	for (AssetID& file : reloadTexQueue) {
+		//		_loadTexture(file);
+		//	}
+		//	reloadTexQueue.clear();
+		//}
+		if (rebuildSurfaceMaterialQueue.size() != 0) {
+			vkDeviceWaitIdle(engineDevice->device());
+			for (rPtr<SurfaceMaterial>& material : rebuildSurfaceMaterialQueue) {
+				_buildSurfaceMaterial(material);
+			}
+			rebuildSurfaceMaterialQueue.clear();
+		}
 	}
 
 #pragma region Mesh
 
-	void ResourceHandler::_loadMesh(const AssetID& assetPath) {
+	void ResourceHandler::loadMesh(const AssetID& assetPath) {
 		std::fstream input{ assetPath.getFile(), std::ios::binary | std::ios::in };
-		std::streampos fileSize;
-		input.unsetf(std::ios::skipws);
 
-		input.seekg(0, std::ios::end);
-		fileSize = input.tellg();
-		input.seekg(0, std::ios::beg);
-
-		std::string bytes;
-		bytes.reserve(fileSize);
-
-		bytes.insert(bytes.begin(),
-			std::istream_iterator<uint8_t>(input),
-			std::istream_iterator<uint8_t>());
-
-		{
-			std::string itemType = bytes.substr(sizeof("<asset_type>"), bytes.find("<asset_file>") - 2 - sizeof("<asset_type>"));
-			if (itemType != "mesh3d") {
-				SHARD3D_ERROR("Trying to load non mesh asset!");
-				return;
-			}
-		}
-		// Hacky binary read
-		MeshLoadInfo loadInfo = *reinterpret_cast<MeshLoadInfo*>(reinterpret_cast<uintptr_t>(bytes.substr(bytes.find("<properties>") + sizeof("<properties>  ")).data()));
-
-		// Hacky entry reading
-		size_t entryBegin = bytes.find("<asset_file>") + sizeof("<asset_file>");
-		std::string meshFile = bytes.substr(entryBegin, bytes.find("<asset_orig>") - 2 - entryBegin);
-		AssetID meshAsset = assetPath;
-		input.close();
-		if (meshAssets.find(meshAsset) != meshAssets.end()) {
-			SHARD3D_WARN("Mesh at path '{0}' (ID {1}) already exists! Mesh will be ignored...", meshAsset.getFile(), meshAsset.getID());
+		if (!input.good()) {
+			SHARD3D_ERROR("Failed to load {0} (ID {1})", assetPath.getFile(), assetPath.getID());
 			return;
 		}
 
-		rPtr<EngineMesh> mesh = EngineMesh::loadMeshFromFile(*engineDevice, meshFile, loadInfo);
+		std::ifstream stream(assetPath.getFile());
+		std::stringstream strStream;
+		strStream << stream.rdbuf();
+
+		YAML::Node data = YAML::Load(strStream.str());
+
+		stream.close();
+		if (data["AssetType"].as<std::string>() != "mesh3d") {
+			SHARD3D_ERROR("Trying to load non texture asset!");
+			return;
+		}
+		
+		// Hacky binary read
+		MeshLoadInfo loadInfo = *reinterpret_cast<MeshLoadInfo*>(reinterpret_cast<uintptr_t>(data["Properties"].as<YAML::Binary>().data()));
+		
+		input.close();
+		if (meshAssets.find(assetPath) != meshAssets.end()) 
+			return;
+		
+
+		rPtr<EngineMesh> mesh = EngineMesh::loadMeshFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
 		if (!mesh) return;
-		SHARD3D_LOG("Loaded asset to resource map '{0}'", meshAsset.getFile());
-		meshAssets[meshAsset] = mesh;
+		SHARD3D_LOG("Loaded asset to resource map '{0}'", assetPath.getFile());
+		meshAssets[assetPath] = mesh;
 	}
-	void ResourceHandler::loadMesh(const AssetID& asset) {
-		reloadMeshQueue.push_back(asset);
-	}
+
+
 	rPtr<EngineMesh>& ResourceHandler::retrieveMesh_unsafe(const AssetID& asset) {
 		return meshAssets.at(asset);
 	}
@@ -189,58 +221,42 @@ namespace Shard3D {
 		return meshAssets.at(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
 	}
 #pragma endregion
+
 #pragma region Texture
+
 	void ResourceHandler::loadTexture(const AssetID& assetPath) {
 		std::fstream input{ assetPath.getFile(), std::ios::binary | std::ios::in };
-		std::streampos fileSize;
-		input.unsetf(std::ios::skipws);
-
-		input.seekg(0, std::ios::end);
-		fileSize = input.tellg();
-		input.seekg(0, std::ios::beg);
-
-		std::string bytes; 
-		bytes.reserve(fileSize);
 		
-		bytes.insert(bytes.begin(),
-			std::istream_iterator<uint8_t>(input),
-			std::istream_iterator<uint8_t>());
-
-		{
-			std::string itemType = bytes.substr(sizeof("<asset_type>"), bytes.find("<asset_file>") - 2 - sizeof("<asset_type>"));
-			if (itemType != "texture") {
-				SHARD3D_ERROR("Trying to load non texture asset!");
-				return;
-			}
-		}
-		// Hacky binary read
-		TextureLoadInfo loadInfo = *reinterpret_cast<TextureLoadInfo*>(reinterpret_cast<uintptr_t>(bytes.substr(bytes.find("<properties>") + sizeof("<properties>  ")).data()));
-
-		// Hacky entry reading
-		size_t entryBegin = bytes.find("<asset_file>") + sizeof("<asset_file>");
-		std::string textureFile = bytes.substr(entryBegin, bytes.find("<asset_orig>") - 2 - entryBegin);
-		AssetID textureAsset = assetPath;
-		input.close();
-		if (textureAssets.find(textureAsset) != textureAssets.end()) {
-			SHARD3D_WARN("Texture at path '{0}' (ID {1}) already exists! Texture will be ignored...", textureAsset.getFile(), textureAsset.getID());
+		if (!input.good()) {
+			SHARD3D_ERROR("Failed to load {0} (ID {1})", assetPath.getFile(), assetPath.getID());
 			return;
 		}
-		rPtr<EngineTexture> texture = EngineTexture::createTextureFromFile(*engineDevice, textureFile, loadInfo);
+
+		std::ifstream stream(assetPath.getFile());
+		std::stringstream strStream;
+		strStream << stream.rdbuf();
+
+		YAML::Node data = YAML::Load(strStream.str());
+
+		stream.close();
+		if (data["AssetType"].as<std::string>() != "texture") {
+			SHARD3D_ERROR("Trying to load non texture asset!");
+			return;
+		}
+
+		// Hacky binary read
+		TextureLoadInfo loadInfo = *reinterpret_cast<TextureLoadInfo*>(reinterpret_cast<uintptr_t>(data["Properties"].as<YAML::Binary>().data()));
+
+		// Hacky entry reading
+		AssetID textureAsset = assetPath;
+		input.close();
+		if (textureAssets.find(textureAsset) != textureAssets.end()) 
+			return;
+		
+		rPtr<EngineTexture> texture = EngineTexture::createTextureFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
 		if (!texture) return;
 		SHARD3D_LOG("Loaded texture to resource map '{0}'", textureAsset.getFile());
 		textureAssets[textureAsset] = texture;
-	}
-
-
-	void ResourceHandler::runGarbageCollector() {
-		if (reloadMeshQueue.size() != 0) {
-			vkDeviceWaitIdle(engineDevice->device());
-			for (AssetID& file : reloadMeshQueue) {
-				_loadMesh(file);
-			}
-			reloadMeshQueue.clear();
-			return;
-		}	
 	}
 
 	rPtr<EngineTexture>& ResourceHandler::retrieveTexture_unsafe(const AssetID& asset) {
@@ -251,20 +267,41 @@ namespace Shard3D {
 			return textureAssets.at(asset);
 		return textureAssets.at(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
 	}
+
 #pragma endregion
 
 #pragma region Material
-	void ResourceHandler::loadMaterial(rPtr<SurfaceMaterial> material, const std::string& materialPath) {
-		surfaceMaterialAssets[AssetID(materialPath)] = material;
+	void ResourceHandler::loadSurfaceMaterial(const AssetID& asset) {
+		if (surfaceMaterialAssets.find(asset) != surfaceMaterialAssets.cend()) return;
+		rPtr<SurfaceMaterial> material = MaterialManager::loadSurfaceMaterial(asset);
+		if (!material) return;
+		surfaceMaterialAssets[asset] = material;
+		rebuildSurfaceMaterial(material);
+		SHARD3D_LOG("Loaded material to resource map '{0}'", asset.getFile());
+	}
+
+	void ResourceHandler::loadSurfaceMaterialRecursive(const AssetID& asset) {
+		loadSurfaceMaterial(asset);
+		surfaceMaterialAssets[asset]->loadAllTextures();
+	}
+
+	void ResourceHandler::rebuildSurfaceMaterial(rPtr<SurfaceMaterial> material) {
+		if (!material->isBuilt()) _buildSurfaceMaterial(material);
+		rebuildSurfaceMaterialQueue.push_back(material);
+	}
+
+	void ResourceHandler::_buildSurfaceMaterial(rPtr<SurfaceMaterial> material) {
 		material->createMaterialShader(*engineDevice, SharedPools::staticMaterialPool);
 	}
 
 	rPtr<SurfaceMaterial>& ResourceHandler::retrieveSurfaceMaterial_safe(const AssetID& asset) {
 		if (surfaceMaterialAssets.find(asset) != surfaceMaterialAssets.cend())
-			return surfaceMaterialAssets.at(asset); return surfaceMaterialAssets.at(asset);
+			return surfaceMaterialAssets.at(asset);
 		return surfaceMaterialAssets.at(AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX));
 	}
 #pragma endregion
+
+
 
 }
 

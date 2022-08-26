@@ -6,7 +6,7 @@
 namespace Shard3D {
     struct AudioProperties {
         float volume{ 1.f };
-        float pitch{ 0.f };
+        float pitch{ 1.f };
         glm::vec3 relativePos{ 0.f };
     };
     enum AudioParams {

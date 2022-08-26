@@ -9,8 +9,6 @@ namespace Shard3D {
 	// engine settings
 	#define ENSET_WINDOW_ICON_PATH						"shardwinico.png"
 	
-	#define ENSET_WB3DLEVEL_CIPHER_KEY					128	// for level encyption and decryption for release ready games, MUST BE A MULTIPLE OF 2!!
-	
 	#define ENSET_ENABLE_PLUGINS						
 	#define ENSET_MAX_ACTOR_CHILDREN_COUNT				256
 }

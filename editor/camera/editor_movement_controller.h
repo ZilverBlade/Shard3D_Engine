@@ -31,6 +31,7 @@ namespace Shard3D {
                 int moveUp = GLFW_KEY_SPACE;
                 int moveDown = GLFW_KEY_RIGHT_CONTROL;
                 int slowDown = GLFW_KEY_LEFT_CONTROL;
+                int speedUp = GLFW_KEY_LEFT_SHIFT;
             };
 
             struct ButtonMappings {

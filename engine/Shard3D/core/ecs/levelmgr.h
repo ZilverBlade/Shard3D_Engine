@@ -6,25 +6,20 @@
 namespace Shard3D {
 	namespace ECS {
 		enum class LevelMgrResults {
-			SuccessResult = 0,
-			FailedResult = 1,
-			UnknownResult = -1,
-			ErrorResult = -2,
+			SuccessResult,
+			FailedResult,
+			UnknownResult,
+			ErrorResult,
 
-			WrongFileResult = 10,
-			InvalidEntryResult = 20,
-			OldEngineVersionResult = 30,
-			OldEditorVersionResult = 31,
-			FutureVersionResult = 40,
-			FutureEditorVersionResult = 41
+			WrongFileResult,
+			InvalidEntryResult,
+			OldEngineVersionResult,
+			FutureVersionResult,
 		};
 
 		class LevelManager {
 		public:
 			LevelManager(const sPtr<Level>& level);
-
-			std::string encrypt(std::string input);
-			std::string decrypt(std::string input);
 
 			void save(const std::string& destinationPath, bool encryptLevel = false);
 			void saveRuntime(const std::string& destinationPath);
@@ -34,7 +29,6 @@ namespace Shard3D {
 
 		private:
 			sPtr<Level> mLevel;
-			const int WB3D_CIPHER_KEY = ENSET_WB3DLEVEL_CIPHER_KEY;
 		};
 	}
 }

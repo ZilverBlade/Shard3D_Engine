@@ -150,6 +150,11 @@ ALPHA:
 		- Improved cutouts for editor billboards
 		- Removed blueprints
 		- Begun huge asset and resource system overhaul
+		- Minor camera control improvements
+		- Level saving now stores editor camera position
+
+		:: NEXT, store materials per mesh, per level, and per blueprint (future). materials get copied from mesh to blueprints, from blueprint to level, from mesh to level.
+		Figure out to use either unordered map or ordered map, to keep track of the correct order of material slots.
 		
 
 		:: TODO, proper events sytem, add editor layouts, use premake

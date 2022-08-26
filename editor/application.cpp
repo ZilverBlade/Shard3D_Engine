@@ -45,6 +45,8 @@ namespace Shard3D {
 		ResourceHandler::setDevice(engineDevice);
 
 		_special_assets::_editor_icons_load();
+		
+		
 		GraphicsSettings::init(&engineWindow);
 
 		CSimpleIniA ini;
@@ -84,6 +86,22 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 
+		
+		GridSystem gridSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+#ifdef ENSET_ENABLE_COMPUTE_SHADERS
+		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+#endif
+		ForwardRenderSystem forwardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		
+		BillboardRenderSystem billboardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+
+		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+
+		PhysicsSystem physicsSystem{};
+		LightSystem lightSystem{};
+
+		ResourceHandler::clearAllAssets();
+
 		{
 			CSimpleIniA ini;
 			ini.SetUnicode();
@@ -92,11 +110,13 @@ namespace Shard3D {
 			ImGuiInitializer::init(engineDevice, engineWindow, engineRenderer.getSwapChainRenderPass(), ini.GetBoolValue("THEME", "useLightMode"));
 		}
 		ImGuiLayer* imguiLayer = new ImGuiLayer();
-		
+
 		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, mainOffScreen);
-		
+
 		layerStack.pushOverlay(imguiLayer);
 
+		// TODO: render the HUDLayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
+		// but render the HUD seperately from everything in the GUIEditor window.
 		HUDLayer* hudLayer0 = new HUDLayer();
 		HUDLayer* hudLayer1 = new HUDLayer();
 		HUDLayer* hudLayer2 = new HUDLayer();
@@ -110,35 +130,14 @@ namespace Shard3D {
 		layerStack.pushOverlay(hudLayer1);
 		layerStack.pushOverlay(hudLayer0);
 
-		//guiLayer0->attach(Singleton::mainOffScreen.getRenderPass(), &layerStack);
-		// 
-		// 
-		// TODO: render the HUDLayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
-		// but render the HUD seperately from everything in the GUIEditor window.
-
-		GridSystem gridSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-#ifdef ENSET_ENABLE_COMPUTE_SHADERS
-		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-#endif
-		ForwardRenderSystem forwardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		ResourceHandler::clearAllAssets();
-
-		BillboardRenderSystem billboardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-
-		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-
-		PhysicsSystem physicsSystem{};
-		LightSystem lightSystem{};
-
-
 		SHARD3D_INFO("Loading editor camera actor");
-		ECS::Actor editor_cameraActor = level->createActorWithGUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
+		ECS::Actor editor_cameraActor = level->createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
 		editor_cameraActor.addComponent<Components::CameraComponent>();
 
 		level->setPossessedCameraActor(editor_cameraActor);
 		editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
 		SHARD3D_INFO("Loading dummy actor");
-		ECS::Actor dummy = level->createActorWithGUID(1, "Dummy Actor (SYSTEM RESERVED)");
+		ECS::Actor dummy = level->createActorWithUUID(1, "Dummy Actor (SYSTEM RESERVED)");
 
 		controller::EditorMovementController editorCameraController{};
 		{
@@ -197,7 +196,7 @@ beginWhileLoop:
 
 			auto possessedCameraActor = level->getPossessedCameraActor();
 			auto& possessedCamera = level->getPossessedCamera();
-			editor_cameraActor = level->getActorFromGUID(0);
+			editor_cameraActor = level->getActorFromUUID(0);
 
 			if (level->simulationState == PlayState::Simulating) {
 				SHARD3D_STAT_RECORD();
@@ -238,6 +237,7 @@ beginWhileLoop:
 				ubo.inverseView = possessedCamera.getInverseView();
 
 				ubo.materialSettings = GraphicsSettings::get().GlobalMaterialSettings;
+				ubo.ambientColor = GraphicsSettings::getRuntimeInfo().ambientLightColor;
 
 				lightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -315,7 +315,7 @@ beginWhileLoop:
 		//ECS::LevelManager levelman(level);
 		//levelman.load("assets/leveldata/drivecartest.wbl", true);
 		//
-		//ECS::Actor car = level->createActorWithGUID(43827493259, "Car");
+		//ECS::Actor car = level->createActorWithUUID(43827493259, "Car");
 		//AssetManager::emplaceMesh("assets/modeldata/FART.obj");
 		//car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
 		//

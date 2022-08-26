@@ -200,20 +200,41 @@ namespace Shard3D {
 				char fileBuffer[256];
 				memset(fileBuffer, 0, 256);
 				strncpy(fileBuffer, rfile.c_str(), 256);
+				
 				if (ImGui::InputText("Mesh File", fileBuffer, 256)) {
-					rfile = std::string(fileBuffer);
+					rfile = std::string(fileBuffer);			
+				}
+				if (ImGui::BeginDragDropTarget()) {
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.MESH")) {
+						rfile = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
+					}
 				}
 				if (ImGui::Button("Load Mesh")) {
 					std::ifstream ifile(fileBuffer);
 					if (ifile.good()) {
 						SHARD3D_LOG("Reloading mesh '{0}'", rfile);
-						actor.getComponent<Components::MeshComponent>().asset = AssetID(rfile);
-						ResourceHandler::loadMesh(actor.getComponent<Components::MeshComponent>().asset);
+						AssetID meshAsset = AssetID(rfile);
+						actor.getComponent<Components::MeshComponent>().asset = meshAsset;
+						ResourceHandler::loadMesh(meshAsset);
+						actor.getComponent<Components::MeshComponent>() = Components::MeshComponent(meshAsset);
 					} else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
+				}
+				for (int i = 0; i < actor.getComponent<Components::MeshComponent>().materials.size(); i++) {
+					ImGui::Text("%i# %s", i, ResourceHandler::retrieveMesh(actor.getComponent<Components::MeshComponent>().asset)->materialSlots[i].c_str());
+					auto& tag = actor.getComponent<Components::MeshComponent>().materials[i].getFileRef();
+					char tagBuffer[256];
+					memset(tagBuffer, 0, 256);
+					strncpy(tagBuffer, tag.c_str(), 256);
+					if (ImGui::InputText("##inputmaterial", tagBuffer, 256)) {}
+					if (ImGui::BeginDragDropTarget())
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.SMAT")) {
+							tag = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
+							actor.getComponent<Components::MeshComponent>().materials[i] = AssetID(actor.getComponent<Components::MeshComponent>().materials[i].getFile());
+						}
 				}
 				ImGui::TreePop();
 			}
-			if (killComponent) context->killMesh(actor);
+			if (killComponent) actor.killComponent<Components::MeshComponent>();
 		}
 		if (actor.hasComponent<Components::BillboardComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::BillboardComponent).hash_code(), nodeFlags, "Billboard");
@@ -227,26 +248,32 @@ namespace Shard3D {
 				ImGui::EndPopup();
 			}
 			if (open) {
-				//auto& rfile = actor.getComponent<Components::BillboardComponent>().asset.getFile();
-				//
-				//char fileBuffer[256];
-				//memset(fileBuffer, 0, 256);
-				//strncpy(fileBuffer, rfile.c_str(), 256);
-				//if (ImGui::InputText("Texture File", fileBuffer, 256)) {
-				//	rfile = std::string(fileBuffer);
-				//}
-				//if (ImGui::Button("Load Texture")) {
-				//	std::ifstream ifile(fileBuffer);
-				//	if (ifile.good()) {
-				//		SHARD3D_LOG("Reloading texture '{0}'", rfile);
-				//		actor.getComponent<Components::BillboardComponent>().cacheFile = rfile;
-				//		context->reloadTexture(actor);
-				//	}
-				//	else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
-				//}
+				auto& rfile = actor.getComponent<Components::BillboardComponent>().asset.getFileRef();
+			
+				char fileBuffer[256];
+				memset(fileBuffer, 0, 256);
+				strncpy(fileBuffer, rfile.c_str(), 256);
+			
+				if (ImGui::InputText("Texture File", fileBuffer, 256)) {
+					rfile = std::string(fileBuffer);
+				}
+				if (ImGui::BeginDragDropTarget()) {
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.TEX")) {
+						rfile = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
+					}
+				}
+				if (ImGui::Button("Load Texture")) {
+					std::ifstream ifile(fileBuffer);
+					if (ifile.good()) {
+						SHARD3D_LOG("Reloading texture '{0}'", rfile);
+						actor.getComponent<Components::BillboardComponent>().asset = AssetID(rfile);
+						ResourceHandler::loadTexture(actor.getComponent<Components::BillboardComponent>().asset);
+					}
+					else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
+				}
 				ImGui::TreePop();
 			}
-			if (killComponent) context->killTexture(actor);
+			if (killComponent) actor.killComponent<Components::BillboardComponent>();
 		}
 		if (actor.hasComponent<Components::AudioComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::AudioComponent).hash_code(), nodeFlags, "Audio");

@@ -1,5 +1,5 @@
 #include "asset_explorer_panel.h"
-#include <Shard3D/ecs.h>
+
 #include <Shard3D/core/asset/assetmgr.h>
 #include <Shard3D/utils/dialogs.h>
 #include <fstream>
@@ -7,32 +7,44 @@
 #include <imgui.h>
 
 #include "../imgui/imgui_implementation.h"
+#include <Shard3D/core/asset/matmgr.h>
+#include <Shard3D/core/ecs/levelmgr.h>
 
 namespace Shard3D {
 	void AssetExplorerPanel::refreshIterator(std::filesystem::path newPath) {
 		directoryEntries.entries.clear();
 		directoryEntries.types.clear();
+		directoryEntries.icons.clear();
 		for (auto& dirEnt : std::filesystem::directory_iterator(newPath)) {
 			auto relativePath = std::filesystem::relative(dirEnt.path(), std::filesystem::path(ENGINE_ASSETS_PATH));
 			std::string fileStr = relativePath.filename().string();
 			if (!dirEnt.is_directory() && !(strUtils::hasEnding(fileStr, ENGINE_ASSET_SUFFIX) || strUtils::hasEnding(fileStr, ".s3dlevel"))) continue;
 			directoryEntries.entries.push_back(dirEnt);
 			if (dirEnt.is_directory()) {
-				directoryEntries.types.push_back(&folderIcon);
+				directoryEntries.types.push_back(AssetType::Unknown);
+				directoryEntries.icons.push_back(&folderIcon);
 				continue;
 			}
-			switch (AssetUtils::discoverAssetType(fileStr)) {
+			switch (AssetUtils::discoverAssetType("assets\\" + relativePath.string())) {
 			case (AssetType::Mesh3D):
-				directoryEntries.types.push_back(&mesh3dIcon);
+				directoryEntries.types.push_back(AssetType::Mesh3D);
+				directoryEntries.icons.push_back(&mesh3dIcon);
 				continue;
 			case (AssetType::Texture):
-				directoryEntries.types.push_back(&textureIcon);
+				directoryEntries.types.push_back(AssetType::Texture);
+				directoryEntries.icons.push_back(&textureIcon);
+				continue;
+			case (AssetType::SurfaceMaterial):
+				directoryEntries.types.push_back(AssetType::SurfaceMaterial);
+				directoryEntries.icons.push_back(&smatIcon);
 				continue;
 			case (AssetType::Level):
-				directoryEntries.types.push_back(&levelIcon);
+				directoryEntries.types.push_back(AssetType::Level);
+				directoryEntries.icons.push_back(&levelIcon);
 				continue;
 			}
-			directoryEntries.types.push_back(&fileIcon);
+			directoryEntries.types.push_back(AssetType::Unknown);
+			directoryEntries.icons.push_back(&fileIcon);
 		}
 	}
 
@@ -52,20 +64,24 @@ namespace Shard3D {
 		} {
 			auto& img = _special_assets::_editor_icons.at("editor.browser.file.msh");
 			mesh3dIcon = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		} {
+			auto& img = _special_assets::_editor_icons.at("editor.browser.file.smt");
+			smatIcon = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
-
 		refreshIterator(std::filesystem::path(ENGINE_ASSETS_PATH));
 	}
 
-	AssetExplorerPanel::~AssetExplorerPanel() {
-	}
+	AssetExplorerPanel::~AssetExplorerPanel() {}
 
 	void AssetExplorerPanel::render() {
 		bool refresh_it = false;
 
 		ImGui::Begin("Asset Explorer");
-		
+		if (ImGui::ImageButtonWithText(fileIcon, "Refresh", {16.f, 16.f})) {
+			refresh_it = true;
+		}
 		if (currentDir != std::filesystem::path(ENGINE_ASSETS_PATH)) {
+			ImGui::SameLine();
 			if (ImGui::Button("<= Back")) {
 				currentDir = currentDir.parent_path();
 				refresh_it = true;
@@ -73,8 +89,8 @@ namespace Shard3D {
 		}
 
 		float panelWidth = ImGui::GetContentRegionAvail().x;
-		int columnCount = std::max((int)(panelWidth / 112.f)// <--- thumbnail size (96px) + padding (16px)
-														, 1);
+		int columnCount = std::max((int)(panelWidth / (96.f + 16.f))// <--- thumbnail size (96px) + padding (16px)
+																, 1);
 
 		ImGui::Columns(columnCount, 0, false);
 		for (int i = 0; i < directoryEntries.entries.size(); i++) {
@@ -82,30 +98,89 @@ namespace Shard3D {
 			const auto& dirEntPath = dirEnt.path();
 			auto relativePath = std::filesystem::relative(dirEntPath, std::filesystem::path(ENGINE_ASSETS_PATH));
 			std::string fileStr = relativePath.filename().string();
+			
+			ImGui::PushID(fileStr.data());
+
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4());
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
-			ImGui::ImageButton(*directoryEntries.types[i], { 96.f, 96.f });
-			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-				if (dirEnt.is_directory()) {
-					currentDir /= dirEntPath.filename();
-					refresh_it = true;
+
+			ImGui::ImageButton(*directoryEntries.icons[i], { 96.f, 96.f });
+			if (ImGui::IsItemHovered()) {
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+					if (dirEnt.is_directory()) {
+						currentDir /= dirEntPath.filename();
+						refresh_it = true;
+					}
+				}
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+					currentContextMenu = dirEntPath;
 				}
 			}
+			if (!dirEnt.is_directory())
+				if (ImGui::BeginDragDropSource()) {
+					// likely memory leak. if any issues in the future, check this
+					char* item = (char*)malloc(relativePath.u8string().length() + 1);
+					strncpy(item, const_cast<char*>(relativePath.u8string().c_str()), relativePath.u8string().length() + 1);
+					switch (directoryEntries.types[i]) {
+					case(AssetType::Texture):
+						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.TEX", item, strlen(item) + 1, ImGuiCond_Once);
+						break;
+					case(AssetType::Mesh3D):
+						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.MESH", item, strlen(item) + 1, ImGuiCond_Once);
+						break;
+					case(AssetType::Level):
+						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.LVL", item, strlen(item) + 1, ImGuiCond_Once);
+						break;
+					case(AssetType::SurfaceMaterial):
+						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.SMAT", item, strlen(item) + 1, ImGuiCond_Once);
+						break;
+					case(AssetType::Unknown):
+						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.WHAT", item, strlen(item) + 1, ImGuiCond_Once);
+						break;
+					}
+					ImGui::EndDragDropSource();
+				}
+
 			ImGui::PopStyleVar();
 			ImGui::PopStyleColor();		
 			ImGui::TextWrapped(fileStr.c_str());
+
 			ImGui::NextColumn();
+			ImGui::PopID();
 
 			if (refresh_it) { refreshIterator(currentDir); break; }
 		}
 		ImGui::Columns(1);
 
-		if (ImGui::BeginPopupContextWindow("Import Asset", ImGuiMouseButton_Right, false)) {
+		if (ImGui::BeginPopupContextWindow("AssetMenu", ImGuiMouseButton_Right, true)) {
+			if (ImGui::MenuItem("Rename")) {
+				SHARD3D_NOIMPL;
+
+				currentContextMenu = std::filesystem::path();
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Replace")) {
+				SHARD3D_NOIMPL;
+
+				currentContextMenu = std::filesystem::path();
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Delete")) {
+				AssetManager::purgeAsset(currentContextMenu.string());
+				refresh_it = true;
+
+				currentContextMenu = std::filesystem::path();
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupContextWindow("AssetExplorerContext", ImGuiMouseButton_Right, false)) {
 			if (ImGui::MenuItem("Import Texture")) {
 				std::string file = FileDialogs::openFile();
 				std::ifstream check(file);
 				if (check.good()) {
-					const auto& dest = std::string(currentDir.string() + AssetUtils::truncatePath(file));
+					std::string dest = std::string(currentDir.string() + AssetUtils::truncatePath(file));
+					std::replace(dest.begin(), dest.end(), '\\', '/');
 					AssetManager::importTexture(file, dest, TextureLoadInfo());
 					refreshIterator(currentDir);
 				}
@@ -118,13 +193,31 @@ namespace Shard3D {
 				std::string file = FileDialogs::openFile();
 				std::ifstream check(file);
 				if (check.good()) {
-					const auto& dest = std::string(currentDir.string() + AssetUtils::truncatePath(file));
+					std::string dest = std::string(currentDir.string() + AssetUtils::truncatePath(file));
+					std::replace(dest.begin(), dest.end(), '\\', '/');
 					AssetManager::importMesh(file, dest, MeshLoadInfo());
 					refreshIterator(currentDir);
 				}
 				else {
 					MessageDialogs::show("Invalid model file provided", "Asset Error", MessageDialogs::OPTICONERROR);
 				}
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("New level")) {
+				LevelManager lman(make_sPtr<Level>("Some kind of level"));
+				lman.save(std::string(currentDir.string() + "/Some kind of level"));
+				refreshIterator(currentDir);	
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Create Surface Material")) {
+				rPtr<SurfaceMaterial_ShadedOpaque> worldgrid = make_rPtr<SurfaceMaterial_ShadedOpaque>();
+				worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
+				worldgrid->shininess = 0.05f;
+				worldgrid->specular = 0.3f;
+				std::string dest = std::string(currentDir.string() + "/Some kind of material");
+				AssetManager::createMaterial(dest, worldgrid);
+				refreshIterator(currentDir);
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();

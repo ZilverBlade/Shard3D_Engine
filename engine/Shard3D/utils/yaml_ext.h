@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <yaml-cpp/yaml.h>
+#include "../core/asset/assetid.h"
 
 namespace YAML {
 	template<>
@@ -61,6 +62,23 @@ namespace YAML {
 			return true;
 		}
 	};
+
+	template<>
+	struct convert<std::vector<Shard3D::AssetID>> {
+		static Node encode(const std::vector<Shard3D::AssetID>& rhs) {
+			Node node;
+			for (auto& item : rhs) {
+				node.push_back(item.getFile());
+			}
+			return node;
+		}
+		static bool decode(const Node& node, std::vector<Shard3D::AssetID>& rhs) {
+			for (auto& item : node) {
+				rhs.push_back(item.as<std::string>());
+			}
+			return true;
+		}
+	};
 }
 
 namespace Shard3D {
@@ -79,5 +97,13 @@ namespace Shard3D {
 		out << YAML::Flow;
 		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
 		return out; // [float, float, float, float]
+	}
+	static YAML::Emitter& operator<<(YAML::Emitter& out, const std::vector<AssetID>& a) {
+		out << YAML::Flow;
+		out << YAML::BeginSeq;
+		for (auto& v : a)
+			out << v.getFile();
+		out << YAML::EndSeq;
+		return out;
 	}
 }

@@ -27,7 +27,7 @@ namespace Shard3D {
 			if (Input::isKeyDown(keys.moveUp)) moveDir += upDir;
 			if (Input::isKeyDown(keys.moveDown)) moveDir -= upDir;
 
-			speedModifier = 0.25f + 0.75f * (!Input::isKeyDown(keys.slowDown));
+			speedModifier = 0.25f + 0.75f * (!Input::isKeyDown(keys.slowDown)) + 1.75f * Input::isKeyDown(keys.speedUp);
 
 			if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
 				actor.getComponent<Components::TransformComponent>().setTranslation(
@@ -53,23 +53,24 @@ namespace Shard3D {
 				float rotX = sensitivity * (float)(mouseY - (height / 2.f)) / height;
 				float rotY = sensitivity * (float)(mouseX - (width / 2.f)) / width;
 
-				// up down rotation
-				orientation = glm::rotate(orientation, glm::radians(rotX), upVec);
-				// to make sure it doesnt over-rotate			
-				orientation.x = glm::clamp(orientation.x, -1.57079632679f, 1.57079632679f);
-
-				// left right rotation
-				orientation = glm::rotate(orientation, glm::radians(rotY), glm::normalize(glm::cross(orientation, upVec)));
 
 				// force the roll to be pi*2 radians
 				orientation.z = 6.283185482f;
+
+				// up down rotation
+				orientation = glm::rotate(orientation, glm::radians(rotX), upVec);
+				// to make sure it doesnt over-rotate			
+				orientation.x = glm::clamp(orientation.x, -1.5707963f, 1.5707963f);
+
+				// left right rotation
+				orientation = glm::rotate(orientation, glm::radians(rotY), glm::normalize(glm::cross(orientation, upVec)));
 
 				glfwSetCursorPos(window, (width / 2.f), (height / 2.f));
 			}
 			else { glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); firstClick = true; }
 
 			if (glm::dot(orientation, orientation) > std::numeric_limits<float>::epsilon()) {
-				actor.getComponent<Components::TransformComponent>().setRotation({ orientation.x, orientation.z, orientation.y });
+				actor.getComponent<Components::TransformComponent>().setRotation({ orientation.x, 0.f, orientation.y });
 			}
 		}
 		void EditorMovementController::eventEvent(Events::Event& e) {

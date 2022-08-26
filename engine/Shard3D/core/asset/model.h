@@ -1,7 +1,7 @@
 #pragma once
 #include "../../vulkan_abstr.h"
 #include "material.h"
-#include "../misc/assetid.h"
+#include "../asset/assetid.h"
 extern "C" {
 	struct aiNode;
 	struct aiScene;
@@ -30,6 +30,7 @@ namespace Shard3D {
 		struct SubmeshData {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
+			AssetID materialAsset{""};
 		};
 
 		struct SubmeshBuffers {
@@ -47,6 +48,8 @@ namespace Shard3D {
 			void loadScene(const std::string& filepath, bool createMaterials);
 			void processNode(aiNode* node, const aiScene* scene, bool createMaterials);
 			void loadSubmesh(aiMesh* mesh, const aiScene* scene, bool createMaterials);
+
+			std::string workingDir;
 		};
 
 		EngineMesh(EngineDevice& dvc, const EngineMesh::Builder &builder);
@@ -70,12 +73,11 @@ namespace Shard3D {
 
 		//			<Buffer Data>
 		std::vector<SubmeshBuffers> buffers{};
-
+		std::vector<std::string> materialSlots{};
+		std::vector<AssetID> materials{};
 	private:
 		void createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
 		void createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
-		void createMaterialBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
-
 
 		EngineDevice* device;
 	};

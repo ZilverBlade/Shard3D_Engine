@@ -7,35 +7,19 @@
 
 namespace Shard3D {
 	
-	MaterialManager::MaterialManager(SurfaceMaterial& material){}
-
-	static void saveMaterial_SurfaceMaterial_ShadedOpaque(YAML::Emitter& out, SurfaceMaterial_ShadedOpaque* material) {
-		out << YAML::BeginMap;
-		out << YAML::Key << "diffuseVec4" << YAML::Value << material->diffuseColor;
-		out << YAML::Key << "diffuseTex" << YAML::Value << material->diffuseTex.getID();
-		out << YAML::Key << "specularFloat" << YAML::Value << material->specular;
-		out << YAML::Key << "specularTex" << YAML::Value << material->specularTex.getID();
-		out << YAML::Key << "roughnessFloat" << YAML::Value << material->shininess;
-		out << YAML::Key << "roughnessTex" << YAML::Value << material->shininessTex.getID();
-		out << YAML::Key << "metallicFloat" << YAML::Value << material->metallic;
-		out << YAML::Key << "metallicTex" << YAML::Value << material->metallicTex.getID();
-
-		out << YAML::Key << "normalTex" << YAML::Value << material->normalTex.getID();
-		out << YAML::EndMap;
-	}
+	MaterialManager::MaterialManager(SurfaceMaterial& material) {}
 	
 	void MaterialManager::saveMaterial(const rPtr<SurfaceMaterial>& material, const std::string& destPath, bool ignoreWarns) {
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION.toString();
-		out << YAML::Key << "SHARD3D" << YAML::Value << EDITOR_VERSION.toString();
-		out << YAML::Key << "WBASSET_Material" << YAML::Value << YAML::BeginSeq;
+		out << YAML::Key << "AssetType" << YAML::Value << "surface_material";
+		out << YAML::Key << "SurfaceMaterial" << YAML::Value << YAML::BeginSeq;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Material" << YAML::Value << material->materialTag;
 
 		out << YAML::Key << "Physics";
 		out << YAML::BeginMap;
-		const volatile char* surfaceMaterialType = typeid(*material.get()).name();
 		out << YAML::Key << "MaterialType" << YAML::Value << "SurfaceMaterial";
 		out << YAML::Key << "MaterialClass" << YAML::Value << typeid(*material.get()).name();
 		out << YAML::EndMap;
@@ -47,75 +31,47 @@ namespace Shard3D {
 		out << YAML::EndMap;
 		
 		out << YAML::Key << "Data";
-		//material->serialize(destPath);
-		if (surfaceMaterialType == typeid(SurfaceMaterial_ShadedOpaque).raw_name()) {}
-		//	material->serialize(destPath);
-		//} else if (surfaceMaterialType == typeid(SurfaceMaterial_ShadedMasked).name()) {
-		//	saveMaterial_SurfaceMaterial_ShadedMasked(out, reinterpret_cast<SurfaceMaterial_ShadedMasked*>(material.get()));
-		//}
+
+		material->serialize(&out);
 
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 
-		auto newPath = destPath;
-		if (!strUtils::hasEnding(destPath, ".wbasset")) newPath = destPath + ".wbasset";
+		std::string newPath = destPath;
+		if (!strUtils::hasEnding(destPath, ".s3dasset")) newPath = destPath + ".s3dasset";
 		std::ofstream fout(newPath);
 		fout << out.c_str();
 		fout.flush();
 		fout.close();
 	}
-	rPtr<SurfaceMaterial> MaterialManager::loadSurfaceMaterial(const std::string& sourcePath, bool ignoreWarns) {
-		
-		return make_rPtr<SurfaceMaterial_ShadedOpaque>();
-		std::ifstream stream(sourcePath);
+	rPtr<SurfaceMaterial> MaterialManager::loadSurfaceMaterial(const AssetID& asset, bool ignoreWarns) {
+		std::ifstream stream(asset.getFile());
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
 		
 		YAML::Node data = YAML::Load(strStream.str());
 		
-		if (!data["WBASSET_Material"]) return make_rPtr<SurfaceMaterial_ShadedOpaque>();
-		
+		if (data["AssetType"].as<std::string>() != "surface_material") return make_rPtr<SurfaceMaterial_ShadedOpaque>();
 		
 		if (data["Shard3D"].as<std::string>() != ENGINE_VERSION.toString()) {
 			SHARD3D_WARN("(Shard3D::MaterialSystem) Incorrect engine version");
-		}// change this to check if the version is less or more
-		if (data["SHARD3D"].as<std::string>() != EDITOR_VERSION.toString()) {
-			SHARD3D_WARN("(Shard3D::MaterialSystem) Incorrect editor version");
-		}// change this to check if the version is less or more
+		}
 		
-		std::string levelName = data["Level"].as<std::string>();
-		
-		if (data["Material"]) {
-			auto container = data["Material"];
-
+		if (data["SurfaceMaterial"]) {
+			auto container = data["SurfaceMaterial"][0];
 			DrawData drawData;
-			drawData.culling = static_cast<VkCullModeFlags>(container["Draw"]["culling"].as<uint32_t>());
-			drawData.polygonMode = static_cast<VkPolygonMode>(container["Draw"]["polygonMode"].as<uint32_t>());
-
-			if (container["Physics"]["MaterialType"].as<std::string>() != "SurfaceMaterial") return make_rPtr<SurfaceMaterial_ShadedOpaque>();
+			drawData.culling = static_cast<VkCullModeFlags>(container["Draw"]["VkCullModeFlags"].as<uint32_t>());
+			drawData.polygonMode = static_cast<VkPolygonMode>(container["Draw"]["VkPolygonMode"].as<uint32_t>());
 
 			if (container["Physics"]["MaterialClass"].as<std::string>() == typeid(SurfaceMaterial_ShadedOpaque).name()) {
-
-			}// else if (container["Physics"]["MaterialClass"].as<std::string>() == typeid(SurfaceMaterial_ShadedMasked).name()) {
-				
-			//}
-			
-		//loadedMaterial.surfaceMaterial.diffuseColor = container["Data"]["diffuseVec4"].as<glm::vec4>();
-		//loadedMaterial.surfaceMaterial.specular = container["Data"]["specularFloat"].as<float>();
-		//loadedMaterial.surfaceMaterial.roughness = container["Data"]["roughnessFloat"].as<float>();
-		//loadedMaterial.surfaceMaterial.metallic = container["Data"]["metallicFloat"].as<float>();
-		//
-		//loadedMaterial.surfaceMaterial.normalTex.path = container["Data"]["normalTex"].as<std::string>();
-		//loadedMaterial.surfaceMaterial.diffuseTex.path = container["Data"]["diffuseTex"].as<std::string>();
-		//loadedMaterial.surfaceMaterial.specularTex.path = container["Data"]["specularTex"].as<std::string>();
-		//loadedMaterial.surfaceMaterial.roughnessTex.path = container["Data"]["roughnessTex"].as<std::string>();
-		//loadedMaterial.surfaceMaterial.metallicTex.path = container["Data"]["metallicTex"].as<std::string>();
-		//
-		//// this is strictly a local path, which means all materials must be in this folder
-		//loadedMaterial.path = loadLoc;//.substr(loadLoc.rfind("assets\\materialdata"));
-		//ResourceHandler::loadMaterial(loadedMaterial);
-		//	return loadedMaterial;
+				rPtr<SurfaceMaterial_ShadedOpaque> material = make_rPtr<SurfaceMaterial_ShadedOpaque>();
+				material->materialTag = container["Material"].as<std::string>();
+				material->drawData = drawData;
+				material->deserialize(&container);
+				return material;
+			}
 		}
-
+		SHARD3D_ERROR("Unable to load material {0} (ID {1))", asset.getFile(), asset.getID());
+		return make_rPtr<SurfaceMaterial_ShadedOpaque>();
 	}	
 }

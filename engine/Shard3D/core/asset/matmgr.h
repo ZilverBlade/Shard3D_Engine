@@ -12,9 +12,7 @@ namespace Shard3D {
     	WrongFileResult = 10,
     	InvalidEntryResult = 20,
     	OldEngineVersionResult = 30,
-    	OldEditorVersionResult = 31,
     	FutureVersionResult = 40,
-    	FutureEditorVersionResult = 41
     };
     
     class MaterialManager {
@@ -22,9 +20,6 @@ namespace Shard3D {
         MaterialManager(SurfaceMaterial& material);
     
         static void saveMaterial(const rPtr<SurfaceMaterial>& material, const std::string& destPath, bool ignoreWarns = false);
-        static rPtr<SurfaceMaterial> loadSurfaceMaterial(const std::string& sourcePath, bool ignoreWarns = false);
-
-    private:
-    	const int WB3D_CIPHER_KEY = ENSET_WB3DLEVEL_CIPHER_KEY;
+        static rPtr<SurfaceMaterial> loadSurfaceMaterial(const AssetID& asset, bool ignoreWarns = false);
     };	
 }

@@ -44,20 +44,21 @@ namespace Shard3D {
 		//	&descriptorSet1,
 		//	0,
 		//	nullptr);
-
-		const auto& material = ResourceHandler::retrieveMaterial(std::string("world_grid"));
-		material->bind(frameInfo.commandBuffer, frameInfo.globalDescriptorSet);
-
+		
 		auto view = frameInfo.activeLevel->registry.view<Components::MeshComponent, Components::TransformComponent>();
 		for (auto obj : view) { ECS::Actor actor = { obj, frameInfo.activeLevel.get() };
 			auto& transform = actor.getTransform();
+			auto& component = actor.getComponent<Components::MeshComponent>();
 			MeshPushConstantData push{};
 			push.modelMatrix = frameInfo.activeLevel->getParentMat4(actor) * transform.mat4() ;
 			push.normalMatrix = frameInfo.activeLevel->getParentNormals(actor) * transform.normalMatrix();
 
-			auto& model = ResourceHandler::retrieveMesh(actor.getComponent<Components::MeshComponent>().asset);
-			for (auto& buffer : model->buffers) {
-				//actor.getComponent<Components::MeshComponent>().bindMaterial(frameInfo.commandBuffer, frameInfo.globalDescriptorSet, buffer);
+			auto& model = ResourceHandler::retrieveMesh(component.asset);
+			SHARD3D_ASSERT(model->buffers.size() == component.materials.size() && "Mesh Component and 3D model do not match!");
+			for (int i = 0; i < model->buffers.size(); i++) {
+				auto& buffer = model->buffers[i];
+				rPtr<SurfaceMaterial> material = ResourceHandler::retrieveSurfaceMaterial(component.materials[i]);
+				material->bind(frameInfo.commandBuffer, frameInfo.globalDescriptorSet);
 				vkCmdPushConstants(
 					frameInfo.commandBuffer,
 					material->getPipelineLayout(),

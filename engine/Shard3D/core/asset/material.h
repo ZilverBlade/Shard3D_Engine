@@ -2,7 +2,7 @@
 
 #include "../../core.h"
 #include "../../vulkan_abstr.h"
-#include "../misc/assetid.h"
+#include "../asset/assetid.h"
 /*
 * Shard 3D Material system
 * 
@@ -25,6 +25,12 @@
 * 		- surface_unshaded_translucent_masked_shader
 *
 */
+
+namespace YAML {
+	class Emitter;
+	class Node;
+}
+
 namespace Shard3D {
 	struct DrawData {
 		VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
@@ -57,8 +63,12 @@ namespace Shard3D {
 		DrawData drawData{};
 
 		virtual void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) = 0;
+		virtual void serialize(YAML::Emitter* out) = 0;
+		virtual void deserialize(YAML::Node* data) = 0;
+		virtual void loadAllTextures() = 0;
 
 		void bind(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet);
+		inline bool isBuilt() { return built; }
 		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig->shaderPipelineLayout; }
 	protected:
 		bool built = false;
@@ -88,6 +98,9 @@ namespace Shard3D {
 		AssetID metallicTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 
 		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
+		void serialize(YAML::Emitter* out) override;
+		void deserialize(YAML::Node* data) override;
+		void loadAllTextures() override;
 	};
 
 	/*

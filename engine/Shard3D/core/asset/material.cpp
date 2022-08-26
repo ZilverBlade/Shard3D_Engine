@@ -1,3 +1,4 @@
+#include "../../s3dpch.h"
 #include "material.h"
 #include "assetmgr.h"
 #include "../../systems/buffers/material_system.h"
@@ -86,8 +87,8 @@ namespace Shard3D {
 			.build(materialDescriptorInfo.factors);
 
 		SurfaceMaterial_ShadedOpaque_Factors factors{};
-		factors.diffuse = { diffuseColor.x, diffuseColor.y, diffuseColor.z, 1.f };
-		factors.SSM = { specular, shininess, metallic };
+		factors.diffuse = { this->diffuseColor.x, this->diffuseColor.y, this->diffuseColor.z, 1.f };
+		factors.SSM = { this->specular, this->shininess, this->metallic };
 		factorsBuffer->writeToBuffer(&factors);
 		factorsBuffer->flush();
 
@@ -100,12 +101,12 @@ namespace Shard3D {
 			.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 			.build();
 
-		VkDescriptorImageInfo diffuseTex_imageInfo = ResourceHandler::retrieveTexture(diffuseTex)->getImageInfo();
-		VkDescriptorImageInfo specularTex_imageInfo = ResourceHandler::retrieveTexture(specularTex)->getImageInfo();
-		VkDescriptorImageInfo shininessTex_imageInfo = ResourceHandler::retrieveTexture(shininessTex)->getImageInfo();
-		VkDescriptorImageInfo metallicTex_imageInfo = ResourceHandler::retrieveTexture(metallicTex)->getImageInfo();
+		VkDescriptorImageInfo diffuseTex_imageInfo = ResourceHandler::retrieveTexture(this->diffuseTex)->getImageInfo();
+		VkDescriptorImageInfo specularTex_imageInfo = ResourceHandler::retrieveTexture(this->specularTex)->getImageInfo();
+		VkDescriptorImageInfo shininessTex_imageInfo = ResourceHandler::retrieveTexture(this->shininessTex)->getImageInfo();
+		VkDescriptorImageInfo metallicTex_imageInfo = ResourceHandler::retrieveTexture(this->metallicTex)->getImageInfo();
 
-		VkDescriptorImageInfo normalTex_imageInfo = ResourceHandler::retrieveTexture(normalTex)->getImageInfo();
+		VkDescriptorImageInfo normalTex_imageInfo = ResourceHandler::retrieveTexture(this->normalTex)->getImageInfo();
 
 		EngineDescriptorWriter(*materialDescriptorInfo.textureLayout, *descriptorPool)
 				.writeImage(1, &diffuseTex_imageInfo)
@@ -132,6 +133,41 @@ namespace Shard3D {
 			"assets/shaderdata/materials/surface_shaded_opaque.frag.spv");
 
 		built = true;
+	}
+
+	void SurfaceMaterial_ShadedOpaque::serialize(YAML::Emitter* out) {
+		*out << YAML::BeginMap;
+		*out << YAML::Key << "diffuseColor" << YAML::Value << this->diffuseColor;
+		*out << YAML::Key << "diffuseTex" << YAML::Value << this->diffuseTex.getFile();
+		*out << YAML::Key << "specularFactor" << YAML::Value << this->specular;
+		*out << YAML::Key << "specularTex" << YAML::Value << this->specularTex.getFile();
+		*out << YAML::Key << "shininessFactor" << YAML::Value << this->shininess;
+		*out << YAML::Key << "shininessTex" << YAML::Value << this->shininessTex.getFile();
+		*out << YAML::Key << "metallicFactor" << YAML::Value << this->metallic;
+		*out << YAML::Key << "metallicTex" << YAML::Value << this->metallicTex.getFile();	
+		*out << YAML::Key << "normalTex" << YAML::Value << this->normalTex.getFile();
+		*out << YAML::EndMap;
+	}
+
+	void SurfaceMaterial_ShadedOpaque::deserialize(YAML::Node* data) {
+		this->diffuseColor = (*data)["Data"]["diffuseColor"].as<glm::vec3>();
+		this->specular = (*data)["Data"]["specularFactor"].as<float>();
+		this->shininess = (*data)["Data"]["shininessFactor"].as<float>();
+		this->metallic = (*data)["Data"]["metallicFactor"].as<float>();
+		
+		this->normalTex = (*data)["Data"]["normalTex"].as<std::string>();
+		this->diffuseTex = (*data)["Data"]["diffuseTex"].as<std::string>();
+		this->specularTex = (*data)["Data"]["specularTex"].as<std::string>();
+		this->shininessTex = (*data)["Data"]["shininessTex"].as<std::string>();
+		this->metallicTex = (*data)["Data"]["metallicTex"].as<std::string>();
+	}
+
+	void SurfaceMaterial_ShadedOpaque::loadAllTextures() {
+		ResourceHandler::loadTexture(this->normalTex);
+		ResourceHandler::loadTexture(this->diffuseTex);
+		ResourceHandler::loadTexture(this->specularTex);
+		ResourceHandler::loadTexture(this->shininessTex);
+		ResourceHandler::loadTexture(this->metallicTex);
 	}
 
 

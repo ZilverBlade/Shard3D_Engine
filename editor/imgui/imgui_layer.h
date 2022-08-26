@@ -10,12 +10,13 @@
 #include "../panels/level_properties_panel.h"
 #include "../panels/level_peekers.h"
 #include "../panels/asset_explorer_panel.h"
-
+#include "../panels/material_builder_panel.h" 
 #include "../panels/hud_builder_panel.h"
 
 #include <Shard3D/events/mouse_event.h>
 #include <Shard3D/events/key_event.h>
 #include "../panels/settings_panel.h"
+#include "../panels/default_component_panels.h"
 
 namespace Shard3D {
 	class HUDLayer;
@@ -91,9 +92,12 @@ namespace Shard3D {
 		LevelTreePanel levelTreePanel;
 		LevelPropertiesPanel levelPropertiesPanel;
 		LevelPeekingPanel levelPeekPanel;
+		DefaultComponentPanels componentActorPanels;
 		AssetExplorerPanel assetExplorerPanel;
 		SettingsPanel settingsPanel;
 		HUDBuilderPanel hudBuilder;
+		MaterialBuilderPanel materialBuilder;
+
 		bool refreshContext;
 //Gizmo levelGizmo;
 

@@ -35,8 +35,8 @@ make sure for the first build to switch 'Use (/Yu)' to 'Create (/Yc)', and then 
 - Move Up = SPACE
 - Move Down = RIGHT CONTROL
 - Slow Down Movement = LEFT CONTROL
+- Speed Up Movement = LEFT SHIFT
 - Adjust FOV = Scroll Wheel
-- Adjust Speed = ALT + Scroll Wheel
 
 # What Shard3D offers
 

@@ -5,11 +5,11 @@
 #include "texture.h"
 #include "model.h"
 
-#include "../misc/assetid.h"
+#include "assetid.h"
 
 namespace Shard3D {
 	enum class AssetType {
-		Unknown, Texture, Mesh3D, Material, Level
+		Unknown, Texture, Mesh3D, SurfaceMaterial, Level
 	};
 	class AssetUtils {
 	public:
@@ -19,12 +19,16 @@ namespace Shard3D {
 
 	class AssetManager {
 	public:
+		static bool doesAssetExist(const std::string& assetPath);
+
 		static void loadLevelAssets();
 
 		static void importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info);
 		static void importMesh(const std::string& sourcepath, const std::string& destpath, MeshLoadInfo info);
 		static void createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material);
 		
+		static void purgeAsset(const std::string& assetPath);
+
 		static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
 	private:
 		static inline EngineDevice* engineDevice{};
@@ -59,7 +63,7 @@ namespace Shard3D {
 #endif
 		}
 
-		static void loadTexture(const AssetID& assetPath);
+		static void loadTexture(const AssetID& asset);
 		static inline rPtr<EngineTexture>& retrieveTexture(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveTexture_safe(asset);
@@ -68,8 +72,11 @@ namespace Shard3D {
 #endif
 		}
 
-		static void loadMaterial(rPtr<SurfaceMaterial> material, const std::string& materialPath);
-		static inline rPtr<SurfaceMaterial> retrieveMaterial(const AssetID& asset) {
+		static void loadSurfaceMaterial(const AssetID& asset);
+		static void loadSurfaceMaterialRecursive(const AssetID& asset);
+		
+		static void rebuildSurfaceMaterial(rPtr<SurfaceMaterial> material);
+		static inline rPtr<SurfaceMaterial> retrieveSurfaceMaterial(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveSurfaceMaterial_safe(asset);
 #else
@@ -80,12 +87,13 @@ namespace Shard3D {
 		static auto& getMeshAssets() { return meshAssets; }
 		static auto& getTextureAssets() { return textureAssets; }
 		static auto& getSurfaceMaterialAssets() { return surfaceMaterialAssets; }
-
+		
 		static void runGarbageCollector();
 	private:
-		static inline std::vector<AssetID> actorReloadTexQueue;
-		static inline std::vector<AssetID> reloadMeshQueue;
-		static void _loadMesh(const AssetID& asset);
+		static inline std::vector<AssetID> destroyTexQueue;
+		static inline std::vector<AssetID> destroyMeshQueue;
+		static inline std::vector<rPtr<SurfaceMaterial>> rebuildSurfaceMaterialQueue;
+		static void _buildSurfaceMaterial(rPtr<SurfaceMaterial> material);
 
 		static rPtr<EngineTexture>& retrieveTexture_unsafe			(const AssetID& asset);
 		static rPtr<EngineTexture>& retrieveTexture_safe			(const AssetID& asset);
@@ -100,6 +108,12 @@ namespace Shard3D {
 		static inline EngineDevice* engineDevice{};
 		friend class _special_assets;
 	};
+
+	//class EditorHandler {
+	//	public:	static inline std::string searchAssetOnLookupTable(AssetKey key) { return lookupTable[key]; }
+	//	private: static inline std::unordered_map<AssetKey, std::string> lookupTable;
+	//};
+
 	class _special_assets {
 	public:
 		// engine only function, do not call this
@@ -110,31 +124,32 @@ namespace Shard3D {
 		static inline hashMap<std::string, rPtr<EngineTexture>> _editor_icons;
 
 		static inline const char* _editor_icons_array[][2]{
-			{"editor.play",						"assets/_engine/tex/_editor/icon_play.png"			},
-			{"editor.pause",					"assets/_engine/tex/_editor/icon_pause.png"			},
-			{"editor.stop",						"assets/_engine/tex/_editor/icon_stop.png"			},
-			{"editor.save",						"assets/_engine/tex/_editor/icon_save.png"			},
-			{"editor.load",						"assets/_engine/tex/_editor/icon_load.png"			},
-			{"editor.pref",						"assets/_engine/tex/_editor/icon_pref.png"			},
-			{"editor.settings",					"assets/_engine/tex/_editor/icon_gear.png"			},
-			{"editor.preview",					"assets/_engine/tex/_editor/preview.png"			},
-			{"editor.layout",					"assets/_engine/tex/_editor/icon_null"				},
-			{"editor.viewport",					"assets/_engine/tex/_editor/icon_monitor.png"		},
-			{"editor.level",					"assets/_engine/tex/_editor/icon_level.png"			},
-			{"editor.browser.folder",			"assets/_engine/tex/_editor/icon_folder.png"		},
-			{"editor.browser.file",				"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.tex",			"assets/_engine/tex/_editor/icon_texture.png"		},
-			{"editor.browser.file.msh",			"assets/_engine/tex/_editor/icon_mesh.png"			},
-			{"editor.browser.file.lvl",			"assets/_engine/tex/_editor/icon_level_old.png"		},
-			{"editor.browser.file.cpp",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.csh",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.vba",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.0",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"component.light.point",			"assets/_engine/tex/_editor/icon_lightpoint.png"	},
-			{"component.light.spot",			"assets/_engine/tex/_editor/icon_lightspot.png"		},
-			{"component.light.directional",		"assets/_engine/tex/_editor/icon_lightdir.png"		},
-			{"component.audio",					"assets/_engine/tex/_editor/icon_null"				},
-			{"component.camera",				"assets/_engine/tex/_editor/icon_null"				},
+			{"editor.play",						"assets/_engine/_editor/icon_play.png"			},
+			{"editor.pause",					"assets/_engine/_editor/icon_pause.png"			},
+			{"editor.stop",						"assets/_engine/_editor/icon_stop.png"			},
+			{"editor.save",						"assets/_engine/_editor/icon_save.png"			},
+			{"editor.load",						"assets/_engine/_editor/icon_load.png"			},
+			{"editor.pref",						"assets/_engine/_editor/icon_pref.png"			},
+			{"editor.settings",					"assets/_engine/_editor/icon_gear.png"			},
+			{"editor.preview",					"assets/_engine/_editor/preview.png"			},
+			{"editor.layout",					"assets/_engine/_editor/icon_null"				},
+			{"editor.viewport",					"assets/_engine/_editor/icon_monitor.png"		},
+			{"editor.level",					"assets/_engine/_editor/icon_level.png"			},
+			{"editor.browser.folder",			"assets/_engine/_editor/icon_folder.png"		},
+			{"editor.browser.file",				"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.tex",			"assets/_engine/_editor/icon_texture.png"		},
+			{"editor.browser.file.msh",			"assets/_engine/_editor/icon_mesh.png"			},
+			{"editor.browser.file.lvl",			"assets/_engine/_editor/icon_level_old.png"		},
+			{"editor.browser.file.smt",			"assets/_engine/_editor/icon_material.png"		},
+			{"editor.browser.file.cpp",			"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.csh",			"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.vba",			"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.0",			"assets/_engine/_editor/icon_file.png"			},
+			{"component.light.point",			"assets/_engine/_editor/icon_lightpoint.png"	},
+			{"component.light.spot",			"assets/_engine/_editor/icon_lightspot.png"		},
+			{"component.light.directional",		"assets/_engine/_editor/icon_lightdir.png"		},
+			{"component.audio",					"assets/_engine/_editor/icon_null"				},
+			{"component.camera",				"assets/_engine/_editor/icon_null"				},
 		};
 	};
 }

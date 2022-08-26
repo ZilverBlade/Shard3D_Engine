@@ -32,6 +32,8 @@ namespace Shard3D {
 			createVertexBuffers(data, _buffers);
 			createIndexBuffers(data, _buffers);
 			buffers.push_back(_buffers);
+			materialSlots.push_back(submesh.first);
+			materials.push_back(data.materialAsset);
 		}
 	}
 	EngineMesh::~EngineMesh() {}
@@ -174,6 +176,9 @@ namespace Shard3D {
 			return;
 		}
 		submeshes.clear();
+
+		workingDir = filepath.substr(0, filepath.find_last_of("/"));
+		SHARD3D_LOG("{0}",workingDir);
 		processNode(scene->mRootNode, scene, createMaterials);
 		
 		SHARD3D_LOG("Duration of loading {0}: {1} ms", filepath,
@@ -250,24 +255,34 @@ namespace Shard3D {
 #endif
 
 		if (createMaterials) {
-			aiColor4D color{};
+			aiColor4D color{1.f, 1.f, 1.f, 1.f};
 			aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color);
-			float specular{};
+			float specular{0.5f};
 			aiGetMaterialFloat(material, AI_MATKEY_SPECULAR_FACTOR, &specular);
-			float shininess{}; { float roughness{};
+			float shininess{0.5f}; { float roughness{};
 			aiGetMaterialFloat(material, AI_MATKEY_ROUGHNESS_FACTOR, &roughness); shininess = 1.f - roughness; }
-			float metallic{};
+			float metallic{0.f};
 			aiGetMaterialFloat(material, AI_MATKEY_METALLIC_FACTOR, &metallic);
 
 			// We just create a simple default grid texture for all meshes
 			rPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_rPtr<SurfaceMaterial_ShadedOpaque>();
 			grid_material->materialTag = materialSlot;
-			grid_material->diffuseColor = { 1.f, 1.f, 1.f };
-			grid_material->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
-			grid_material->specular = 1.0f;
-			grid_material->shininess = 0.5f;
+			grid_material->diffuseColor = { color.r, color.g, color.b };
+			grid_material->specular = specular;
+			grid_material->shininess = shininess;
+			grid_material->metallic = metallic;
+			grid_material->drawData.culling = VK_CULL_MODE_FRONT_BIT;
 
-			//AssetManager::create(grid_material, std::string("assets/materialdata/" + materialSlot + ".wbmat"));
+			AssetManager::createMaterial("assets/materialdata/" + materialSlot + ".s3dasset", grid_material);
 		}
+		AssetID m_asset = AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX);
+		if (AssetManager::doesAssetExist("assets/materialdata/" + materialSlot + ".s3dasset")) {
+			m_asset = AssetID("assets/materialdata/" + materialSlot + ".s3dasset");
+			if (!createMaterials) ResourceHandler::loadSurfaceMaterialRecursive(m_asset);
+		}
+		
+
+
+		submeshes[materialSlot].materialAsset = m_asset;
 	}
 }

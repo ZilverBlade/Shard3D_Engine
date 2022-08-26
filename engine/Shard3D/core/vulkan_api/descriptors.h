@@ -114,8 +114,8 @@ namespace Shard3D {
 
             staticMaterialPool = EngineDescriptorPool::Builder(device)
                 .setMaxSets(1024)
-                .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1024)
-                .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 256)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2048)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2048)
                 .addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 256)
                 .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
                 .build();

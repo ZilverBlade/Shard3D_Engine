@@ -240,10 +240,12 @@
     <ClCompile Include="imgui\imgui_layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="panels\asset_explorer_panel.cpp" />
+    <ClCompile Include="panels\default_component_panels.cpp" />
     <ClCompile Include="panels\hud_builder_panel.cpp" />
     <ClCompile Include="panels\level_peekers.cpp" />
     <ClCompile Include="panels\level_properties_panel.cpp" />
     <ClCompile Include="panels\level_tree_panel.cpp" />
+    <ClCompile Include="panels\material_builder_panel.cpp" />
     <ClCompile Include="panels\settings_panel.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -254,10 +256,12 @@
     <ClInclude Include="imgui\imgui_initializer.h" />
     <ClInclude Include="imgui\imgui_layer.h" />
     <ClInclude Include="panels\asset_explorer_panel.h" />
+    <ClInclude Include="panels\default_component_panels.h" />
     <ClInclude Include="panels\hud_builder_panel.h" />
     <ClInclude Include="panels\level_peekers.h" />
     <ClInclude Include="panels\level_properties_panel.h" />
     <ClInclude Include="panels\level_tree_panel.h" />
+    <ClInclude Include="panels\material_builder_panel.h" />
     <ClInclude Include="panels\settings_panel.h" />
     <ClInclude Include="scripting\cpp\carcontroller.h" />
     <ClInclude Include="scripting\cpp\example_script.h" />
