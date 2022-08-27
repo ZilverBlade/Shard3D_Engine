@@ -4,7 +4,7 @@
 #include "offscreen.h"
 #include "../misc/graphics_settings.h"
 namespace Shard3D {
-	OffScreen::OffScreen(EngineDevice& device) : m_Device{ device } {
+	OffScreen::OffScreen(EngineDevice& device, bool canMultiSample) : m_Device{ device }, msaa_Good(canMultiSample) {
 		pass.width = 1920;
 		pass.height = 1080;
 
@@ -39,7 +39,7 @@ namespace Shard3D {
 		image.extent.depth = 1;
 		image.mipLevels = 1;
 		image.arrayLayers = 1;
-		image.samples = GraphicsSettings::get().MSAASamples;
+		image.samples = msaa_Good ? GraphicsSettings::get().MSAASamples : VK_SAMPLE_COUNT_1_BIT;
 		image.tiling = VK_IMAGE_TILING_OPTIMAL;
 		// We will sample directly from the color attachment
 		image.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT
@@ -133,7 +133,7 @@ namespace Shard3D {
 		// Depth stencil attachment
 		image.format = fbDepthFormat;
 		image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		image.samples = GraphicsSettings::get().MSAASamples;
+		image.samples = msaa_Good ? GraphicsSettings::get().MSAASamples : VK_SAMPLE_COUNT_1_BIT;
 
 		if (vkCreateImage(m_Device.device(), &image, nullptr, &pass.depth.image) != VK_SUCCESS) {
 			SHARD3D_ERROR("Failed to create image");
@@ -171,7 +171,7 @@ namespace Shard3D {
 		std::array<VkAttachmentDescription, 3> attchmentDescriptions{};
 		// Color attachment
 		attchmentDescriptions[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		attchmentDescriptions[0].samples = GraphicsSettings::get().MSAASamples;
+		attchmentDescriptions[0].samples = msaa_Good ? GraphicsSettings::get().MSAASamples : VK_SAMPLE_COUNT_1_BIT;
 		attchmentDescriptions[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		attchmentDescriptions[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 		attchmentDescriptions[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -180,7 +180,7 @@ namespace Shard3D {
 		attchmentDescriptions[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Depth attachment
 		attchmentDescriptions[1].format = fbDepthFormat;
-		attchmentDescriptions[1].samples = GraphicsSettings::get().MSAASamples;
+		attchmentDescriptions[1].samples = msaa_Good ? GraphicsSettings::get().MSAASamples : VK_SAMPLE_COUNT_1_BIT;
 		attchmentDescriptions[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		attchmentDescriptions[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		attchmentDescriptions[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;

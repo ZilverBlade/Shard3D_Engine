@@ -90,7 +90,8 @@ namespace Shard3D {
 		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		
+		PostProcessingSystem ppoSystem{ engineDevice, postProcessImage.getRenderPass(), mainOffScreen.getImageView(), mainOffScreen.getSampler() };
+
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -109,7 +110,7 @@ namespace Shard3D {
 		}
 		ImGuiLayer* imguiLayer = new ImGuiLayer();
 
-		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, mainOffScreen);
+		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, postProcessImage);
 
 		layerStack.pushOverlay(imguiLayer);
 
@@ -270,6 +271,10 @@ beginWhileLoop:
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Billboards" });
 
 				mainOffScreen.end(frameInfo);
+
+				postProcessImage.start(frameInfo);
+				ppoSystem.render(frameInfo);
+				postProcessImage.end(frameInfo);
 
 #ifdef ENSET_ENABLE_COMPUTE_SHADERS
 				computeSystem.render(frameInfo);

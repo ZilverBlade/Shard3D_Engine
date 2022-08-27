@@ -1,7 +1,7 @@
 Shard3D: 1.2.6.r7-alpha
 AssetType: surface_material
 SurfaceMaterial:
-  - Material: TaillightBtm
+  - Material: Some kind of material
     Physics:
       MaterialType: SurfaceMaterial
       MaterialClass: class Shard3D::SurfaceMaterial_ShadedTranslucent
@@ -9,14 +9,14 @@ SurfaceMaterial:
       VkCullModeFlags: 1
       VkPolygonMode: 0
     Data:
-      diffuseColor: [1, 0, 0]
-      diffuseTex: assets/_engine/tex/0xffffff.png.s3dasset
-      specularFactor: 1
+      diffuseColor: [1, 1, 1]
+      diffuseTex: assets/_engine/tex/null_mat.png.s3dasset
+      specularFactor: 0.300000012
       specularTex: assets/_engine/tex/0xffffff.png.s3dasset
-      shininessFactor: 0.0599999987
+      shininessFactor: 0.0500000007
       shininessTex: assets/_engine/tex/0xffffff.png.s3dasset
-      metallicFactor: 0.709999979
+      metallicFactor: 0
       metallicTex: assets/_engine/tex/0xffffff.png.s3dasset
       normalTex: assets/_engine/tex/0x807ffe.png.s3dasset
       opacityTex: assets/_engine/tex/0xffffff.png.s3dasset
-      opacity: 0.819999993
+      opacity: 0.0900000036

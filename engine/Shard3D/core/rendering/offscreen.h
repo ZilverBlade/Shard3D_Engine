@@ -27,7 +27,7 @@ namespace Shard3D {
         std::array<VkClearValue, 2> clearValues{};
         VkDeviceSize offsets[1] = { 0 };
     public:
-        OffScreen(EngineDevice &device);
+        OffScreen(EngineDevice &device, bool canMultiSample);
         //void Init(Device device);
         ~OffScreen() {
             vkDestroyImageView(m_Device.device(), pass.color.view, nullptr);
@@ -67,5 +67,6 @@ namespace Shard3D {
 
         OffscreenPass pass;
         EngineDevice &m_Device;
+        bool msaa_Good;
     };
 }

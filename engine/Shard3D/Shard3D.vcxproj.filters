@@ -133,6 +133,9 @@
     <Filter Include="Resource Files\Shaders\fragment\material">
       <UniqueIdentifier>{2c5f8343-f0cf-409a-857f-b1bfe2c89ace}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\fragment\post_processing">
+      <UniqueIdentifier>{5abb4171-03ea-4239-9722-7a7a9c7a1adf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -183,7 +186,7 @@
     <ClInclude Include="systems\rendering\forward_render_system.h">
       <Filter>Header Files\systems\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="systems\rendering\fullscreen_renderer.h">
+    <ClInclude Include="systems\rendering\post_processing_system.h">
       <Filter>Header Files\systems\rendering</Filter>
     </ClInclude>
     <ClInclude Include="systems\rendering\hud_system.h">
@@ -447,7 +450,7 @@
     <ClCompile Include="core\misc\graphics_settings.cpp">
       <Filter>Source Files\core\misc</Filter>
     </ClCompile>
-    <ClCompile Include="systems\rendering\fullscreen_renderer.cpp">
+    <ClCompile Include="systems\rendering\post_processing_system.cpp">
       <Filter>Source Files\systems\rendering</Filter>
     </ClCompile>
     <ClCompile Include="systems\rendering\hud_system.cpp">
@@ -515,9 +518,6 @@
     <None Include="shaders\surface_shader.frag">
       <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
-    <None Include="shaders\_output_img.frag">
-      <Filter>Resource Files\Shaders\fragment</Filter>
-    </None>
     <None Include="shaders\billboard_sva.frag">
       <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
@@ -528,9 +528,6 @@
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\surface_shader.vert">
-      <Filter>Resource Files\Shaders\vertex</Filter>
-    </None>
-    <None Include="shaders\_output_img.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\materials\surface_shaded_opaque.frag">
@@ -544,6 +541,12 @@
     </None>
     <None Include="shaders\materials\surface_shaded_translucent.frag">
       <Filter>Resource Files\Shaders\fragment\material</Filter>
+    </None>
+    <None Include="shaders\fullscreen_quad.vert">
+      <Filter>Resource Files\Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\post_processing\color_correction.frag">
+      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
     </None>
   </ItemGroup>
 </Project>

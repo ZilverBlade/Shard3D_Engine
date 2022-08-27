@@ -133,6 +133,7 @@ namespace Shard3D {
 			{"editor.stop",						"assets/_engine/_editor/icon_stop.png"			},
 			{"editor.save",						"assets/_engine/_editor/icon_save.png"			},
 			{"editor.load",						"assets/_engine/_editor/icon_load.png"			},
+			{"editor.saveas",					"assets/_engine/_editor/icon_save_as.png"		},
 			{"editor.pref",						"assets/_engine/_editor/icon_pref.png"			},
 			{"editor.settings",					"assets/_engine/_editor/icon_gear.png"			},
 			{"editor.preview",					"assets/_engine/_editor/preview.png"			},
@@ -153,7 +154,7 @@ namespace Shard3D {
 			{"component.light.spot",			"assets/_engine/_editor/icon_lightspot.png"		},
 			{"component.light.directional",		"assets/_engine/_editor/icon_lightdir.png"		},
 			{"component.audio",					"assets/_engine/_editor/icon_null"				},
-			{"component.camera",				"assets/_engine/_editor/icon_null"				},
+			{"component.camera",				"assets/_engine/_editor/icon_camera.png"		},
 		};
 	};
 }

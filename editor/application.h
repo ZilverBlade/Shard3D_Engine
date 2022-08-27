@@ -35,7 +35,8 @@ namespace Shard3D {
 		EngineWindow engineWindow{ 1280, 720, "Shard3D Engine" };
 		EngineDevice engineDevice{ engineWindow };
 		EngineRenderer engineRenderer{ engineWindow, engineDevice };
-		OffScreen mainOffScreen{ engineDevice };
+		OffScreen mainOffScreen{ engineDevice, true };
+		OffScreen postProcessImage{ engineDevice, false };
 
 		// ECS
 		sPtr<ECS::Level> level;

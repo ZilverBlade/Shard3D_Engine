@@ -220,7 +220,7 @@
     <ClInclude Include="systems\rendering\editor\editor_billboard_renderer.h" />
     <ClInclude Include="systems\rendering\editor\grid_system.h" />
     <ClInclude Include="systems\rendering\forward_render_system.h" />
-    <ClInclude Include="systems\rendering\fullscreen_renderer.h" />
+    <ClInclude Include="systems\rendering\post_processing_system.h" />
     <ClInclude Include="systems\rendering\hud_system.h" />
     <ClInclude Include="systems\systems.h" />
     <ClInclude Include="utils\def_dynamic.h" />
@@ -456,7 +456,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="systems\rendering\fullscreen_renderer.cpp">
+    <ClCompile Include="systems\rendering\post_processing_system.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
@@ -485,20 +485,20 @@
   <ItemGroup>
     <None Include="shaders\billboard_sva.frag" />
     <None Include="shaders\billboard_sva.vert" />
+    <None Include="shaders\fullscreen_quad.vert" />
     <None Include="shaders\hud_element.frag" />
     <None Include="shaders\hud_element.vert" />
     <None Include="shaders\materials\surface_shaded_masked.frag" />
     <None Include="shaders\materials\surface_shaded_opaque.frag" />
     <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
+    <None Include="shaders\post_processing\color_correction.frag" />
     <None Include="shaders\surface_shader.frag" />
     <None Include="shaders\surface_shader.vert" />
     <None Include="shaders\_editor\editor_svabill.frag" />
     <None Include="shaders\_editor\editor_svabill.vert" />
     <None Include="shaders\_editor\grid.frag" />
     <None Include="shaders\_editor\grid.vert" />
-    <None Include="shaders\_output_img.frag" />
-    <None Include="shaders\_output_img.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

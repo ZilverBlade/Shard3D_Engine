@@ -346,6 +346,7 @@ namespace Shard3D {
 		PipelineConfigInfo pipelineConfigInfo{};
 		EnginePipeline::pipelineConfig(pipelineConfigInfo)
 			.defaultPipelineConfigInfo()
+			.enableAlphaBlending(VK_BLEND_OP_ADD)
 			.enableVertexDescriptions();
 		MaterialSystem::createSurfacePipeline(
 			&materialPipelineConfig->shaderPipeline,

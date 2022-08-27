@@ -16,13 +16,7 @@ namespace Shard3D {
 
 		void renderForward(FrameInfo &frameInfo);
 	private:
-
-		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-		void createPipeline(VkRenderPass renderPass);
-
 		EngineDevice& engineDevice;
-
-		uPtr<EnginePipeline> enginePipeline;
 
 		uPtr<EngineDescriptorSetLayout> skyboxLayout;
 	};

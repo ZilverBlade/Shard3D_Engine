@@ -282,7 +282,7 @@ namespace Shard3D {
 				char tagBuffer[256];
 				memset(tagBuffer, 0, 256);
 				strncpy(tagBuffer, tag.c_str(), 256);
-				if (ImGui::InputText("Opacity Mask", tagBuffer, 256)) {
+				if (ImGui::InputText("Opacity Map", tagBuffer, 256)) {
 					//	tag = std::string(tagBuffer);
 				}
 				if (ImGui::BeginDragDropTarget())
