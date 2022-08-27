@@ -1,122 +1,159 @@
 #pragma once
 
-#include "../../systems/buffers/material_system.h"
+#include "material.h"
 #include "../../s3dstd.h"
 #include "texture.h"
 #include "model.h"
-#include <vulkan/vulkan_core.h>
+
+#include "assetid.h"
 
 namespace Shard3D {
-	class EngineApplication;
-		class AssetManager {
-		protected:
-			enum LOD_Level {
-				HighDetail = 0,
-				MediumDetal = 1,
-				LowDetail = 2,
-				Invisible = -1
-			};
-		public:
-			//Clears textureAssets
-			static void clearTextureAssets();
-			//Clears meshAssets
-			static void clearMeshAssets();
-			//Clears all of the asset maps
-			static void clearAllAssets();
-			/* Loads all of the materials in use by the level into the asset maps.
-			Make sure to clear before loading, since you dont want to waste resources pointing to unused assets!
-			*/
-			static void loadLevelAssets();
+	enum class AssetType {
+		Unknown, Texture, Mesh3D, SurfaceMaterial, Level
+	};
+	class AssetUtils {
+	public:
+		static std::string truncatePath(const std::string& total);
+		static AssetType discoverAssetType(const std::string& assetPath);
+	};
 
-			//unlike other assets, textures and meshs should use a path as a key, 
-			//since they directly load from there, rather than load into a wrapper/struct
+	class AssetManager {
+	public:
+		static bool doesAssetExist(const std::string& assetPath);
 
-			static hashMap<std::string, sPtr<EngineMesh>>& getMeshAssets() { return meshAssets; }
-			static hashMap<std::string, sPtr<EngineTexture>>& getTextureAssets() { return textureAssets; }
-				   
-			static void emplaceMesh(const std::string& meshPath, MeshType meshType = MeshType::MESH_TYPE_OBJ);
-			static inline sPtr<EngineMesh>& retrieveMesh(const std::string& path) {
-#ifndef ENSET_CONFIDENT_ASSETS
-				return retrieveMesh_NENSET_CONFIDENT_ASSETS(path);
+		static void loadLevelAssets();
+
+		static void importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info);
+		static void importMesh(const std::string& sourcepath, const std::string& destpath, MeshLoadInfo info);
+		static void createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material);
+		
+		static void purgeAsset(const std::string& assetPath);
+
+		static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
+	private:
+		static inline EngineDevice* engineDevice{};
+
+		friend class _special_assets;
+	};
+	class ResourceHandler {
+	public:
+		//Clears textureAssets
+		static void clearTextureAssets();
+		//Clears meshAssets
+		static void clearMeshAssets();
+		//Clears materialAssets
+		static void clearMaterialAssets();
+		//Clears all of the asset maps
+		static void clearAllAssets();
+		/* Loads all of the materials in use by the level into the asset maps.
+		Make sure to clear before loading, since you dont want to waste resources pointing to unused assets!
+		*/
+
+		// Destroys all assets and doesnt keep the core engine ones either
+		static void destroy();
+
+		static void init(EngineDevice& dvc);
+
+		static void loadMesh(const AssetID& asset);
+		static void unloadMesh(const AssetID& asset);
+		static inline rPtr<EngineMesh>& retrieveMesh(const AssetID& asset) {
+#ifndef ENSET_UNSAFE_ASSETS
+			return retrieveMesh_safe(asset);
 #else			
-				return retrieveMesh_ENSET_CONFIDENT_ASSETS(path);
+			return retrieveMesh_unsafe(asset);
 #endif
-			}
+		}
 
-			static void emplaceTexture(const std::string& texturePath, int filter = VK_FILTER_LINEAR);
-			static inline sPtr<EngineTexture>& retrieveTexture(const std::string& path) {
-#ifndef ENSET_CONFIDENT_ASSETS
-				return retrieveTexture_NENSET_CONFIDENT_ASSETS(path);
+		static void loadTexture(const AssetID& asset);
+		static void unloadTexture(const AssetID& asset);
+		static inline rPtr<EngineTexture>& retrieveTexture(const AssetID& asset) {
+#ifndef ENSET_UNSAFE_ASSETS
+			return retrieveTexture_safe(asset);
 #else
-				return retrieveTexture_ENSET_CONFIDENT_ASSETS(path);
+			return retrieveTexture_unsafe(asset);
 #endif
-			}
+		}
 
-#pragma region Material shenanigans
-			static void loadMaterialsFromList(MaterialSystem::MaterialList& matlist);
-			static void emplaceMaterial(MaterialSystem::Material& material);
-			static MaterialSystem::Material retrieveMaterialByGUID(uint64_t guid);
-			static MaterialSystem::Material retrieveMaterialByPath(const std::string& path);
-			static hashMap<uint64_t, MaterialSystem::Material>& getMaterialAssets() { return materialAssets; }
-			static hashMap<uint64_t, MaterialSystem::MaterialList>& getMaterialListAssets() { return materialListAssets; }
-#pragma endregion	
+		static void loadSurfaceMaterial(const AssetID& asset);
+		static void loadSurfaceMaterialRecursive(const AssetID& asset);
+		static void unloadSurfaceMaterial(const AssetID& asset);
 
-			static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
-		private:			
-			static sPtr<EngineTexture>& retrieveTexture_ENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<EngineTexture>& retrieveTexture_NENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<EngineMesh>& retrieveMesh_ENSET_CONFIDENT_ASSETS(const std::string& path);
-			static sPtr<EngineMesh>& retrieveMesh_NENSET_CONFIDENT_ASSETS(const std::string& path);
+		static void rebuildSurfaceMaterial(rPtr<SurfaceMaterial> material);
+		static inline rPtr<SurfaceMaterial> retrieveSurfaceMaterial(const AssetID& asset) {
+#ifndef ENSET_UNSAFE_ASSETS
+			return retrieveSurfaceMaterial_safe(asset);
+#else
+			return make_rPtr<SurfaceMaterial>();
+#endif
+		}
 
-			static inline hashMap<std::string, sPtr<EngineMesh>> meshAssets;
-			static inline hashMap<std::string, sPtr<EngineTexture>> textureAssets;
-			static inline hashMap<uint64_t, MaterialSystem::Material> materialAssets;
-			static inline hashMap<uint64_t, MaterialSystem::MaterialList> materialListAssets;
+		static auto& getMeshAssets() { return meshAssets; }
+		static auto& getTextureAssets() { return textureAssets; }
+		static auto& getSurfaceMaterialAssets() { return surfaceMaterialAssets; }
+		
+		static void runGarbageCollector();
+	private:
+		static inline std::vector<AssetID> destroyTexQueue;
+		static inline std::vector<AssetID> destroyMeshQueue; 
+		static inline std::vector<AssetID> destroySurfaceMatQueue;
+		static inline std::vector<rPtr<SurfaceMaterial>> rebuildSurfaceMaterialQueue;
+		static void _buildSurfaceMaterial(rPtr<SurfaceMaterial> material);
 
-			static inline EngineDevice* engineDevice{};
+		static rPtr<EngineTexture>& retrieveTexture_unsafe			(const AssetID& asset);
+		static rPtr<EngineTexture>& retrieveTexture_safe			(const AssetID& asset);
+		static rPtr<EngineMesh>& retrieveMesh_unsafe				(const AssetID& asset);
+		static rPtr<EngineMesh>& retrieveMesh_safe					(const AssetID& asset);
+		static rPtr<SurfaceMaterial>& retrieveSurfaceMaterial_safe	(const AssetID& asset);
 
-			static void clearAllAssetsAndDontAddDefaults();
-			friend class Shard3D::EngineApplication;
-			friend class _special_assets;
-		};
+		static inline hashMap<AssetKey, rPtr<EngineMesh>> meshAssets;
+		static inline hashMap<AssetKey, rPtr<EngineTexture>> textureAssets;
+		static inline hashMap<AssetKey, rPtr<SurfaceMaterial>> surfaceMaterialAssets;
+
+		static inline EngineDevice* engineDevice{};
+		friend class _special_assets;
+	};
+
+	//class EditorHandler {
+	//	public:	static inline std::string searchAssetOnLookupTable(AssetKey key) { return lookupTable[key]; }
+	//	private: static inline std::unordered_map<AssetKey, std::string> lookupTable;
+	//};
+
 	class _special_assets {
+	public:
 		// engine only function, do not call this
 		static void _editor_icons_load();
 		// engine only function, do not call this
 		static void _editor_icons_destroy();
 		// engine only function, do not call this
-		static inline hashMap<std::string, sPtr<EngineTexture>> _editor_icons;
+		static inline hashMap<std::string, rPtr<EngineTexture>> _editor_icons;
 
 		static inline const char* _editor_icons_array[][2]{
-			{"editor.play",						"assets/_engine/tex/_editor/icon_play.png"			},
-			{"editor.pause",					"assets/_engine/tex/_editor/icon_pause.png"			},
-			{"editor.stop",						"assets/_engine/tex/_editor/icon_stop.png"			},		
-			{"editor.save",						"assets/_engine/tex/_editor/icon_save.png"			},
-			{"editor.load",						"assets/_engine/tex/_editor/icon_load.png"			},
-			{"editor.pref",						"assets/_engine/tex/_editor/icon_pref.png"			},
-			{"editor.settings",					"assets/_engine/tex/_editor/icon_gear.png"			},
-			{"editor.preview",					"assets/_engine/tex/_editor/preview.png"			},
-			{"editor.layout",					"assets/_engine/tex/_editor/icon_null"				},
-			{"editor.viewport",					"assets/_engine/tex/_editor/icon_monitor.png"		},
-			{"editor.level",					"assets/_engine/tex/_editor/icon_level.png"			},
-			{"editor.browser.folder",			"assets/_engine/tex/_editor/icon_folder.png"		},
-			{"editor.browser.file",				"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.tex",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.msh",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.cpp",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.csh",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.vba",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"editor.browser.file.0",			"assets/_engine/tex/_editor/icon_file.png"			},
-			{"component.light.point",			"assets/_engine/tex/_editor/icon_lightpoint.png"	},
-			{"component.light.spot",			"assets/_engine/tex/_editor/icon_lightspot.png"		},
-			{"component.light.directional",		"assets/_engine/tex/_editor/icon_lightdir.png"		},
-			{"component.audio",					"assets/_engine/tex/_editor/icon_null"				},
-			{"component.camera",				"assets/_engine/tex/_editor/icon_null"				},
+			{"editor.play",						"assets/_engine/_editor/icon_play.png"			},
+			{"editor.pause",					"assets/_engine/_editor/icon_pause.png"			},
+			{"editor.stop",						"assets/_engine/_editor/icon_stop.png"			},
+			{"editor.save",						"assets/_engine/_editor/icon_save.png"			},
+			{"editor.load",						"assets/_engine/_editor/icon_load.png"			},
+			{"editor.pref",						"assets/_engine/_editor/icon_pref.png"			},
+			{"editor.settings",					"assets/_engine/_editor/icon_gear.png"			},
+			{"editor.preview",					"assets/_engine/_editor/preview.png"			},
+			{"editor.layout",					"assets/_engine/_editor/icon_null"				},
+			{"editor.viewport",					"assets/_engine/_editor/icon_monitor.png"		},
+			{"editor.level",					"assets/_engine/_editor/icon_level.png"			},
+			{"editor.browser.folder",			"assets/_engine/_editor/icon_folder.png"		},
+			{"editor.browser.file",				"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.tex",			"assets/_engine/_editor/icon_texture.png"		},
+			{"editor.browser.file.msh",			"assets/_engine/_editor/icon_mesh.png"			},
+			{"editor.browser.file.lvl",			"assets/_engine/_editor/icon_level_old.png"		},
+			{"editor.browser.file.smt",			"assets/_engine/_editor/icon_material.png"		},
+			{"editor.browser.file.cpp",			"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.csh",			"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.vba",			"assets/_engine/_editor/icon_file.png"			},
+			{"editor.browser.file.0",			"assets/_engine/_editor/icon_file.png"			},
+			{"component.light.point",			"assets/_engine/_editor/icon_lightpoint.png"	},
+			{"component.light.spot",			"assets/_engine/_editor/icon_lightspot.png"		},
+			{"component.light.directional",		"assets/_engine/_editor/icon_lightdir.png"		},
+			{"component.audio",					"assets/_engine/_editor/icon_null"				},
+			{"component.camera",				"assets/_engine/_editor/icon_null"				},
 		};
-
-		friend class EngineApplication;
-		friend class _EditorBillboardRenderer;
-		friend class AssetExplorerPanel;
-		friend class ImGuiLayer;
 	};
 }

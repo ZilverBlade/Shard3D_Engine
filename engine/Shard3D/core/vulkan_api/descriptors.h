@@ -112,6 +112,14 @@ namespace Shard3D {
                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, EngineSwapChain::MAX_FRAMES_IN_FLIGHT)
                 .build();
 
+            staticMaterialPool = EngineDescriptorPool::Builder(device)
+                .setMaxSets(1024)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2048)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2048)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 256)
+                .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
+                .build();
+
             // Draw pools
             drawPools.resize(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
             auto framePoolBuilder = EngineDescriptorPool::Builder(device)

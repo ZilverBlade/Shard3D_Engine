@@ -23,9 +23,6 @@ namespace Shard3D {
 		public:
 			HUDManager(HUDContainer* container);
 
-			std::string encrypt(std::string input);
-			std::string decrypt(std::string input);
-
 			void save(const std::string& destinationPath, int layer, bool encryptGui = false);
 			void saveRuntime(const std::string& destinationPath);
 
@@ -34,7 +31,6 @@ namespace Shard3D {
 
 		private:
 			HUDContainer* mHud;
-			const int WB3D_CIPHER_KEY = ENSET_WB3DLEVEL_CIPHER_KEY;
 		};
 	}
 }

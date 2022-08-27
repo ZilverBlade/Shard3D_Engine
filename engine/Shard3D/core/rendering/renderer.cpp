@@ -64,7 +64,7 @@ namespace Shard3D {
 
 	VkCommandBuffer EngineRenderer::beginFrame() {
 #ifndef NDEBUG
-		assert(!isFrameStarted && "Can't call beginFrame while already in progress");
+		SHARD3D_ASSERT(!isFrameStarted && "Can't call beginFrame while already in progress");
 #endif
 		auto result = engineSwapChain->acquireNextImage(&currentImageIndex);
 
@@ -91,9 +91,8 @@ namespace Shard3D {
 		return commandBuffer;
 	}
 	void EngineRenderer::endFrame() {
-#ifndef NDEBUG
-		assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
-#endif
+		SHARD3D_ASSERT(isFrameStarted && "Can't call endFrame while frame is not in progress");
+
 		auto commandBuffer = getCurrentCommandBuffer();
 
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
@@ -112,10 +111,9 @@ namespace Shard3D {
 		currentFrameIndex = (currentFrameIndex + 1) % EngineSwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
 	void EngineRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-#ifndef NDEBUG
-		assert(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
-		assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
-#endif
+		SHARD3D_ASSERT(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
+		SHARD3D_ASSERT(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
+
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = engineSwapChain->getRenderPass();
@@ -141,10 +139,9 @@ namespace Shard3D {
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 	}
 	void EngineRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-#ifndef NDEBUG
-		assert(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
-		assert(commandBuffer == getCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame");
-#endif NDEBUG
+		SHARD3D_ASSERT(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
+		SHARD3D_ASSERT(commandBuffer == getCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame");
+
 		vkCmdEndRenderPass(commandBuffer);
 	}
 

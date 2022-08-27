@@ -4,38 +4,77 @@
 #include "../asset/assetmgr.h"
 namespace Shard3D {
 	namespace Components {
-		glm::mat4 TransformComponent::mat4() {
 
+		struct MatrixCalculator {
+		// https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
+
+			// Matrix corresponds to translate * Rz * Rx * Ry * scale transformation
+	// Rotation convention = ZXY tait-bryan angles
+			static inline glm::mat4 ZXY(TransformComponent& transform) {
+				const float c3 = glm::cos(transform.rotation.z);
+				const float s3 = glm::sin(transform.rotation.z);
+				const float c2 = glm::cos(transform.rotation.x);
+				const float s2 = glm::sin(transform.rotation.x);
+				const float c1 = glm::cos(transform.rotation.y);
+				const float s1 = glm::sin(transform.rotation.y);
+
+				return glm::mat4(
+					{
+						transform.scale.x * (-c2 * s1),
+						transform.scale.x * (c1 * c2),
+						transform.scale.x * (s2),
+						0.0f,
+					},
+					{
+						transform.scale.y * (c1 * s3 + c3 * s1 * s2),
+						transform.scale.y * (s1 * s3 - c1 * c3 * s2),
+						transform.scale.y * (c2 * c3),
+						0.0f,
+					},
+					{
+						transform.scale.z * (c1 * c3 - s1 * s2 * s3),
+						transform.scale.z * (c3 * s1 + c1 * s2 * s3),
+						transform.scale.z * (-c2 * s3),
+						0.0f,
+					},
+					{ transform.translation.x, transform.translation.y, transform.translation.z, 1.0f }
+				);
+			}
 			// Matrix corresponds to translate * Ry * Rx * Rz * scale transformation
-			// Rotation convention = YXZ tait-bryan angles
-			// https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
+	// Rotation convention = YXZ tait-bryan angles
+			static inline glm::mat4 YXZ(TransformComponent& transform) {
+				const float c3 = glm::cos(transform.rotation.z);
+				const float s3 = glm::sin(transform.rotation.z);
+				const float c2 = glm::cos(transform.rotation.x);
+				const float s2 = glm::sin(transform.rotation.x);
+				const float c1 = glm::cos(transform.rotation.y);
+				const float s1 = glm::sin(transform.rotation.y);
+				return glm::mat4(
+					{
+						transform.scale.x * (c1 * c3 + s1 * s2 * s3),
+						transform.scale.x * (c2 * s3),
+						transform.scale.x * (c1 * s2 * s3 - c3 * s1),
+						0.0f,
+					},
+					{
+						transform.scale.y * (c3 * s1 * s2 - c1 * s3),
+						transform.scale.y * (c2 * c3),
+						transform.scale.y * (c1 * c3 * s2 + s1 * s3),
+						0.0f,
+					},
+					{
+						transform.scale.z * (c2 * s1),
+						transform.scale.z * (-s2),
+						transform.scale.z * (c1 * c2),
+						0.0f,
+					},
+					{ transform.translation.x, transform.translation.y, transform.translation.z, 1.0f }
+				);
+			}
+		};
 
-			const float c3 = glm::cos(rotation.z);
-			const float s3 = glm::sin(rotation.z);
-			const float c2 = glm::cos(rotation.x);
-			const float s2 = glm::sin(rotation.x);
-			const float c1 = glm::cos(rotation.y);
-			const float s1 = glm::sin(rotation.y);
-			return glm::mat4{
-				{
-					scale.x * (c1 * c3 + s1 * s2 * s3),
-					scale.x * (c2 * s3),
-					scale.x * (c1 * s2 * s3 - c3 * s1),
-					0.0f,
-				},
-				{
-					scale.y * (c3 * s1 * s2 - c1 * s3),
-					scale.y * (c2 * c3),
-					scale.y * (c1 * c3 * s2 + s1 * s3),
-					0.0f,
-				},
-				{
-					scale.z * (c2 * s1),
-					scale.z * (-s2),
-					scale.z * (c1 * c2),
-					0.0f,
-				},
-				{translation.x, translation.y, translation.z, 1.0f} };
+		glm::mat4 TransformComponent::mat4() {
+			return MatrixCalculator::YXZ(*this);
 		}
 
 		glm::mat3 TransformComponent::normalMatrix() {
@@ -64,24 +103,12 @@ namespace Shard3D {
 					invScale.z * (c1 * c2),
 				}, };
 		}
-
-		MeshComponent::MeshComponent(const std::string& mdl) {
-			cacheFile = mdl; // cacheFile is to be used to store future possible model
-			file = mdl;
-
+		MeshComponent::MeshComponent(const AssetID& mdl) : asset(mdl.getFile()) {
+			auto& model = ResourceHandler::retrieveMesh(mdl);
+			for (auto& material : model->materials) {
+				materials.push_back(material);
+			}
 		}
-		void MeshComponent::reapplyMesh(const std::string& mdl) {
-			file = mdl;
-			AssetManager::emplaceMesh(cacheFile);
-
-		}
-		BillboardComponent::BillboardComponent(const std::string& tex) {
-			cacheFile = tex; // cacheFile is to be used to store future possible model
-			file = tex;
-		}
-		void BillboardComponent::reapplyTexture(const std::string& tex) {
-			file = tex;
-			AssetManager::emplaceTexture(cacheFile);
-		}
+		BillboardComponent::BillboardComponent(const AssetID& tex) : asset(tex.getFile()) {}
 	}
 }

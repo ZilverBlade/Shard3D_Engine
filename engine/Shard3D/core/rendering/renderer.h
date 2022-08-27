@@ -18,14 +18,14 @@ namespace Shard3D {
 		bool isFrameInProgress() const { return isFrameStarted; }
 
 		VkCommandBuffer getCurrentCommandBuffer() const { 
-			assert(isFrameStarted && "Cannot get command buffer when frame is not in progress");
+			SHARD3D_ASSERT(isFrameStarted && "Cannot get command buffer when frame is not in progress");
 			return commandBuffers[currentFrameIndex]; 
 		}
 
 		VkImageView getSwapchainImageView(int index) { return engineSwapChain->getImageView(index); }
 
 		int getFrameIndex()const {
-			assert(isFrameStarted && "Cannot get frame index when frame is not in progress");
+			SHARD3D_ASSERT(isFrameStarted && "Cannot get frame index when frame is not in progress");
 			return currentFrameIndex;
 		}
 

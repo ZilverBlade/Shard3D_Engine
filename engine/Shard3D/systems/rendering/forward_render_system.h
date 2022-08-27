@@ -15,7 +15,6 @@ namespace Shard3D {
 		ForwardRenderSystem& operator=(const ForwardRenderSystem&) = delete;
 
 		void renderForward(FrameInfo &frameInfo);
-
 	private:
 
 		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
@@ -24,7 +23,7 @@ namespace Shard3D {
 		EngineDevice& engineDevice;
 
 		uPtr<EnginePipeline> enginePipeline;
-		VkPipelineLayout pipelineLayout;
+
 		uPtr<EngineDescriptorSetLayout> skyboxLayout;
 	};
 

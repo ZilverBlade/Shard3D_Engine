@@ -10,7 +10,7 @@ namespace Shard3D {
         VkDescriptorType descriptorType,
         VkShaderStageFlags stageFlags,
         uint32_t count) {
-        assert(bindings.count(binding) == 0 && "Binding already in use");
+        SHARD3D_ASSERT(bindings.count(binding) == 0 && "Binding already in use");
         VkDescriptorSetLayoutBinding layoutBinding{};
         layoutBinding.binding = binding;
         layoutBinding.descriptorType = descriptorType;
@@ -111,6 +111,7 @@ namespace Shard3D {
         // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
         // a new pool whenever an old pool fills up. But this is beyond our current scope
         if (vkAllocateDescriptorSets(engineDevice.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
+            SHARD3D_ERROR("Descriptor pool overfilled! Allocation failed!");
             return false;
         }
         return true;
@@ -135,11 +136,11 @@ namespace Shard3D {
 
     EngineDescriptorWriter& EngineDescriptorWriter::writeBuffer(
         uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
-        assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
+        SHARD3D_ASSERT(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
         auto& bindingDescription = setLayout.bindings[binding];
 
-        assert(
+        SHARD3D_ASSERT(
             bindingDescription.descriptorCount == 1 &&
             "Binding single descriptor info, but binding expects multiple");
 
@@ -156,11 +157,11 @@ namespace Shard3D {
 
     EngineDescriptorWriter& EngineDescriptorWriter::writeImage(
         uint32_t binding, VkDescriptorImageInfo* imageInfo) {
-        assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
+        SHARD3D_ASSERT(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
         auto& bindingDescription = setLayout.bindings[binding];
 
-        assert(
+        SHARD3D_ASSERT(
             bindingDescription.descriptorCount == 1 &&
             "Binding single descriptor info, but binding expects multiple");
 

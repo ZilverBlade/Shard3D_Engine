@@ -26,12 +26,13 @@ namespace Shard3D {
 
 	class EnginePipeline {
 		struct _pipeline_cfg {
-			_pipeline_cfg(PipelineConfigInfo& _configInfo) : configInfo(_configInfo) {}
+			_pipeline_cfg(PipelineConfigInfo& _configInfo) : configInfo(_configInfo) { }
 
 			_pipeline_cfg defaultPipelineConfigInfo();
 			_pipeline_cfg enableVertexDescriptions();
 			_pipeline_cfg enableAlphaBlending(VkBlendOp blendOp = VK_BLEND_OP_ADD);
 			_pipeline_cfg lineRasterizer(float thickness = 1.0f);
+			_pipeline_cfg setCullingMode(VkCullModeFlags cullMode);
 			_pipeline_cfg discardRasterizer();
 			_pipeline_cfg forceSampleCount(VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
 		private:

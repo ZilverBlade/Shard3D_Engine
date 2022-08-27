@@ -1,0 +1,6 @@
+Shard3D: 1.2.6.r5-alpha
+AssetType: mesh3d
+AssetFile: assets/_engine/msh/quad.obj
+AssetOrig: D:\GameEngines\Shard3DEngine\assets\_engine\msh\quad.obj
+Materials: [assets/materialdata/DefaultMaterial.s3dasset]
+Properties: !!binary "AAAAAA=="

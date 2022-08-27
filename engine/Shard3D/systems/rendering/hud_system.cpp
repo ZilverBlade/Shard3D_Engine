@@ -86,7 +86,7 @@ namespace Shard3D {
 	}
 
 	void HUDRenderSystem::createPipeline(VkRenderPass renderPass) {
-		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::pipelineConfig(pipelineConfig)
@@ -129,7 +129,7 @@ namespace Shard3D {
 				element->_design_tex = element->hover_texture;
 			else
 				element->_design_tex = element->default_texture;
-			auto imageInfo = AssetManager::retrieveTexture(element->_design_tex)->getImageInfo();
+			auto imageInfo = ResourceHandler::retrieveTexture(element->_design_tex)->getImageInfo();
 			VkDescriptorSet descriptorSet1;
 			EngineDescriptorWriter(*guiSystemLayout, frameInfo.perDrawDescriptorPool)
 				.writeImage(2, &imageInfo)

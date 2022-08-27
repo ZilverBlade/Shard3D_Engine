@@ -1,0 +1,6 @@
+Shard3D: 1.2.6.r5-alpha
+AssetType: mesh3d
+AssetFile: assets/modeldata/shard3d.fbx
+AssetOrig: D:\Directories\Documents\shard3d.fbx
+Materials: [assets/materialdata/epic.s3dasset, assets/materialdata/base.s3dasset, assets/materialdata/emission.s3dasset, assets/materialdata/normal.s3dasset]
+Properties: !!binary "AAAAAA=="

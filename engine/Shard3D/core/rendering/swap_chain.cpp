@@ -371,7 +371,7 @@ VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
     
   for (const auto &availableFormat : availableFormats) {  
-      if (availableFormat.format == VK_FORMAT_R8G8B8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+      if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
           return availableFormat;
       }
   }
@@ -417,9 +417,15 @@ VkExtent2D EngineSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &cap
 }
 
 VkFormat EngineSwapChain::findDepthFormat() {
-  return device.findSupportedFormat(
-      {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-      VK_IMAGE_TILING_OPTIMAL,
-      VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+    CSimpleIniA ini;
+    ini.SetUnicode();
+    ini.LoadFile(ENGINE_SETTINGS_PATH);
+    // Find a suitable depth format
+    if (ini.GetBoolValue("RENDERING", "HighPrecisionDBuffer"))
+        return device.findSupportedFormat(
+            { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+            VK_IMAGE_TILING_OPTIMAL,
+            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+    else return VK_FORMAT_D24_UNORM_S8_UINT;
 }
 }

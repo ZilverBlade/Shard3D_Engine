@@ -30,7 +30,7 @@ namespace Shard3D {
     }
 
     void GridSystem::createPipeline(VkRenderPass renderPass) {
-        assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+        SHARD3D_ASSERT(pipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
 
         PipelineConfigInfo pipelineConfig{};
         EnginePipeline::pipelineConfig(pipelineConfig)
@@ -49,7 +49,7 @@ namespace Shard3D {
 
     void GridSystem::render(FrameInfo& frameInfo) {
         enginePipeline->bind(frameInfo.commandBuffer);
-
+        vkCmdSetCullMode(frameInfo.commandBuffer, VK_CULL_MODE_NONE);
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
             VK_PIPELINE_BIND_POINT_GRAPHICS,

@@ -9,7 +9,6 @@ namespace Shard3D {
 	class EngineApplication;
 	namespace ECS {
 		class Actor;
-		class Blueprint;
 		class LevelTreePanel;
 		enum class PlayState {
 			Stopped = 0, // no scripts have been instantiated. outside of the editor this should only be this state when loading levels.
@@ -27,24 +26,18 @@ namespace Shard3D {
 
 			static sPtr<Level> copy(sPtr<Level> other);
 
-			Blueprint createBlueprint(Actor actor, std::string path, std::string name = "Some kind of blueprint");
-
 			Actor createActor(const std::string& name= "Some kind of actor");
 			
 			void killEverything();
 			void killActor(Actor actor);
-			void killMesh(Actor actor);
-			void killTexture(Actor actor);
-			void reloadMesh(Actor actor);
-			void reloadTexture(Actor actor);
-
+			
 			glm::mat4 getParentMat4(Actor& child);
 			glm::mat3 getParentNormals(Actor& child);
 
 			void runGarbageCollector(EngineDevice& device);
 
-			Actor getActorFromGUID(UUID guid);
-			// Unreliable function as multiple actors can have identical tags, use getActorFromGUID() whenever possible.
+			Actor getActorFromUUID(UUID guid);
+			// Unreliable function as multiple actors can have identical tags, use getActorFromUUID() whenever possible.
 			Actor getActorFromTag(const std::string& tag);
 
 			void setPossessedCameraActor(Actor actor);
@@ -83,7 +76,7 @@ namespace Shard3D {
 
 		private:
 			//should only be called by system processes
-			Actor createActorWithGUID(UUID guid, const std::string& name = "Some kind of actor");
+			Actor createActorWithUUID(UUID guid, const std::string& name = "Some kind of actor");
 
 			bool loadRegistryCapture = false;
 
@@ -93,10 +86,6 @@ namespace Shard3D {
 
 			// queues 
 			std::vector<Actor> actorKillQueue;
-			std::vector<Actor> actorKillTexQueue;
-			std::vector<Actor> actorReloadTexQueue;
-			std::vector<Actor> actorKillMeshQueue;
-			std::vector<Actor> actorReloadMeshQueue;
 
 			friend class Shard3D::EngineApplication;
 			friend class Actor;

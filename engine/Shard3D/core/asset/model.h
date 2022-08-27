@@ -1,21 +1,21 @@
 #pragma once
 #include "../../vulkan_abstr.h"
-
+#include "material.h"
+#include "../asset/assetid.h"
+extern "C" {
+	struct aiNode;
+	struct aiScene;
+	struct aiMesh;
+}
 namespace Shard3D {
-	enum class MeshType {
-		MESH_TYPE_NULL = 0,
-		
-		MESH_TYPE_OBJ = 1,
-		MESH_TYPE_COLLADA = 2,
-		MESH_TYPE_GLTF = 3,
-		MESH_TYPE_FBX = 4
+	struct MeshLoadInfo {
+		int x;
 	};
 
 	class EngineMesh {
 	public:
 		struct Vertex {
 			glm::vec3 position{};
-			glm::vec3 color{};
 			glm::vec3 normal{};
 			glm::vec2 uv{};
 
@@ -23,15 +23,33 @@ namespace Shard3D {
 			static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
 
 			bool operator==(const Vertex &other) const {
-				return position == other.position && color == other.color && normal == other.normal && uv == other.uv;
+				return position == other.position && normal == other.normal && uv == other.uv;
 			}
 		};
 
-		struct Builder {
+		struct SubmeshData {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
+			AssetID materialAsset{""};
+		};
 
-			void loadIndexedMesh(const std::string& filepath, MeshType modelType);
+		struct SubmeshBuffers {
+			sPtr<EngineBuffer> indexBuffer{};
+			sPtr<EngineBuffer> vertexBuffer{};
+
+			uint32_t vertexCount{};
+			uint32_t indexCount{};
+			bool hasIndexBuffer = false;
+		};
+
+		struct Builder {
+			//    <Material Slot> <Submesh>
+			hashMap<std::string, SubmeshData> submeshes;
+			void loadScene(const std::string& filepath, bool createMaterials);
+			void processNode(aiNode* node, const aiScene* scene, bool createMaterials);
+			void loadSubmesh(aiMesh* mesh, const aiScene* scene, bool createMaterials);
+
+			std::string workingDir;
 		};
 
 		EngineMesh(EngineDevice& dvc, const EngineMesh::Builder &builder);
@@ -43,22 +61,24 @@ namespace Shard3D {
 		static uPtr<EngineMesh> createMeshFromFile(
 			EngineDevice& dvc,
 			const std::string& filepath, 
-			MeshType modelType
+			MeshLoadInfo loadInfo
 		);
+		static uPtr<EngineMesh> loadMeshFromFile(
+			EngineDevice& dvc,
+			const AssetID& asset,
+			MeshLoadInfo loadInfo
+		);
+		void bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
+		void draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
 
-		void bind(VkCommandBuffer commandBuffer);
-		void draw(VkCommandBuffer commandBuffer);
-
+		//			<Buffer Data>
+		std::vector<SubmeshBuffers> buffers{};
+		std::vector<std::string> materialSlots{};
+		std::vector<AssetID> materials{};
 	private:
-		void createVertexBuffers(const std::vector<Vertex> &vertices);
-		void createIndexBuffers(const std::vector<uint32_t> &indices);
+		void createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
+		void createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
 
-		uPtr<EngineBuffer> vertexBuffer;
-		uint32_t vertexCount;
-
-		bool hasIndexBuffer = false;
-		uPtr<EngineBuffer> indexBuffer;
-		uint32_t indexCount;
 		EngineDevice* device;
 	};
 }

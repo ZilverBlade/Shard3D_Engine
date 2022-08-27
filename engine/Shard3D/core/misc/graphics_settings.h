@@ -23,6 +23,7 @@ namespace Shard3D {
 
 		struct RuntimeInfo {
 			float aspectRatio = 1.f;
+			glm::vec4 ambientLightColor= { 1.0f, 1.0f, 1.0f, 0.01f };;
 		};
 
 		struct Settings {

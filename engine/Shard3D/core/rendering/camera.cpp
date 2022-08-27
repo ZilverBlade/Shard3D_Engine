@@ -1,3 +1,4 @@
+#include "../../s3dpch.h"
 #include "camera.h"
 
 #undef near
@@ -16,7 +17,7 @@ namespace Shard3D {
 	}
 
 	void EngineCamera::setPerspectiveProjection(float fovy, float aspect, float near /*Near clipping plane*/, float far /*Far clipping plane*/) {
-		assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
+		SHARD3D_ASSERT(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f, "");
 		const float tanHalfFovy = tan(fovy / 2.f);
 		projectionMatrix = glm::mat4{ 0.0f };
 		projectionMatrix[0][0] = 1.f / (aspect * tanHalfFovy);
@@ -65,7 +66,7 @@ namespace Shard3D {
 * Set camera view based on the camera's position and target
 */
 	void EngineCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
-		assert((target - position) != glm::vec3(0) && "direction cannot be 0");
+		SHARD3D_ASSERT((target - position) != glm::vec3(0), "direction cannot be 0");
 		setViewDirection(position, target - position, up);
 	}
 	/* *

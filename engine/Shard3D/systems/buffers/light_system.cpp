@@ -6,20 +6,21 @@ namespace Shard3D {
 	void LightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo) {	
 		{
 			int lightIndex = 0;
-			frameInfo.activeLevel->registry.view<Components::PointlightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
+			frameInfo.activeLevel->registry.view<Components::PointlightComponent, Components::TransformComponent>().each([&](Components::PointlightComponent light, Components::TransformComponent transform) {
 				glm::vec3 t = transform.getTranslation();
 
 				ubo.pointlights[lightIndex].position = glm::vec4(t.x, t.z, t.y, 1.f);
 				ubo.pointlights[lightIndex].color = glm::vec4(light.color, light.lightIntensity);
 				ubo.pointlights[lightIndex].attenuationMod = glm::vec4(light.attenuationMod, 0.f);
 				ubo.pointlights[lightIndex].specularMod = light.specularMod;
+				ubo.pointlights[lightIndex].radius = light.radius;
 				lightIndex += 1;
 			});
 			ubo.numPointlights = lightIndex;
 		}
 		{
 			int lightIndex = 0;
-			frameInfo.activeLevel->registry.view<Components::SpotlightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
+			frameInfo.activeLevel->registry.view<Components::SpotlightComponent, Components::TransformComponent>().each([&](Components::SpotlightComponent light, Components::TransformComponent transform) {
 				glm::vec3 r = transform.getRotation();
 				glm::vec3 t = transform.getTranslation();
 
@@ -29,13 +30,14 @@ namespace Shard3D {
 				ubo.spotlights[lightIndex].angle = glm::vec2(light.outerAngle, light.innerAngle);
 				ubo.spotlights[lightIndex].attenuationMod = glm::vec4(light.attenuationMod, 0.f);
 				ubo.spotlights[lightIndex].specularMod = light.specularMod;
+				ubo.spotlights[lightIndex].radius = light.radius;
 				lightIndex += 1;
 			});
 			ubo.numSpotlights = lightIndex;
 		}
 		{
 			int lightIndex = 0;
-			frameInfo.activeLevel->registry.view<Components::DirectionalLightComponent, Components::TransformComponent>().each([&](auto light, auto transform) {
+			frameInfo.activeLevel->registry.view<Components::DirectionalLightComponent, Components::TransformComponent>().each([&](Components::DirectionalLightComponent light, Components::TransformComponent transform) {
 				glm::vec3 r = transform.getRotation();
 				glm::vec3 t = transform.getTranslation();
 

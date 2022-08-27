@@ -6,6 +6,7 @@
 
 namespace Shard3D {
 #pragma region Smart Pointers
+	// Unique Pointer
 	template<typename T>
 	using uPtr = std::unique_ptr<T>;
 	template<typename T, typename ... Args>
@@ -13,6 +14,7 @@ namespace Shard3D {
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
 
+	// Shared Pointer
 	template<typename T>
 	using sPtr = std::shared_ptr<T>;
 	template<typename T, typename ... Args>
@@ -20,6 +22,15 @@ namespace Shard3D {
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 
+	// Resource Pointer
+	template<typename T>
+	using rPtr = std::shared_ptr<T>;
+	template<typename T, typename ... Args>
+	constexpr inline std::shared_ptr<T> make_rPtr(Args&& ... args) {
+		return std::make_shared<T>(std::forward<Args>(args)...);
+	}
+
+	// Weak Pointer
 	template<typename T>
 	using wPtr = std::weak_ptr<T>;
 #pragma endregion 

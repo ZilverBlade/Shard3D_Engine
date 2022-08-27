@@ -71,10 +71,10 @@ namespace Shard3D {
 		const std::string& fragFilePath,
 		const PipelineConfigInfo& configInfo
 	) {
-		assert(
+		SHARD3D_ASSERT(
 			configInfo.pipelineLayout != VK_NULL_HANDLE &&
 			"Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
-		assert(
+		SHARD3D_ASSERT(
 			configInfo.renderPass != VK_NULL_HANDLE &&
 			"Cannot create graphics pipeline:: no renderPass provided in configInfo");
 		auto vertCode = readFile(vertFilePath);
@@ -140,10 +140,10 @@ namespace Shard3D {
 		const std::string& shaderFilePath,
 		const PipelineConfigInfo& configInfo
 	) {
-		assert(
+		SHARD3D_ASSERT(
 			configInfo.pipelineLayout != VK_NULL_HANDLE &&
 			"Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
-		assert(
+		SHARD3D_ASSERT(
 			configInfo.renderPass != VK_NULL_HANDLE &&
 			"Cannot create graphics pipeline:: no renderPass provided in configInfo");
 		auto shaderCode = readFile(shaderFilePath);
@@ -265,7 +265,7 @@ namespace Shard3D {
 		configInfo.depthStencilInfo.front = {};  // Optional
 		configInfo.depthStencilInfo.back = {};   // Optional
 
-		configInfo.dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+		configInfo.dynamicStateEnables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_CULL_MODE };
 		configInfo.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
 		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
@@ -293,6 +293,10 @@ namespace Shard3D {
 	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::lineRasterizer(float thickness) {
 		configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
 		configInfo.rasterizationInfo.lineWidth = thickness;
+		return _pipeline_cfg(configInfo);
+	}
+	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::setCullingMode(VkCullModeFlags cullMode) {
+		configInfo.rasterizationInfo.cullMode = cullMode;
 		return _pipeline_cfg(configInfo);
 	}
 	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::discardRasterizer() {

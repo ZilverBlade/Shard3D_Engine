@@ -13,6 +13,7 @@ namespace Shard3D {
 		glm::vec4 color{}; 
 		glm::vec4 attenuationMod{};
 		alignas(16)float specularMod{};
+		float radius{};
 	};
 	struct Spotlight {
 		glm::vec4 position{};
@@ -21,6 +22,7 @@ namespace Shard3D {
 		alignas(16) glm::vec2 angle{}; //x = outer, y = inner
 		glm::vec4 attenuationMod{};
 		alignas(16)float specularMod{};
+		float radius{};
 	};
 	struct DirectionalLight {
 		glm::vec4 position{};
@@ -55,33 +57,6 @@ namespace Shard3D {
 
 	struct ComputeUbo {
 		VkSampler inputImage;
-	};
-
-	struct SurfaceLitMaterialUbo {
-		VkSampler normalTex{};
-
-		//glm::vec4 emissiveColor{};
-		//VkSampler emissiveTex{};
-
-		glm::vec4 diffuseColor{};
-		VkSampler diffuseTex{};
-
-		alignas(16) float specular{};
-		VkSampler specularTex{};
-
-		alignas(16) float roughness{};
-		VkSampler roughnessTex{};
-
-		alignas(16) float metallic{};
-		VkSampler metallicTex{};
-
-		VkSampler maskTex{};
-	};
-	struct SurfaceUnlitMaterialUbo {
-		glm::vec4 emissiveColor{};
-		VkSampler emissiveTex{};
-
-		VkSampler maskTex{};
 	};
 
 	struct FrameInfo {

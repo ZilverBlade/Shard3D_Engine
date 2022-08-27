@@ -1,0 +1,161 @@
+ALPHA:
+	> Shard3D Torque 1.0.9-alpha
+		- Preliminary implementation of blueprints
+		- Preliminary implementation of material system
+		- Preliminary implementation of compute shaders
+		- Experimental implementation of video playback
+		- Added proper logging system
+	
+	> Shard3D Torque 1.1.0-alpha
+		- Preliminary implementation of textures
+		- Preliminary implementation of asset system
+		- Improved WIP compute system
+		- Improved vulkan logging, now shows severity!
+		- Added material system serializer
+		- Added changes to resources.rc to show proper name in Task manager!
+		- Replaced std::throw with SHARD3D_FATAL
+	
+	> Shard3D Torque 1.1.1-alpha
+		- Added "level peeking" to show behind the scenes working of stuff like asset manager, or actor registry.
+		- Added GraphicsSettings class to manage current graphics settings
+		- Added Project.cpp for Deploy 
+		- Added a c++ script file for tech demo
+		- Added offscreen render pass
+		- Added global variable types for commonly used types
+		- Added cheatcode system
+		- Deprecated custom AR ratio for cameras.
+	
+	> Shard3D Torque 1.1.2-alpha
+		- Added docking to ImGui
+		- Added mesh support to asset manager
+		- Added (broken) PCH file
+		- Added new component: Billboard component
+			- Screenview aligned
+		- Added texture support to asset manager
+		- Added features to level peeker
+		- Added Actor::getTransform()
+		- Experimental implementation preview camera
+	
+	> Shard3D Torque 1.1.3-alpha
+		- Restructured folder setup
+		- Deprecated wb3d_imgui_frame.cpp and editor console.
+		- Improved WIP compute system
+		- Fixed several validation errors
+	
+	> Shard3D Torque 1.1.4-alpha
+		- Increased offscreen render pass resolution to 1920x1080
+		- Renamed definitions
+		- Fixed WB3D panels not displaying the reverted Level after stopping simulation
+		- Fixed billboard UV's being mirrored
+		- Fixed asset manager crashing when an invalid mesh/texture was loaded
+		- Fixed ImGui validation errors
+		- "Save Level" now saves directly, rather than do the same as "Save Level As"
+		- Billboards now can be created and saved in WB3D
+		- Changed visibility of functions from the ActingActor class
+		- Changed pointlights to use a billboard texture
+		- Changed editor theme
+		- Improved PBR (however broke spot and directional lights)
+		- Implemented preliminary code for particle system
+		- Added Jolt physics library
+		- Added "special assets" for core assets (textures)
+		- Optimised some rendering
+		- Added HUD system
+	
+	> Shard3D Torque 1.2.0-alpha
+		- Added changelog file counting after 1.0.8-alpha
+		- Added new component: Audio component
+			- Using Miniaudio, WIP implementation
+		- More improvements to PBR shader + can now adjust with the MaterialBuilder window
+		- PBR can now be toggled in engine_settings.ini
+		- ActingActor::spawnEvent and ActingActor::killEvent are now unused until they are properly used
+		- The possessed camera when resuming level simulation now actually possesses the editor camera rather than the previously possessed camera
+
+	> Shard3D Torque 1.2.1-alpha	
+		- Renamed scenedata/ to leveldata/ and sounddata/ to audiodata/
+		- Added asset explorer
+		- Fixed _special_assets asset array causing null termination
+		- Experimental C# and VB script engines using Mono
+		- Fixed video playback crashing on start
+		- Video playback now closes when playback ended
+		- Moved Video playback to its own static library
+		- Disabled video playback for non debug builds as they cause a crash
+		- Removed "Release Debug" as it no longer makes sense and constantly breaks the linker, and renamed Optimised No-Debug back to Release
+		- Restructured camera controls to be less annoying
+		- Changed font to be 8px based tahoma 
+		- Added material builder controls for classic shading (specular and roughness)
+		- Tweaked PBR specular BRDF
+		- Tweaked blinn power specular
+		- Fixed PCH not working
+		- Updated editor icons
+		- Added "Quickbar" with image buttons
+		- Fixed viewport not conforming to the viewport window
+		- Renamed assets/shaders to assets/shaderdata to conform to naming scheme
+		- Changed clear colour to (0.01, 0.01, 0.01)
+
+	> Shard3D Torque 1.2.2-alpha
+		- Added several new custom icons
+		- Remastered save icon
+		- Moved all editor billboards to render an editor billboard system
+		- Fixed broken spotlight angles
+		- Fixed example script not displaying camera correctly upon possession
+		- Renamed final folder, settings to configdata
+		- Added light theme (configurable in editor_settings.ini)
+		- Added experimental mouse picking support for HUD system using storage buffers
+		- Fixed ImGui detachment not working as intended
+		- Improvements to script engine
+		- Fixed rotation matrix for HUD elements
+		- Credits menu
+		- Fixed vb and c# script dll's not being pushed to repo
+		- Fixed camera movement relative to car in the example script
+		- Improvements to HUD system
+		- Added getters and setters for TransformComponent
+
+	> Shard3D Torque 1.2.3-alpha
+		- Script system is now usable
+		- Rebranded logos and icons
+		- Forced use of getters and setters of transforms
+		- Transforms now expose proper Z up values
+		- Removed unnecessary shader files
+		- Fixed HUD stretching with screen size
+		- Fixed rotation issues with HUD
+		- Added HUD element anchoring
+		- Added 2 seperate layer designations for HUD, one for depth layering and one for overlay layering
+		- Added scripting ability for HUD
+		- Added ability to load and destroy HUD from scripts
+		- Added proper HUD buttons that can change texture depending if being hovered over, pressed, or idle
+		- Added C# and VB Generics for components
+
+	> Shard3D Torque 1.2.4-alpha
+		- Added stats timing
+		- Added event system
+
+	> Shard3D Torque 1.2.5-alpha
+		- Moved everything to a static library
+		- Cleanup up bits and bobs of tech debt
+		- Vulkan SDK include now uses enviroment variables
+		- Renamed .hpp to .h to easier differentiate between implementation and header files
+		- Significantly optimised asset explorer
+		- Removed several preprocessor definitions (like ENSET_ACTOR_FORCE_TRANSFORM_COMPONENT and ENSET_ALLOW_PREVIEW_CAMERA)
+		- Removed Asset Properties Panel
+		- Removed video playback engine as it's extremely unstable and it's api is susceptible to be removed from windows
+		- Increased max pointlights and spotlight from 20 to 128
+		- Engine now always tries to select a discrete graphics card if it can
+
+
+	> Shard3D Torque 1.2.6-alpha
+		- Implementation of ASSIMP
+		- Removed PBR in favour of a hybrid between Classic and PBR
+		- Implementation of material system with hierarchies and inheritance
+		- Moved editor panels to editor execulable
+		- Fixed inability to seperately disable grid and editor billboards in view
+		- Improved cutouts for editor billboards
+		- Removed blueprints
+		- Huge asset and resource system overhaul
+		- Minor camera control improvements
+		- QOL editor improvements
+		- Level saving now stores editor camera position
+		- Implemented MSAA
+		- Experimental HDR
+
+		:: TODO, proper events sytem, add editor layouts, use premake
+		:: Fix: dont use 64 bit integers for shaders (e.g. HUD system)

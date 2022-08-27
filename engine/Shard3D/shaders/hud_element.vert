@@ -2,6 +2,8 @@
 
 #extension GL_EXT_shader_explicit_arithmetic_types_int64  : enable
 
+// change to use uint32 , 80x faster
+
 #define maxLayers 128.0
 const vec2 OFFSETS_ANCHOR_CENTRE[6] = vec2[](
   vec2(-0.5, -0.5),
@@ -43,6 +45,7 @@ vec2 rotate(vec2 v, float a) {
 	const mat2 m = mat2(c, s, -s, c);
 	return v * m;
 }
+
 void main(){
 	vec2 fragOffset = OFFSETS_ANCHOR_CENTRE[gl_VertexIndex] + push.anchorOffset; 
 	fragUV = UV[gl_VertexIndex];

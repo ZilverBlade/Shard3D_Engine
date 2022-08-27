@@ -1,0 +1,94 @@
+Shard3D: 1.2.6.r5-alpha
+Level: Some kind of level
+LastSavedEditorCameraPos: [0.989107251, -3.57854056, 1.82888186]
+Actors:
+  - Actor: 13198841397511589211
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [0, 0, 2]
+      Rotation: [0.15358898, 0.00349065848, 0.0610865243]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Emission: [1, 1, 1, 2.75999999]
+      Specularness: 1
+  - Actor: 6680890089577249484
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [500, 500, 500]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/sphere.obj.s3dasset
+      Materials: [assets/texturedata/skybox.s3dasset]
+  - Actor: 11007495147738507327
+    TagComponent:
+      Tag: Camera Actor
+    TransformComponent:
+      Translation: [4.05000019, -3.42000008, 1.02999997]
+      Rotation: [0.160570294, 0, -0.771435559]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      Module: AutoPossessCamera
+      Language: C#
+    CameraComponent:
+      ProjectionType: 1
+      FOV: 70
+      NearClipPlane: 0.0500000007
+      FarClipPlane: 1024
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
+      Materials: [assets/_engine/mat/camera_material.s3dasset]
+  - Actor: 18382512696233890748
+    TagComponent:
+      Tag: Sphere
+    TransformComponent:
+      Translation: [2.53999996, 2, 0.600000024]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [0.5, 0.5, 0.5]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/sphere.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid.s3dasset]
+  - Actor: 11262034877991962476
+    TagComponent:
+      Tag: Platform
+    TransformComponent:
+      Translation: [0, 0, 0.100000001]
+      Rotation: [0, 0, 0]
+      Scale: [5, 5, 1]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/quad.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 3380813172334762521
+    TagComponent:
+      Tag: Source
+    TransformComponent:
+      Translation: [200, 0, 40.5699997]
+      Rotation: [-0.144862324, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 30000]
+      Radius: 6.51000023
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 2085834435892676269
+    TagComponent:
+      Tag: Vase
+    TransformComponent:
+      Translation: [0, 0, 0.100000001]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/smooth_vase.obj.s3dasset
+      Materials: [assets/_engine/mat/vase_material.s3dasset]
+  - Actor: 7214764435354144056
+    TagComponent:
+      Tag: Container
+    TransformComponent:
+      Translation: [-1.75999999, -0.620000005, 0.5]
+      Rotation: [0, 0, 0]
+      Scale: [0.400000006, 0.400000006, 0.400000006]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/texturedata/container2.s3dasset]

@@ -10,33 +10,6 @@ namespace Shard3D {
 			SHARD3D_INFO("Loading HUD Manager");
 		}
 
-		std::string HUDManager::encrypt(std::string input) {
-			auto newTime = std::chrono::high_resolution_clock::now();
-			char c;
-			std::string encryptedString;
-			for (int i = 0; i < input.length(); i++) {
-				c = input.at(i);
-				encryptedString.push_back((char)
-					((((c + WB3D_CIPHER_KEY) * 2) - WB3D_CIPHER_KEY) / 2));
-			}
-
-			SHARD3D_LOG("Duration of HUD encryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
-			return encryptedString;
-		}
-		std::string HUDManager::decrypt(std::string input) {
-			auto newTime = std::chrono::high_resolution_clock::now();
-			char c;
-			std::string decryptedString;
-			for (int i = 0; i < input.length(); i++) {
-				c = input.at(i);
-				decryptedString.push_back((char)
-					(((c * 2) + WB3D_CIPHER_KEY) / 2) - WB3D_CIPHER_KEY);
-			}
-
-			SHARD3D_LOG("Duration of HUD decryption: {0} ms", std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count() * 1000);
-			return decryptedString;
-		}
-
 		static void saveElement(YAML::Emitter& out, sPtr<HUDElement> element) {
 			if (element->guid == 0) return; // might be reserved for core engine purposes
 
@@ -87,30 +60,23 @@ namespace Shard3D {
 			YAML::Emitter out;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION.toString();
-			out << YAML::Key << "WorldBuilder3D" << YAML::Value << EDITOR_VERSION.toString();
-			out << YAML::Key << "GUI_Template" << YAML::Value << "Some kind of template";
+			out << YAML::Key << "HUD_Template" << YAML::Value << "Some kind of template";
 			out << YAML::Key << "Layer" << YAML::Value << layer;
 			saveLayer(out, mHud, layer);
 			out << YAML::EndMap;
 			std::string newPath = destinationPath;
 			if (!strUtils::hasEnding(destinationPath, ".wbht")) newPath = destinationPath + ".wbht";
-			if (encryptLevel) {
-				std::ofstream fout(newPath);
-				fout << encrypt(out.c_str());
-				fout.flush();
-				fout.close();
-			} else {
-				std::ofstream fout(newPath);
-				fout << out.c_str();
-				fout.flush();
-				fout.close();
-			}
-		
+			
+			std::ofstream fout(newPath);
+			fout << out.c_str();
+			fout.flush();
+			fout.close();
+				
 			SHARD3D_LOG("Saved scene '{0}'", newPath);
 		}
 
 		void HUDManager::saveRuntime(const std::string& destinationPath) {
-			assert(false);
+			SHARD3D_ASSERT(false);
 		}
 
 		HUDMgrResults HUDManager::load(const std::string& sourcePath, int layer, bool ignoreWarns) {
@@ -118,31 +84,16 @@ namespace Shard3D {
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
 
-#ifdef _DEPLOY
-			//YAML::Node data = YAML::Load(decrypt(strStream.str()));
 			YAML::Node data = YAML::Load(strStream.str());
-#if ENSET_BETA_DEBUG_TOOLS
-			std::ofstream fout(sourcePath + ".dcr");
-			fout << decrypt(strStream.str());
-			fout.flush();
-			fout.close();
-#endif
-#else
-			YAML::Node data = YAML::Load(strStream.str());
-#endif
 
 			if (ignoreWarns == false) {
-				if (!data["GUI_Template"]) return HUDMgrResults::WrongFileResult;
+				if (!data["HUD_Template"]) return HUDMgrResults::WrongFileResult;
 
 				if (data["Shard3D"].as<std::string>() != ENGINE_VERSION.toString()) {
 					SHARD3D_WARN("Incorrect engine version");
 					return HUDMgrResults::OldEngineVersionResult;
 				}// change this to check if the version is less or more
-				if (data["WorldBuilder3D"].as<std::string>() != EDITOR_VERSION.toString()) {
-					SHARD3D_WARN("Incorrect editor version");
-					return HUDMgrResults::OldEditorVersionResult;
-				}// change this to check if the version is less or more
-
+				
 			}
 			
 			if (data["Elements"]) {
@@ -168,11 +119,11 @@ namespace Shard3D {
 					loadedElement->anchorOffset = element["Transform2D"]["Anchor"].as<glm::vec2>();
 
 					loadedElement->default_texture = element["Texture"]["DefaultTex"].as<std::string>();
-					AssetManager::emplaceTexture(loadedElement->default_texture);
+					ResourceHandler::loadTexture(loadedElement->default_texture);
 					loadedElement->hover_texture = element["Texture"]["HoverTex"].as<std::string>();
-					AssetManager::emplaceTexture(loadedElement->hover_texture);
+					ResourceHandler::loadTexture(loadedElement->hover_texture);
 					loadedElement->press_texture = element["Texture"]["PressTex"].as<std::string>();
-					AssetManager::emplaceTexture(loadedElement->press_texture);
+					ResourceHandler::loadTexture(loadedElement->press_texture);
 					loadedElement->scriptmodule = element["Script"]["Module"].as<std::string>();
 					loadedElement->scriptlang = element["Script"]["Language"].as<std::string>() == "C#" ? 0 : 1;
 					loadedElement->isActive = !element["Script"]["Static"].as<bool>();
@@ -183,7 +134,7 @@ namespace Shard3D {
 		}
 
 		HUDMgrResults HUDManager::loadRuntime(const std::string& sourcePath) {
-			assert(false);
+			SHARD3D_ASSERT(false);
 			return HUDMgrResults::ErrorResult;
 		}
 	}

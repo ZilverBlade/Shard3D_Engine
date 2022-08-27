@@ -2,9 +2,14 @@
 #include "../vulkan_api/device.h"
 #include "../../s3dstd.h"
 namespace Shard3D {
+    struct TextureLoadInfo {
+        VkFilter filter = VK_FILTER_LINEAR;
+        VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        VkSamplerMipmapMode mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    };
     class EngineTexture {
     public:
-        EngineTexture(EngineDevice& device, const std::string& textureFilepath, VkFilter filter);
+        EngineTexture(EngineDevice& device, const std::string& textureFilepath, TextureLoadInfo loadInfo);
         EngineTexture(EngineDevice& device);
         EngineTexture(
             EngineDevice& device,
@@ -32,7 +37,7 @@ namespace Shard3D {
         static void freeSTBImage(void* pixels);
         void createBlankTextureImage();
         static uPtr<EngineTexture> createTextureFromFile(
-            EngineDevice& device, const std::string& filepath, VkFilter filter);
+            EngineDevice& device, const std::string& filepath, TextureLoadInfo loadInfo);
         static uPtr<EngineTexture> createEmptyTexture(
             EngineDevice& device);
 
@@ -54,7 +59,7 @@ namespace Shard3D {
         VkImageView mTextureImageView = nullptr;
         VkSampler mTextureSampler = nullptr;
         VkFormat mFormat;
-        VkFilter mFilter;
+        TextureLoadInfo mLoadInfo;
         VkImageLayout mTextureLayout;
         uint32_t mMipLevels{ 1 };
         uint32_t mLayerCount{ 1 };

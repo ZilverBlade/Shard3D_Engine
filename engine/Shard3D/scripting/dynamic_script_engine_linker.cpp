@@ -21,8 +21,8 @@ namespace Shard3D {
 	_ctp(mono_reflection_type_from_name(const_cast<char*>(type_builder.data()), DynamicScriptEngine::getCoreAssemblyImage(0))),
 	_vtp(mono_reflection_type_from_name(const_cast<char*>(type_builder.data()), DynamicScriptEngine::getCoreAssemblyImage(1))) {}
 
-	template <typename/*...*/ Component>
-	void registerComponent(){//([](){
+	template <typename Component>
+	void registerComponent() {
 		std::string_view type_name = typeid(Component).name();
 		size_t pos = type_name.find_last_of(":");
 		std::string_view struct_name = type_name.substr(pos + 1);
@@ -38,7 +38,7 @@ namespace Shard3D {
 		__h_ctr->monoTypeComboRegistryAppenderAddComponent.push_back([](ECS::Actor actor) { actor.addComponent<Component>(); });
 		__h_ctr->monoTypeComboRegistryAppenderRmvComponent.push_back([](ECS::Actor actor) { actor.killComponent<Component>(); });
 		SHARD3D_LOG("Registered component: '{0}'", corrected_typename);
-	}//(), ...);}
+	}
 
 	void DynamicScriptEngineLinker::registerLinker() {
 		registerInternalCalls();
@@ -65,7 +65,6 @@ namespace Shard3D {
 		_S3D_ICALL(SceneManagerLoadLevel);
 		_S3D_ICALL(SceneManagerLoadHUD);
 		_S3D_ICALL(SceneManagerDestroyHUDLayer);
-
 
 		_S3D_ICALL(TransformComponent_SetTranslation);
 		_S3D_ICALL(TransformComponent_GetTranslation);
@@ -133,7 +132,6 @@ namespace Shard3D {
 		_S3D_ICALL(DirectionalLightComponent_SetIntensity);
 		_S3D_ICALL(DirectionalLightComponent_GetSpecularFactor);
 		_S3D_ICALL(DirectionalLightComponent_SetSpecularFactor);
-
 	}
 	void DynamicScriptEngineLinker::registerComponents() {
 		//registerComponent<Components::BlueprintComponent>();
@@ -183,7 +181,7 @@ namespace Shard3D::InternalScriptCalls {
 		mono_free(t);
 	}
 	bool Actor_HasComponent(uint64_t actorID, MonoReflectionType* componentType, int lang) {
-		ECS::Actor actor = DynamicScriptEngine::getContext()->getActorFromGUID(actorID);
+		ECS::Actor actor = DynamicScriptEngine::getContext()->getActorFromUUID(actorID);
 		MonoType* monoComponentType = mono_reflection_type_get_type(componentType);
 		int i = 0;
 		for (MonoTypeCombo* object : __h_ctr->monoTypeComboRegistryVector) {
@@ -194,7 +192,7 @@ namespace Shard3D::InternalScriptCalls {
 		return false;
 	}
 	void Actor_AddComponent(uint64_t actorID, MonoReflectionType* componentType, int lang) {
-		ECS::Actor actor = DynamicScriptEngine::getContext()->getActorFromGUID(actorID);
+		ECS::Actor actor = DynamicScriptEngine::getContext()->getActorFromUUID(actorID);
 		MonoType* monoComponentType = mono_reflection_type_get_type(componentType);
 		int i = 0;
 		for (MonoTypeCombo* object : __h_ctr->monoTypeComboRegistryVector) {
@@ -204,7 +202,7 @@ namespace Shard3D::InternalScriptCalls {
 		}
 	}
 	void Actor_RmvComponent(uint64_t actorID, MonoReflectionType* componentType, int lang) {
-		ECS::Actor actor = DynamicScriptEngine::getContext()->getActorFromGUID(actorID);
+		ECS::Actor actor = DynamicScriptEngine::getContext()->getActorFromUUID(actorID);
 		MonoType* monoComponentType = mono_reflection_type_get_type(componentType);
 		int i = 0;
 		for (MonoTypeCombo* object : __h_ctr->monoTypeComboRegistryVector) {
@@ -215,7 +213,7 @@ namespace Shard3D::InternalScriptCalls {
 	}
 
 	void KillActor(uint64_t actorID) {
-		DynamicScriptEngine::getContext()->killActor(DynamicScriptEngine::getContext()->getActorFromGUID(actorID));
+		DynamicScriptEngine::getContext()->killActor(DynamicScriptEngine::getContext()->getActorFromUUID(actorID));
 	}
 
 	void GetActorByTag(uint64_t* actorID, MonoString* string) {
@@ -226,168 +224,168 @@ namespace Shard3D::InternalScriptCalls {
 	}
 
 	void TransformComponent_GetTranslation(uint64_t actorID, glm::vec3* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().getTranslation();
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().getTranslation();
 	}
 	void TransformComponent_SetTranslation(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().setTranslation(*v);
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().setTranslation(*v);
 	}
 	void TransformComponent_GetRotation(uint64_t actorID, glm::vec3* v) {
-		*v = glm::degrees((DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().getRotation()));
+		*v = glm::degrees((DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().getRotation()));
 	}
 	void TransformComponent_SetRotation(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().setRotation(glm::radians(*v));
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().setRotation(glm::radians(*v));
 	}
 	void TransformComponent_GetScale(uint64_t actorID, glm::vec3* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().getScale();
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().getScale();
 	}
 	void TransformComponent_SetScale(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getTransform().setScale(*v);
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().setScale(*v);
 	}
 
 	void CameraComponent_GetFOV(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().getFOV();
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().getFOV();
 	}
 
 	void CameraComponent_SetFOV(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().setFOV(*v);
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().setFOV(*v);
 	}
 
 	void CameraComponent_GetProjectionType(uint64_t actorID, int* v) {
-		*v = (int)DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().getProjectionType();
+		*v = (int)DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().getProjectionType();
 	}
 
 	void CameraComponent_SetProjectionType(uint64_t actorID, int* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().setProjectionType((Components::CameraComponent::ProjectType)*v);
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().setProjectionType((Components::CameraComponent::ProjectType)*v);
 	}
 
 	void CameraComponent_GetNearClip(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().getNearClip();
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().getNearClip();
 	}
 
 	void CameraComponent_SetNearClip(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().setNearClip(*v);
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().setNearClip(*v);
 	}
 
 	void CameraComponent_GetFarClip(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().getFarClip();
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().getFarClip();
 	}
 
 	void CameraComponent_SetFarClip(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::CameraComponent>().setFarClip(*v);
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().setFarClip(*v);
 	}
 
 	void AudioComponent_GetFile(uint64_t actorID, MonoString* string) {
-		string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().file.c_str());
+		string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().file.c_str());
 	}
 
 	void AudioComponent_SetFile(uint64_t actorID, MonoString* string) {
 		char* t = mono_string_to_utf8(string);
 		std::string text(t);
 
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().file = text;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().file = text;
 		mono_free(t);
 	}
 
 	void AudioComponent_GetPropertiesVolume(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().properties.volume;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().properties.volume;
 	}
 
 	void AudioComponent_SetPropertiesVolume(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().properties.volume = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().properties.volume = *v;
 	}
 
 	void AudioComponent_GetPropertiesPitch(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().properties.pitch;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().properties.pitch;
 	}
 
 	void AudioComponent_SetPropertiesPitch(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().properties.pitch = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().properties.pitch = *v;
 	}
 
 	void AudioComponent_Play(uint64_t actorID) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().play();
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().play();
 	}
 
 	void AudioComponent_Pause(uint64_t actorID) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().pause();
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().pause();
 	}
 
 	void AudioComponent_Stop(uint64_t actorID) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().stop();
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().stop();
 	}
 
 	void AudioComponent_Resume(uint64_t actorID) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().resume();
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().resume();
 	}
 
 	void AudioComponent_Update(uint64_t actorID) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::AudioComponent>().update();
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().update();
 	}
 
 	void MeshComponent_GetFile(uint64_t actorID, MonoString* string) {
-		string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>().file.c_str());
+	//	string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::MeshComponent>().file.c_str());
 	}
 
 	void MeshComponent_SetFile(uint64_t actorID, MonoString* string) {
 		char* t = mono_string_to_utf8(string);
 		std::string text(t);
 
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>().cacheFile = text;
+		//DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::MeshComponent>().cacheFile = text;
 		mono_free(t);
 	}
 
 	void MeshComponent_Load(uint64_t actorID) {
-		auto& c = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::MeshComponent>();
-		c.reapplyMesh(c.cacheFile);
+		//auto& c = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::MeshComponent>();
+		//c.reapplyMesh(c.cacheFile);
 	}
 
 	void BillboardComponent_GetFile(uint64_t actorID, MonoString* string) {
-		string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>().file.c_str());
+		//string = mono_string_new(DynamicScriptEngine::getDomain(), DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::BillboardComponent>().file.c_str());
 	}
 
 	void BillboardComponent_SetFile(uint64_t actorID, MonoString* string) {
 		char* t = mono_string_to_utf8(string);
 		std::string text(t);
 
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>().cacheFile = text;
+		//DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::BillboardComponent>().cacheFile = text;
 		mono_free(t);
 	}
 
 	void BillboardComponent_Load(uint64_t actorID) {
-		auto& c = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::BillboardComponent>();
-		c.reapplyTexture(c.cacheFile);
+		//auto& c = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::BillboardComponent>();
+		//c.reapplyTexture(c.cacheFile);
 	}
 
 	void PointlightComponent_GetColor(uint64_t actorID, glm::vec3* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().color;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().color;
 	}
 
 	void PointlightComponent_SetColor(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().color = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().color = *v;
 	}
 
 	void PointlightComponent_GetIntensity(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().lightIntensity;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().lightIntensity;
 	}
 
 	void PointlightComponent_SetIntensity(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().lightIntensity = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().lightIntensity = *v;
 	}
 
 	void PointlightComponent_GetAttenuationFactor(uint64_t actorID, glm::vec3* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().attenuationMod;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().attenuationMod;
 	}
 
 	void PointlightComponent_SetAttenuationFactor(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().attenuationMod = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().attenuationMod = *v;
 	}
 
 	void PointlightComponent_GetSpecularFactor(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().specularMod;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().specularMod;
 	}
 
 	void PointlightComponent_SetSpecularFactor(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::PointlightComponent>().specularMod = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::PointlightComponent>().specularMod = *v;
 	}
 
 	void PointlightComponent_GetRadius(uint64_t actorID, float* v) {
@@ -399,50 +397,50 @@ namespace Shard3D::InternalScriptCalls {
 	}
 
 	void SpotlightComponent_GetColor(uint64_t actorID, glm::vec3* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().color;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().color;
 	}
 
 	void SpotlightComponent_SetColor(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().color = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().color = *v;
 	}
 
 	void SpotlightComponent_GetIntensity(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().lightIntensity;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().lightIntensity;
 	}
 
 	void SpotlightComponent_SetIntensity(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().lightIntensity = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().lightIntensity = *v;
 	}
 
 	void SpotlightComponent_GetAttenuationFactor(uint64_t actorID, glm::vec3* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().attenuationMod;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().attenuationMod;
 	}
 
 	void SpotlightComponent_SetAttenuationFactor(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().attenuationMod = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().attenuationMod = *v;
 	}
 
 	void SpotlightComponent_GetSpecularFactor(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().specularMod;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().specularMod;
 	}
 
 	void SpotlightComponent_SetSpecularFactor(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().specularMod = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().specularMod = *v;
 	}
 	void SpotlightComponent_GetOuterAngle(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().outerAngle;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().outerAngle;
 	}
 
 	void SpotlightComponent_SetOuterAngle(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().outerAngle = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().outerAngle = *v;
 	}
 
 	void SpotlightComponent_GetInnerAngle(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().innerAngle;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().innerAngle;
 	}
 
 	void SpotlightComponent_SetInnerAngle(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::SpotlightComponent>().innerAngle = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::SpotlightComponent>().innerAngle = *v;
 	}
 
 	void SpotlightComponent_GetRadius(uint64_t actorID, float* v) {
@@ -454,26 +452,26 @@ namespace Shard3D::InternalScriptCalls {
 	}
 
 	void DirectionalLightComponent_GetColor(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::DirectionalLightComponent>().color = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::DirectionalLightComponent>().color = *v;
 	}
 
 	void DirectionalLightComponent_SetColor(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::DirectionalLightComponent>().color = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::DirectionalLightComponent>().color = *v;
 	}
 
 	void DirectionalLightComponent_GetIntensity(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::DirectionalLightComponent>().lightIntensity;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::DirectionalLightComponent>().lightIntensity;
 	}
 
 	void DirectionalLightComponent_SetIntensity(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::DirectionalLightComponent>().lightIntensity = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::DirectionalLightComponent>().lightIntensity = *v;
 	}
 	void DirectionalLightComponent_GetSpecularFactor(uint64_t actorID, float* v) {
-		*v = DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::DirectionalLightComponent>().specularMod;
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::DirectionalLightComponent>().specularMod;
 	}
 
 	void DirectionalLightComponent_SetSpecularFactor(uint64_t actorID, float* v) {
-		DynamicScriptEngine::getContext()->getActorFromGUID(actorID).getComponent<Components::DirectionalLightComponent>().specularMod = *v;
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::DirectionalLightComponent>().specularMod = *v;
 	}
 	void SceneManagerLoadLevel(MonoString* string) {
 		char* t = mono_string_to_utf8(string);
