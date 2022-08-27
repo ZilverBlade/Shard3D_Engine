@@ -1,0 +1,6 @@
+Shard3D: 1.2.6.r5-alpha
+AssetType: mesh3d
+AssetFile: assets/_engine/msh/smooth_vase.obj
+AssetOrig: D:\GameEngines\Shard3DEngine\assets\_engine\msh\smooth_vase.obj
+Materials: [assets/materialdata/ceramic_vase_01.s3dasset]
+Properties: !!binary "AAAAAA=="

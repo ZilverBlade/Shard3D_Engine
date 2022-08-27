@@ -112,17 +112,17 @@ vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint
 // shader code
 void main(){
 	
-	float material_specular = texture(tex_specular, fragUV).x * factor.specular;
-	float material_shininess = texture(tex_shininess, fragUV).x * factor.shininess;
-	float material_metallic = texture(tex_metallic, fragUV).x * factor.metallic;
-	vec3 fragColor = texture(tex_diffuse, fragUV).xyz * factor.diffuse.xyz;
+	const float material_specular = texture(tex_specular, fragUV).x * factor.specular;
+	const float material_shininess = texture(tex_shininess, fragUV).x * factor.shininess;
+	const float material_metallic = texture(tex_metallic, fragUV).x * factor.metallic;
+	const vec3 fragColor = texture(tex_diffuse, fragUV).xyz * factor.diffuse.xyz;
 
 	// // obtain normal from normal map in range [0,1]
 	// vec3 normal = texture(tex_normal, fragUV).xyz;
    //// transform normal vector to range [-1,1]
    // normal = normalize(normal * 2.0 - 1.0);   
 
-	vec3 N = normalize(fragNormalWorld);
+	const vec3 N = normalize(fragNormalWorld);
 
 
 	vec3 cameraPosWorld = ubo.invView[3].xyz;

@@ -1,7 +1,7 @@
 Shard3D: 1.2.6.r5-alpha
 AssetType: surface_material
 SurfaceMaterial:
-  - Material: Hello test
+  - Material: World Grid Material
     Physics:
       MaterialType: SurfaceMaterial
       MaterialClass: class Shard3D::SurfaceMaterial_ShadedOpaque

@@ -487,7 +487,9 @@
     <None Include="shaders\billboard_sva.vert" />
     <None Include="shaders\hud_element.frag" />
     <None Include="shaders\hud_element.vert" />
+    <None Include="shaders\materials\surface_shaded_masked.frag" />
     <None Include="shaders\materials\surface_shaded_opaque.frag" />
+    <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
     <None Include="shaders\surface_shader.frag" />
     <None Include="shaders\surface_shader.vert" />

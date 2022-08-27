@@ -52,9 +52,10 @@ namespace Shard3D {
 		// Destroys all assets and doesnt keep the core engine ones either
 		static void destroy();
 
-		static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
+		static void init(EngineDevice& dvc);
 
 		static void loadMesh(const AssetID& asset);
+		static void unloadMesh(const AssetID& asset);
 		static inline rPtr<EngineMesh>& retrieveMesh(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveMesh_safe(asset);
@@ -64,6 +65,7 @@ namespace Shard3D {
 		}
 
 		static void loadTexture(const AssetID& asset);
+		static void unloadTexture(const AssetID& asset);
 		static inline rPtr<EngineTexture>& retrieveTexture(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveTexture_safe(asset);
@@ -74,7 +76,8 @@ namespace Shard3D {
 
 		static void loadSurfaceMaterial(const AssetID& asset);
 		static void loadSurfaceMaterialRecursive(const AssetID& asset);
-		
+		static void unloadSurfaceMaterial(const AssetID& asset);
+
 		static void rebuildSurfaceMaterial(rPtr<SurfaceMaterial> material);
 		static inline rPtr<SurfaceMaterial> retrieveSurfaceMaterial(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
@@ -91,7 +94,8 @@ namespace Shard3D {
 		static void runGarbageCollector();
 	private:
 		static inline std::vector<AssetID> destroyTexQueue;
-		static inline std::vector<AssetID> destroyMeshQueue;
+		static inline std::vector<AssetID> destroyMeshQueue; 
+		static inline std::vector<AssetID> destroySurfaceMatQueue;
 		static inline std::vector<rPtr<SurfaceMaterial>> rebuildSurfaceMaterialQueue;
 		static void _buildSurfaceMaterial(rPtr<SurfaceMaterial> material);
 

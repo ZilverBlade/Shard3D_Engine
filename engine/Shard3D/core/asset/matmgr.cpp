@@ -70,8 +70,22 @@ namespace Shard3D {
 				material->deserialize(&container);
 				return material;
 			}
+			if (container["Physics"]["MaterialClass"].as<std::string>() == typeid(SurfaceMaterial_ShadedMasked).name()) {
+				rPtr<SurfaceMaterial_ShadedMasked> material = make_rPtr<SurfaceMaterial_ShadedMasked>();
+				material->materialTag = container["Material"].as<std::string>();
+				material->drawData = drawData;
+				material->deserialize(&container);
+				return material;
+			}
+			if (container["Physics"]["MaterialClass"].as<std::string>() == typeid(SurfaceMaterial_ShadedTranslucent).name()) {
+				rPtr<SurfaceMaterial_ShadedTranslucent> material = make_rPtr<SurfaceMaterial_ShadedTranslucent>();
+				material->materialTag = container["Material"].as<std::string>();
+				material->drawData = drawData;
+				material->deserialize(&container);
+				return material;
+			}
 		}
-		SHARD3D_ERROR("Unable to load material {0} (ID {1))", asset.getFile(), asset.getID());
+		SHARD3D_ERROR("Unable to load material {0} (ID {1}))", asset.getFile(), asset.getID());
 		return make_rPtr<SurfaceMaterial_ShadedOpaque>();
 	}	
 }

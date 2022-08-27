@@ -58,6 +58,7 @@ namespace Shard3D {
 			glm::vec3 rotation{ 0.f, 0.f, 0.f };
 			glm::vec3 scale{ 1.f, 1.f, 1.f };
 			friend class LevelPropertiesPanel; // to modify the values real time
+			friend struct MatrixCalculator;
 		};
 
 		struct CameraComponent {

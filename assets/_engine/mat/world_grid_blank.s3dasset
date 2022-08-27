@@ -1,0 +1,20 @@
+Shard3D: 1.2.6.r5-alpha
+AssetType: surface_material
+SurfaceMaterial:
+  - Material: World Grid Material
+    Physics:
+      MaterialType: SurfaceMaterial
+      MaterialClass: class Shard3D::SurfaceMaterial_ShadedOpaque
+    Draw:
+      VkCullModeFlags: 1
+      VkPolygonMode: 0
+    Data:
+      diffuseColor: [1, 1, 1]
+      diffuseTex: assets/_engine/tex/null_mat.png.s3dasset
+      specularFactor: 0.0500000007
+      specularTex: assets/_engine/tex/0xffffff.png.s3dasset
+      shininessFactor: 0.0399999991
+      shininessTex: assets/_engine/tex/0xffffff.png.s3dasset
+      metallicFactor: 0
+      metallicTex: assets/_engine/tex/0xffffff.png.s3dasset
+      normalTex: assets/_engine/tex/0x807ffe.png.s3dasset

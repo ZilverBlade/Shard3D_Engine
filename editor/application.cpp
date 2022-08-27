@@ -35,17 +35,15 @@ namespace Shard3D {
 		DynamicScriptEngine::init();
 
 		//mainOffScreen.setViewportSize({ 1920, 1080 });
-		Events::setWindow(&engineWindow);
 		Input::setWindow(engineWindow);
 		setWindowCallbacks();
 		
 		SharedPools::constructPools(engineDevice);
 		
 		AssetManager::setDevice(engineDevice);
-		ResourceHandler::setDevice(engineDevice);
+		ResourceHandler::init(engineDevice);
 
 		_special_assets::_editor_icons_load();
-		
 		
 		GraphicsSettings::init(&engineWindow);
 
@@ -100,7 +98,7 @@ namespace Shard3D {
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
 
-		ResourceHandler::clearAllAssets();
+		ResourceHandler::init(engineDevice);
 
 		{
 			CSimpleIniA ini;

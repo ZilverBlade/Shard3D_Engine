@@ -539,5 +539,11 @@
     <None Include="shaders\mesh_shader.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
+    <None Include="shaders\materials\surface_shaded_masked.frag">
+      <Filter>Resource Files\Shaders\fragment\material</Filter>
+    </None>
+    <None Include="shaders\materials\surface_shaded_translucent.frag">
+      <Filter>Resource Files\Shaders\fragment\material</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -2,4 +2,5 @@ Shard3D: 1.2.6.r5-alpha
 AssetType: mesh3d
 AssetFile: assets\_engine\msh\null_mdl.obj
 AssetOrig: D:\GameEngines\Shard3DEngine\assets\_engine\msh\null_mdl.obj
+Materials: [assets/_engine/mat/world_grid.s3dasset]
 Properties: !!binary "AAAAAA=="

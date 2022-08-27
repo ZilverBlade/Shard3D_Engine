@@ -210,15 +210,38 @@ namespace Shard3D {
 				refreshIterator(currentDir);	
 				ImGui::CloseCurrentPopup();
 			}
-			if (ImGui::MenuItem("Create Surface Material")) {
-				rPtr<SurfaceMaterial_ShadedOpaque> worldgrid = make_rPtr<SurfaceMaterial_ShadedOpaque>();
-				worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
-				worldgrid->shininess = 0.05f;
-				worldgrid->specular = 0.3f;
-				std::string dest = std::string(currentDir.string() + "/Some kind of material");
-				AssetManager::createMaterial(dest, worldgrid);
-				refreshIterator(currentDir);
-				ImGui::CloseCurrentPopup();
+			if (ImGui::BeginMenu("Create Surface Material")) {
+				if (ImGui::MenuItem("Shaded Opaque")) {
+					rPtr<SurfaceMaterial_ShadedOpaque> worldgrid = make_rPtr<SurfaceMaterial_ShadedOpaque>();
+					worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
+					worldgrid->shininess = 0.05f;
+					worldgrid->specular = 0.3f;
+					std::string dest = std::string(currentDir.string() + "/Some kind of material");
+					AssetManager::createMaterial(dest, worldgrid);
+					refreshIterator(currentDir);
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Shaded Masked")) {
+					rPtr<SurfaceMaterial_ShadedMasked> worldgrid = make_rPtr<SurfaceMaterial_ShadedMasked>();
+					worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
+					worldgrid->shininess = 0.05f;
+					worldgrid->specular = 0.3f;
+					std::string dest = std::string(currentDir.string() + "/Some kind of material");
+					AssetManager::createMaterial(dest, worldgrid);
+					refreshIterator(currentDir);
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Shaded Translucent")) {
+					rPtr<SurfaceMaterial_ShadedTranslucent> worldgrid = make_rPtr<SurfaceMaterial_ShadedTranslucent>();
+					worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
+					worldgrid->shininess = 0.05f;
+					worldgrid->specular = 0.3f;
+					std::string dest = std::string(currentDir.string() + "/Some kind of material");
+					AssetManager::createMaterial(dest, worldgrid);
+					refreshIterator(currentDir);
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndMenu();
 			}
 			ImGui::EndPopup();
 		}

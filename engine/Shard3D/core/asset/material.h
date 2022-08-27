@@ -103,6 +103,61 @@ namespace Shard3D {
 		void loadAllTextures() override;
 	};
 
+	// SSMR (Specular/Shininess/Metallic Rendering), Masked
+	class SurfaceMaterial_ShadedMasked : public SurfaceMaterial {
+	public:
+		AssetID normalTex = std::string(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
+		AssetID maskTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		glm::vec3 emissiveColor{ 0.f };
+		AssetID emissiveTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		glm::vec3 diffuseColor{ 1.f };
+		AssetID diffuseTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		float specular = 0.5f;
+		AssetID specularTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		float shininess = 0.5f;
+		AssetID shininessTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		float metallic = 0.f;
+		AssetID metallicTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
+		void serialize(YAML::Emitter* out) override;
+		void deserialize(YAML::Node* data) override;
+		void loadAllTextures() override;
+	};
+
+	// SSCR (Specular/Shininess/Clarity Rendering), Translucent
+	class SurfaceMaterial_ShadedTranslucent : public SurfaceMaterial {
+	public:
+		AssetID normalTex = std::string(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
+		AssetID opacityTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+		float opacity{ 1.f };
+
+		glm::vec3 emissiveColor{ 0.f };
+		AssetID emissiveTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		glm::vec3 diffuseColor{ 1.f };
+		AssetID diffuseTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		float specular = 0.5f;
+		AssetID specularTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		float shininess = 0.5f;
+		AssetID shininessTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		float metallic = 0.f;
+		AssetID metallicTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+
+		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
+		void serialize(YAML::Emitter* out) override;
+		void deserialize(YAML::Node* data) override;
+		void loadAllTextures() override;
+	};
+
 	/*
 	*	Material that can be used for projecting textures onto meshes.
 	*	It will overlay whatever previous material with it's properties and render over it.

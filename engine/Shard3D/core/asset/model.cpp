@@ -268,20 +268,19 @@ namespace Shard3D {
 			rPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_rPtr<SurfaceMaterial_ShadedOpaque>();
 			grid_material->materialTag = materialSlot;
 			grid_material->diffuseColor = { color.r, color.g, color.b };
+			grid_material->diffuseTex = AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 			grid_material->specular = specular;
 			grid_material->shininess = shininess;
 			grid_material->metallic = metallic;
 			grid_material->drawData.culling = VK_CULL_MODE_FRONT_BIT;
 
-			AssetManager::createMaterial("assets/materialdata/" + materialSlot + ".s3dasset", grid_material);
+			AssetManager::createMaterial(workingDir + "/" + materialSlot + ".s3dasset", grid_material);
 		}
 		AssetID m_asset = AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX);
-		if (AssetManager::doesAssetExist("assets/materialdata/" + materialSlot + ".s3dasset")) {
-			m_asset = AssetID("assets/materialdata/" + materialSlot + ".s3dasset");
-			if (!createMaterials) ResourceHandler::loadSurfaceMaterialRecursive(m_asset);
+		if (AssetManager::doesAssetExist(workingDir + "/" + materialSlot + ".s3dasset")) {
+			m_asset = AssetID(workingDir + "/" + materialSlot + ".s3dasset");
+		//	if (!createMaterials) ResourceHandler::loadSurfaceMaterialRecursive(m_asset);
 		}
-		
-
 
 		submeshes[materialSlot].materialAsset = m_asset;
 	}

@@ -35,7 +35,7 @@ namespace Shard3D {
 		return AssetType::Unknown;
 	}
 
-	bool Shard3D::AssetManager::doesAssetExist(const std::string& assetPath) {
+	bool AssetManager::doesAssetExist(const std::string& assetPath) {
 		std::ifstream ifile(assetPath);
 		return ifile.good();
 	}
@@ -45,28 +45,58 @@ namespace Shard3D {
 		meshAssets.clear(); 
 		surfaceMaterialAssets.clear(); 
 	}
+
+	void ResourceHandler::init(EngineDevice& dvc) { 
+		if (engineDevice) {
+			loadTexture(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
+			loadTexture(AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX));
+			loadTexture(AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX));
+			loadTexture(AssetID(ENGINE_BLKTEX ENGINE_ASSET_SUFFIX));
+			loadTexture(AssetID(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX));
+			loadMesh(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
+			loadMesh(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
+			loadSurfaceMaterial(AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX));
+		}
+		engineDevice = &dvc; 
+	}
+
+	// Check if is a core texture
+	static bool isCoreAsset_T(AssetKey asset) {
+		return	asset == AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX) ||
+				asset == AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX) ||
+				asset == AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX) ||
+				asset == AssetID(ENGINE_BLKTEX ENGINE_ASSET_SUFFIX) ||
+				asset == AssetID(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
+	}
+
+	// Check if is a core mesh
+	static bool isCoreAsset_M(AssetKey asset) {
+		return	asset == AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX) ||
+			asset == AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX);
+	}
+
+	// Check if is a core surface material
+	static bool isCoreAsset_S(AssetKey asset) {
+		return asset == AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX);
+	}
+
 	void ResourceHandler::clearTextureAssets() {
 		SHARD3D_INFO("Clearing all texture assets");
-		vkDeviceWaitIdle(engineDevice->device());
-		textureAssets.clear();
-	    loadTexture(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
-	    loadTexture(AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX));
-	    loadTexture(AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX));
-	    loadTexture(AssetID(ENGINE_BLKTEX ENGINE_ASSET_SUFFIX));
-	    loadTexture(AssetID(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX));
+		for (auto& asset : textureAssets) 
+			if (!isCoreAsset_T(asset.first))
+				ResourceHandler::unloadTexture(asset.first);
 	}
 	void ResourceHandler::clearMeshAssets() {
 		SHARD3D_INFO("Clearing all mesh assets");
-		vkDeviceWaitIdle(engineDevice->device());
-		meshAssets.clear();
-		loadMesh(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
-		loadMesh(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
+		for (auto& asset : meshAssets)
+			if (!isCoreAsset_M(asset.first))
+				ResourceHandler::unloadMesh(asset.first);
 	}
 	void ResourceHandler::clearMaterialAssets() {
 		SHARD3D_INFO("Clearing all material assets");
-		vkDeviceWaitIdle(engineDevice->device());
-
-		loadSurfaceMaterial(AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX));
+		for (auto& asset : surfaceMaterialAssets)
+			if (!isCoreAsset_S(asset.first))
+				ResourceHandler::unloadSurfaceMaterial(asset.first);
 	}
 	void ResourceHandler::clearAllAssets() {
 		clearTextureAssets();
@@ -124,6 +154,7 @@ namespace Shard3D {
 		out << YAML::Key << "AssetType" << YAML::Value << "mesh3d";
 		out << YAML::Key << "AssetFile" << YAML::Value << destpath;
 		out << YAML::Key << "AssetOrig" << YAML::Value << sourcepath;
+		out << YAML::Key << "Materials" << YAML::Value << tempreadInfo->materials;
 		
 		MeshLoadInfo _info[1] = { info };
 		std::vector<uint8_t> data = IOUtils::getStackBinary(_info, sizeof(MeshLoadInfo));
@@ -152,26 +183,33 @@ namespace Shard3D {
 	}
 
 	void ResourceHandler::runGarbageCollector() {
-		//if (reloadMeshQueue.size() != 0) {
-		//	vkDeviceWaitIdle(engineDevice->device());
-		//	for (AssetID& file : reloadMeshQueue) {
-		//		_loadMesh(file);
-		//	}
-		//	reloadMeshQueue.clear();
-		//}
-		//if (reloadTexQueue.size() != 0) {
-		//	vkDeviceWaitIdle(engineDevice->device());
-		//	for (AssetID& file : reloadTexQueue) {
-		//		_loadTexture(file);
-		//	}
-		//	reloadTexQueue.clear();
-		//}
+		if (destroyMeshQueue.size() != 0) {
+			vkDeviceWaitIdle(engineDevice->device());
+			for (AssetID& file : destroyMeshQueue) {
+				meshAssets.erase(file);
+			}
+			destroyMeshQueue.clear();
+		}
+		if (destroyTexQueue.size() != 0) {
+			vkDeviceWaitIdle(engineDevice->device());
+			for (AssetID& file : destroyTexQueue) {
+				textureAssets.erase(file);
+			}
+			destroyTexQueue.clear();
+		}
 		if (rebuildSurfaceMaterialQueue.size() != 0) {
 			vkDeviceWaitIdle(engineDevice->device());
 			for (rPtr<SurfaceMaterial>& material : rebuildSurfaceMaterialQueue) {
 				_buildSurfaceMaterial(material);
 			}
 			rebuildSurfaceMaterialQueue.clear();
+		}
+		if (destroySurfaceMatQueue.size() != 0) {
+			vkDeviceWaitIdle(engineDevice->device());
+			for (AssetID& file : destroySurfaceMatQueue) {
+				surfaceMaterialAssets.erase(file);
+			}
+			destroySurfaceMatQueue.clear();
 		}
 	}
 
@@ -195,22 +233,26 @@ namespace Shard3D {
 		if (data["AssetType"].as<std::string>() != "mesh3d") {
 			SHARD3D_ERROR("Trying to load non texture asset!");
 			return;
-		}
+		} 
 		
 		// Hacky binary read
 		MeshLoadInfo loadInfo = *reinterpret_cast<MeshLoadInfo*>(reinterpret_cast<uintptr_t>(data["Properties"].as<YAML::Binary>().data()));
 		
 		input.close();
 		if (meshAssets.find(assetPath) != meshAssets.end()) 
-			return;
+			return;	
 		
-
 		rPtr<EngineMesh> mesh = EngineMesh::loadMeshFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
 		if (!mesh) return;
 		SHARD3D_LOG("Loaded asset to resource map '{0}'", assetPath.getFile());
+		mesh->materials = data["Materials"].as<std::vector<AssetID>>();
+		for (auto& material : mesh->materials) ResourceHandler::loadSurfaceMaterialRecursive(material);
 		meshAssets[assetPath] = mesh;
 	}
 
+	void ResourceHandler::unloadMesh(const AssetID& asset) {
+		destroyMeshQueue.push_back(asset);
+	}
 
 	rPtr<EngineMesh>& ResourceHandler::retrieveMesh_unsafe(const AssetID& asset) {
 		return meshAssets.at(asset);
@@ -259,6 +301,10 @@ namespace Shard3D {
 		textureAssets[textureAsset] = texture;
 	}
 
+	void ResourceHandler::unloadTexture(const AssetID& asset) {
+		destroyTexQueue.push_back(asset);
+	}
+
 	rPtr<EngineTexture>& ResourceHandler::retrieveTexture_unsafe(const AssetID& asset) {
 		return textureAssets.at(asset);
 	}
@@ -285,8 +331,13 @@ namespace Shard3D {
 		surfaceMaterialAssets[asset]->loadAllTextures();
 	}
 
+	void ResourceHandler::unloadSurfaceMaterial(const AssetID& asset) {
+		destroySurfaceMatQueue.push_back(asset);
+	}
+
 	void ResourceHandler::rebuildSurfaceMaterial(rPtr<SurfaceMaterial> material) {
-		if (!material->isBuilt()) _buildSurfaceMaterial(material);
+		material->loadAllTextures();
+		if (!material->isBuilt()) _buildSurfaceMaterial(material);	
 		rebuildSurfaceMaterialQueue.push_back(material);
 	}
 

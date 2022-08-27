@@ -1,0 +1,85 @@
+Shard3D: 1.2.6.r6-alpha
+Level: Some kind of level
+LastSavedEditorCameraPos: [-0.818397403, -2.47566438, 0.77188623]
+Actors:
+  - Actor: 9969066776044137698
+    TagComponent:
+      Tag: Car
+    TransformComponent:
+      Translation: [0, 0, 0.200000003]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/ConvertibleSoft.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 11949163726201048202
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-1.27999997, 2.24000001, 1.48000002]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 8743851749570293074
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 0.100000001]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 4033656676149174111
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0.75, 2.29999995, 1.51999998]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 13142917975213745888
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-1.28999996, -3.33999991, 1.70000005]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 3.25]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 1783217970709618022
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [1.36000001, -3.33999991, 1.75]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 7486444172512055221
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [3.47000003, -0.889999986, 2.1500001]
+      Rotation: [-0.427605659, 0.136135682, -0.186750218]
+      Scale: [1, 1, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 3.25]
+      Radius: 1
+      Angle: [0.52359879, 1.04719758]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]

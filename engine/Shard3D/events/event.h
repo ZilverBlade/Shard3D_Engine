@@ -48,10 +48,6 @@ namespace Shard3D::Events {
 	private:
 		Event& event;
 	};
-
-	static EngineWindow* _wndPtr{};
-	static void setWindow(EngineWindow* wnd) { _wndPtr = &*wnd; }
-
 }
 // macros
 

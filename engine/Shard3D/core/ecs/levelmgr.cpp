@@ -220,6 +220,9 @@ namespace Shard3D {
 						loadedActor.addComponent<Components::MeshComponent>(
 							actor["MeshComponent"]["MeshAsset"].as<std::string>());
 						loadedActor.getComponent<Components::MeshComponent>().materials = actor["MeshComponent"]["Materials"].as<std::vector<AssetID>>();
+						for (auto& material : loadedActor.getComponent<Components::MeshComponent>().materials) {
+							ResourceHandler::loadSurfaceMaterialRecursive(material);
+						}
 					}
 					
 					if (actor["PointlightComponent"]) {
