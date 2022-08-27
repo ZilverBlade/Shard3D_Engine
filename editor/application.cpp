@@ -234,8 +234,7 @@ beginWhileLoop:
 				ubo.view = possessedCamera.getView();
 				ubo.inverseView = possessedCamera.getInverseView();
 
-				ubo.materialSettings = GraphicsSettings::get().GlobalMaterialSettings;
-				ubo.ambientColor = GraphicsSettings::getRuntimeInfo().ambientLightColor;
+				//ubo.cameraSettings = { GraphicsSettings::get().GlobalMaterialSettings,  GraphicsSettings::get().exposure };
 
 				lightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -310,28 +309,6 @@ beginWhileLoop:
 	}
 
 	void EngineApplication::loadStaticObjects() {
-		//ECS::LevelManager levelman(level);
-		//levelman.load("assets/leveldata/drivecartest.wbl", true);
-		//
-		//ECS::Actor car = level->createActorWithUUID(43827493259, "Car");
-		//AssetManager::emplaceMesh("assets/modeldata/FART.obj");
-		//car.addComponent<Components::MeshComponent>("assets/modeldata/FART.obj");
-		//
-		//car.getComponent<Components::TransformComponent>().setRotation({ 0.f, 0.f, glm::radians(90.f) });
-		//car.addComponent<Components::CppScriptComponent>().bind<CppScripts::CarController>();
-		//car.addComponent<Components::AudioComponent>().file = 
-		//	"assets/audiodata/race_scream.wav";
-		//
-		////car.addComponent<Components::ScriptComponent>();
-		//
-		//ECS::Actor light = level->createActor("thing");
-		//light.getComponent<Components::TransformComponent>().setTranslation({ 0.f, -5.f, 2.f });
-		//light.addComponent<Components::PointlightComponent>().color = { 1.f, 0.f, 1.f };
-		//level->parentActor(&light, &car);
-
-		auto actor = level->createActor("Cube"); actor.addComponent<Components::MeshComponent>(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
-		actor.addComponent<Components::DirectionalLightComponent>();
-		actor.getTransform().setRotation({ 1.f, 1.f, 3.f });
 
 	}
 }

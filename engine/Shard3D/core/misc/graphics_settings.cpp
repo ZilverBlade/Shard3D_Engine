@@ -33,9 +33,10 @@ namespace Shard3D {
 			SHARD3D_FATAL("maxAnisotropy read is invalid!!");
 	
 		graphics.FramerateCap = ini.GetLongValue("GRAPHICS", "FramerateCap");
-		graphics.MSAASamples = ini.GetLongValue("GRAPHICS", "MSAASamples");
-		if (graphics.MSAASamples < 1)
-			SHARD3D_FATAL("MSAASamples read is invalid!!");
+		//graphics.MSAASamples = static_cast<VkSampleCountFlagBits>(ini.GetLongValue("GRAPHICS", "MSAASamples"));
+		//if (graphics.MSAASamples < 1)
+		//	SHARD3D_FATAL("MSAASamples read is invalid!!");
+		// let device class decide
 	
 		graphics.LODCoef = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "LODCoef");
 		graphics.ShadowQuality = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "ShadowQuality");
@@ -59,7 +60,7 @@ namespace Shard3D {
 		ini.SetLongValue("TEXTURES", "maxAnisotropy", graphics.maxAnisotropy);
 
 		ini.SetLongValue("GRAPHICS", "FramerateCap", graphics.FramerateCap);
-		ini.SetLongValue("GRAPHICS", "MSAASamples", graphics.MSAASamples);
+		ini.SetLongValue("GRAPHICS", "MSAASamples", static_cast<int>(graphics.MSAASamples));
 
 		ini.SetLongValue("GRAPHICS", "LODCoef", graphics.LODCoef);
 		ini.SetLongValue("GRAPHICS", "ShadowQuality", graphics.ShadowQuality);

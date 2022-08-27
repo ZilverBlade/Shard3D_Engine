@@ -76,6 +76,7 @@ int EngineDevice::getMaxUsableSampleCount() {
     if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
     if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
     if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
+
     return VK_SAMPLE_COUNT_1_BIT;
 }
 
@@ -156,7 +157,7 @@ void EngineDevice::pickPhysicalDevice() {
   ini.SetUnicode();
   ini.LoadFile(GAME_SETTINGS_PATH);
 
-  for (const auto &device : devices) {
+  for (const auto& device : devices) {
       if (isPreferredDevice(device)) {
           physicalDevice_ = device;
           goto loadphysdvcprops;
@@ -165,20 +166,21 @@ void EngineDevice::pickPhysicalDevice() {
 
   for (const auto& device : devices) {
       if (isSuitableDevice(device)) {
-      break;
-    }
+          break;
+      }
   }
+
 
 loadphysdvcprops:
   if (physicalDevice_ == VK_NULL_HANDLE) {
     SHARD3D_FATAL("Failed to find a suitable GPU!");
   }
 
-
   //MSAA setup
   SHARD3D_ASSERT(msaaSamples >= 1, "MSAA samples cannot be inferior to 1!");
   if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { SHARD3D_WARN("MSAA Sample count exceeds device capability, dropping down to device's limit"); }
   msaaSamples = (VkSampleCountFlagBits)std::min((int)ini.GetLongValue("GRAPHICS", "MSAASamples"), getMaxUsableSampleCount());
+  GraphicsSettings::get().MSAASamples = msaaSamples;
 
   SHARD3D_INFO("Using {0}x MSAA", msaaSamples);
   vkGetPhysicalDeviceProperties(physicalDevice_, &properties);

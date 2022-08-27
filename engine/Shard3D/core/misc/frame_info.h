@@ -52,7 +52,7 @@ namespace Shard3D {
 		int numSpotlights;
 		int numDirectionalLights;
 		
-		alignas(16)glm::vec3 materialSettings= {1.f, 0.5f, 0.f};
+		alignas(16)glm::vec4 cameraSettings = {1.f, 0.5f, 0.f, 1.f};
 	};
 
 	struct ComputeUbo {

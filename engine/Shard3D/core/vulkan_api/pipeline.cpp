@@ -3,6 +3,7 @@
 #include "pipeline.h"
 #include "../asset/model.h"
 #include <fstream>
+#include "../misc/graphics_settings.h"
 namespace Shard3D {
 
 	EnginePipeline::EnginePipeline(
@@ -226,7 +227,7 @@ namespace Shard3D {
 
 		configInfo.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 		configInfo.multisampleInfo.sampleShadingEnable = VK_FALSE;
-		configInfo.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+		configInfo.multisampleInfo.rasterizationSamples = GraphicsSettings::get().MSAASamples;
 		configInfo.multisampleInfo.minSampleShading = 1.0f;           // Optional
 		configInfo.multisampleInfo.pSampleMask = nullptr;             // Optional
 		configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;  // Optional
@@ -300,6 +301,10 @@ namespace Shard3D {
 	}
 	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::discardRasterizer() {
 		configInfo.rasterizationInfo.rasterizerDiscardEnable = VK_TRUE;
+		return _pipeline_cfg(configInfo);
+	}
+	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::forceSampleCount(VkSampleCountFlagBits samples) {
+		configInfo.multisampleInfo.rasterizationSamples = samples;
 		return _pipeline_cfg(configInfo);
 	}
 }

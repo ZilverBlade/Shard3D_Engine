@@ -141,21 +141,21 @@ ALPHA:
 		- Increased max pointlights and spotlight from 20 to 128
 		- Engine now always tries to select a discrete graphics card if it can
 
+
 	> Shard3D Torque 1.2.6-alpha
-		- Preliminary implementation of ASSIMP
+		- Implementation of ASSIMP
 		- Removed PBR in favour of a hybrid between Classic and PBR
-		- Preliminary implementation of material system with hierarchies and inheritance
+		- Implementation of material system with hierarchies and inheritance
 		- Moved editor panels to editor execulable
 		- Fixed inability to seperately disable grid and editor billboards in view
 		- Improved cutouts for editor billboards
 		- Removed blueprints
-		- Begun huge asset and resource system overhaul
+		- Huge asset and resource system overhaul
 		- Minor camera control improvements
+		- QOL editor improvements
 		- Level saving now stores editor camera position
-
-		:: NEXT, store materials per mesh, per level, and per blueprint (future). materials get copied from mesh to blueprints, from blueprint to level, from mesh to level.
-		Figure out to use either unordered map or ordered map, to keep track of the correct order of material slots.
-		
+		- Implemented MSAA
+		- Experimental HDR
 
 		:: TODO, proper events sytem, add editor layouts, use premake
 		:: Fix: dont use 64 bit integers for shaders (e.g. HUD system)

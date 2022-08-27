@@ -91,6 +91,7 @@ namespace Shard3D {
 		PipelineConfigInfo pipelineConfig{};
 		EnginePipeline::pipelineConfig(pipelineConfig)
 			.defaultPipelineConfigInfo()
+			.forceSampleCount(VK_SAMPLE_COUNT_1_BIT)
 			.enableAlphaBlending(VK_BLEND_OP_ADD);
 
 		pipelineConfig.renderPass = renderPass;

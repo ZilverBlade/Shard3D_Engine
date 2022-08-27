@@ -18,7 +18,7 @@ namespace Shard3D {
             uint32_t width = 1280;
             uint32_t height = 720;
             VkFramebuffer frameBuffer;
-            FrameBufferAttachment color, depth;
+            FrameBufferAttachment color, depth, colorResolve;
             VkRenderPass renderPass;
             VkSampler sampler;
             VkDescriptorImageInfo descriptor;
@@ -38,6 +38,11 @@ namespace Shard3D {
             vkDestroyImageView(m_Device.device(), pass.depth.view, nullptr);
             vkDestroyImage(m_Device.device(), pass.depth.image, nullptr);
             vkFreeMemory(m_Device.device(), pass.depth.mem, nullptr);
+            
+            // Depth attachment
+            vkDestroyImageView(m_Device.device(), pass.colorResolve.view, nullptr);
+            vkDestroyImage(m_Device.device(), pass.colorResolve.image, nullptr);
+            vkFreeMemory(m_Device.device(), pass.colorResolve.mem, nullptr);
 
             vkDestroyRenderPass(m_Device.device(), pass.renderPass, nullptr);
             vkDestroySampler(m_Device.device(), pass.sampler, nullptr);
@@ -45,7 +50,7 @@ namespace Shard3D {
         }
 
         VkSampler getSampler() { return pass.sampler; }
-        VkImageView getImageView() { return pass.color.view; }
+        VkImageView getImageView() { return pass.colorResolve.view; }
         VkRenderPass getRenderPass() { return pass.renderPass; }
         const OffscreenPass getPass() { return pass; }
         void setViewportSize(const glm::vec2& size) {
