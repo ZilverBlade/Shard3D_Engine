@@ -355,6 +355,15 @@
     <ClInclude Include="core\asset\assetid.h">
       <Filter>Header Files\core\asset</Filter>
     </ClInclude>
+    <ClInclude Include="core\rendering\renderpass.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rendering\frame_buffer.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rendering\subpass.h">
+      <Filter>Header Files\core\rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s3dpch.cpp">
@@ -497,6 +506,15 @@
     </ClCompile>
     <ClCompile Include="core\asset\assetid.cpp">
       <Filter>Source Files\core\asset</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\renderpass.cpp">
+      <Filter>Source Files\core\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\frame_buffer.cpp">
+      <Filter>Source Files\core\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rendering\subpass.cpp">
+      <Filter>Source Files\core\rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

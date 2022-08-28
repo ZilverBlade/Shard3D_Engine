@@ -5,6 +5,7 @@
 namespace Shard3D {
 	class LightSystem {
 	public:
+		LightSystem() = default;
 		LightSystem(const LightSystem&) = delete;
 		LightSystem& operator=(const LightSystem&) = delete;
 

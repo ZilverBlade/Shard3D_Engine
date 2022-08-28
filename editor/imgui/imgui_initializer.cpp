@@ -5,6 +5,7 @@
 #include <Shard3D/vulkan_abstr.h>
 #include <Shard3D/workarounds.h>
 #include "imgui_layer.h"
+#include <Shard3D/core/rendering/frame_buffer.h>
 namespace Shard3D {
 	void ImGuiInitializer::init(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass, bool lightTheme) {
 		//imgui hell
@@ -239,8 +240,8 @@ namespace Shard3D {
 		}
 #endif
 	}
-	void ImGuiInitializer::setViewportImage(VkDescriptorSet* image, OffScreen& viewport) {
-		*image = ImGui_ImplVulkan_AddTexture(viewport.getSampler(), viewport.getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	void ImGuiInitializer::setViewportImage(VkDescriptorSet* image, FrameBufferAttachment* frameBufferAttachment) {
+		*image = ImGui_ImplVulkan_AddTexture(frameBufferAttachment->getSampler(), frameBufferAttachment->getImageView(), frameBufferAttachment->getDescription().finalLayout);
 	}
 
 }

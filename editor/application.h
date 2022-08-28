@@ -9,6 +9,7 @@
 #include <Shard3D/core/rendering/swap_chain.h>
 #include <Shard3D/core/rendering/renderer.h>
 #include <Shard3D/core/rendering/offscreen.h>
+#include <Shard3D/core/rendering/renderpass.h>
 
 #include <Shard3D/layer/layer_stack.h>
 
@@ -26,7 +27,8 @@ namespace Shard3D {
 		// Functions
 		void setupEngineFeatures();
 		void setWindowCallbacks();
-		
+		void createRenderpasses();
+
 		void loadStaticObjects();
 
 		void eventEvent(Events::Event& e);
@@ -35,8 +37,17 @@ namespace Shard3D {
 		EngineWindow engineWindow{ 1280, 720, "Shard3D Engine" };
 		EngineDevice engineDevice{ engineWindow };
 		EngineRenderer engineRenderer{ engineWindow, engineDevice };
-		OffScreen mainOffScreen{ engineDevice, true };
-		OffScreen postProcessImage{ engineDevice, false };
+		
+		FrameBufferAttachment* mainColorFramebufferAttachment;
+		FrameBufferAttachment* mainDepthFramebufferAttachment;
+		FrameBufferAttachment* mainResolveFramebufferAttachment;
+		FrameBuffer* mainFrameBuffer;
+		SimpleRenderPass* mainRenderpass;
+
+		FrameBufferAttachment* ppoColorFramebufferAttachment;
+		FrameBufferAttachment* ppoDepthFramebufferAttachment;
+		FrameBuffer* ppoFrameBuffer;
+		SimpleRenderPass* ppoRenderpass;
 
 		// ECS
 		sPtr<ECS::Level> level;

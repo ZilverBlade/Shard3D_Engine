@@ -137,7 +137,7 @@ namespace Shard3D {
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, _buffers, offsets);
 		if (buffers.hasIndexBuffer) {
 			vkCmdBindIndexBuffer(commandBuffer, buffers.indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
-		}	
+		}
 	}
 
 	void EngineMesh::draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
@@ -198,20 +198,10 @@ namespace Shard3D {
 		}
 	}
 
-	// experiments
-
-//#define CombineMaterials
-//#define CustomIndexing
-
 	void EngineMesh::Builder::loadSubmesh(aiMesh* mesh, const aiScene* scene, bool createMaterials) {
 		const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		const std::string& materialSlot =
-#ifndef CombineMaterials
-			 material->GetName().C_Str();
-#endif
-#ifdef CombineMaterials
-		"material";
-#endif
+		const std::string& materialSlot = material->GetName().C_Str();
+
 		if (submeshes.find(materialSlot) == submeshes.end()) { // create new slot if none exist
 			SubmeshData submesh{}; 
 			submeshes[materialSlot] = submesh;
@@ -235,24 +225,16 @@ namespace Shard3D {
 					mesh->mTextureCoords[0][i].y
 				};
 			else vertex.uv = { 0.f, 0.f };
-#ifdef CustomIndexing
-			if (uniqueVertices.count(vertex) == 0) {
-				uniqueVertices[vertex] = static_cast<uint32_t>(submeshes[materialSlot].vertices.size());
-#endif
-				submeshes[materialSlot].vertices.push_back(vertex);
-#ifdef CustomIndexing
-			}
-			submeshes[materialSlot].indices.push_back(uniqueVertices[vertex]);
-#endif
+
+			submeshes[materialSlot].vertices.push_back(vertex);
 		}
 
-#ifndef CustomIndexing
 		for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 			aiFace face = mesh->mFaces[i];
 			for (unsigned int j = 0; j < face.mNumIndices; j++)
 				submeshes[materialSlot].indices.push_back(face.mIndices[j]);
 		}
-#endif
+
 
 		if (createMaterials) {
 			aiColor4D color{1.f, 1.f, 1.f, 1.f};
@@ -264,7 +246,6 @@ namespace Shard3D {
 			float metallic{0.f};
 			aiGetMaterialFloat(material, AI_MATKEY_METALLIC_FACTOR, &metallic);
 
-			// We just create a simple default grid texture for all meshes
 			rPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_rPtr<SurfaceMaterial_ShadedOpaque>();
 			grid_material->materialTag = materialSlot;
 			grid_material->diffuseColor = { color.r, color.g, color.b };
@@ -279,7 +260,6 @@ namespace Shard3D {
 		AssetID m_asset = AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX);
 		if (AssetManager::doesAssetExist(workingDir + "/" + materialSlot + ".s3dasset")) {
 			m_asset = AssetID(workingDir + "/" + materialSlot + ".s3dasset");
-		//	if (!createMaterials) ResourceHandler::loadSurfaceMaterialRecursive(m_asset);
 		}
 
 		submeshes[materialSlot].materialAsset = m_asset;

@@ -22,12 +22,105 @@
 
 namespace Shard3D {
 	EngineApplication::EngineApplication() {
+		createRenderpasses();
 		setupEngineFeatures();
 
 		SHARD3D_INFO("Constructing Level Pointer");
 		level = make_sPtr<ECS::Level>("runtime test lvl");
 	}
 	EngineApplication::~EngineApplication() { }
+
+	void EngineApplication::createRenderpasses() {
+		{ // Main renderer
+			mainColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				GraphicsSettings::get().MSAASamples
+				}, AttachmentType::Color);
+
+			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_D24_UNORM_S8_UINT,
+				VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+				GraphicsSettings::get().MSAASamples
+				}, AttachmentType::Depth);
+
+			mainResolveFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, AttachmentType::Resolve);
+
+			AttachmentInfo colorAttachmentInfo{};
+			colorAttachmentInfo.frameBufferAttachment = mainColorFramebufferAttachment;
+			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			colorAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			AttachmentInfo depthAttachmentInfo{};
+			depthAttachmentInfo.frameBufferAttachment = mainDepthFramebufferAttachment;
+			depthAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+			AttachmentInfo resolveAttachmentInfo{};
+			resolveAttachmentInfo.frameBufferAttachment = mainResolveFramebufferAttachment;
+			resolveAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			resolveAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+			mainRenderpass = new SimpleRenderPass(
+				engineDevice, {
+				colorAttachmentInfo,
+				depthAttachmentInfo,
+				resolveAttachmentInfo
+				});
+
+			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainResolveFramebufferAttachment });
+		}
+
+		{ // Post processing
+			ppoColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_B8G8R8A8_SRGB,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, AttachmentType::Color);
+			ppoDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_D24_UNORM_S8_UINT,
+				VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, AttachmentType::Depth);
+
+			AttachmentInfo colorAttachmentInfo{};
+			colorAttachmentInfo.frameBufferAttachment = ppoColorFramebufferAttachment;
+			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			colorAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			AttachmentInfo depthAttachmentInfo{};
+			depthAttachmentInfo.frameBufferAttachment = ppoDepthFramebufferAttachment;
+			depthAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+			ppoRenderpass = new SimpleRenderPass(
+				engineDevice, {
+				colorAttachmentInfo,
+				depthAttachmentInfo
+				});
+
+			ppoFrameBuffer = new FrameBuffer(engineDevice, ppoRenderpass->getRenderPass(), { ppoColorFramebufferAttachment, ppoDepthFramebufferAttachment });
+		}
+	}
 
 	void EngineApplication::setupEngineFeatures() {
 		EngineAudio::init();
@@ -57,6 +150,8 @@ namespace Shard3D {
 		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, EngineApplication::eventEvent);
 	}
 
+	
+
 	void EngineApplication::eventEvent(Events::Event& e) {
 		//SHARD3D_LOG("{0}", e.toString());
 	}
@@ -85,16 +180,16 @@ namespace Shard3D {
 		}
 
 		
-		GridSystem gridSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		GridSystem gridSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #ifdef ENSET_ENABLE_COMPUTE_SHADERS
 		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
-		ForwardRenderSystem forwardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem{ engineDevice, postProcessImage.getRenderPass(), mainOffScreen.getImageView(), mainOffScreen.getSampler() };
+		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		PostProcessingSystem ppoSystem{ engineDevice, ppoRenderpass->getRenderPass(), mainResolveFramebufferAttachment->getImageView(), mainResolveFramebufferAttachment->getSampler() };
 
-		BillboardRenderSystem billboardRenderSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		_EditorBillboardRenderer editorBillboardRenderer{ engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
@@ -110,7 +205,7 @@ namespace Shard3D {
 		}
 		ImGuiLayer* imguiLayer = new ImGuiLayer();
 
-		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, postProcessImage);
+		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, ppoColorFramebufferAttachment);
 
 		layerStack.pushOverlay(imguiLayer);
 
@@ -255,7 +350,7 @@ beginWhileLoop:
 					Also order absolutely matters, post processing for example must go last
 				*/
 				//	render
-				mainOffScreen.start(frameInfo);
+				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
 				SHARD3D_STAT_RECORD();
 				forwardRenderSystem.renderForward(frameInfo);
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Lighting" });
@@ -270,11 +365,11 @@ beginWhileLoop:
 				}
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Billboards" });
 
-				mainOffScreen.end(frameInfo);
+				mainRenderpass->endRenderPass(frameInfo);
 
-				postProcessImage.start(frameInfo);
+				ppoRenderpass->beginRenderPass(frameInfo, ppoFrameBuffer);
 				ppoSystem.render(frameInfo);
-				postProcessImage.end(frameInfo);
+				ppoRenderpass->endRenderPass(frameInfo);
 
 #ifdef ENSET_ENABLE_COMPUTE_SHADERS
 				computeSystem.render(frameInfo);

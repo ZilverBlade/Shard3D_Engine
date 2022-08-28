@@ -156,6 +156,8 @@ ALPHA:
 		- Level saving now stores editor camera position
 		- Implemented MSAA
 		- Experimental HDR
+	> Shard3D Torque 1.2.7-alpha
+		- Added post process system and abstracted renderpasses
 
 		:: TODO, proper events sytem, add editor layouts, use premake
-		:: Fix: dont use 64 bit integers for shaders (e.g. HUD system)
+		:: Fix: change vertex and index buffers to draw offset, dont use 64 bit integers for shaders (e.g. HUD system)

@@ -177,7 +177,7 @@ loadphysdvcprops:
   }
 
   //MSAA setup
-  SHARD3D_ASSERT(msaaSamples >= 1, "MSAA samples cannot be inferior to 1!");
+  SHARD3D_ASSERT(msaaSamples >= 1 && "MSAA samples cannot be inferior to 1!");
   if ((int)ini.GetLongValue("GRAPHICS", "MSAASamples") > getMaxUsableSampleCount()) { SHARD3D_WARN("MSAA Sample count exceeds device capability, dropping down to device's limit"); }
   msaaSamples = (VkSampleCountFlagBits)std::min((int)ini.GetLongValue("GRAPHICS", "MSAASamples"), getMaxUsableSampleCount());
   GraphicsSettings::get().MSAASamples = msaaSamples;
