@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include <Shard3D/core/vulkan_api/device.h>
 #include "imgui_implementation.h"
-#include <Shard3D/core/rendering/offscreen.h>
 
 namespace Shard3D {
 	class ImGuiLayer;

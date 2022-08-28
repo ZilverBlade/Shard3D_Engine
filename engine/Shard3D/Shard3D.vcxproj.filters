@@ -255,9 +255,6 @@
     <ClInclude Include="core\rendering\camera.h">
       <Filter>Header Files\core\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="core\rendering\offscreen.h">
-      <Filter>Header Files\core\rendering</Filter>
-    </ClInclude>
     <ClInclude Include="core\ui\hud.h">
       <Filter>Header Files\core\ui</Filter>
     </ClInclude>
@@ -361,9 +358,6 @@
     <ClInclude Include="core\rendering\frame_buffer.h">
       <Filter>Header Files\core\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="core\rendering\subpass.h">
-      <Filter>Header Files\core\rendering</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s3dpch.cpp">
@@ -401,9 +395,6 @@
     </ClCompile>
     <ClCompile Include="core\audio\audio.cpp">
       <Filter>Source Files\core\audio</Filter>
-    </ClCompile>
-    <ClCompile Include="core\rendering\offscreen.cpp">
-      <Filter>Source Files\core\rendering</Filter>
     </ClCompile>
     <ClCompile Include="core\rendering\renderer.cpp">
       <Filter>Source Files\core\rendering</Filter>
@@ -511,9 +502,6 @@
       <Filter>Source Files\core\rendering</Filter>
     </ClCompile>
     <ClCompile Include="core\rendering\frame_buffer.cpp">
-      <Filter>Source Files\core\rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="core\rendering\subpass.cpp">
       <Filter>Source Files\core\rendering</Filter>
     </ClCompile>
   </ItemGroup>

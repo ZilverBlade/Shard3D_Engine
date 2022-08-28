@@ -2,7 +2,6 @@
 
 #include "../vulkan_api/device.h"
 #include "frame_buffer.h"
-#include "subpass.h"
 #include "../misc/frame_info.h"
 #include "../../s3dstd.h"
 

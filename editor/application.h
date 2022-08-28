@@ -8,7 +8,6 @@
 #include <Shard3D/core/rendering/window.h>
 #include <Shard3D/core/rendering/swap_chain.h>
 #include <Shard3D/core/rendering/renderer.h>
-#include <Shard3D/core/rendering/offscreen.h>
 #include <Shard3D/core/rendering/renderpass.h>
 
 #include <Shard3D/layer/layer_stack.h>
