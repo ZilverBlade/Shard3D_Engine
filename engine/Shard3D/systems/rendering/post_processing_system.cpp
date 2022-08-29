@@ -29,13 +29,10 @@ namespace Shard3D {
 	}
 
 	PostProcessingSystem::~PostProcessingSystem() {
-		
+		vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
 	}
 
-
 	void PostProcessingSystem::createPipelineLayout() {
-		
-
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{
 			ppo_Layout->getDescriptorSetLayout()
 		};

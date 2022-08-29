@@ -22,7 +22,10 @@ namespace Shard3D {
 		createPipeline();
 	}
 	ShadowMappingSystem::~ShadowMappingSystem() {
+		delete shadowFrameBuffer;
 		delete shadowRenderpass;
+		delete shadowDepthFramebufferAttachment;
+		vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
 	}
 	
 	void ShadowMappingSystem::createRenderPass() {			

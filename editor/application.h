@@ -26,8 +26,8 @@ namespace Shard3D {
 		// Functions
 		void setupEngineFeatures();
 		void setWindowCallbacks();
-		void createRenderpasses();
-
+		void createRenderPasses();
+		void destroyRenderPasses();
 		void loadStaticObjects();
 
 		void eventEvent(Events::Event& e);

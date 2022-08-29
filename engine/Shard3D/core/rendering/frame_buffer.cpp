@@ -78,6 +78,7 @@ namespace Shard3D {
 	FrameBufferAttachment::~FrameBufferAttachment() {
 		vkDestroyImageView(engineDevice.device(), imageView, nullptr);
 		vkDestroyImage(engineDevice.device(), image, nullptr);
+		vkDestroySampler(engineDevice.device(), sampler, nullptr);
 		vkFreeMemory(engineDevice.device(), imageMemory, nullptr);
 	}
 

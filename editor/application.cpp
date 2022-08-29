@@ -22,15 +22,17 @@
 
 namespace Shard3D {
 	EngineApplication::EngineApplication() {
-		createRenderpasses();
+		createRenderPasses();
 		setupEngineFeatures();
 
 		SHARD3D_INFO("Constructing Level Pointer");
 		level = make_sPtr<ECS::Level>("runtime test lvl");
 	}
-	EngineApplication::~EngineApplication() { }
+	EngineApplication::~EngineApplication() {
+	
+	}
 
-	void EngineApplication::createRenderpasses() {
+	void EngineApplication::createRenderPasses() {
 		{ // Main renderer
 			mainColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -120,6 +122,20 @@ namespace Shard3D {
 
 			ppoFrameBuffer = new FrameBuffer(engineDevice, ppoRenderpass->getRenderPass(), { ppoColorFramebufferAttachment, ppoDepthFramebufferAttachment });
 		}
+	}
+
+	void EngineApplication::destroyRenderPasses() {
+		delete ppoFrameBuffer;
+		delete ppoRenderpass;
+		delete ppoColorFramebufferAttachment;
+		delete ppoDepthFramebufferAttachment;
+
+		delete mainFrameBuffer;
+		delete mainRenderpass;
+		delete mainColorFramebufferAttachment;
+		delete mainDepthFramebufferAttachment;
+		delete mainResolveFramebufferAttachment;
+
 	}
 
 	void EngineApplication::setupEngineFeatures() {
@@ -408,6 +424,7 @@ beginWhileLoop:
 		for (Layer* layer : layerStack) {
 			layer->detach();
 		}
+		destroyRenderPasses();
 		SharedPools::destructPools();
 
 		level = nullptr;
