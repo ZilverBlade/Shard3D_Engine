@@ -106,7 +106,7 @@ namespace Shard3D {
 				auto& transform = actor.getTransform();
 				auto& component = actor.getComponent<Components::MeshComponent>();
 
-				push.model = frameInfo.activeLevel->getParentMat4(actor) * transform.mat4();
+				push.model = transform.transformMatrix;
 
 				auto& model = ResourceHandler::retrieveMesh(component.asset);
 

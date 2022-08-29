@@ -67,7 +67,7 @@ namespace Shard3D {
 
 			operator bool() const { return actorHandle != entt::null; }
 			operator entt::entity() const { return actorHandle; };
-			operator uint32_t() const { return (uint32_t)actorHandle; };
+			operator uint32_t() const { return static_cast<uint32_t>(actorHandle); };
 			
 			bool operator==(const Actor& other) const {
 				return actorHandle == other.actorHandle && level == other.level;
@@ -76,13 +76,11 @@ namespace Shard3D {
 				return !(*this == other);
 			}
 			entt::entity actorHandle{ entt::null };
-			entt::entity parentHandle{ entt::null };
 		private:
 			Level* level = nullptr; // 8 bytes (use it as much as needed)
 
 			friend class Level;
 			friend class SActor;
-			friend class BlueprintManager;
 			friend class LevelPeekingPanel;
 		};
 	}

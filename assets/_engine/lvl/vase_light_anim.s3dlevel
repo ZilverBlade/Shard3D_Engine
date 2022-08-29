@@ -1,0 +1,205 @@
+Shard3D: 1.2.7.r0-alpha
+Level: Some kind of level
+LastSavedEditorCameraPos: [-4.2684164, 4.16105747, 2.99879885]
+Actors:
+  - Actor: 15092527220797592573
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [0, 0, 1]
+      Rotation: [0, 0, 0]
+      Scale: [5, 5, 5]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/quad.obj.s3dasset
+      Materials: [assets/materialdata/DefaultMaterial.s3dasset]
+  - Actor: 8874817387433564867
+    TagComponent:
+      Tag: Vase
+    TransformComponent:
+      Translation: [0, 0, 1]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [2, 2, 2]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/smooth_vase.obj.s3dasset
+      Materials: [assets/materialdata/ceramic_vase_01.s3dasset]
+  - Actor: 2656111424845641502
+    TagComponent:
+      Tag: PointlightAnchor
+    RelationshipComponent:
+      Parent: 1
+      Children:
+        - 1145304093585684760
+        - 15899591218538338424
+        - 4042602444775793868
+        - 16379621950445101909
+        - 9227019339940472954
+        - 10328058302458146933
+    TransformComponent:
+      Translation: [0, 0, 3]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      Module: ZRotate
+      Language: C#
+  - Actor: 1145304093585684760
+    TagComponent:
+      Tag: Red
+    RelationshipComponent:
+      Parent: 2656111424845641502
+      Children:
+        - 14302014170166076899
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Actor: 15899591218538338424
+    TagComponent:
+      Tag: White
+    RelationshipComponent:
+      Parent: 2656111424845641502
+      Children:
+        - 5732264059711093643
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 1.04719758]
+      Scale: [1, 1, 1]
+  - Actor: 6310889229401029238
+    TagComponent:
+      Tag: Some kind of actor
+    RelationshipComponent:
+      Parent: 4042602444775793868
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [0, 0, 1, 1]
+      Radius: 0
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 5732264059711093643
+    TagComponent:
+      Tag: Some kind of actor
+    RelationshipComponent:
+      Parent: 15899591218538338424
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 0
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 14302014170166076899
+    TagComponent:
+      Tag: Some kind of actor
+    RelationshipComponent:
+      Parent: 1145304093585684760
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 0, 0, 1]
+      Radius: 0
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 10328058302458146933
+    TagComponent:
+      Tag: Cyan
+    RelationshipComponent:
+      Parent: 2656111424845641502
+      Children:
+        - 5537158652791439439
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 2.09439516]
+      Scale: [1, 1, 1]
+  - Actor: 9227019339940472954
+    TagComponent:
+      Tag: Yellow
+    RelationshipComponent:
+      Parent: 2656111424845641502
+      Children:
+        - 15634076299616734934
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 3.14159274]
+      Scale: [1, 1, 1]
+  - Actor: 4042602444775793868
+    TagComponent:
+      Tag: Blue
+    RelationshipComponent:
+      Parent: 2656111424845641502
+      Children:
+        - 6310889229401029238
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 5.23598766]
+      Scale: [1, 1, 1]
+  - Actor: 16379621950445101909
+    TagComponent:
+      Tag: Green
+    RelationshipComponent:
+      Parent: 2656111424845641502
+      Children:
+        - 11643746830247115361
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 4.18879032]
+      Scale: [1, 1, 1]
+  - Actor: 11643746830247115361
+    TagComponent:
+      Tag: Some kind of actor
+    RelationshipComponent:
+      Parent: 16379621950445101909
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [0, 1, 0, 1]
+      Radius: 0
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 15634076299616734934
+    TagComponent:
+      Tag: Some kind of actor
+    RelationshipComponent:
+      Parent: 9227019339940472954
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 0, 1]
+      Radius: 0
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 5537158652791439439
+    TagComponent:
+      Tag: Some kind of actor
+    RelationshipComponent:
+      Parent: 10328058302458146933
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 2, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [0, 1, 1, 1]
+      Radius: 0
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]

@@ -89,9 +89,8 @@ namespace Shard3D {
 		context->registry.each([&](auto actorGUID) {
 			ECS::Actor actor{ actorGUID, context.get() };
 
-			std::string text = actor.getTag() + " (" + std::to_string((uint64_t)actor.getUUID()) + ")" 
-				+ " handle (" + std::to_string((uint32_t)actor.actorHandle) + ")"
-				+ " p_handle (" + std::to_string((uint32_t)context->getParent(actor).actorHandle) + ")";
+			std::string text = actor.getTag() + " (" + std::to_string((uint64_t)actor.getUUID()) + ")"
+				+ " handle (" + std::to_string((uint32_t)actor.actorHandle) + ")";
 			if (actor.isInvalid())
 				ImGui::TextColored({1.f, 0.f, 1.f, 1.f}, text.c_str());
 			else

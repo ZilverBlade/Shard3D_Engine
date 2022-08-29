@@ -20,7 +20,6 @@ namespace Shard3D {
 
 		class Level {
 		public:
-
 			Level(const std::string& lvlName = "Some kind of level");
 			~Level();
 
@@ -31,9 +30,6 @@ namespace Shard3D {
 			void killEverything();
 			void killActor(Actor actor);
 			
-			glm::mat4 getParentMat4(Actor& child);
-			glm::mat3 getParentNormals(Actor& child);
-
 			void runGarbageCollector(EngineDevice& device);
 
 			Actor getActorFromUUID(UUID guid);
@@ -45,8 +41,8 @@ namespace Shard3D {
 			Actor getPossessedCameraActor();
 			EngineCamera& getPossessedCamera();
 
-			void parentActor(Actor* child, Actor* parent);
-			Actor getParent(Actor child);
+			void parentActor(Actor child, Actor parent);
+
 			/* *
 * Call when level events must begin
 */
@@ -73,16 +69,17 @@ namespace Shard3D {
 		protected:
 			UUID possessedCameraActorGUID;
 			UUID _possessedCameraActorGUID;
-
 		private:
 			//should only be called by system processes
 			Actor createActorWithUUID(UUID guid, const std::string& name = "Some kind of actor");
+
+			void rebuildTransforms();
+			void rebuildRelations(Actor child);
 
 			bool loadRegistryCapture = false;
 
 			// map
 			hashMap<UUID, entt::entity> actorMap;
-			hashMap<UUID, Actor> actor_parent_comparison;
 
 			// queues 
 			std::vector<Actor> actorKillQueue;

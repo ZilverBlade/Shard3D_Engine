@@ -88,7 +88,7 @@ namespace Shard3D::CppScripts {
 		}
 
 		void updateCameraPos() {
-			glm::vec3 cameraPos = thisActor.getTransform().mat4() * glm::vec4(4.f, 0.f, 0.f, 1.f);
+			glm::vec3 cameraPos = thisActor.getTransform().transformMatrix * glm::vec4(4.f, 0.f, 0.f, 1.f);
 
 			camAct.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(cameraPos.x, cameraPos.z, cameraPos.y + 1.5f));
 			camAct.getComponent<Components::TransformComponent>().setRotationZ(thisActor.getTransform().getRotation().z - 1.57079632679f);

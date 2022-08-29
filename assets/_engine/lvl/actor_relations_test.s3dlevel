@@ -1,0 +1,56 @@
+Shard3D: 1.2.7.r0-alpha
+Level: Some kind of level
+LastSavedEditorCameraPos: [0.077673696, -5.23762751, 2.15135765]
+Actors:
+  - Actor: 13436916918918235240
+    TagComponent:
+      Tag: parent0
+    RelationshipComponent:
+      Parent: 1
+      Children:
+        - 11461169820563454499
+    TransformComponent:
+      Translation: [0, 0, -3]
+      Rotation: [0, 0, 0.151843637]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 11461169820563454499
+    TagComponent:
+      Tag: child1
+    RelationshipComponent:
+      Parent: 13436916918918235240
+      Children:
+        - 14111426036743595109
+    TransformComponent:
+      Translation: [0, 0, 3]
+      Rotation: [0.382227093, 0, 0.432841629]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 14111426036743595109
+    TagComponent:
+      Tag: subchild2
+    RelationshipComponent:
+      Parent: 11461169820563454499
+      Children:
+        []
+    TransformComponent:
+      Translation: [3, 3, 3]
+      Rotation: [-0.932005823, -0.00872664619, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 7025414941505917041
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [0, 0, 2.28999996]
+      Rotation: [-2.31617403, -3.30891752, 1.87964976]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Emission: [1, 1, 1, 1]
+      Specularness: 1

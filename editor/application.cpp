@@ -431,6 +431,6 @@ beginWhileLoop:
 	}
 
 	void EngineApplication::loadStaticObjects() {
-		MasterManager::loadLevel("assets/shadowtest/shadowlevel.s3dlevel");
+		
 	}
 }

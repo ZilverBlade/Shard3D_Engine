@@ -41,4 +41,30 @@ namespace Shard3D.Scripts
 		// This is unused as there are no blueprints that can be spawned in with scripts
 		protected void SpawnEvent() { }
 	}
+
+    public class ZRotate : Actor
+    {
+        protected void BeginEvent()
+        {
+        }
+
+        protected void EndEvent()
+        {
+        }
+
+        protected void TickEvent(float dt)
+        {
+            var rotation = this.GetComponent<Components.TransformComponent>().Rotation;
+			rotation.z += dt * 10;
+			this.GetComponent<Components.TransformComponent>().Rotation = rotation;
+        }
+
+        protected void KillEvent()
+        {
+        }
+
+        protected void SpawnEvent()
+        {
+        }
+    }
 }

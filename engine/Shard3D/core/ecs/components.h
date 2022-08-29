@@ -29,20 +29,28 @@ namespace Shard3D {
 			operator std::string() { return tag; };
 		};
 
-		struct TransformComponent {
-			void setTranslation(glm::vec3 _t) { translation = glm::vec3(_t.x, _t.z, _t.y); }
-			void setRotation(glm::vec3 _r) { rotation = glm::vec3(_r.x, _r.z, _r.y); }
-			void setScale(glm::vec3 _s) { scale = glm::vec3(_s.x, _s.z, _s.y); }
+		struct RelationshipComponent {
+			entt::entity parentActor{ entt::null };
+			std::vector<entt::entity> childActors{};
 
-			void setTranslationX(float val) { translation.x = val; }
-			void setRotationX(float val) { rotation.x = val; }
-			void setScaleX(float val) { scale.x = val; }
-			void setTranslationY(float val) { translation.z = val; }
-			void setRotationY(float val) { rotation.z = val;}
-			void setScaleY(float val) { scale.z = val; }
-			void setTranslationZ(float val) { translation.y = val; }
-			void setRotationZ(float val) { rotation.y = val; }
-			void setScaleZ(float val) { scale.y = val; }
+			RelationshipComponent() = default;
+			RelationshipComponent(const RelationshipComponent&) = default;
+		};
+
+		struct TransformComponent {
+			void setTranslation(glm::vec3 _t) { dirty = true; translation = glm::vec3(_t.x, _t.z, _t.y); }
+			void setRotation(glm::vec3 _r) { dirty = true; rotation = glm::vec3(_r.x, _r.z, _r.y); }
+			void setScale(glm::vec3 _s) { dirty = true; scale = glm::vec3(_s.x, _s.z, _s.y); }
+
+			void setTranslationX(float val) { dirty = true; translation.x = val; }
+			void setRotationX(float val) { dirty = true; rotation.x = val; }
+			void setScaleX(float val) { dirty = true; scale.x = val; }
+			void setTranslationY(float val) { dirty = true; translation.z = val; }
+			void setRotationY(float val) { dirty = true; rotation.z = val;}
+			void setScaleY(float val) { dirty = true; scale.z = val; }
+			void setTranslationZ(float val) { dirty = true; translation.y = val; }
+			void setRotationZ(float val) { dirty = true; rotation.y = val; }
+			void setScaleZ(float val) { dirty = true; scale.y = val; }
 
 			glm::vec3 getTranslation() { return glm::vec3(translation.x, translation.z, translation.y); }
 			glm::vec3 getRotation() { return glm::vec3(rotation.x, rotation.z, rotation.y); }
@@ -51,13 +59,17 @@ namespace Shard3D {
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
 
-			glm::mat4 mat4();
-			glm::mat3 normalMatrix();
+			glm::mat4 transformMatrix;
+			glm::mat3 normalMatrix;
+
+			glm::mat4 calculateMat4();
+			glm::mat3 calculateNormalMatrix();
+
+			bool dirty = true;
 		private:
 			glm::vec3 translation{ 0.f, 0.f, 0.f };
 			glm::vec3 rotation{ 0.f, 0.f, 0.f };
 			glm::vec3 scale{ 1.f, 1.f, 1.f };
-			friend class LevelPropertiesPanel; // to modify the values real time
 			friend struct MatrixCalculator;
 		};
 

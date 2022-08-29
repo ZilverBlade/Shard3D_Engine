@@ -53,8 +53,11 @@ namespace Shard3D {
 			copyComponent<Components::DirectionalLightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
-			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::ScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			
+			// Secret components
+			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::RelationshipComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
 			newLvl->possessedCameraActorGUID = other->getPossessedCameraActor().getUUID();
 			//newLvl->actor_parent_comparison = other->actor_parent_comparison;
@@ -79,17 +82,15 @@ namespace Shard3D {
 
 		void Level::runGarbageCollector(EngineDevice& device) {
 			if (actorKillQueue.size() != 0) {
-				for (int i = 0; i < actorKillQueue.size(); i++) {
-					SHARD3D_LOG("Destroying actor '{0}'", actorKillQueue.at(i).getTag());
-					//if (actorKillQueue.at(i).hasComponent<Components::MeshComponent>() || 
-					//	actorKillQueue.at(i).hasComponent<Components::BillboardComponent>()) 
-					//		vkDeviceWaitIdle(device.device());
-					actorMap.erase(actorKillQueue.at(i).getUUID());
-					registry.destroy(actorKillQueue.at(i));
+				for (auto& actor : actorKillQueue) {
+					SHARD3D_LOG("Destroying actor '{0}'", actor.getTag());
+					actorMap.erase(actor.getUUID());
+					registry.destroy(actor);
 				}
 				actorKillQueue.clear();
 				return;
-			}		
+			}
+			rebuildTransforms();
 		}
 
 		Actor Level::getActorFromUUID(UUID guid) {
@@ -137,17 +138,17 @@ namespace Shard3D {
 		EngineCamera& Level::getPossessedCamera() {
 			return getPossessedCameraActor().getComponent<Components::CameraComponent>().camera;
 		}
-		void Level::parentActor(Actor* child, Actor* parent){
-			 actor_parent_comparison.emplace(child->getUUID(), *parent);
-			// child->parentHandle = parent->actorHandle;	
-			 SHARD3D_LOG("Parented actor {0} to {1}", parent->getUUID(), child->getUUID());
-		}
-		Actor Level::getParent(Actor child) {
-			if (actor_parent_comparison.find(child.getUUID()) != actor_parent_comparison.end())
-				return actor_parent_comparison.at(child.getUUID());
-			return Actor();
+		void Level::parentActor(Actor child, Actor parent){
+			SHARD3D_ASSERT(child != parent && "Cannot parent actor to itself!");
+			child.addComponent<Components::RelationshipComponent>();
+			parent.addComponent<Components::RelationshipComponent>();
+			child.getComponent<Components::RelationshipComponent>().parentActor = parent.actorHandle;
+			parent.getComponent<Components::RelationshipComponent>().childActors.push_back(child.actorHandle);
+
+			SHARD3D_LOG("Parented actor {0} to {1}", parent.getUUID(), child.getUUID());
 		}
 
+		
 		void Level::begin() {
 			SHARD3D_INFO("Level: Initializing scripts");
 			simulationState = PlayState::Simulating;
@@ -243,21 +244,55 @@ namespace Shard3D {
 					DynamicScriptEngine::actorScript().killEvent(actor);
 				}	_next:;
 			}
+
+			if (actor.hasComponent<Components::RelationshipComponent>()) {
+				if (actor.getComponent<Components::RelationshipComponent>().parentActor != entt::null) {
+					std::vector<entt::entity>& childVector = Actor(actor.getComponent<Components::RelationshipComponent>().parentActor, this).getComponent<Components::RelationshipComponent>().childActors;
+					std::vector<entt::entity>::iterator q = childVector.begin();	
+					for (int i = 0; i < childVector.size(); i++) {
+						if (childVector.at(i) == actor) break;
+						q++;
+					}
+					childVector.erase(q);
+				}
+				for (auto& child : actor.getComponent<Components::RelationshipComponent>().childActors) {
+					killActor({ child, this });
+				}
+			}
 		}
 
-		glm::mat4 Level::getParentMat4(Actor& child) {
-			Actor parent = getParent(child);
-			if (!parent.isInvalid())
-				return parent.getTransform().mat4();
-			return glm::mat4(1.f);
+		void Level::rebuildTransforms() {
+			auto view = registry.view<Components::TransformComponent>();
+			for (auto obj : view) {
+				ECS::Actor actor = { obj, this };
+				if (!actor.getTransform().dirty) continue;
+				if (actor.hasComponent<Components::RelationshipComponent>()) {
+					rebuildRelations(actor);
+					continue;
+				}
+				// regular actors with no relations get calculated normally if dirty
+				actor.getTransform().transformMatrix = actor.getTransform().calculateMat4();
+				actor.getTransform().normalMatrix = actor.getTransform().calculateNormalMatrix();
+				actor.getTransform().dirty = false;
+			}
 		}
 
-		glm::mat3 Level::getParentNormals(Actor& child) {
-			Actor parent = getParent(child);
-			if (!parent.isInvalid())
-				return parent.getTransform().normalMatrix();
-			return glm::mat3(1.f);
+		void Level::rebuildRelations(Actor child) {
+			glm::mat4 parentMatrix{ 1.f };
+			glm::mat3 parentNormal{ 1.f };
+			if (child.getComponent<Components::RelationshipComponent>().parentActor != entt::null) {
+				Actor parentActor = { child.getComponent<Components::RelationshipComponent>().parentActor, this };
+				parentMatrix = parentActor.getTransform().transformMatrix;
+				parentNormal = parentActor.getTransform().normalMatrix;
+			}
+			child.getTransform().transformMatrix = parentMatrix * child.getTransform().calculateMat4();
+			child.getTransform().normalMatrix = parentNormal * child.getTransform().calculateNormalMatrix();
+			child.getTransform().dirty = false;
+			for (auto& subchild : child.getComponent<Components::RelationshipComponent>().childActors) {
+				rebuildRelations({ subchild, this});
+			}
 		}
+
 
 		void Level::killEverything() {
 			registry.each([&](auto actorGUID) { ECS::Actor actor = { actorGUID, this };

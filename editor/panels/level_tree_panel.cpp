@@ -21,6 +21,7 @@ namespace Shard3D {
 		context->registry.each([&](auto actorGUID) {
 			ECS::Actor actor{ actorGUID, context.get() };	
 			if (actor.isInvalid()) return;
+			if (actor.hasComponent<Components::RelationshipComponent>()) if (actor.getComponent<Components::RelationshipComponent>().parentActor != entt::null) return;
 			drawActorEntry(actor);
 		});
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) selectedActor = {};
@@ -74,16 +75,31 @@ namespace Shard3D {
 
 		// remove stuff
 		bool actorExists = true;
-		if (ImGui::BeginPopupContextItem()) {
-			if (ImGui::MenuItem("Remove Actor")) actorExists = false;
+		if (selectedActor)
+			if (ImGui::BeginPopupContextItem()) {
+				if (ImGui::MenuItem("Remove Actor")) actorExists = false;
+				if (ImGui::MenuItem("Add Child")) {
+					context->parentActor(context->createActor(), selectedActor);
+				}
 
-			ImGui::EndPopup();
-		}
+				ImGui::EndPopup();
+			}
 
 		if (expanded) {
+			if (actor.hasComponent<Components::RelationshipComponent>())
+				for (auto& child : actor.getComponent<Components::RelationshipComponent>().childActors)
+					drawActorEntry({ child, context.get() });
 			ImGui::TreePop();
 		}
-
+		//if (ImGui::BeginDragDropTarget()) {		
+		//	if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ACTOR")) {
+		//		context->parentActor({ (entt::entity)(*reinterpret_cast<uint32_t*>(payload->Data)), context.get() }, selectedActor);
+		//	}
+		//}
+		//if (ImGui::BeginDragDropSource()) {
+		//	uint32_t src = (uint32_t)selectedActor.actorHandle;
+		//	ImGui::SetDragDropPayload("SHARD3D.ACTOR", &src, sizeof(uint32_t), ImGuiCond_Once);
+		//}
 		if (!actorExists) {
 			context->killActor(actor);
 			if (selectedActor == actor) selectedActor = {};

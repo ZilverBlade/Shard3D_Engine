@@ -95,16 +95,16 @@ namespace Shard3D {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.5f, 0.f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.7f, 0.f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.7f, 0.3f, 1.f));
-		if (ImGui::Button("Y", buttonSize)) values.z = resetValue;	
+		if (ImGui::Button("Y", buttonSize)) values.y = resetValue;	
 		ImGui::PopStyleColor(3);
-		ImGui::SameLine(); ImGui::DragFloat("##Y", &values.z, stepVal); ImGui::PopItemWidth(); ImGui::SameLine();
+		ImGui::SameLine(); ImGui::DragFloat("##Y", &values.y, stepVal); ImGui::PopItemWidth(); ImGui::SameLine();
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.7f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.9f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.2f, 0.9f, 1.f));
-		if (ImGui::Button("Z", buttonSize)) values.y = resetValue;
+		if (ImGui::Button("Z", buttonSize)) values.z = resetValue;
 		ImGui::PopStyleColor(3);
-		ImGui::SameLine(); ImGui::DragFloat("##Z", &values.y, stepVal); ImGui::PopItemWidth();
+		ImGui::SameLine(); ImGui::DragFloat("##Z", &values.z, stepVal); ImGui::PopItemWidth();
 
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
@@ -131,13 +131,18 @@ namespace Shard3D {
 		}
 		if (actor.hasComponent<Components::TransformComponent>()) {
 			if (ImGui::TreeNodeEx((void*)typeid(Components::TransformComponent).hash_code(), nodeFlags, "Transform")) {
-				drawTransformControl("Translation", actor.getComponent<Components::TransformComponent>().translation, 0.f);
+				glm::vec3 tran = actor.getComponent<Components::TransformComponent>().getTranslation();
+				drawTransformControl("Translation", tran, 0.f);
+				actor.getComponent<Components::TransformComponent>().setTranslation(tran);
 
-				glm::vec3 rot = glm::degrees(actor.getComponent<Components::TransformComponent>().rotation);
-				drawTransformControl("Rotation", rot, 0.f, 0.1f);
-				actor.getComponent<Components::TransformComponent>().rotation = glm::radians(rot);
 
-				drawTransformControl("Scale", actor.getComponent<Components::TransformComponent>().scale, 1.f);
+				glm::vec3 rota = glm::degrees(actor.getComponent<Components::TransformComponent>().getRotation());
+				drawTransformControl("Rotation", rota, 0.f, 0.1f);
+				actor.getComponent<Components::TransformComponent>().setRotation(glm::radians(rota));
+
+				glm::vec3 scal = actor.getComponent<Components::TransformComponent>().getScale();
+				drawTransformControl("Scale", scal, 1.f);
+				actor.getComponent<Components::TransformComponent>().setScale(scal);
 
 				ImGui::TreePop();
 			}

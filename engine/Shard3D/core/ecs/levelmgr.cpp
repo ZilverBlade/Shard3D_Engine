@@ -11,7 +11,7 @@ namespace Shard3D {
 			SHARD3D_INFO("Loading Level Manager");
 		}
 
-		static void saveActor(YAML::Emitter& out, Actor actor) {
+		static void saveActor(YAML::Emitter& out, Actor actor, Level* level) {
 			if (actor.isInvalid()) return;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Actor" << YAML::Value << actor.getUUID();
@@ -24,6 +24,21 @@ namespace Shard3D {
 				out << YAML::EndMap;
 			}
 
+			// RELATIONSHIP
+			if (actor.hasComponent<Components::RelationshipComponent>()) {
+				out << YAML::Key << "RelationshipComponent";
+				out << YAML::BeginMap;
+				out << YAML::Key << "Parent" << YAML::Value << ((actor.getComponent<Components::RelationshipComponent>().parentActor != entt::null) ?  Actor(actor.getComponent<Components::RelationshipComponent>().parentActor, level).getUUID() : UUID(1));
+				std::vector<uint64_t> correctedIDs;
+				correctedIDs.reserve(actor.getComponent<Components::RelationshipComponent>().childActors.size());
+
+				for (auto& child : actor.getComponent<Components::RelationshipComponent>().childActors)
+					correctedIDs.push_back(Actor(child, level).getUUID());
+				
+				out << YAML::Key << "Children" << YAML::Value << correctedIDs;
+				out << YAML::EndMap;
+			}
+
 			// TRANSFORM
 			if (actor.hasComponent<Components::TransformComponent>()) {
 				out << YAML::Key << "TransformComponent";
@@ -33,6 +48,7 @@ namespace Shard3D {
 					out << YAML::Key << "Scale" << YAML::Value << actor.getComponent<Components::TransformComponent>().getScale();
 				out << YAML::EndMap;
 			}
+
 
 			// SCRIPT
 			if (actor.hasComponent<Components::ScriptComponent>()) {
@@ -127,7 +143,7 @@ namespace Shard3D {
 
 			mLevel->registry.each([&](auto actorGUID) { Actor actor = { actorGUID, mLevel.get() };
 				if (!actor) return;
-				saveActor(out, actor);
+				saveActor(out, actor, mLevel.get());
 			});
 
 			out << YAML::EndSeq;
@@ -182,6 +198,8 @@ namespace Shard3D {
 						loadedActor.getComponent<Components::TransformComponent>().setRotation(actor["TransformComponent"]["Rotation"].as<glm::vec3>());
 						loadedActor.getComponent<Components::TransformComponent>().setScale(actor["TransformComponent"]["Scale"].as<glm::vec3>());
 					}
+
+					
 					// AUDIO
 					if (actor["AudioComponent"]) {
 						loadedActor.addComponent<Components::AudioComponent>();
@@ -253,6 +271,25 @@ namespace Shard3D {
 						loadedActor.getComponent<Components::DirectionalLightComponent>().specularMod = actor["DirectionalLightComponent"]["Specularness"].as<float>();
 					}
 				}
+				for (auto actor : data["Actors"]) {
+					
+					if (actor["RelationshipComponent"]) {		
+						Actor loadedActor{};
+						loadedActor = mLevel->getActorFromUUID(actor["Actor"].as<uint64_t>());
+						loadedActor.addComponent<Components::RelationshipComponent>();
+						if (actor["RelationshipComponent"]["Parent"].as<uint64_t>() != 1)
+							loadedActor.getComponent<Components::RelationshipComponent>().parentActor = mLevel->getActorFromUUID(actor["RelationshipComponent"]["Parent"].as<uint64_t>()).actorHandle;
+						
+						loadedActor.getComponent<Components::RelationshipComponent>().childActors.reserve(actor["RelationshipComponent"]["Children"].as<std::vector<uint64_t>>().size());
+
+						for (auto& child : actor["RelationshipComponent"]["Children"].as<std::vector<uint64_t>>())
+							loadedActor.getComponent<Components::RelationshipComponent>().childActors.push_back(mLevel->getActorFromUUID(child).actorHandle);
+					}
+
+				}
+
+
+
 			}
 			mLevel->currentpath = sourcePath;
 			return LevelMgrResults::SuccessResult;

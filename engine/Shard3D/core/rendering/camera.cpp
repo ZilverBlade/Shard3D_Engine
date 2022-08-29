@@ -71,8 +71,9 @@ namespace Shard3D {
 * Set camera view based on the camera's position and rotation
 */
 	void EngineCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
-		const glm::vec3 _r = { rotation.x, rotation.z, rotation.y };
 		const glm::vec3 _t = { position.x, position.z, position.y };
+		const glm::vec3 _r = { rotation.x, rotation.z, rotation.y };
+		
 		const float c3 = glm::cos(_r.z);
 		const float s3 = glm::sin(_r.z);
 		const float c2 = glm::cos(_r.x);

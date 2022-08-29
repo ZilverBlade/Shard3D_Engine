@@ -28,6 +28,7 @@ namespace Shard3D {
 			LevelMgrResults loadRuntime(const std::string& sourcePath);
 
 		private:
+
 			sPtr<Level> mLevel;
 		};
 	}

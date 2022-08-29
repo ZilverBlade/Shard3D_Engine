@@ -17,8 +17,6 @@ namespace Shard3D {
 		void renderForward(FrameInfo &frameInfo);
 	private:
 		EngineDevice& engineDevice;
-
-		uPtr<EngineDescriptorSetLayout> skyboxLayout;
 	};
 
 }
