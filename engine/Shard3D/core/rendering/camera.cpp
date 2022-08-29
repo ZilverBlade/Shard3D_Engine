@@ -111,4 +111,38 @@ namespace Shard3D {
 		inverseViewMatrix[3][1] = _t.y;
 		inverseViewMatrix[3][2] = _t.z;
 	}
+	void EngineCamera::setViewYXZ(glm::mat4 transformMatrix) {
+		inverseViewMatrix = transformMatrix;
+
+		viewMatrix = glm::mat4{ 1.f };
+
+		const glm::vec3 u =  { 
+			inverseViewMatrix[0][0],
+			inverseViewMatrix[0][1],
+			inverseViewMatrix[0][2]
+		};
+		const glm::vec3 v = { 
+			inverseViewMatrix[1][0],
+			inverseViewMatrix[1][1],
+			inverseViewMatrix[1][2] 
+		};
+		const glm::vec3 w = { 
+			inverseViewMatrix[2][0],
+			inverseViewMatrix[2][1],
+			inverseViewMatrix[2][2] 
+		};
+
+		viewMatrix[0][0] = inverseViewMatrix[0][0];
+		viewMatrix[1][0] = inverseViewMatrix[0][1];
+		viewMatrix[2][0] = inverseViewMatrix[0][2];
+		viewMatrix[0][1] = inverseViewMatrix[1][0];
+		viewMatrix[1][1] = inverseViewMatrix[1][1];
+		viewMatrix[2][1] = inverseViewMatrix[1][2];
+		viewMatrix[0][2] = inverseViewMatrix[2][0];
+		viewMatrix[1][2] = inverseViewMatrix[2][1];
+		viewMatrix[2][2] = inverseViewMatrix[2][2];
+		viewMatrix[3][0] = -glm::dot(u, { inverseViewMatrix[3].x, inverseViewMatrix[3].y, inverseViewMatrix[3].z });
+		viewMatrix[3][1] = -glm::dot(v, { inverseViewMatrix[3].x, inverseViewMatrix[3].y, inverseViewMatrix[3].z });
+		viewMatrix[3][2] = -glm::dot(w, { inverseViewMatrix[3].x, inverseViewMatrix[3].y, inverseViewMatrix[3].z });
+	}
 }

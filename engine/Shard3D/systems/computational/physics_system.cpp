@@ -6,21 +6,20 @@
 #include <Physics/Collision/Shape/Shape.h>
 #include <Physics/Collision/Shape/BoxShape.h>
 #include <Physics/Collision/Shape/ConvexHullShape.h>
-#include <Core/JobSystem.h>
 #include "../../core/ecs/components.h"
 namespace Shard3D {
-	PhysicsSystem::PhysicsSystem() {
-		
-	}
-	PhysicsSystem::~PhysicsSystem() {
-
-	}
-	void PhysicsSystem::simulate(FrameInfo& frameInfo) {
-		//system.Update();
-		frameInfo.activeLevel->registry.view<Components::RigidbodyComponent, Components::TransformComponent>().each([&](auto phys, auto transform) {
-			
-		});
-	}
+	//PhysicsSystem::PhysicsSystem() {		
+	//	system->SetBodyActivationListener(&bodyActivationListener);
+	//}
+	//PhysicsSystem::~PhysicsSystem() {
+	//
+	//}
+	//void PhysicsSystem::simulate(FrameInfo& frameInfo) {
+	//	system->Update(frameInfo.frameTime, 0, 0, nullptr, jobSystem.get());
+	//	frameInfo.activeLevel->registry.view<Components::RigidbodyComponent, Components::TransformComponent>().each([&](Components::RigidbodyComponent phys, Components::TransformComponent transform) {
+	//		
+	//	});
+	//}
 	//JPH::Ref<JPH::Shape> PhysicsSystem::createBoxShape(const JPH::BoxShapeSettings& settings) {
 	//	JPH::Shape::ShapeResult result = settings.Create();
 	//	if (result.IsValid())
@@ -47,6 +46,12 @@ namespace Shard3D {
 	//		return result.Get();
 	//	else
 	//		SHARD3D_FATAL(result.GetError());
+	//}
+	//
+	//JPH::Body& PhysicsSystem::createBody(const JPH::BodyCreationSettings& settings) {
+	//	JPH::Body& body = *bodyInterface->CreateBody(settings);
+	//	bodyInterface->AddBody(body.GetID(), JPH::EActivation::Activate);
+	//	return body;
 	//}
 	//
 	//void PhysicsSystem::dumpShapeToBin(JPH::Ref<JPH::Shape> shape, const std::string& path) {

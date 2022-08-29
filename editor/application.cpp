@@ -325,7 +325,7 @@ beginWhileLoop:
 				editorCameraController.tryPoll(engineWindow, frameTime, editor_cameraActor);
 			}
 			possessedCameraActor.getComponent<Components::CameraComponent>().ar = GraphicsSettings::getRuntimeInfo().aspectRatio;
-			possessedCamera.setViewYXZ(possessedCameraActor.getTransform().getTranslation(), possessedCameraActor.getTransform().getRotation());
+			possessedCamera.setViewYXZ(possessedCameraActor.getTransform().transformMatrix);
 			possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
 
 			if (auto commandBuffer = engineRenderer.beginFrame()) {

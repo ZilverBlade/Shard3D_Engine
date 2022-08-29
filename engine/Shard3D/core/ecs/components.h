@@ -227,15 +227,16 @@ namespace Shard3D {
 		};
 		struct RigidbodyComponent {
 			enum class PhysicsState {
-				NONE = 0,
-				STATIC = 1,
-				DYNAMIC = 2,
-				KINEMATIC = 3
+				STATIC,
+				DYNAMIC,
+				KINEMATIC 
 			};
 
 			float mass;
 			float friction;
 			float restitution;
+
+			//JPH::Ref<JPH::Shape> shape{};
 
 			PhysicsState state = PhysicsState::STATIC;
 		};
