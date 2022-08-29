@@ -72,7 +72,7 @@ namespace Shard3D {
 			AttachmentInfo resolveAttachmentInfo{};
 			resolveAttachmentInfo.frameBufferAttachment = mainResolveFramebufferAttachment;
 			resolveAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			resolveAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			resolveAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
 			mainRenderpass = new SimpleRenderPass(
 				engineDevice, {
@@ -186,6 +186,7 @@ namespace Shard3D {
 #endif
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		PostProcessingSystem ppoSystem{ engineDevice, ppoRenderpass->getRenderPass(), mainResolveFramebufferAttachment->getImageView(), mainResolveFramebufferAttachment->getSampler() };
+		ShadowMappingSystem shadowSystem{ engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
@@ -350,6 +351,10 @@ beginWhileLoop:
 					Also order absolutely matters, post processing for example must go last
 				*/
 				//	render
+				SHARD3D_STAT_RECORD();
+				shadowSystem.render(frameInfo);
+				SHARD3D_STAT_RECORD_END({ "Rendering", "Shadow Mapping" });
+
 				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
 				SHARD3D_STAT_RECORD();
 				forwardRenderSystem.renderForward(frameInfo);
@@ -409,6 +414,6 @@ beginWhileLoop:
 	}
 
 	void EngineApplication::loadStaticObjects() {
-
+		MasterManager::loadLevel("assets/shadowtest/shadowlevel.s3dlevel");
 	}
 }

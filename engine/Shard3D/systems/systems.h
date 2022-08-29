@@ -4,6 +4,7 @@
 #include "rendering/billboard_system.h"
 #include "rendering/hud_system.h"
 #include "rendering/post_processing_system.h"
+#include "rendering/shadow_mapping_system.h"
 #include "rendering/editor/editor_billboard_renderer.h"
 #include "rendering/editor/grid_system.h"
 

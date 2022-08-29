@@ -358,6 +358,9 @@
     <ClInclude Include="core\rendering\frame_buffer.h">
       <Filter>Header Files\core\rendering</Filter>
     </ClInclude>
+    <ClInclude Include="systems\rendering\shadow_mapping_system.h">
+      <Filter>Header Files\systems\rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s3dpch.cpp">
@@ -504,6 +507,9 @@
     <ClCompile Include="core\rendering\frame_buffer.cpp">
       <Filter>Source Files\core\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="systems\rendering\shadow_mapping_system.cpp">
+      <Filter>Source Files\systems\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\_editor\grid.vert">
@@ -521,9 +527,6 @@
     <None Include="shaders\hud_element.frag">
       <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
-    <None Include="shaders\surface_shader.frag">
-      <Filter>Resource Files\Shaders\fragment</Filter>
-    </None>
     <None Include="shaders\billboard_sva.frag">
       <Filter>Resource Files\Shaders\fragment</Filter>
     </None>
@@ -531,9 +534,6 @@
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\hud_element.vert">
-      <Filter>Resource Files\Shaders\vertex</Filter>
-    </None>
-    <None Include="shaders\surface_shader.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\materials\surface_shaded_opaque.frag">
@@ -553,6 +553,12 @@
     </None>
     <None Include="shaders\post_processing\color_correction.frag">
       <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    </None>
+    <None Include="shaders\fragment_blank.frag">
+      <Filter>Resource Files\Shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\shadow_directional.vert">
+      <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
   </ItemGroup>
 </Project>

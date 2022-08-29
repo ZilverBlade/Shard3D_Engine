@@ -1,0 +1,24 @@
+Shard3D: 1.2.7.r0-alpha
+Level: Some kind of level
+LastSavedEditorCameraPos: [-2.92063665, -2.54461551, 2.63880014]
+Actors:
+  - Actor: 7025414941505917041
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [0, 0, 2.28999996]
+      Rotation: [-2.31617403, -3.30891752, 1.87964976]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Emission: [1, 1, 1, 1]
+      Specularness: 1
+  - Actor: 13239493398754867804
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]

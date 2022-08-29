@@ -106,7 +106,7 @@ namespace Shard3D {
 		struct {
 			VkDescriptorSet play, pause, stop, 
 				pref, save, load,
-				preview, layout, viewport, level,
+				preview, layout, viewport, level, launchgame,
 				settings,
 				l_save, l_load;
 			

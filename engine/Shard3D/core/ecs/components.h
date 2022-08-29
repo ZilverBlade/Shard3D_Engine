@@ -198,6 +198,7 @@ namespace Shard3D {
 			glm::vec3 color = { 1.f, 1.f, 1.f };
 			float lightIntensity = 1.0f;
 			float specularMod = 1.0f;
+			glm::mat4 lightProjection{ 1.f };
 
 			DirectionalLightComponent() = default;
 			DirectionalLightComponent(const DirectionalLightComponent&) = default;

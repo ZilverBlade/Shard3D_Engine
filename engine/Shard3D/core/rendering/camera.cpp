@@ -1,30 +1,28 @@
 #include "../../s3dpch.h"
 #include "camera.h"
 
-#undef near
-#undef far
 namespace Shard3D {
 
 	void EngineCamera::setOrthographicProjection(
-		float left, float right, float top, float bottom, float near, float far) {
+		float left, float right, float top, float bottom, float zNear, float zFar) {
 		projectionMatrix = glm::mat4{ 1.0f };
 		projectionMatrix[0][0] = 2.f / (right - left);
 		projectionMatrix[1][1] = 2.f / (bottom - top);
-		projectionMatrix[2][2] = 1.f / (far - near);
+		projectionMatrix[2][2] = 1.f / (zFar - zNear);
 		projectionMatrix[3][0] = -(right + left) / (right - left);
 		projectionMatrix[3][1] = -(bottom + top) / (bottom - top);
-		projectionMatrix[3][2] = -near / (far - near);
+		projectionMatrix[3][2] = -zNear / (zFar - zNear);
 	}
 
-	void EngineCamera::setPerspectiveProjection(float fovy, float aspect, float near /*Near clipping plane*/, float far /*Far clipping plane*/) {
+	void EngineCamera::setPerspectiveProjection(float fovy, float aspect, float zNear /*Near clipping plane*/, float zFar /*Far clipping plane*/) {
 		SHARD3D_ASSERT(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f, "");
 		const float tanHalfFovy = tan(fovy / 2.f);
 		projectionMatrix = glm::mat4{ 0.0f };
 		projectionMatrix[0][0] = 1.f / (aspect * tanHalfFovy);
 		projectionMatrix[1][1] = 1.f / (tanHalfFovy);
-		projectionMatrix[2][2] = far / (far - near);
+		projectionMatrix[2][2] = zFar / (zFar - zNear);
 		projectionMatrix[2][3] = 1.f;
-		projectionMatrix[3][2] = -(far * near) / (far - near);
+		projectionMatrix[3][2] = -(zFar * zNear) / (zFar - zNear);
 	}
 	/* *
 * Set camera view based on the camera's position and direction

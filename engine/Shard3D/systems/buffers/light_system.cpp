@@ -45,6 +45,7 @@ namespace Shard3D {
 				ubo.directionalLights[lightIndex].color = glm::vec4(light.color, light.lightIntensity);
 				ubo.directionalLights[lightIndex].direction = glm::vec4(r.x, r.z, r.y, 1.f);
 				ubo.directionalLights[lightIndex].specularMod = light.specularMod;
+			//	ubo.directionalLights[lightIndex].lightProjection = light.lightProjection;
 				lightIndex += 1;
 			});
 			ubo.numDirectionalLights = lightIndex;

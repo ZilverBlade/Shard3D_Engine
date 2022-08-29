@@ -162,6 +162,7 @@
     <ClInclude Include="core\asset\assetid.h" />
     <ClInclude Include="core\rendering\frame_buffer.h" />
     <ClInclude Include="core\rendering\renderpass.h" />
+    <ClInclude Include="systems\rendering\shadow_mapping_system.h" />
     <ClInclude Include="workarounds.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="dynamic_definitions.h" />
@@ -469,6 +470,11 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="systems\rendering\shadow_mapping_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="utils\engine_utils.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
@@ -488,6 +494,7 @@
   <ItemGroup>
     <None Include="shaders\billboard_sva.frag" />
     <None Include="shaders\billboard_sva.vert" />
+    <None Include="shaders\fragment_blank.frag" />
     <None Include="shaders\fullscreen_quad.vert" />
     <None Include="shaders\hud_element.frag" />
     <None Include="shaders\hud_element.vert" />
@@ -496,8 +503,7 @@
     <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
     <None Include="shaders\post_processing\color_correction.frag" />
-    <None Include="shaders\surface_shader.frag" />
-    <None Include="shaders\surface_shader.vert" />
+    <None Include="shaders\shadow_directional.vert" />
     <None Include="shaders\_editor\editor_svabill.frag" />
     <None Include="shaders\_editor\editor_svabill.vert" />
     <None Include="shaders\_editor\grid.frag" />

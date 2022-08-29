@@ -98,7 +98,11 @@ namespace Shard3D {
 		} {
 			auto& img = _special_assets::_editor_icons.at("editor.settings");
 			icons.settings = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		} {
+			auto& img = _special_assets::_editor_icons.at("editor.launch");
+			icons.launchgame = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
+	
 	}
 
 	void ImGuiLayer::detach() {
@@ -375,11 +379,17 @@ namespace Shard3D {
 		}
 		ImGui::TextWrapped("Layout");
 		ImGui::NextColumn();
+		if (ImGui::ImageButton(icons.launchgame, btnSize)) {
+			SHARD3D_NOIMPL;
+		}
+		ImGui::TextWrapped("Launch");
+		ImGui::NextColumn();
 		if (ImGui::ImageButton(icons.viewport, btnSize)) {
 			SHARD3D_NOIMPL;
 		}
 		ImGui::TextWrapped("View");
 		ImGui::NextColumn();
+		
 		// end
 		ImGui::Columns(1);
 		ImGui::PopStyleVar();
