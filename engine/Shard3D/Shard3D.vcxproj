@@ -502,7 +502,7 @@
     <None Include="shaders\materials\surface_shaded_opaque.frag" />
     <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
-    <None Include="shaders\post_processing\color_correction.frag" />
+    <None Include="shaders\post_processing\bloom.frag" />
     <None Include="shaders\shadow_directional.vert" />
     <None Include="shaders\_editor\editor_svabill.frag" />
     <None Include="shaders\_editor\editor_svabill.vert" />

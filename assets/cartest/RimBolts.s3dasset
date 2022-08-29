@@ -1,0 +1,20 @@
+Shard3D: 1.2.7.r0-alpha
+AssetType: surface_material
+SurfaceMaterial:
+  - Material: RimBolts
+    Physics:
+      MaterialType: SurfaceMaterial
+      MaterialClass: class Shard3D::SurfaceMaterial_ShadedOpaque
+    Draw:
+      VkCullModeFlags: 1
+      VkPolygonMode: 0
+    Data:
+      diffuseColor: [0.392156869, 0.392156869, 0.392156869]
+      diffuseTex: assets/_engine/tex/0xffffff.png.s3dasset
+      specularFactor: 0.310000002
+      specularTex: assets/_engine/tex/0xffffff.png.s3dasset
+      shininessFactor: 0.0299999993
+      shininessTex: assets/_engine/tex/0xffffff.png.s3dasset
+      metallicFactor: 1
+      metallicTex: assets/_engine/tex/0xffffff.png.s3dasset
+      normalTex: assets/_engine/tex/0x807ffe.png.s3dasset

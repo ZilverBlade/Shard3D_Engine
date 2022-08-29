@@ -551,7 +551,7 @@
     <None Include="shaders\fullscreen_quad.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
-    <None Include="shaders\post_processing\color_correction.frag">
+    <None Include="shaders\post_processing\bloom.frag">
       <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
     </None>
     <None Include="shaders\fragment_blank.frag">

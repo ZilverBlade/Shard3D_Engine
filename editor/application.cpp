@@ -388,9 +388,11 @@ beginWhileLoop:
 
 				mainRenderpass->endRenderPass(frameInfo);
 
+				SHARD3D_STAT_RECORD();
 				ppoRenderpass->beginRenderPass(frameInfo, ppoFrameBuffer);
 				ppoSystem.render(frameInfo);
 				ppoRenderpass->endRenderPass(frameInfo);
+				SHARD3D_STAT_RECORD_END({ "Post Processing", "Bloom" });
 
 #ifdef ENSET_ENABLE_COMPUTE_SHADERS
 				computeSystem.render(frameInfo);

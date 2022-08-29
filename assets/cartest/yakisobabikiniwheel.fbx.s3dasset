@@ -1,0 +1,6 @@
+Shard3D: 1.2.7.r0-alpha
+AssetType: mesh3d
+AssetFile: assets/cartest/yakisobabikiniwheel.fbx
+AssetOrig: D:\Directories\Documents\yakisobabikiniwheel.fbx
+Materials: [assets/cartest/RimInside.s3dasset, assets/cartest/Rim.s3dasset, assets/cartest/Tyre.s3dasset, assets/cartest/RimBolts.s3dasset]
+Properties: !!binary "AAAAAA=="

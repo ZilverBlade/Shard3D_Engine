@@ -62,7 +62,7 @@ namespace Shard3D {
 		enginePipeline = make_uPtr<EnginePipeline>(
 			engineDevice,
 			"assets/shaderdata/fullscreen_quad.vert.spv",
-			"assets/shaderdata/post_processing/color_correction.frag.spv",
+			"assets/shaderdata/post_processing/bloom.frag.spv",
 			pipelineConfig
 		);
 	}
