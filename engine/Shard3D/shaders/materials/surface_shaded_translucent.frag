@@ -166,5 +166,5 @@ void main(){
 		lightOutput += lightIntensity * color_intensity * fragColor * Kd;
 	}
 
-	outColor = vec4(lightOutput, texture(tex_opacity, fragUV).x * factor.diffuse.w); //RGBA
+	outColor = vec4(ubo.ambientLightColor.xyz * ubo.ambientLightColor.w * fragColor + lightOutput, texture(tex_opacity, fragUV).x * factor.diffuse.w); //RGBA
 }

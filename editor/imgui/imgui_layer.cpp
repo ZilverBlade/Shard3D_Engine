@@ -35,7 +35,7 @@ namespace Shard3D {
 		engineDevice = &dvc;
 		engineWindow = &wnd;
 		currentStack = layerStack;
-		std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Null)";
+		std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped)";
 		glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
 		hasBeenDetached = false;
 
@@ -332,15 +332,15 @@ namespace Shard3D {
 			if (frameInfo.activeLevel->simulationState == PlayState::Stopped) { // Play
 				ECS::MasterManager::captureLevel(frameInfo.activeLevel);
 				frameInfo.activeLevel->begin();
-				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: SIMULATING) | " + frameInfo.activeLevel->name;
+				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
 				glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
 			} else if (frameInfo.activeLevel->simulationState == PlayState::Paused) {  // Resume
-				frameInfo.activeLevel->simulationState = PlayState::Simulating;
+				frameInfo.activeLevel->simulationState = PlayState::Playing;
 				frameInfo.activeLevel->simulationStateCallback();
-				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: SIMULATING) | " + frameInfo.activeLevel->name;
+				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
 				glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
 
-			} else if (frameInfo.activeLevel->simulationState == PlayState::Simulating) {  // Pause
+			} else if (frameInfo.activeLevel->simulationState == PlayState::Playing) {  // Pause
 				frameInfo.activeLevel->simulationState = PlayState::Paused;
 				frameInfo.activeLevel->simulationStateCallback();
 				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Paused) | " + frameInfo.activeLevel->name;
@@ -353,7 +353,7 @@ namespace Shard3D {
 		if (ImGui::ImageButton(icons.stop, btnSize)) {        // Stop
 			levelTreePanel.clearSelectedActor();
 			frameInfo.activeLevel->end();
-			std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Null) | " + frameInfo.activeLevel->name;
+			std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped) | " + frameInfo.activeLevel->name;
 			glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
 			refreshContext = true;
 		}
@@ -446,11 +446,11 @@ namespace Shard3D {
 				if (ImGui::MenuItem("Begin")) {
 					ECS::MasterManager::captureLevel(frameInfo.activeLevel);
 					frameInfo.activeLevel->begin();
-					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: SIMULATING) | " + frameInfo.activeLevel->name;
+					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
 					glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
 				} ImGui::EndDisabled();
 				if (frameInfo.activeLevel->simulationState != PlayState::Paused) {
-					ImGui::BeginDisabled(frameInfo.activeLevel->simulationState != PlayState::Simulating); if (ImGui::MenuItem("Pause")) {
+					ImGui::BeginDisabled(frameInfo.activeLevel->simulationState != PlayState::Playing); if (ImGui::MenuItem("Pause")) {
 						frameInfo.activeLevel->simulationState = PlayState::Paused;
 						frameInfo.activeLevel->simulationStateCallback();
 						std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Paused) | " + frameInfo.activeLevel->name;
@@ -458,10 +458,10 @@ namespace Shard3D {
 					} ImGui::EndDisabled();
 				}
 				else {
-					ImGui::BeginDisabled(frameInfo.activeLevel->simulationState == PlayState::Simulating); if (ImGui::MenuItem("Resume")) {
-						frameInfo.activeLevel->simulationState = PlayState::Simulating;
+					ImGui::BeginDisabled(frameInfo.activeLevel->simulationState == PlayState::Playing); if (ImGui::MenuItem("Resume")) {
+						frameInfo.activeLevel->simulationState = PlayState::Playing;
 						frameInfo.activeLevel->simulationStateCallback();
-						std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: SIMULATING) | " + frameInfo.activeLevel->name;
+						std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
 						glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
 					} ImGui::EndDisabled();
 				}
@@ -470,7 +470,7 @@ namespace Shard3D {
 				if (ImGui::MenuItem("End")) {
 					levelTreePanel.clearSelectedActor();
 					frameInfo.activeLevel->end();
-					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Null) | " + frameInfo.activeLevel->name;
+					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped) | " + frameInfo.activeLevel->name;
 					glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
 					refreshContext = true;
 				} ImGui::EndDisabled();

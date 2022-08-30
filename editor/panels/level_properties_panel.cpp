@@ -19,7 +19,7 @@ namespace Shard3D {
 
 	void LevelPropertiesPanel::render(LevelTreePanel& tree) {
 		SHARD3D_ASSERT(context != nullptr && "Context not provided!");
-		ImGui::Begin("Properties"); ImGui::BeginDisabled(context->simulationState == PlayState::Simulating/*&& ini.canEditDuringSimulation*/);
+		ImGui::Begin("Properties"); ImGui::BeginDisabled(context->simulationState == PlayState::Playing/*&& ini.canEditDuringSimulation*/);
 		if (tree.selectedActor) { 
 			drawActorProperties(tree.selectedActor);
 			if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");

@@ -43,6 +43,9 @@ namespace Shard3D {
 		static void SceneManagerDestroyHUDLayer(int layer);
 #pragma endregion
 
+		static bool IsKeyDown(int keyCode);
+		static bool IsMouseButtonDown(int button);
+
 #pragma region ECS
 		static void SpawnActor(uint64_t* actorID, MonoString* string);
 		static void KillActor(uint64_t actorID);

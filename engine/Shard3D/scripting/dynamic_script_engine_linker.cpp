@@ -66,6 +66,9 @@ namespace Shard3D {
 		_S3D_ICALL(SceneManagerLoadHUD);
 		_S3D_ICALL(SceneManagerDestroyHUDLayer);
 
+		_S3D_ICALL(IsKeyDown);
+		_S3D_ICALL(IsMouseButtonDown);
+
 		_S3D_ICALL(TransformComponent_SetTranslation);
 		_S3D_ICALL(TransformComponent_GetTranslation);
 		_S3D_ICALL(TransformComponent_SetRotation);
@@ -174,6 +177,13 @@ namespace Shard3D::InternalScriptCalls {
 	void SceneManager_PossessCameraActor(uint64_t actorID) {
 		DynamicScriptEngine::getContext()->setPossessedCameraActor(actorID);
 	}
+	bool IsKeyDown(int keyCode) {
+		return Input::isKeyDown(keyCode);
+	}
+	bool IsMouseButtonDown(int button) {
+		return Input::isMouseButtonDown(button);
+	}
+
 	void SpawnActor(uint64_t* actorID, MonoString* string) {
 		char* t = mono_string_to_utf8(string);
 		std::string text(t);
@@ -230,10 +240,10 @@ namespace Shard3D::InternalScriptCalls {
 		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().setTranslation(*v);
 	}
 	void TransformComponent_GetRotation(uint64_t actorID, glm::vec3* v) {
-		*v = glm::degrees((DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().getRotation()));
+		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().getRotation();
 	}
 	void TransformComponent_SetRotation(uint64_t actorID, glm::vec3* v) {
-		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().setRotation(glm::radians(*v));
+		DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().setRotation(*v);
 	}
 	void TransformComponent_GetScale(uint64_t actorID, glm::vec3* v) {
 		*v = DynamicScriptEngine::getContext()->getActorFromUUID(actorID).getTransform().getScale();
@@ -494,4 +504,5 @@ namespace Shard3D::InternalScriptCalls {
 	void SceneManagerDestroyHUDLayer(int layer) {
 		DynamicScriptEngine::getHUDContext()->wipe(layer);
 	}
+
 }

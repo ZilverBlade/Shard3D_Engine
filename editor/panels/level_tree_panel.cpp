@@ -17,7 +17,8 @@ namespace Shard3D {
 
 	void LevelTreePanel::render() {
 		SHARD3D_ASSERT(context != nullptr && "Context not provided!");
-		ImGui::Begin(std::string("Level Tree (" + context->name + ")").c_str());
+		ImGui::Begin("Level Tree");
+		ImGui::Text(context->name.c_str());
 		context->registry.each([&](auto actorGUID) {
 			ECS::Actor actor{ actorGUID, context.get() };	
 			if (actor.isInvalid()) return;
@@ -78,6 +79,7 @@ namespace Shard3D {
 		if (selectedActor)
 			if (ImGui::BeginPopupContextItem()) {
 				if (ImGui::MenuItem("Remove Actor")) actorExists = false;
+				if (ImGui::MenuItem("Copy UUID to clipboard")) ImGui::SetClipboardText(std::to_string(selectedActor.getUUID()).c_str());
 				if (ImGui::MenuItem("Add Child")) {
 					context->parentActor(context->createActor(), selectedActor);
 				}

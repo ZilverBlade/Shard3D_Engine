@@ -133,7 +133,7 @@ namespace Shard3D {
 			YAML::Emitter out;
 			out << YAML::BeginMap;
 			out << YAML::Key << "Shard3D" << YAML::Value << ENGINE_VERSION.toString();
-			out << YAML::Key << "Level" << YAML::Value << "Some kind of level";
+			out << YAML::Key << "Level" << YAML::Value << AssetUtils::truncatePath(destinationPath);
 			out << YAML::Key << "LastSavedEditorCameraPos" << YAML::Value;
 			if (mLevel->actorMap.find(0) != mLevel->actorMap.end())
 				out << mLevel->getActorFromUUID(0).getTransform().getTranslation();
@@ -157,6 +157,7 @@ namespace Shard3D {
 			fout.close();
 		
 			SHARD3D_LOG("Saved scene '{0}'", newPath);
+			mLevel->currentpath = destinationPath;
 		}
 
 		void LevelManager::saveRuntime(const std::string& destinationPath) {
@@ -164,7 +165,6 @@ namespace Shard3D {
 		}
 
 		LevelMgrResults LevelManager::load(const std::string& sourcePath, bool ignoreWarns) {
-			ResourceHandler::clearAllAssets(); // remove since new stuff will be loaded into memory
 			std::ifstream stream(sourcePath);
 			std::stringstream strStream;
 			strStream << stream.rdbuf();
@@ -181,6 +181,8 @@ namespace Shard3D {
 			
 			}
 
+			ResourceHandler::clearAllAssets(); // remove since new stuff will be loaded into memory
+			
 			std::string levelName = data["Level"].as<std::string>();
 			mLevel->getActorFromUUID(0).getTransform().setTranslation(data["LastSavedEditorCameraPos"].as<glm::vec3>());
 
@@ -291,6 +293,7 @@ namespace Shard3D {
 
 
 			}
+			mLevel->name = AssetUtils::truncatePath(sourcePath);
 			mLevel->currentpath = sourcePath;
 			return LevelMgrResults::SuccessResult;
 		}

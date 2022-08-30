@@ -44,6 +44,12 @@ namespace Shard3D.Core
 
         #endregion
 
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static bool IsKeyDown(KeyInput keyCode);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static bool IsMouseButtonDown(MouseInput mouseButton);
+
         #region Transforms
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]

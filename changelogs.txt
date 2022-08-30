@@ -162,6 +162,12 @@ ALPHA:
 		- Added actor parenting
 		- Added Bloom
 		- Fixed age old bug with the level capture iterating backwards, flipping the list of actors with each play/stop
+		- Fixed lighting bug with surface masked and surface translucent material shaders
+		- Added some input support to script engine
+		- Ported over car driving script from c++ to c# + added some more features
+		- Fixed bug when loaded a level, cant save it directly
+		- Cleaned up editor_layout.ini
+		- Added experimental standalone game runtime application
 
 		:: TODO, proper events sytem, add editor layouts, use premake
 		:: Fix: change vertex and index buffers to draw offset, dont use 64 bit integers for shaders (e.g. HUD system)

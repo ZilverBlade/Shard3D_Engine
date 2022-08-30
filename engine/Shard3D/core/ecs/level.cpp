@@ -151,7 +151,7 @@ namespace Shard3D {
 		
 		void Level::begin() {
 			SHARD3D_INFO("Level: Initializing scripts");
-			simulationState = PlayState::Simulating;
+			simulationState = PlayState::Playing;
 			{
 				registry.view<Components::CppScriptComponent>().each([&](auto actor, auto& csc) {
 					if (!csc.Inst) {
@@ -197,7 +197,7 @@ namespace Shard3D {
 				wasPaused = true;
 				SHARD3D_LOG("LEVEL: PAUSED");
 			}
-			if (simulationState == PlayState::Simulating || simulationState == PlayState::Playing) {
+			if (simulationState == PlayState::Playing) {
 				setPossessedCameraActor(_possessedCameraActorGUID);
 				auto audioView = registry.view<Components::AudioComponent>();
 				for (auto actor : audioView) {
@@ -231,7 +231,7 @@ namespace Shard3D {
 
 		void Level::killActor(Actor actor) {
 			actorKillQueue.emplace_back(actor);
-			if (simulationState == PlayState::Simulating) {
+			if (simulationState == PlayState::Playing) {
 				if (!actor.hasComponent<Components::CppScriptComponent>()) goto next;
 				{
 					if (actor.getComponent<Components::CppScriptComponent>().Inst) {
@@ -289,7 +289,7 @@ namespace Shard3D {
 			child.getTransform().normalMatrix = parentNormal * child.getTransform().calculateNormalMatrix();
 			child.getTransform().dirty = false;
 			for (auto& subchild : child.getComponent<Components::RelationshipComponent>().childActors) {
-				rebuildRelations({ subchild, this});
+				rebuildRelations({ subchild, this });
 			}
 		}
 

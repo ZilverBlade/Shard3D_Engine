@@ -12,8 +12,8 @@ namespace Shard3D {
 		class LevelTreePanel;
 		enum class PlayState {
 			Stopped = 0, // no scripts have been instantiated. outside of the editor this should only be this state when loading levels.
-			Playing = 2, // unused, for future when stuff like player controls can be properly integrated in game.
-			Simulating = 1, // indicates that the level is being simulated in the editor.
+			Simulating = 2, // unused, for future when stuff physics can be previewed.
+			Playing = 1, // indicates that the level is being played in the editor.
 			Paused = -1, // regular pause mode, for the editor, where all input pauses including HUD, and repossesses editor camera.
 			PausedRuntime = -2	// special pause state where everything pauses except UI input, for game runtime like pause menu etc.
 		};

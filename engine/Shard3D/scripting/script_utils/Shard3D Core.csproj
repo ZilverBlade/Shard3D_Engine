@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="developer fuckery.cs" />
+    <Compile Include="Input.cs" />
     <Compile Include="InternalCalls.cs" />
     <Compile Include="SceneMgr.cs" />
     <Compile Include="Misc.cs" />

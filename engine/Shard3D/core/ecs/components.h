@@ -59,8 +59,8 @@ namespace Shard3D {
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
 
-			glm::mat4 transformMatrix;
-			glm::mat3 normalMatrix;
+			glm::mat4 transformMatrix{1.f};
+			glm::mat3 normalMatrix{1.f};
 
 			glm::mat4 calculateMat4();
 			glm::mat3 calculateNormalMatrix();

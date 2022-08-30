@@ -30,7 +30,7 @@ namespace Shard3D {
         const auto& element = getSelectedElement();
         bool isPress = Input::isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT);
 
-        if (frameInfo.activeLevel->simulationState == ECS::PlayState::Simulating ||
+        if (frameInfo.activeLevel->simulationState == ECS::PlayState::Playing ||
             frameInfo.activeLevel->simulationState == ECS::PlayState::PausedRuntime) {
             if (isPress)
                 DynamicScriptEngine::hudScript().pressEvent(element.get(), frameInfo.frameTime);
@@ -69,7 +69,7 @@ namespace Shard3D {
     bool HUDLayer::mouseButtonDownEvent(Events::MouseButtonDownEvent& e) {
         bool isClick = e.getButtonCode() == GLFW_MOUSE_BUTTON_LEFT;
 
-        //if (Singleton::activeLevel->simulationState == ECS::PlayState::Simulating ||
+        //if (Singleton::activeLevel->simulationState == ECS::PlayState::Playing ||
         //    Singleton::activeLevel->simulationState == ECS::PlayState::PausedRuntime && isClick) {
         //    const uint64_t& id = hudRenderSystem.getSelectedID();
         //    if (id == 0) return false;
