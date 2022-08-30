@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <Physics/Constraints/Constraint.h>
-#include <Physics/Body/Body.h>
+#include <Jolt/Physics/Constraints/Constraint.h>
+#include <Jolt/Physics/Body/Body.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class TwoBodyConstraint;
 
@@ -25,8 +25,13 @@ public:
 class TwoBodyConstraint : public Constraint
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 								TwoBodyConstraint(Body &inBody1, Body &inBody2, const TwoBodyConstraintSettings &inSettings) : Constraint(inSettings), mBody1(&inBody1), mBody2(&inBody2) { }
+
+	/// Get the type of a constraint
+	virtual EConstraintType		GetType() const override				{ return EConstraintType::TwoBodyConstraint; }
 
 	/// Solver interface
 	virtual bool				IsActive() const override				{ return Constraint::IsActive() && (mBody1->IsActive() || mBody2->IsActive()) && (mBody2->IsDynamic() || mBody1->IsDynamic()); }
@@ -53,4 +58,4 @@ protected:
 	Body *						mBody2;
 };
 
-} // JPH
+JPH_NAMESPACE_END

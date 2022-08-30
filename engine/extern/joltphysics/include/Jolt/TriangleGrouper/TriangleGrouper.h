@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Geometry/IndexedTriangle.h>
+#include <Jolt/Geometry/IndexedTriangle.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// A class that groups triangles in batches of N (according to closeness)
 class TriangleGrouper
@@ -19,7 +19,7 @@ public:
 	/// @param inTriangles The list of indexed triangles (indexes into inVertices)
 	/// @param inGroupSize How big each group should be
 	/// @param outGroupedTriangleIndices An ordered list of indices (indexing into inTriangles), contains groups of inGroupSize large worth of indices to triangles that are grouped together. If the triangle count is not an exact multiple of inGroupSize the last batch will be smaller.
-	virtual void			Group(const VertexList &inVertices, const IndexedTriangleList &inTriangles, int inGroupSize, vector<uint> &outGroupedTriangleIndices) = 0;
+	virtual void			Group(const VertexList &inVertices, const IndexedTriangleList &inTriangles, int inGroupSize, Array<uint> &outGroupedTriangleIndices) = 0;
 };
 
-} // JPH
+JPH_NAMESPACE_END

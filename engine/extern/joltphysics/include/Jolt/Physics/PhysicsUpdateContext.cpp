@@ -1,11 +1,17 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/PhysicsUpdateContext.h>
+#include <Jolt/Physics/PhysicsUpdateContext.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
+
+PhysicsUpdateContext::PhysicsUpdateContext(TempAllocator &inTempAllocator) :
+	mTempAllocator(&inTempAllocator),
+	mSteps(inTempAllocator)
+{
+}
 
 PhysicsUpdateContext::~PhysicsUpdateContext()
 {
@@ -13,4 +19,4 @@ PhysicsUpdateContext::~PhysicsUpdateContext()
 	JPH_ASSERT(mActiveConstraints == nullptr);
 }
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,23 +3,24 @@
 
 #pragma once
 
-#include <Core/FixedSizeFreeList.h>
-#include <Core/Atomics.h>
-#include <Core/NonCopyable.h>
-#include <Physics/Body/BodyManager.h>
-#include <Physics/Collision/BroadPhase/BroadPhase.h>
+#include <Jolt/Core/FixedSizeFreeList.h>
+#include <Jolt/Core/Atomics.h>
+#include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Physics/Body/BodyManager.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhase.h>
 
-#ifdef JPH_TRACK_BROADPHASE_STATS
-	#include <map>
-#endif // JPH_TRACK_BROADPHASE_STATS
+//#define JPH_DUMP_BROADPHASE_TREE
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Internal tree structure in broadphase, is essentially a quad AABB tree.
 /// Tree is lockless (except for UpdatePrepare/Finalize() function), modifying objects in the tree will widen the aabbs of parent nodes to make the node fit.
 /// During the UpdatePrepare/Finalize() call the tree is rebuilt to achieve a tight fit again.
 class QuadTree : public NonCopyable
 {
+public:
+	JPH_OVERRIDE_NEW_DELETE
+
 private:
 	// Forward declare
 	class AtomicNodeID;
@@ -28,6 +29,8 @@ private:
 	class NodeID
 	{
 	public:
+		JPH_OVERRIDE_NEW_DELETE
+
 		/// Default constructor does not initialize
 		inline 					NodeID() = default;
 
@@ -73,7 +76,7 @@ private:
 		inline void				operator = (const NodeID &inRHS)			{ mID = inRHS.mID; }
 
 		/// Getting the value
-		inline					operator const NodeID () const				{ return NodeID(mID); }
+		inline					operator NodeID () const					{ return NodeID(mID); }
 
 		/// Check if the ID is valid
 		inline bool				IsValid() const								{ return mID != cInvalidNodeIndex; }
@@ -94,7 +97,7 @@ private:
 	{
 	public:
 		/// Construct node
-		explicit				Node(bool inLocked);
+		explicit				Node(bool inIsChanged);
 
 		/// Get bounding box encapsulating all children
 		void					GetNodeBounds(AABox &outBounds) const;
@@ -124,11 +127,11 @@ private:
 
 		/// Index of the parent node.
 		/// Note: This value is unreliable during the UpdatePrepare/Finalize() function as a node may be relinked to the newly built tree.
-		atomic<uint32>			mParentNodeIndex;
+		atomic<uint32>			mParentNodeIndex = cInvalidNodeIndex;
 
-		/// If this part of the tree is locked, meaning we will treat this sub tree as a single body during the UpdatePrepare/Finalize().
-		/// If any changes are made to an object inside this sub tree then the direct path from the body to the top of the tree will become unlocked.
-		atomic<uint32>			mIsLocked;
+		/// If this part of the tree has changed, if not, we will treat this sub tree as a single body during the UpdatePrepare/Finalize().
+		/// If any changes are made to an object inside this sub tree then the direct path from the body to the top of the tree will become changed.
+		atomic<uint32>			mIsChanged;
 
 		// Padding to align to 124 bytes
 		uint32					mPadding = 0;
@@ -162,7 +165,7 @@ public:
 		atomic<uint32>			mBodyLocation { cInvalidBodyLocation };
 	};
 
-	using TrackingVector = vector<Tracking>;
+	using TrackingVector = Array<Tracking>;
 
 	/// Destructor
 								~QuadTree();
@@ -187,7 +190,6 @@ public:
 
 	struct UpdateState
 	{
-		NodeID *				mAllNodeIDs;						///< Temporary storage for all leaf node ID's in the tree that must be grouped into a new tree
 		NodeID					mRootNodeID;						///< This will be the new root node id
 	};
 
@@ -196,8 +198,8 @@ public:
 
 	/// Update the broadphase, needs to be called regularly to achieve a tight fit of the tree when bodies have been modified.
 	/// UpdatePrepare() will build the tree, UpdateFinalize() will lock the root of the tree shortly and swap the trees and afterwards clean up temporary data structures.
-	void						UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTracking, UpdateState &outUpdateState);
-	void						UpdateFinalize(const BodyVector &inBodies, TrackingVector &ioTracking, UpdateState &inUpdateState);
+	void						UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTracking, UpdateState &outUpdateState, bool inFullRebuild);
+	void						UpdateFinalize(const BodyVector &inBodies, const TrackingVector &inTracking, const UpdateState &inUpdateState);
 
 	/// Temporary data structure to pass information between AddBodiesPrepare and AddBodiesFinalize/Abort
 	struct AddState
@@ -219,11 +221,10 @@ public:
 	void						AddBodiesAbort(TrackingVector &ioTracking, const AddState &inState);
 
 	/// Remove inNumber bodies in ioBodyIDs from the quadtree.
-	/// ioBodyIDs may be shuffled around by this function.
-	void						RemoveBodies(const BodyVector &inBodies, TrackingVector &ioTracking, BodyID *ioBodyIDs, int inNumber);
+	void						RemoveBodies(const BodyVector &inBodies, TrackingVector &ioTracking, const BodyID *ioBodyIDs, int inNumber);
 
-	/// Call whenever the aabb of a body changes (can change order of ioBodyIDs array).
-	void						NotifyBodiesAABBChanged(const BodyVector &inBodies, const TrackingVector &inTracking, BodyID *ioBodyIDs, int inNumber);
+	/// Call whenever the aabb of a body changes.
+	void						NotifyBodiesAABBChanged(const BodyVector &inBodies, const TrackingVector &inTracking, const BodyID *ioBodyIDs, int inNumber);
 
 	/// Cast a ray and get the intersecting bodies in ioCollector.
 	void						CastRay(const RayCast &inRay, RayCastBodyCollector &ioCollector, const ObjectLayerFilter &inObjectLayerFilter, const TrackingVector &inTracking) const;
@@ -270,7 +271,7 @@ private:
 	/// Caches location of body inBodyID in the tracker, body can be found in mNodes[inNodeIdx].mChildNodeID[inChildIdx]
 	void						GetBodyLocation(const TrackingVector &inTracking, BodyID inBodyID, uint32 &outNodeIdx, uint32 &outChildIdx) const;
 	void						SetBodyLocation(TrackingVector &ioTracking, BodyID inBodyID, uint32 inNodeIdx, uint32 inChildIdx) const;
-	void						InvalidateBodyLocation(TrackingVector &ioTracking, BodyID inBodyID);
+	static void					sInvalidateBodyLocation(TrackingVector &ioTracking, BodyID inBodyID);
 
 	/// Get the current root of the tree
 	JPH_INLINE const RootNode &	GetCurrentRoot() const				{ return mRootNode[mRootNodeIndex]; }
@@ -279,14 +280,14 @@ private:
 	/// Depending on if inNodeID is a body or tree node return the bounding box
 	inline AABox				GetNodeOrBodyBounds(const BodyVector &inBodies, NodeID inNodeID) const;
 
-	/// Unlock node and all of its parents
-	inline void					UnlockNodeAndParents(uint32 inNodeIndex);
+	/// Mark node and all of its parents as changed
+	inline void					MarkNodeAndParentsChanged(uint32 inNodeIndex);
 
-	/// Widen parent bounds of node inNodeIndex to encapsulate inNewBounds, also unlock the node and its parents
-	inline void					WidenAndUnlockNodeAndParents(uint32 inNodeIndex, const AABox &inNewBounds);
+	/// Widen parent bounds of node inNodeIndex to encapsulate inNewBounds, also mark node and all of its parents as changed
+	inline void					WidenAndMarkNodeAndParentsChanged(uint32 inNodeIndex, const AABox &inNewBounds);
 
 	/// Allocate a new node
-	inline uint32				AllocateNode(bool inLocked);
+	inline uint32				AllocateNode(bool inIsChanged);
 
 	/// Try to insert a new leaf to the tree at inNodeIndex
 	inline bool					TryInsertLeaf(TrackingVector &ioTracking, int inNodeIndex, NodeID inLeafID, const AABox &inLeafBounds, int inLeafNumBodies);
@@ -294,8 +295,8 @@ private:
 	/// Try to replace the existing root with a new root that contains both the existing root and the new leaf
 	inline bool					TryCreateNewRoot(TrackingVector &ioTracking, atomic<uint32> &ioRootNodeIndex, NodeID inLeafID, const AABox &inLeafBounds, int inLeafNumBodies);
 
-	/// Build a tree for ioBodyIDs, returns the NodeID of the root (which will be the ID of a single body if inNumber = 1)
-	NodeID						BuildTree(const BodyVector &inBodies, TrackingVector &ioTracking, NodeID *ioNodeIDs, int inNumber, uint32 inParentNodeIndex, bool inLocked, AABox &outBounds);
+	/// Build a tree for ioBodyIDs, returns the NodeID of the root (which will be the ID of a single body if inNumber = 1). All tree levels up to inMaxDepthMarkChanged will be marked as 'changed'.
+	NodeID						BuildTree(const BodyVector &inBodies, TrackingVector &ioTracking, NodeID *ioNodeIDs, int inNumber, uint inMaxDepthMarkChanged, AABox &outBounds);
 
 	/// Sorts ioNodeIDs spatially into 2 groups. Second groups starts at ioNodeIDs + outMidPoint.
 	/// After the function returns ioNodeIDs and ioNodeCenters will be shuffled
@@ -312,6 +313,11 @@ private:
 	void						ValidateTree(const BodyVector &inBodies, const TrackingVector &inTracking, uint32 inNodeIndex, uint32 inNumExpectedBodies) const;
 #endif
 
+#ifdef JPH_DUMP_BROADPHASE_TREE
+	/// Dump the tree in DOT format (see: https://graphviz.org/)
+	void						DumpTree(const NodeID &inRoot, const char *inFileNamePrefix) const;
+#endif
+
 #ifdef JPH_TRACK_BROADPHASE_STATS
 	/// Mutex protecting the various LayerToStats members
 	mutable Mutex				mStatsMutex;
@@ -326,7 +332,7 @@ private:
 		uint64					mCollectorTicks = 0;
 	};
 	
-	using LayerToStats = map<string, Stat>;
+	using LayerToStats = UnorderedMap<String, Stat>;
 
 	/// Trace the stats of a single query type to the TTY
 	void						ReportStats(const char *inName, const LayerToStats &inLayer) const;
@@ -338,6 +344,9 @@ private:
 	mutable LayerToStats		mCollideOrientedBoxStats;
 	mutable LayerToStats		mCastAABoxStats;
 #endif // JPH_TRACK_BROADPHASE_STATS
+
+	/// Debug function to get the depth of the tree from node inNodeID
+	uint						GetMaxTreeDepth(const NodeID &inNodeID) const;
 
 	/// Walk the node tree calling the Visitor::VisitNodes for each node encountered and Visitor::VisitBody for each body encountered
 	template <class Visitor>
@@ -366,4 +375,4 @@ private:
 	atomic<bool>				mIsDirty = false;
 };
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Physics/Constraints/TwoBodyConstraint.h>
-#include <Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/PointConstraintPart.h>
+#include <Jolt/Physics/Constraints/TwoBodyConstraint.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/PointConstraintPart.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Fixed constraint settings, used to create a fixed constraint
 class FixedConstraintSettings final : public TwoBodyConstraintSettings
@@ -15,8 +15,31 @@ class FixedConstraintSettings final : public TwoBodyConstraintSettings
 public:
 	JPH_DECLARE_SERIALIZABLE_VIRTUAL(FixedConstraintSettings)
 
+	// See: ConstraintSettings::SaveBinaryState
+	virtual void				SaveBinaryState(StreamOut &inStream) const override;
+
 	/// Create an an instance of this constraint
 	virtual TwoBodyConstraint *	Create(Body &inBody1, Body &inBody2) const override;
+
+	/// This determines in which space the constraint is setup, all properties below should be in the specified space
+	EConstraintSpace			mSpace = EConstraintSpace::WorldSpace;
+
+	/// When mSpace is WorldSpace mPoint1 and mPoint2 can be automatically calculated based on the positions of the bodies when the constraint is created (they will be fixated in their current relative position/orientation). Set this to false if you want to supply the attachment points yourself.
+	bool						mAutoDetectPoint = false;
+
+	/// Body 1 constraint reference frame (space determined by mSpace)
+	Vec3						mPoint1 = Vec3::sZero();
+	Vec3						mAxisX1 = Vec3::sAxisX();
+	Vec3						mAxisY1 = Vec3::sAxisY();
+
+	/// Body 2 constraint reference frame (space determined by mSpace)
+	Vec3						mPoint2 = Vec3::sZero();
+	Vec3						mAxisX2 = Vec3::sAxisX();
+	Vec3						mAxisY2 = Vec3::sAxisY();
+
+protected:
+	// See: ConstraintSettings::RestoreBinaryState
+	virtual void				RestoreBinaryState(StreamIn &inStream) override;
 };
 
 /// A fixed constraint welds two bodies together removing all degrees of freedom between them.
@@ -24,11 +47,13 @@ public:
 class FixedConstraint final : public TwoBodyConstraint
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 								FixedConstraint(Body &inBody1, Body &inBody2, const FixedConstraintSettings &inSettings);
 
 	// Generic interface of a constraint
-	virtual EConstraintType		GetType() const override					{ return EConstraintType::Fixed; }
+	virtual EConstraintSubType	GetSubType() const override									{ return EConstraintSubType::Fixed; }
 	virtual void				SetupVelocityConstraint(float inDeltaTime) override;
 	virtual void				WarmStartVelocityConstraint(float inWarmStartImpulseRatio) override;
 	virtual bool				SolveVelocityConstraint(float inDeltaTime) override;
@@ -38,6 +63,7 @@ public:
 #endif // JPH_DEBUG_RENDERER
 	virtual void				SaveState(StateRecorder &inStream) const override;
 	virtual void				RestoreState(StateRecorder &inStream) override;
+	virtual Ref<ConstraintSettings> GetConstraintSettings() const override;
 
 	// See: TwoBodyConstraint
 	virtual Mat44				GetConstraintToBody1Matrix() const override					{ return Mat44::sTranslation(mLocalSpacePosition1); }
@@ -64,4 +90,4 @@ private:
 	PointConstraintPart			mPointConstraintPart;
 };
 
-} // JPH
+JPH_NAMESPACE_END

@@ -1,12 +1,15 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
+
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <fstream>
+JPH_SUPPRESS_WARNINGS_STD_END
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
-static void DummyTrace(const char *inFMT, ...) 
+static void DummyTrace([[maybe_unused]] const char *inFMT, ...) 
 { 
 	JPH_ASSERT(false); 
 };
@@ -24,4 +27,4 @@ AssertFailedFunction AssertFailed = DummyAssertFailed;
 
 #endif // JPH_ENABLE_ASSERTS
 
-} // JPH
+JPH_NAMESPACE_END

@@ -1,43 +1,35 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Body/Body.h>
-#include <Physics/Body/BodyCreationSettings.h>
-#include <Physics/PhysicsSettings.h>
-#include <Physics/StateRecorder.h>
-#include <Physics/Collision/Shape/SphereShape.h>
-#include <Core/StringTools.h>
-#include <Core/Profiler.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/PhysicsSettings.h>
+#include <Jolt/Physics/StateRecorder.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Core/StringTools.h>
+#include <Jolt/Core/Profiler.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
+static const SphereShape sFixedToWorldShape(FLT_EPSILON);
 Body Body::sFixedToWorld(false);
 
 Body::Body(bool) :
 	mPosition(Vec3::sZero()),
 	mRotation(Quat::sIdentity()),
+	mShape(&sFixedToWorldShape), // Dummy shape
 	mFriction(0.0f),
 	mRestitution(0.0f),
 	mObjectLayer(cObjectLayerInvalid),
 	mMotionType(EMotionType::Static)
 {
-	// Dummy shape
-	mShape = new SphereShape(FLT_EPSILON);
+	sFixedToWorldShape.SetEmbedded();
 }
-
-#ifdef _DEBUG
-
-string Body::GetDebugName() const
-{ 
-	return mDebugName.empty()? ConvertToString(mID.GetIndex()) : ConvertToString(mID.GetIndex()) + "-" + mDebugName; 
-}
-
-#endif
 
 void Body::SetMotionType(EMotionType inMotionType)
 {
@@ -146,8 +138,8 @@ void Body::SetShapeInternal(const Shape *inShape, bool inUpdateMassProperties)
 
 Body::ECanSleep Body::UpdateSleepStateInternal(float inDeltaTime, float inMaxMovement, float inTimeBeforeSleep)
 {
-	// Check override
-	if (!mMotionProperties->mAllowSleeping)
+	// Check override & sensors will never go to sleep (they would stop detecting collisions with sleeping bodies)
+	if (!mMotionProperties->mAllowSleeping || IsSensor())
 		return ECanSleep::CannotSleep;
 
 	// Get the points to test
@@ -174,7 +166,7 @@ Body::ECanSleep Body::UpdateSleepStateInternal(float inDeltaTime, float inMaxMov
 	return mMotionProperties->mSleepTestTimer >= inTimeBeforeSleep? ECanSleep::CanSleep : ECanSleep::CannotSleep;
 }
 
-void Body::ApplyBuoyancyImpulse(const Plane &inSurface, float inBuoyancy, float inLinearDrag, float inAngularDrag, Vec3Arg inFluidVelocity, Vec3Arg inGravity, float inDeltaTime)
+bool Body::ApplyBuoyancyImpulse(const Plane &inSurface, float inBuoyancy, float inLinearDrag, float inAngularDrag, Vec3Arg inFluidVelocity, Vec3Arg inGravity, float inDeltaTime)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -262,7 +254,10 @@ void Body::ApplyBuoyancyImpulse(const Plane &inSurface, float inBuoyancy, float 
 		// Calculate total delta angular velocity due to drag and buoyancy
 		Vec3 delta_angular_velocity = drag_delta_angular_velocity + inv_inertia * relative_center_of_buoyancy.Cross(buoyancy_impulse + drag_impulse);
 		mMotionProperties->AddAngularVelocityStep(delta_angular_velocity);
+		return true;
 	}
+
+	return false;
 }
 
 void Body::SaveState(StateRecorder &inStream) const
@@ -304,6 +299,8 @@ BodyCreationSettings Body::GetBodyCreationSettings() const
 
 	result.mPosition = GetPosition();
 	result.mRotation = GetRotation();
+	result.mLinearVelocity = mMotionProperties != nullptr? mMotionProperties->GetLinearVelocity() : Vec3::sZero();
+	result.mAngularVelocity = mMotionProperties != nullptr? mMotionProperties->GetAngularVelocity() : Vec3::sZero();
 	result.mObjectLayer = GetObjectLayer();
 	result.mCollisionGroup = GetCollisionGroup();
 	result.mMotionType = GetMotionType();
@@ -319,11 +316,11 @@ BodyCreationSettings Body::GetBodyCreationSettings() const
 	result.mMaxAngularVelocity = mMotionProperties != nullptr? mMotionProperties->GetMaxAngularVelocity() : 0.0f;
 	result.mGravityFactor = mMotionProperties != nullptr? mMotionProperties->GetGravityFactor() : 1.0f;
 	result.mOverrideMassProperties = EOverrideMassProperties::MassAndInertiaProvided;
-	result.mMassPropertiesOverride.mMass = mMotionProperties != nullptr? 1.0f / mMotionProperties->GetInverseMass() : FLT_MAX;
-	result.mMassPropertiesOverride.mInertia = mMotionProperties != nullptr? mMotionProperties->GetLocalSpaceInverseInertia().Inversed3x3() : Mat44::sIdentity();
+	result.mMassPropertiesOverride.mMass = mMotionProperties != nullptr? 1.0f / mMotionProperties->GetInverseMassUnchecked() : FLT_MAX;
+	result.mMassPropertiesOverride.mInertia = mMotionProperties != nullptr? mMotionProperties->GetLocalSpaceInverseInertiaUnchecked().Inversed3x3() : Mat44::sIdentity();
 	result.SetShape(GetShape());
 
 	return result;
 }
 
-} // JPH
+JPH_NAMESPACE_END

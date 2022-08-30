@@ -3,17 +3,19 @@
 
 #pragma once
 
-#include <Math/Swizzle.h>
+#include <Jolt/Math/Swizzle.h>
 
-#ifdef JPH_USE_AVX // DVec3 currently uses AVX intrinsics but the class is currently unused so we can leave it out (it will be used in the future to support objects at a large distance from the origin)
+#ifdef JPH_USE_AVX2 // DVec3 currently uses AVX2 intrinsics but the class is currently unused so we can leave it out (it will be used in the future to support objects at a large distance from the origin)
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// 3 component vector of doubles (stored as 4 vectors). 
 /// Note that we keep the 4th component the same as the 3rd component to avoid divisions by zero when JPH_FLOATING_POINT_EXCEPTIONS_ENABLED defined
 class [[nodiscard]] DVec3
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 #ifdef JPH_FLOATING_POINT_EXCEPTIONS_ENABLED
 	/// Internal helper function that checks that W is equal to Z, so e.g. dividing by it should not generate div by 0
 	JPH_INLINE void				CheckW() const									{ JPH_ASSERT(reinterpret_cast<const uint64 *>(mD32)[2] == reinterpret_cast<const uint64 *>(mD32)[3]); } // Avoid asserts when both components are NaN
@@ -214,8 +216,8 @@ private:
 
 static_assert(is_trivial<DVec3>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "DVec3.inl"
 
-#endif // JPH_USE_AVX
+#endif // JPH_USE_AVX2

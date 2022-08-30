@@ -1,23 +1,21 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <ObjectStream/ObjectStreamOut.h>
-#include <ObjectStream/ObjectStreamTextOut.h>
-#include <ObjectStream/ObjectStreamBinaryOut.h>
-#include <ObjectStream/SerializableAttribute.h>
-#include <ObjectStream/TypeDeclarations.h>
+#include <Jolt/ObjectStream/ObjectStreamOut.h>
+#include <Jolt/ObjectStream/ObjectStreamTextOut.h>
+#include <Jolt/ObjectStream/ObjectStreamBinaryOut.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 ObjectStreamOut::ObjectStreamOut(ostream &inStream) :
-	mStream(inStream),
-	mNextIdentifier(sNullIdentifier + 1)
+	mStream(inStream)
 {
 // Add all primitives to the class set
 #define JPH_DECLARE_PRIMITIVE(name)	mClassSet.insert(JPH_RTTI(name));
-#include <ObjectStream/ObjectStreamTypes.h>
+#include <Jolt/ObjectStream/ObjectStreamTypes.h>
 }
 
 ObjectStreamOut *ObjectStreamOut::Open(EStreamType inType, ostream &inStream)
@@ -34,7 +32,8 @@ ObjectStreamOut *ObjectStreamOut::Open(EStreamType inType, ostream &inStream)
 bool ObjectStreamOut::Write(const void *inObject, const RTTI *inRTTI)
 {
 	// Assign a new identifier to the object and write it
-	mIdentifierMap.insert(IdentifierMap::value_type(inObject, ObjectInfo(mNextIdentifier++, inRTTI)));
+	mIdentifierMap.try_emplace(inObject, mNextIdentifier, inRTTI);
+	mNextIdentifier++;
 	WriteObject(inObject);
 
 	// Write all linked objects
@@ -65,7 +64,7 @@ void ObjectStreamOut::WriteObject(const void *inObject)
 	HintNextItem();
 
 	// Write object header.
-	WriteDataType(EDataType::Object);
+	WriteDataType(EOSDataType::Object);
 	WriteName(i->second.mRTTI->GetName());
 	WriteIdentifier(i->second.mIdentifier);
 
@@ -89,7 +88,7 @@ void ObjectStreamOut::WriteRTTI(const RTTI *inRTTI)
 	HintNextItem();
 
 	// Write class header. E.g. in text mode: "class <name> <attr-count>"
-	WriteDataType(EDataType::Declare);
+	WriteDataType(EOSDataType::Declare);
 	WriteName(inRTTI->GetName());
 	WriteCount(inRTTI->GetAttributeCount());
 
@@ -98,20 +97,18 @@ void ObjectStreamOut::WriteRTTI(const RTTI *inRTTI)
 	for (int attr_index = 0; attr_index < inRTTI->GetAttributeCount(); ++attr_index) 
 	{
 		// Get attribute
-		const SerializableAttribute *attr = DynamicCast<SerializableAttribute, RTTIAttribute>(inRTTI->GetAttribute(attr_index));
-		if (attr == nullptr)
-			continue;
+		const SerializableAttribute &attr = inRTTI->GetAttribute(attr_index);
 
 		// Write definition of attribute class if undefined
-		const RTTI *rtti = attr->GetMemberPrimitiveType();
+		const RTTI *rtti = attr.GetMemberPrimitiveType();
 		if (rtti != nullptr)
 			QueueRTTI(rtti);
 
 		HintNextItem();
 
 		// Write attribute information.
-		WriteName(attr->GetName());
-		attr->WriteDataType(*this);
+		WriteName(attr.GetName());
+		attr.WriteDataType(*this);
 	}
 	HintIndentDown();
 }
@@ -125,11 +122,8 @@ void ObjectStreamOut::WriteClassData(const RTTI *inRTTI, const void *inInstance)
 	for (int attr_index = 0; attr_index < inRTTI->GetAttributeCount(); ++attr_index) 
 	{
 		// Get attribute
-		const SerializableAttribute *attr = DynamicCast<SerializableAttribute, RTTIAttribute>(inRTTI->GetAttribute(attr_index));
-		if (attr == nullptr)
-			continue;
-
-		attr->WriteData(*this, inInstance);
+		const SerializableAttribute &attr = inRTTI->GetAttribute(attr_index);
+		attr.WriteData(*this, inInstance);
 	}
 	HintIndentDown();
 }
@@ -151,7 +145,7 @@ void ObjectStreamOut::WritePointerData(const RTTI *inRTTI, const void *inPointer
 		{
 			// Assign a new identifier to this object and queue it for serialization
 			identifier = mNextIdentifier++;
-			mIdentifierMap.insert(IdentifierMap::value_type(inPointer, ObjectInfo(identifier, inRTTI)));
+			mIdentifierMap.try_emplace(inPointer, identifier, inRTTI);
 			mObjectQueue.push(inPointer);
 		}
 	} 
@@ -166,19 +160,4 @@ void ObjectStreamOut::WritePointerData(const RTTI *inRTTI, const void *inPointer
 	WriteIdentifier(identifier);
 }
 
-// Define macro to declare functions for a specific primitive type
-#define JPH_DECLARE_PRIMITIVE(name)															\
-	void	OSWriteDataType(ObjectStreamOut &ioStream, name *inNull)						\
-	{																						\
-		ioStream.WriteDataType(ObjectStream::EDataType::T_##name);							\
-	}																						\
-	void	OSWriteData(ObjectStreamOut &ioStream, const name &inPrimitive)					\
-	{																						\
-		ioStream.HintNextItem();															\
-		ioStream.WritePrimitiveData(inPrimitive);											\
-	}
-
-// This file uses the JPH_DECLARE_PRIMITIVE macro to define all types
-#include <ObjectStream/ObjectStreamTypes.h>
-
-} // JPH
+JPH_NAMESPACE_END

@@ -1,32 +1,35 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Core/StringTools.h>
+#include <Jolt/Core/StringTools.h>
+
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <cstdarg>
+JPH_SUPPRESS_WARNINGS_STD_END
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
-string StringFormat(const char *inFMT, ...)
+String StringFormat(const char *inFMT, ...)
 {
-	static char buffer[1024];
+	char buffer[1024];
 
 	// Format the string
 	va_list list;
 	va_start(list, inFMT);
 	vsnprintf(buffer, sizeof(buffer), inFMT, list);
 
-	return string(buffer);
+	return String(buffer);
 }
 
-void StringReplace(string &ioString, string inSearch, string inReplace)
+void StringReplace(String &ioString, const string_view &inSearch, const string_view &inReplace)
 {
 	size_t index = 0;
 	for (;;)
 	{
 		 index = ioString.find(inSearch, index);
-		 if (index == std::string::npos) 
+		 if (index == String::npos) 
 			 break;
 
 		 ioString.replace(index, inSearch.size(), inReplace);
@@ -35,7 +38,7 @@ void StringReplace(string &ioString, string inSearch, string inReplace)
 	}
 }
 
-void StringToVector(const string &inString, vector<string> &outVector, const string &inDelimiter, bool inClearVector)
+void StringToVector(const string_view &inString, Array<String> &outVector, const string_view &inDelimiter, bool inClearVector)
 {
 	JPH_ASSERT(inDelimiter.size() > 0);
 
@@ -48,11 +51,11 @@ void StringToVector(const string &inString, vector<string> &outVector, const str
 		return;
 
 	// Start with initial string
-	string s(inString);
+	String s(inString);
 
 	// Add to vector while we have a delimiter
 	size_t i;
-	while (!s.empty() && (i = s.find(inDelimiter)) != string::npos)
+	while (!s.empty() && (i = s.find(inDelimiter)) != String::npos)
 	{
 		outVector.push_back(s.substr(0, i));
 		s.erase(0, i + inDelimiter.length());
@@ -62,25 +65,25 @@ void StringToVector(const string &inString, vector<string> &outVector, const str
 	outVector.push_back(s);
 }
 
-void VectorToString(const vector<string> &inVector, string &outString, const string &inDelimiter)
+void VectorToString(const Array<String> &inVector, String &outString, const string_view &inDelimiter)
 {
 	// Ensure string empty
 	outString.clear();
 
-	for (vector<string>::const_iterator i = inVector.begin(); i != inVector.end(); ++i)
+	for (const String &s : inVector)
 	{
 		// Add delimiter if not first element
 		if (!outString.empty())
 			outString.append(inDelimiter);
 
 		// Add element
-		outString.append(*i);
+		outString.append(s);
 	}
 }
 
-string ToLower(const string &inString)
+String ToLower(const string_view &inString)
 {
-	string out;
+	String out;
 	out.reserve(inString.length());
 	for (char c : inString)
 		out.push_back((char)tolower(c));
@@ -93,4 +96,4 @@ const char *NibbleToBinary(uint32 inNibble)
 	return nibbles[inNibble & 0xf];
 }
 
-} // JPH
+JPH_NAMESPACE_END

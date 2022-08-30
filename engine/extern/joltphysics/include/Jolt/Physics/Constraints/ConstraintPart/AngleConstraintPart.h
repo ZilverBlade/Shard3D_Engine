@@ -3,12 +3,11 @@
 
 #pragma once
 
-#include <Physics/PhysicsSettings.h>
-#include <Physics/Body/Body.h>
-#include <Physics/Constraints/ConstraintPart/SpringPart.h>
-#include <Physics/StateRecorder.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/SpringPart.h>
+#include <Jolt/Physics/StateRecorder.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Constraint that constrains rotation along 1 axis
 ///
@@ -35,7 +34,7 @@ namespace JPH {
 class AngleConstraintPart
 {
 	/// Internal helper function to update velocities of bodies after Lagrange multiplier is calculated
-	JPH_INLINE bool				ApplyVelocityStep(Body &ioBody1, Body &ioBody2, float inLambda)
+	JPH_INLINE bool				ApplyVelocityStep(Body &ioBody1, Body &ioBody2, float inLambda) const
 	{
 		// Apply impulse if delta is not zero
 		if (inLambda != 0.0f)
@@ -136,7 +135,7 @@ public:
 	/// @param ioBody2 The second body that this constraint is attached to
 	/// @param inC Value of the constraint equation (C)
 	/// @param inBaumgarte Baumgarte constant (fraction of the error to correct)
-	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, float inC, float inBaumgarte)
+	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, float inC, float inBaumgarte) const
 	{
 		// Only apply position constraint when the constraint is hard, otherwise the velocity bias will fix the constraint
 		if (inC != 0.0f && !mSpringPart.IsActive())
@@ -193,4 +192,4 @@ private:
 	float						mTotalLambda = 0.0f;
 };
 
-} // JPH
+JPH_NAMESPACE_END

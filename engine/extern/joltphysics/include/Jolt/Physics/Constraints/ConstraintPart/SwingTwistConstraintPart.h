@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Geometry/Ellipse.h>
-#include <Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/AngleConstraintPart.h>
+#include <Jolt/Geometry/Ellipse.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/AngleConstraintPart.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Quaternion based constraint that decomposes the rotation in constraint space in swing and twist: q = q_swing * q_twist
 /// where q_swing.x = 0 and where q_twist.y = q_twist.z = 0
@@ -36,6 +36,10 @@ public:
 		JPH_ASSERT(inSwingYHalfAngle >= 0.0f && inSwingYHalfAngle <= JPH_PI);
 		JPH_ASSERT(inSwingZHalfAngle >= 0.0f && inSwingZHalfAngle <= JPH_PI);
 
+		// Calculate the sine and cosine of the half angles
+		Vec4 s, c;
+		(0.5f * Vec4(inTwistMinAngle, inTwistMaxAngle, inSwingYHalfAngle, inSwingZHalfAngle)).SinCos(s, c);
+
 		// Store axis flags which are used at runtime to quickly decided which contraints to apply
 		mRotationFlags = 0;
 		if (inTwistMinAngle > -cLockedAngle && inTwistMaxAngle < cLockedAngle)
@@ -56,12 +60,10 @@ public:
 		}
 		else
 		{
-			float twist_half_min = 0.5f * inTwistMinAngle;
-			float twist_half_max = 0.5f * inTwistMaxAngle;
-			mSinTwistHalfMinAngle = sin(twist_half_min);
-			mSinTwistHalfMaxAngle = sin(twist_half_max);
-			mCosTwistHalfMinAngle = cos(twist_half_min);
-			mCosTwistHalfMaxAngle = cos(twist_half_max);
+			mSinTwistHalfMinAngle = s.GetX();
+			mSinTwistHalfMaxAngle = s.GetY();
+			mCosTwistHalfMinAngle = c.GetX();
+			mCosTwistHalfMaxAngle = c.GetY();
 		}
 
 		if (inSwingYHalfAngle < cLockedAngle)
@@ -76,7 +78,7 @@ public:
 		}
 		else
 		{
-			mSinSwingYQuarterAngle = sin(0.5f * inSwingYHalfAngle);
+			mSinSwingYQuarterAngle = s.GetZ();
 		}
 
 		if (inSwingZHalfAngle < cLockedAngle)
@@ -91,7 +93,7 @@ public:
 		}
 		else
 		{
-			mSinSwingZQuarterAngle = sin(0.5f * inSwingZHalfAngle);
+			mSinSwingZQuarterAngle = s.GetW();
 		}
 	}
 
@@ -367,7 +369,7 @@ public:
 	/// @param inConstraintRotation The current rotation of the constraint in constraint space
 	/// @param inConstraintToBody1 , inConstraintToBody2 Rotates from constraint space to body 1/2 space
 	/// @param inBaumgarte Baumgarte constant (fraction of the error to correct)
-	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, QuatArg inConstraintRotation, QuatArg inConstraintToBody1, QuatArg inConstraintToBody2, float inBaumgarte)
+	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, QuatArg inConstraintRotation, QuatArg inConstraintToBody1, QuatArg inConstraintToBody2, float inBaumgarte) const
 	{
 		Quat q_swing, q_twist;
 		inConstraintRotation.GetSwingTwist(q_swing, q_twist);
@@ -460,4 +462,4 @@ private:
 	AngleConstraintPart			mTwistLimitConstraintPart;
 };
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <Physics/Body/BodyLockInterface.h>
+#include <Jolt/Physics/Body/BodyLockInterface.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Base class for locking bodies for the duration of the scope of this class (do not use directly)
 template <bool Write, class BodyType>
-class BodyLockBase
+class BodyLockBase : public NonCopyable
 {
 public:
 	/// Constructor will lock the body
@@ -107,4 +107,4 @@ class BodyLockWrite : public BodyLockBase<true, Body>
 	using BodyLockBase::BodyLockBase;
 };
 
-} // JPH
+JPH_NAMESPACE_END

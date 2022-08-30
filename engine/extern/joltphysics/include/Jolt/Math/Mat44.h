@@ -3,14 +3,16 @@
 
 #pragma once
 
-#include <Math/MathTypes.h>
+#include <Jolt/Math/MathTypes.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Holds a 4x4 matrix of floats, but supports also operations on the 3x3 upper left part of the matrix.
-class [[nodiscard]] Mat44
+class [[nodiscard]] alignas(16) Mat44
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	// Underlying column type
 	using Type = Vec4::Type;
 
@@ -73,6 +75,12 @@ public:
 	/// Returns matrix MR so that \f$MR(q) \: p = p \: q\f$ (where p and q are quaternions)
 	static JPH_INLINE Mat44		sQuatRightMultiply(QuatArg inQ);
 
+	/// Returns a look at matrix that transforms from world space to view space
+	/// @param inPos Position of the camera
+	/// @param inTarget Target of the camera
+	/// @param inUp Up vector
+	static JPH_INLINE Mat44		sLookAt(Vec3Arg inPos, Vec3Arg inTarget, Vec3Arg inUp);
+
 	/// Get float component by element index
 	JPH_INLINE float			operator () (uint inRow, uint inColumn) const			{ JPH_ASSERT(inRow < 4); JPH_ASSERT(inColumn < 4); return mCol[inColumn].mF32[inRow]; }
 	JPH_INLINE float &			operator () (uint inRow, uint inColumn)					{ JPH_ASSERT(inRow < 4); JPH_ASSERT(inColumn < 4); return mCol[inColumn].mF32[inRow]; }
@@ -126,21 +134,21 @@ public:
 	JPH_INLINE Mat44 &			operator += (Mat44Arg inM);
 
 	/// Access to the columns
-	JPH_INLINE const Vec3		GetAxisX() const										{ return Vec3(mCol[0]); }
+	JPH_INLINE Vec3				GetAxisX() const										{ return Vec3(mCol[0]); }
 	JPH_INLINE void				SetAxisX(Vec3Arg inV)									{ mCol[0] = Vec4(inV, 0.0f); }
-	JPH_INLINE const Vec3		GetAxisY() const										{ return Vec3(mCol[1]); }
+	JPH_INLINE Vec3				GetAxisY() const										{ return Vec3(mCol[1]); }
 	JPH_INLINE void				SetAxisY(Vec3Arg inV)									{ mCol[1] = Vec4(inV, 0.0f); }
-	JPH_INLINE const Vec3		GetAxisZ() const										{ return Vec3(mCol[2]); }
+	JPH_INLINE Vec3				GetAxisZ() const										{ return Vec3(mCol[2]); }
 	JPH_INLINE void				SetAxisZ(Vec3Arg inV)									{ mCol[2] = Vec4(inV, 0.0f); }
-	JPH_INLINE const Vec3		GetTranslation() const									{ return Vec3(mCol[3]); }
+	JPH_INLINE Vec3				GetTranslation() const									{ return Vec3(mCol[3]); }
 	JPH_INLINE void				SetTranslation(Vec3Arg inV)								{ mCol[3] = Vec4(inV, 1.0f); }
-	JPH_INLINE const Vec3		GetDiagonal3() const									{ return Vec3(mCol[0][0], mCol[1][1], mCol[2][2]); }
+	JPH_INLINE Vec3				GetDiagonal3() const									{ return Vec3(mCol[0][0], mCol[1][1], mCol[2][2]); }
 	JPH_INLINE void				SetDiagonal3(Vec3Arg inV)								{ mCol[0][0] = inV.GetX(); mCol[1][1] = inV.GetY(); mCol[2][2] = inV.GetZ(); }
-	JPH_INLINE const Vec4		GetDiagonal4() const									{ return Vec4(mCol[0][0], mCol[1][1], mCol[2][2], mCol[3][3]); }
+	JPH_INLINE Vec4				GetDiagonal4() const									{ return Vec4(mCol[0][0], mCol[1][1], mCol[2][2], mCol[3][3]); }
 	JPH_INLINE void				SetDiagonal4(Vec4Arg inV)								{ mCol[0][0] = inV.GetX(); mCol[1][1] = inV.GetY(); mCol[2][2] = inV.GetZ(); mCol[3][3] = inV.GetW(); }
-	JPH_INLINE const Vec3		GetColumn3(uint inCol) const							{ JPH_ASSERT(inCol < 4); return Vec3(mCol[inCol]); }
+	JPH_INLINE Vec3				GetColumn3(uint inCol) const							{ JPH_ASSERT(inCol < 4); return Vec3(mCol[inCol]); }
 	JPH_INLINE void				SetColumn3(uint inCol, Vec3Arg inV)						{ JPH_ASSERT(inCol < 4); mCol[inCol] = Vec4(inV, inCol == 3? 1.0f : 0.0f); }
-	JPH_INLINE const Vec4		GetColumn4(uint inCol) const							{ JPH_ASSERT(inCol < 4); return mCol[inCol]; }
+	JPH_INLINE Vec4				GetColumn4(uint inCol) const							{ JPH_ASSERT(inCol < 4); return mCol[inCol]; }
 	JPH_INLINE void				SetColumn4(uint inCol, Vec4Arg inV)						{ JPH_ASSERT(inCol < 4); mCol[inCol] = inV; }
 
 	/// Store matrix to memory
@@ -177,10 +185,16 @@ public:
 	JPH_INLINE void				SetRotation(Mat44Arg inRotation);
 
 	/// Convert to quaternion
-	JPH_INLINE const Quat		GetQuaternion() const;
+	JPH_INLINE Quat				GetQuaternion() const;
 
 	/// Get matrix that transforms a direction with the same transform as this matrix (length is not preserved)
-	JPH_INLINE const Mat44		GetDirectionPreservingMatrix() const					{ return GetRotation().Inversed3x3().Transposed3x3(); }
+	JPH_INLINE Mat44			GetDirectionPreservingMatrix() const					{ return GetRotation().Inversed3x3().Transposed3x3(); }
+
+	/// Pre multiply by translation matrix: result = this * Mat44::sTranslation(inTranslation)
+	JPH_INLINE Mat44			PreTranslated(Vec3Arg inTranslation) const;
+
+	/// Post multiply by translation matrix: result = Mat44::sTranslation(inTranslation) * this (i.e. add inTranslation to the 4-th column)
+	JPH_INLINE Mat44			PostTranslated(Vec3Arg inTranslation) const;
 
 	/// Scale a matrix: result = this * Mat44::sScale(inScale)
 	JPH_INLINE Mat44			PreScaled(Vec3Arg inScale) const;
@@ -207,6 +221,6 @@ private:
 
 static_assert(is_trivial<Mat44>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "Mat44.inl"

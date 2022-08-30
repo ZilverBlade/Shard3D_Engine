@@ -1,17 +1,18 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Body/MassProperties.h>
-#include <Math/Matrix.h>
-#include <Math/Vector.h>
-#include <Math/EigenValueSymmetric.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Body/MassProperties.h>
+#include <Jolt/Math/Matrix.h>
+#include <Jolt/Math/Vector.h>
+#include <Jolt/Math/EigenValueSymmetric.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
+#include <Jolt/Core/InsertionSort.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_NON_VIRTUAL(MassProperties)
 {
@@ -32,7 +33,7 @@ bool MassProperties::DecomposePrincipalMomentsOfInertia(Mat44 &outRotation, Vec3
 
 	// Sort so that the biggest value goes first
 	int indices[] = { 0, 1, 2 };
-	sort(indices, indices + 3, [&eigen_val](int inLeft, int inRight) -> bool { return eigen_val[inLeft] > eigen_val[inRight]; });
+	InsertionSort(indices, indices + 3, [&eigen_val](int inLeft, int inRight) { return eigen_val[inLeft] > eigen_val[inRight]; });
 		
 	// Convert to a regular Mat44 and Vec3
 	outRotation = Mat44::sIdentity();
@@ -180,4 +181,4 @@ void MassProperties::RestoreBinaryState(StreamIn &inStream)
 	inStream.Read(mInertia);
 }
 
-} // JPH
+JPH_NAMESPACE_END

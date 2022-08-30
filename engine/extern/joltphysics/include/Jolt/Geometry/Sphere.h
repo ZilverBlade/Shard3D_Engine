@@ -3,27 +3,29 @@
 
 #pragma once
 
-#include <Geometry/AABox.h>
+#include <Jolt/Geometry/AABox.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class [[nodiscard]] Sphere
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 	inline				Sphere() = default;
 	inline				Sphere(const Float3 &inCenter, float inRadius)			: mCenter(inCenter), mRadius(inRadius) { }
 	inline				Sphere(Vec3Arg inCenter, float inRadius)				: mRadius(inRadius) { inCenter.StoreFloat3(&mCenter); }
 
 	/// Calculate the support vector for this convex shape.
-	inline const Vec3	GetSupport(Vec3Arg inDirection) const
+	inline Vec3			GetSupport(Vec3Arg inDirection) const
 	{
 		float length = inDirection.Length();
 		return length > 0.0f ? Vec3::sLoadFloat3Unsafe(mCenter) + (mRadius/ length) * inDirection : Vec3::sLoadFloat3Unsafe(mCenter);
 	}
 
 	// Properties
-	inline const Vec3 	GetCenter() const										{ return Vec3::sLoadFloat3Unsafe(mCenter); }
+	inline Vec3 		GetCenter() const										{ return Vec3::sLoadFloat3Unsafe(mCenter); }
 	inline float		GetRadius() const										{ return mRadius; }
 
 	/// Test if two spheres overlap
@@ -66,4 +68,4 @@ private:
 	float				mRadius;
 };
 
-} // JPH
+JPH_NAMESPACE_END

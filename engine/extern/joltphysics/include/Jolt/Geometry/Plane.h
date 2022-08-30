@@ -3,12 +3,14 @@
 
 #pragma once
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// An infinite plane described by the formula X . Normal + Constant = 0.
 class [[nodiscard]] Plane
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 					Plane() = default;
 	explicit		Plane(Vec4Arg inNormalAndConstant)										: mNormalAndConstant(inNormalAndConstant) { }
@@ -21,7 +23,7 @@ public:
 	static Plane	sFromPointsCCW(Vec3Arg inV1, Vec3Arg inV2, Vec3Arg inV3)				{ return sFromPointAndNormal(inV1, (inV2 - inV1).Cross(inV3 - inV1).Normalized()); }
 
 	// Properties
-	const Vec3		GetNormal() const														{ return Vec3(mNormalAndConstant); }
+	Vec3			GetNormal() const														{ return Vec3(mNormalAndConstant); }
 	void			SetNormal(Vec3Arg inNormal)												{ mNormalAndConstant = Vec4(inNormal, mNormalAndConstant.GetW()); }
 	float			GetConstant() const														{ return mNormalAndConstant.GetW(); }
 	void			SetConstant(float inConstant)											{ mNormalAndConstant.SetW(inConstant); }
@@ -70,4 +72,4 @@ private:
 	Vec4			mNormalAndConstant;													///< XYZ = normal, W = constant, plane: x . normal + constant = 0
 };
 
-} // JPH
+JPH_NAMESPACE_END

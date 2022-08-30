@@ -1,16 +1,16 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Collision/Shape/MutableCompoundShape.h>
-#include <Physics/Collision/Shape/CompoundShapeVisitors.h>
-#include <Core/Profiler.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
-#include <ObjectStream/TypeDeclarations.h>
+#include <Jolt/Physics/Collision/Shape/MutableCompoundShape.h>
+#include <Jolt/Physics/Collision/Shape/CompoundShapeVisitors.h>
+#include <Jolt/Core/Profiler.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(MutableCompoundShapeSettings)
 {
@@ -54,12 +54,6 @@ MutableCompoundShape::MutableCompoundShape(const MutableCompoundShapeSettings &i
 	outResult.Set(this);
 }
 
-MutableCompoundShape::~MutableCompoundShape()
-{
-	// Free our bounds
-	free(mSubShapeBounds);
-}
-
 void MutableCompoundShape::AdjustCenterOfMass()
 {
 	// First calculate the delta of the center of mass
@@ -88,7 +82,7 @@ void MutableCompoundShape::CalculateLocalBounds()
 	if (num_blocks > 0)
 	{
 		// Initialize min/max for first block
-		const Bounds *bounds = mSubShapeBounds;
+		const Bounds *bounds = mSubShapeBounds.data();
 		Vec4 min_x = bounds->mMinX;
 		Vec4 min_y = bounds->mMinY;
 		Vec4 min_z = bounds->mMinZ;
@@ -130,12 +124,8 @@ void MutableCompoundShape::EnsureSubShapeBoundsCapacity()
 {
 	// Check if we have enough space
 	uint new_capacity = ((uint)mSubShapes.size() + 3) >> 2;
-	if (mSubShapeBoundsCapacity < new_capacity)
-	{
-		uint new_size = new_capacity * sizeof(Bounds);
-		mSubShapeBounds = reinterpret_cast<Bounds *>(realloc(mSubShapeBounds, new_size));
-		mSubShapeBoundsCapacity = new_capacity;
-	}
+	if (mSubShapeBounds.size() < new_capacity)
+		mSubShapeBounds.resize(new_capacity);
 }
 
 void MutableCompoundShape::CalculateSubShapeBounds(uint inStartIdx, uint inNumber)
@@ -310,9 +300,13 @@ bool MutableCompoundShape::CastRay(const RayCast &inRay, const SubShapeIDCreator
 	return visitor.mReturnValue;
 }
 
-void MutableCompoundShape::CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector) const
+void MutableCompoundShape::CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector, const ShapeFilter &inShapeFilter) const
 {
 	JPH_PROFILE_FUNCTION();
+
+	// Test shape filter
+	if (!inShapeFilter.ShouldCollide(inSubShapeIDCreator.GetID()))
+		return;
 
 	struct Visitor : public CastRayVisitorCollector
 	{
@@ -337,13 +331,17 @@ void MutableCompoundShape::CastRay(const RayCast &inRay, const RayCastSettings &
 		}
 	};
 
-	Visitor visitor(inRay, inRayCastSettings, this, inSubShapeIDCreator, ioCollector);
+	Visitor visitor(inRay, inRayCastSettings, this, inSubShapeIDCreator, ioCollector, inShapeFilter);
 	WalkSubShapes(visitor);
 }
 
-void MutableCompoundShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector) const
+void MutableCompoundShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector, const ShapeFilter &inShapeFilter) const
 {
 	JPH_PROFILE_FUNCTION();
+
+	// Test shape filter
+	if (!inShapeFilter.ShouldCollide(inSubShapeIDCreator.GetID()))
+		return;
 
 	struct Visitor : public CollidePointVisitor
 	{
@@ -367,7 +365,7 @@ void MutableCompoundShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator
 		}
 	};
 
-	Visitor visitor(inPoint, this, inSubShapeIDCreator, ioCollector);
+	Visitor visitor(inPoint, this, inSubShapeIDCreator, ioCollector, inShapeFilter);
 	WalkSubShapes(visitor);
 }
 
@@ -405,9 +403,13 @@ void MutableCompoundShape::sCastShapeVsCompound(const ShapeCast &inShapeCast, co
 	shape->WalkSubShapes(visitor);
 }
 
-void MutableCompoundShape::CollectTransformedShapes(const AABox &inBox, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale, const SubShapeIDCreator &inSubShapeIDCreator, TransformedShapeCollector &ioCollector) const
+void MutableCompoundShape::CollectTransformedShapes(const AABox &inBox, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale, const SubShapeIDCreator &inSubShapeIDCreator, TransformedShapeCollector &ioCollector, const ShapeFilter &inShapeFilter) const
 {
 	JPH_PROFILE_FUNCTION();
+
+	// Test shape filter
+	if (!inShapeFilter.ShouldCollide(inSubShapeIDCreator.GetID()))
+		return;
 
 	struct Visitor : public CollectTransformedShapesVisitor
 	{
@@ -431,7 +433,7 @@ void MutableCompoundShape::CollectTransformedShapes(const AABox &inBox, Vec3Arg 
 		}
 	};
 
-	Visitor visitor(inBox, this, inPositionCOM, inRotation, inScale, inSubShapeIDCreator, ioCollector);
+	Visitor visitor(inBox, this, inPositionCOM, inRotation, inScale, inSubShapeIDCreator, ioCollector, inShapeFilter);
 	WalkSubShapes(visitor);
 }
 
@@ -453,7 +455,7 @@ int MutableCompoundShape::GetIntersectingSubShapes(const OrientedBox &inBox, uin
 	return visitor.GetNumResults();
 }
 
-void MutableCompoundShape::sCollideCompoundVsShape(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector)
+void MutableCompoundShape::sCollideCompoundVsShape(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector, const ShapeFilter &inShapeFilter)
 {	
 	JPH_PROFILE_FUNCTION();
 
@@ -482,11 +484,11 @@ void MutableCompoundShape::sCollideCompoundVsShape(const Shape *inShape1, const 
 		}
 	};
 
-	Visitor visitor(shape1, inShape2, inScale1, inScale2, inCenterOfMassTransform1, inCenterOfMassTransform2, inSubShapeIDCreator1, inSubShapeIDCreator2, inCollideShapeSettings, ioCollector);
+	Visitor visitor(shape1, inShape2, inScale1, inScale2, inCenterOfMassTransform1, inCenterOfMassTransform2, inSubShapeIDCreator1, inSubShapeIDCreator2, inCollideShapeSettings, ioCollector, inShapeFilter);
 	shape1->WalkSubShapes(visitor);
 }
 
-void MutableCompoundShape::sCollideShapeVsCompound(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector)
+void MutableCompoundShape::sCollideShapeVsCompound(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector, const ShapeFilter &inShapeFilter)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -515,7 +517,7 @@ void MutableCompoundShape::sCollideShapeVsCompound(const Shape *inShape1, const 
 		}
 	};
 
-	Visitor visitor(inShape1, shape2, inScale1, inScale2, inCenterOfMassTransform1, inCenterOfMassTransform2, inSubShapeIDCreator1, inSubShapeIDCreator2, inCollideShapeSettings, ioCollector);
+	Visitor visitor(inShape1, shape2, inScale1, inScale2, inCenterOfMassTransform1, inCenterOfMassTransform2, inSubShapeIDCreator1, inSubShapeIDCreator2, inCollideShapeSettings, ioCollector, inShapeFilter);
 	shape2->WalkSubShapes(visitor);
 }
 
@@ -525,7 +527,7 @@ void MutableCompoundShape::SaveBinaryState(StreamOut &inStream) const
 
 	// Write bounds
 	uint bounds_size = (((uint)mSubShapes.size() + 3) >> 2) * sizeof(Bounds);
-	inStream.WriteBytes(mSubShapeBounds, bounds_size);
+	inStream.WriteBytes(mSubShapeBounds.data(), bounds_size);
 }
 
 void MutableCompoundShape::RestoreBinaryState(StreamIn &inStream)
@@ -537,7 +539,7 @@ void MutableCompoundShape::RestoreBinaryState(StreamIn &inStream)
 
 	// Read bounds
 	uint bounds_size = (((uint)mSubShapes.size() + 3) >> 2) * sizeof(Bounds);
-	inStream.ReadBytes(mSubShapeBounds, bounds_size);
+	inStream.ReadBytes(mSubShapeBounds.data(), bounds_size);
 }
 
 void MutableCompoundShape::sRegister()
@@ -554,4 +556,4 @@ void MutableCompoundShape::sRegister()
 	}
 }
 
-} // JPH
+JPH_NAMESPACE_END

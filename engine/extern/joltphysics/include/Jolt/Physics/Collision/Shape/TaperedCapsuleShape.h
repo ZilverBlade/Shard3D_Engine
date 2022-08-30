@@ -3,9 +3,12 @@
 
 #pragma once
 
-#include <Physics/Collision/Shape/ConvexShape.h>
+#include <Jolt/Physics/Collision/Shape/ConvexShape.h>
+#ifdef JPH_DEBUG_RENDERER
+	#include <Jolt/Renderer/DebugRenderer.h>
+#endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Class that constructs a TaperedCapsuleShape
 class TaperedCapsuleShapeSettings final : public ConvexShapeSettings
@@ -36,6 +39,8 @@ class TaperedCapsuleShapeSettings final : public ConvexShapeSettings
 class TaperedCapsuleShape final : public ConvexShape
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 							TaperedCapsuleShape() : ConvexShape(EShapeSubType::TaperedCapsule) { }
 							TaperedCapsuleShape(const TaperedCapsuleShapeSettings &inSettings, ShapeResult &outResult);
@@ -112,4 +117,4 @@ private:
 #endif // JPH_DEBUG_RENDERER
 };
 
-} // JPH
+JPH_NAMESPACE_END

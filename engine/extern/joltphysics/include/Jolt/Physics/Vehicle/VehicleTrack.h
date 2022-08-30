@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <ObjectStream/SerializableObject.h>
-#include <Core/LinearCurve.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
-#include <Physics/StateRecorder.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
+#include <Jolt/Core/LinearCurve.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
+#include <Jolt/Physics/StateRecorder.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// On which side of the vehicle the track is located (for steering)
 enum class ETrackSide : uint
@@ -32,7 +32,7 @@ public:
 	void					RestoreBinaryState(StreamIn &inStream);
 
 	uint					mDrivenWheel;								///< Which wheel on the track is connected to the engine
-	vector<uint>			mWheels;									///< Indices of wheels that are inside this track, should include the driven wheel too
+	Array<uint>				mWheels;									///< Indices of wheels that are inside this track, should include the driven wheel too
 	float					mInertia = 10.0f;							///< Moment of inertia (kg m^2) of the track and its wheels as seen on the driven wheel
 	float					mAngularDamping = 0.5f;						///< Damping factor of track and its wheels: dw/dt = -c * w as seen on the driven wheel
 	float					mMaxBrakeTorque = 15000.0f;					///< How much torque (Nm) the brakes can apply on the driven wheel
@@ -52,4 +52,4 @@ public:
 
 using VehicleTracks = VehicleTrack[(int)ETrackSide::Num];
 
-} // JPH
+JPH_NAMESPACE_END

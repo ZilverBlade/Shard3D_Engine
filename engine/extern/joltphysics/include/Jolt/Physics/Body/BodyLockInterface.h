@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <Physics/Body/Body.h>
-#include <Physics/Body/BodyManager.h>
-#include <Physics/PhysicsLock.h>
-#include <Core/Mutex.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/BodyManager.h>
+#include <Jolt/Physics/PhysicsLock.h>
+#include <Jolt/Core/Mutex.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Base class interface for locking a body. Usually you will use BodyLockRead / BodyLockWrite / BodyLockMultiRead / BodyLockMultiWrite instead.
-class BodyLockInterface
+class BodyLockInterface : public NonCopyable
 {
 public:
 	/// Redefine MutexMask
@@ -60,16 +60,16 @@ public:
 
 	///@name Locking functions
 	virtual SharedMutex *		LockRead(const BodyID &inBodyID) const override		{ return nullptr; }
-	virtual void				UnlockRead(SharedMutex *inMutex) const override		{ }
+	virtual void				UnlockRead(SharedMutex *inMutex) const override		{ /* Nothing to do */ }
 	virtual SharedMutex *		LockWrite(const BodyID &inBodyID) const override	{ return nullptr; }
-	virtual void				UnlockWrite(SharedMutex *inMutex) const override	{ }
+	virtual void				UnlockWrite(SharedMutex *inMutex) const override	{ /* Nothing to do */ }
 
 	///@name Batch locking functions
 	virtual MutexMask			GetMutexMask(const BodyID *inBodies, int inNumber) const override { return 0; }
-	virtual void				LockRead(MutexMask inMutexMask) const override		{ }
-	virtual void				UnlockRead(MutexMask inMutexMask) const override	{ }
-	virtual void				LockWrite(MutexMask inMutexMask) const override		{ }
-	virtual void				UnlockWrite(MutexMask inMutexMask) const override	{ }
+	virtual void				LockRead(MutexMask inMutexMask) const override		{ /* Nothing to do */ }
+	virtual void				UnlockRead(MutexMask inMutexMask) const override	{ /* Nothing to do */ }
+	virtual void				LockWrite(MutexMask inMutexMask) const override		{ /* Nothing to do */ }
+	virtual void				UnlockWrite(MutexMask inMutexMask) const override	{ /* Nothing to do */ }
 };
 
 /// Implementation that uses the body manager to lock the correct mutex for a body
@@ -130,4 +130,4 @@ public:
 	}
 };
 
-} // JPH
+JPH_NAMESPACE_END

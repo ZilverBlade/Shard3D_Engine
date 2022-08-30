@@ -1,19 +1,19 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Collision/Shape/Shape.h>
-#include <Physics/Collision/Shape/ScaledShape.h>
-#include <Physics/Collision/Shape/StaticCompoundShape.h>
-#include <Physics/Collision/TransformedShape.h>
-#include <Physics/Collision/PhysicsMaterial.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
-#include <Core/Factory.h>
-#include <ObjectStream/TypeDeclarations.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/ScaledShape.h>
+#include <Jolt/Physics/Collision/Shape/StaticCompoundShape.h>
+#include <Jolt/Physics/Collision/TransformedShape.h>
+#include <Jolt/Physics/Collision/PhysicsMaterial.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
+#include <Jolt/Core/Factory.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_ABSTRACT_BASE(ShapeSettings)
 {
@@ -39,8 +39,12 @@ TransformedShape Shape::GetSubShapeTransformedShape(const SubShapeID &inSubShape
 	return ts;
 }
 
-void Shape::CollectTransformedShapes(const AABox &inBox, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale, const SubShapeIDCreator &inSubShapeIDCreator, TransformedShapeCollector &ioCollector) const
+void Shape::CollectTransformedShapes(const AABox &inBox, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale, const SubShapeIDCreator &inSubShapeIDCreator, TransformedShapeCollector &ioCollector, const ShapeFilter &inShapeFilter) const
 {
+	// Test shape filter
+	if (!inShapeFilter.ShouldCollide(inSubShapeIDCreator.GetID()))
+		return;
+
 	TransformedShape ts(inPositionCOM, inRotation, this, TransformedShape::sGetBodyID(ioCollector.GetContext()), inSubShapeIDCreator);
 	ts.SetShapeScale(inScale);
 	ioCollector.AddHit(ts);
@@ -298,7 +302,7 @@ Shape::ShapeResult Shape::ScaleShape(Vec3Arg inScale) const
 			mShapes.push_back(inResult);
 		}
 
-		vector<TransformedShape>	mShapes;
+		Array<TransformedShape>		mShapes;
 	};
 	Collector collector;
 	TransformShape(Mat44::sScale(inScale) * Mat44::sTranslation(GetCenterOfMass()), collector);
@@ -306,7 +310,7 @@ Shape::ShapeResult Shape::ScaleShape(Vec3Arg inScale) const
 	// Construct a compound shape
 	StaticCompoundShapeSettings compound;
 	compound.mSubShapes.reserve(collector.mShapes.size());
-	for (TransformedShape &ts : collector.mShapes)
+	for (const TransformedShape &ts : collector.mShapes)
 	{
 		const Shape *shape = ts.mShape;
 
@@ -322,4 +326,4 @@ Shape::ShapeResult Shape::ScaleShape(Vec3Arg inScale) const
 	return compound.Create();
 }
 
-} // JPH
+JPH_NAMESPACE_END

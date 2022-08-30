@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Physics/Constraints/PathConstraintPath.h>
+#include <Jolt/Physics/Constraints/PathConstraintPath.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// A path that follows a Hermite spline
 class PathConstraintPathHermite final : public PathConstraintPath
@@ -45,9 +45,9 @@ private:
 	/// Helper function that returns the index of the path segment and the fraction t on the path segment based on the full path fraction
 	inline void			GetIndexAndT(float inFraction, int &outIndex, float &outT) const;
 
-	using Points = vector<Point>;
+	using Points = Array<Point>;
 	   
 	Points				mPoints;															///< Points on the Hermite spline
 };
 
-} // JPH
+JPH_NAMESPACE_END

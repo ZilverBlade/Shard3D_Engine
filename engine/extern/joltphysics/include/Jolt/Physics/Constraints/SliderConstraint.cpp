@@ -1,37 +1,63 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/SliderConstraint.h>
-#include <Physics/Body/Body.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Constraints/SliderConstraint.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(SliderConstraintSettings)
 {
 	JPH_ADD_BASE_CLASS(SliderConstraintSettings, TwoBodyConstraintSettings)
 
-	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mSliderAxis)
+	JPH_ADD_ENUM_ATTRIBUTE(SliderConstraintSettings, mSpace)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mAutoDetectPoint)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mPoint1)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mSliderAxis1)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mNormalAxis1)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mPoint2)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mSliderAxis2)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mNormalAxis2)
 	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mLimitsMin)
 	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mLimitsMax)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mFrequency)
+	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mDamping)
 	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mMaxFrictionForce)
 	JPH_ADD_ATTRIBUTE(SliderConstraintSettings, mMotorSettings)
+}
+
+void SliderConstraintSettings::SetSliderAxis(Vec3Arg inSliderAxis)
+{
+	JPH_ASSERT(mSpace == EConstraintSpace::WorldSpace);
+
+	mSliderAxis1 = mSliderAxis2 = inSliderAxis;
+	mNormalAxis1 = mNormalAxis2 = inSliderAxis.GetNormalizedPerpendicular();
 }
 
 void SliderConstraintSettings::SaveBinaryState(StreamOut &inStream) const
 { 
 	ConstraintSettings::SaveBinaryState(inStream);
 
-	inStream.Write(mSliderAxis);
+	inStream.Write(mSpace);
+	inStream.Write(mAutoDetectPoint);
+	inStream.Write(mPoint1);
+	inStream.Write(mSliderAxis1);
+	inStream.Write(mNormalAxis1);
+	inStream.Write(mPoint2);
+	inStream.Write(mSliderAxis2);
+	inStream.Write(mNormalAxis2);
 	inStream.Write(mLimitsMin);
 	inStream.Write(mLimitsMax);
+	inStream.Write(mFrequency);
+	inStream.Write(mDamping);
 	inStream.Write(mMaxFrictionForce);
 	mMotorSettings.SaveBinaryState(inStream);
 }
@@ -40,9 +66,18 @@ void SliderConstraintSettings::RestoreBinaryState(StreamIn &inStream)
 {
 	ConstraintSettings::RestoreBinaryState(inStream);
 
-	inStream.Read(mSliderAxis);
+	inStream.Read(mSpace);
+	inStream.Read(mAutoDetectPoint);
+	inStream.Read(mPoint1);
+	inStream.Read(mSliderAxis1);
+	inStream.Read(mNormalAxis1);
+	inStream.Read(mPoint2);
+	inStream.Read(mSliderAxis2);
+	inStream.Read(mNormalAxis2);
 	inStream.Read(mLimitsMin);
 	inStream.Read(mLimitsMax);
+	inStream.Read(mFrequency);
+	inStream.Read(mDamping);
 	inStream.Read(mMaxFrictionForce);
 	mMotorSettings.RestoreBinaryState(inStream);
 }
@@ -54,37 +89,69 @@ TwoBodyConstraint *SliderConstraintSettings::Create(Body &inBody1, Body &inBody2
 
 SliderConstraint::SliderConstraint(Body &inBody1, Body &inBody2, const SliderConstraintSettings &inSettings) :
 	TwoBodyConstraint(inBody1, inBody2, inSettings),
+	mLocalSpacePosition1(inSettings.mPoint1),
+	mLocalSpacePosition2(inSettings.mPoint2),
+	mLocalSpaceSliderAxis1(inSettings.mSliderAxis1),
+	mLocalSpaceNormal1(inSettings.mNormalAxis1),
 	mMaxFrictionForce(inSettings.mMaxFrictionForce),
 	mMotorSettings(inSettings.mMotorSettings)
 {
-	Mat44 inv_transform1 = inBody1.GetInverseCenterOfMassTransform();
+	// Store inverse of initial rotation from body 1 to body 2 in body 1 space
+	mInvInitialOrientation = RotationEulerConstraintPart::sGetInvInitialOrientationXY(inSettings.mSliderAxis1, inSettings.mNormalAxis1, inSettings.mSliderAxis2, inSettings.mNormalAxis2);
 
-	// Determine anchor point: If any of the bodies can never be dynamic use the other body as anchor point, otherwise use the mid point between the two center of masses
-	Vec3 anchor;
-	if (!mBody1->CanBeKinematicOrDynamic())
-		anchor = mBody2->GetCenterOfMassPosition();
-	else if (!mBody2->CanBeKinematicOrDynamic())
-		anchor = mBody1->GetCenterOfMassPosition();
-	else
-		anchor = 0.5f * (mBody1->GetCenterOfMassPosition() + mBody2->GetCenterOfMassPosition());
+	if (inSettings.mSpace == EConstraintSpace::WorldSpace)
+	{
+		if (inSettings.mAutoDetectPoint)
+		{
+			// Determine anchor point: If any of the bodies can never be dynamic use the other body as anchor point
+			Vec3 anchor;
+			if (!inBody1.CanBeKinematicOrDynamic())
+				anchor = inBody2.GetCenterOfMassPosition();
+			else if (!inBody2.CanBeKinematicOrDynamic())
+				anchor = inBody1.GetCenterOfMassPosition();
+			else
+			{
+				// Otherwise use weighted anchor point towards the lightest body
+				float inv_m1 = inBody1.GetMotionPropertiesUnchecked()->GetInverseMassUnchecked();
+				float inv_m2 = inBody2.GetMotionPropertiesUnchecked()->GetInverseMassUnchecked();
+				anchor = (inv_m1 * inBody1.GetCenterOfMassPosition() + inv_m2 * inBody2.GetCenterOfMassPosition()) / (inv_m1 + inv_m2);
+			}
 
-	// Store local positions
-	mLocalSpacePosition1 = inv_transform1 * anchor;
-	mLocalSpacePosition2 = inBody2.GetInverseCenterOfMassTransform() * anchor;
+			mLocalSpacePosition1 = mLocalSpacePosition2 = anchor;
+		}
 
-	// Store local sliding axis
-	mLocalSpaceSliderAxis1 = inv_transform1.Multiply3x3(inSettings.mSliderAxis).Normalized();
+		// If all properties were specified in world space, take them to local space now
+		Mat44 inv_transform1 = inBody1.GetInverseCenterOfMassTransform();
+		mLocalSpacePosition1 = inv_transform1 * mLocalSpacePosition1;
+		mLocalSpaceSliderAxis1 = inv_transform1.Multiply3x3(mLocalSpaceSliderAxis1).Normalized();
+		mLocalSpaceNormal1 = inv_transform1.Multiply3x3(mLocalSpaceNormal1).Normalized();
 
-	// Store local space normals
-	mLocalSpaceNormal1 = mLocalSpaceSliderAxis1.GetNormalizedPerpendicular();
+		mLocalSpacePosition2 = inBody2.GetInverseCenterOfMassTransform() * mLocalSpacePosition2;
+
+		// Constraints were specified in world space, so we should have replaced c1 with q10^-1 c1 and c2 with q20^-1 c2
+		// => r0^-1 = (q20^-1 c2) (q10^-1 c1)^1 = q20^-1 (c2 c1^-1) q10
+		mInvInitialOrientation = inBody2.GetRotation().Conjugated() * mInvInitialOrientation * inBody1.GetRotation();
+	}
+
+	// Calculate 2nd local space normal
 	mLocalSpaceNormal2 = mLocalSpaceSliderAxis1.Cross(mLocalSpaceNormal1);
-	
-	// Inverse of initial rotation from body 1 to body 2 in body 1 space
-	mInvInitialOrientation = RotationEulerConstraintPart::sGetInvInitialOrientation(inBody1, inBody2);
 
 	// Store limits
-	JPH_ASSERT(inSettings.mLimitsMin != inSettings.mLimitsMax, "Better use a fixed constraint");
+	JPH_ASSERT(inSettings.mLimitsMin != inSettings.mLimitsMax || inSettings.mFrequency > 0.0f, "Better use a fixed constraint");
 	SetLimits(inSettings.mLimitsMin, inSettings.mLimitsMax);
+
+	// Store frequency and damping
+	SetFrequency(inSettings.mFrequency);
+	SetDamping(inSettings.mDamping);
+}
+
+float SliderConstraint::GetCurrentPosition() const
+{
+	// See: CalculateR1R2U and CalculateSlidingAxisAndPosition
+	Vec3 r1 = mBody1->GetRotation() * mLocalSpacePosition1;
+	Vec3 r2 = mBody2->GetRotation() * mLocalSpacePosition2;
+	Vec3 u = mBody2->GetCenterOfMassPosition() + r2 - mBody1->GetCenterOfMassPosition() - r1;
+	return u.Dot(mBody1->GetRotation() * mLocalSpaceSliderAxis1);
 }
 
 void SliderConstraint::SetLimits(float inLimitsMin, float inLimitsMax)
@@ -127,11 +194,12 @@ void SliderConstraint::CalculateSlidingAxisAndPosition(Mat44Arg inRotation1)
 	}
 }
 
-void SliderConstraint::CalculatePositionLimitsConstraintProperties(float inDeltaTime, Mat44Arg inRotation1)
+void SliderConstraint::CalculatePositionLimitsConstraintProperties(float inDeltaTime)
 {
 	// Check if distance is within limits
-	if (mHasLimits && (mD <= mLimitsMin || mD >= mLimitsMax))
-		mPositionLimitsConstraintPart.CalculateConstraintProperties(inDeltaTime, *mBody1, mR1 + mU, *mBody2, mR2, mWorldSpaceSliderAxis);
+	bool below_min = mD <= mLimitsMin;
+	if (mHasLimits && (below_min || mD >= mLimitsMax))
+		mPositionLimitsConstraintPart.CalculateConstraintProperties(inDeltaTime, *mBody1, mR1 + mU, *mBody2, mR2, mWorldSpaceSliderAxis, 0.0f, mD - (below_min? mLimitsMin : mLimitsMax), mFrequency, mDamping);
 	else
 		mPositionLimitsConstraintPart.Deactivate();
 }
@@ -166,7 +234,7 @@ void SliderConstraint::SetupVelocityConstraint(float inDeltaTime)
 	CalculatePositionConstraintProperties(rotation1, rotation2);
 	mRotationConstraintPart.CalculateConstraintProperties(*mBody1, rotation1, *mBody2, rotation2);
 	CalculateSlidingAxisAndPosition(rotation1);
-	CalculatePositionLimitsConstraintProperties(inDeltaTime, rotation1);
+	CalculatePositionLimitsConstraintProperties(inDeltaTime);
 	CalculateMotorConstraintProperties(inDeltaTime);
 }
 
@@ -240,13 +308,13 @@ bool SliderConstraint::SolvePositionConstraint(float inDeltaTime, float inBaumga
 
 	// Solve limits along slider axis
 	bool limit = false;
-	if (mHasLimits)
+	if (mHasLimits && mFrequency <= 0.0f)
 	{
 		rotation1 = Mat44::sRotation(mBody1->GetRotation());
 		rotation2 = Mat44::sRotation(mBody2->GetRotation());
 		CalculateR1R2U(rotation1, rotation2);
 		CalculateSlidingAxisAndPosition(rotation1);
-		CalculatePositionLimitsConstraintProperties(inDeltaTime, rotation1);
+		CalculatePositionLimitsConstraintProperties(inDeltaTime);
 		if (mPositionLimitsConstraintPart.IsActive())
 		{
 			if (mD <= mLimitsMin)
@@ -351,6 +419,27 @@ void SliderConstraint::RestoreState(StateRecorder &inStream)
 	inStream.Read(mTargetPosition);
 }
 
+Ref<ConstraintSettings> SliderConstraint::GetConstraintSettings() const
+{
+	SliderConstraintSettings *settings = new SliderConstraintSettings;
+	ToConstraintSettings(*settings);
+	settings->mSpace = EConstraintSpace::LocalToBodyCOM;
+	settings->mPoint1 = mLocalSpacePosition1;
+	settings->mSliderAxis1 = mLocalSpaceSliderAxis1;
+	settings->mNormalAxis1 = mLocalSpaceNormal1;
+	settings->mPoint2 = mLocalSpacePosition2;
+	Mat44 inv_initial_rotation = Mat44::sRotation(mInvInitialOrientation);
+	settings->mSliderAxis2 = inv_initial_rotation.Multiply3x3(mLocalSpaceSliderAxis1);
+	settings->mNormalAxis2 = inv_initial_rotation.Multiply3x3(mLocalSpaceNormal1);
+	settings->mLimitsMin = mLimitsMin;
+	settings->mLimitsMax = mLimitsMax;
+	settings->mFrequency = mFrequency;
+	settings->mDamping = mDamping;
+	settings->mMaxFrictionForce = mMaxFrictionForce;
+	settings->mMotorSettings = mMotorSettings;
+	return settings;
+}
+
 Mat44 SliderConstraint::GetConstraintToBody1Matrix() const
 { 
 	return Mat44(Vec4(mLocalSpaceSliderAxis1, 0), Vec4(mLocalSpaceNormal1, 0), Vec4(mLocalSpaceNormal2, 0), Vec4(mLocalSpacePosition1, 1)); 
@@ -363,4 +452,4 @@ Mat44 SliderConstraint::GetConstraintToBody2Matrix() const
 	return mat; 
 }
 
-} // JPH
+JPH_NAMESPACE_END

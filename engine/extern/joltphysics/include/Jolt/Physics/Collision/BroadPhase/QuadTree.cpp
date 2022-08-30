@@ -1,25 +1,26 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
-#include <Physics/Collision/BroadPhase/BroadPhaseQuadTree.h>
-#include <Physics/Collision/RayCast.h>
-#include <Physics/Collision/AABoxCast.h>
-#include <Physics/Collision/CastResult.h>
-#include <Physics/Collision/SortReverseAndStore.h>
-#include <Physics/Body/BodyPair.h>
-#include <Physics/PhysicsLock.h>
-#include <Geometry/AABox4.h>
-#include <Geometry/RayAABox.h>
-#include <Geometry/OrientedBox.h>
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseQuadTree.h>
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/AABoxCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/SortReverseAndStore.h>
+#include <Jolt/Physics/Body/BodyPair.h>
+#include <Jolt/Physics/PhysicsLock.h>
+#include <Jolt/Geometry/AABox4.h>
+#include <Jolt/Geometry/RayAABox.h>
+#include <Jolt/Geometry/OrientedBox.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // QuadTree::Node
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-QuadTree::Node::Node(bool inLocked)
+QuadTree::Node::Node(bool inIsChanged) :
+	mIsChanged(inIsChanged)
 {
 	// First reset bounds
 	Vec4 val = Vec4::sReplicate(cLargeFloat);
@@ -36,12 +37,6 @@ QuadTree::Node::Node(bool inLocked)
 	mChildNodeID[1] = NodeID::sInvalid();
 	mChildNodeID[2] = NodeID::sInvalid();
 	mChildNodeID[3] = NodeID::sInvalid();
-
-	// Reset parent node index
-	mParentNodeIndex = cInvalidNodeIndex;
-
-	// Store lock status
-	mIsLocked = inLocked;
 }
 
 void QuadTree::Node::GetChildBounds(int inChildIndex, AABox &outBounds) const
@@ -133,7 +128,7 @@ void QuadTree::SetBodyLocation(TrackingVector &ioTracking, BodyID inBodyID, uint
 #endif
 }
 
-void QuadTree::InvalidateBodyLocation(TrackingVector &ioTracking, BodyID inBodyID)
+void QuadTree::sInvalidateBodyLocation(TrackingVector &ioTracking, BodyID inBodyID)
 {
 	ioTracking[inBodyID.GetIndex()].mBodyLocation = Tracking::cInvalidBodyLocation;
 }
@@ -144,7 +139,7 @@ QuadTree::~QuadTree()
 	DiscardOldTree();
 
 	// Get the current root node
-	RootNode &root_node = GetCurrentRoot();
+	const RootNode &root_node = GetCurrentRoot();
 
 	// Collect all bodies
 	Allocator::Batch free_batch;
@@ -163,16 +158,13 @@ QuadTree::~QuadTree()
 			const Node &node = mAllocator->Get(node_idx);
 
 			// Recurse and get all child nodes
-			for (int i = 0; i < 4; ++i)
-			{
-				NodeID child_node_id = node.mChildNodeID[i];
+			for (NodeID child_node_id : node.mChildNodeID)
 				if (child_node_id.IsValid() && child_node_id.IsNode())
 				{
 					JPH_ASSERT(top < cStackSize);
 					node_stack[top] = child_node_id;
 					top++;
 				}
-			}
 
 			// Mark node to be freed
 			mAllocator->AddObjectToBatch(free_batch, node_idx);
@@ -185,9 +177,9 @@ QuadTree::~QuadTree()
 	mAllocator->DestructObjectBatch(free_batch);
 }
 
-uint32 QuadTree::AllocateNode(bool inLocked)
+uint32 QuadTree::AllocateNode(bool inIsChanged)
 {
-	uint32 index = mAllocator->ConstructObject(inLocked);
+	uint32 index = mAllocator->ConstructObject(inIsChanged);
 	if (index == Allocator::cInvalidObjectIndex)
 	{
 		Trace("QuadTree: Out of nodes!");
@@ -222,7 +214,7 @@ void QuadTree::DiscardOldTree()
 	}
 }
 
-void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTracking, UpdateState &outUpdateState)
+void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTracking, UpdateState &outUpdateState, bool inFullRebuild)
 {
 #ifdef JPH_ENABLE_ASSERTS
 	// We only read positions
@@ -236,7 +228,11 @@ void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTrack
 	mIsDirty = false;
 
 	// Get the current root node
-	RootNode &root_node = GetCurrentRoot();
+	const RootNode &root_node = GetCurrentRoot();
+
+#ifdef JPH_DUMP_BROADPHASE_TREE
+	DumpTree(root_node.GetNodeID(), StringFormat("%s_PRE", mName).c_str());
+#endif
 
 	// Assert sane data
 #ifdef _DEBUG
@@ -244,8 +240,8 @@ void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTrack
 #endif
 
 	// Create space for all body ID's
-	outUpdateState.mAllNodeIDs = new NodeID [mNumBodies];
-	NodeID *cur_node_id = outUpdateState.mAllNodeIDs;
+	NodeID *node_ids = new NodeID [mNumBodies];
+	NodeID *cur_node_id = node_ids;
 
 	// Collect all bodies
 	NodeID node_stack[cStackSize];
@@ -274,25 +270,32 @@ void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTrack
 			uint32 node_idx = node_id.GetNodeIndex();
 			const Node &node = mAllocator->Get(node_idx);
 
-			if (node.mIsLocked)
+			if (!node.mIsChanged && !inFullRebuild)
 			{
-				// Node is locked, treat it as a whole
+				// Node is unchanged, treat it as a whole
 				*cur_node_id = node_id;
 				++cur_node_id;
 			}
 			else
 			{
-				// Node is not locked, recurse and get all children
-				for (int i = 0; i < 4; ++i)
-				{
-					NodeID child_node_id = node.mChildNodeID[i];
+				// Node is changed, recurse and get all children
+				for (NodeID child_node_id : node.mChildNodeID)
 					if (child_node_id.IsValid())
 					{
-						JPH_ASSERT(top < cStackSize);
-						node_stack[top] = child_node_id;
-						top++;
+						if (top < cStackSize)
+						{
+							node_stack[top] = child_node_id;
+							top++;
+						}
+						else
+						{
+							JPH_ASSERT(false); // Out of stack space, this must be a very deep tree. Are you batch adding bodies to the broadphase?
+
+							// Falling back to adding the node as a whole
+							*cur_node_id = child_node_id;
+							++cur_node_id;
+						}
 					}
-				}
 
 				// Mark node to be freed
 				mAllocator->AddObjectToBatch(mFreeNodeBatch, node_idx);
@@ -303,17 +306,23 @@ void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTrack
 	while (top >= 0);
 
 	// Check that our book keeping matches
-	uint32 num_node_ids = uint32(cur_node_id - outUpdateState.mAllNodeIDs);
-	JPH_ASSERT(num_node_ids <= mNumBodies);
+	uint32 num_node_ids = uint32(cur_node_id - node_ids);
+	JPH_ASSERT(inFullRebuild? num_node_ids == mNumBodies : num_node_ids <= mNumBodies);
 
 	// This will be the new root node id
 	NodeID root_node_id;
 
 	if (num_node_ids > 0)
 	{
+		// We mark the first 5 levels (max 1024 nodes) of the newly built tree as 'changed' so that
+		// those nodes get recreated every time when we rebuild the tree. This balances the amount of
+		// time we spend on rebuilding the tree ('unchanged' nodes will be put in the new tree as a whole)
+		// vs the quality of the built tree.
+		constexpr uint cMaxDepthMarkChanged = 5;
+
 		// Build new tree
 		AABox root_bounds;
-		root_node_id = BuildTree(inBodies, ioTracking, outUpdateState.mAllNodeIDs, num_node_ids, cInvalidNodeIndex, false, root_bounds);
+		root_node_id = BuildTree(inBodies, ioTracking, node_ids, num_node_ids, cMaxDepthMarkChanged, root_bounds);
 
 		if (root_node_id.IsBody())
 		{
@@ -325,21 +334,6 @@ void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTrack
 			SetBodyLocation(ioTracking, root_node_id.GetBodyID(), root_idx, 0);
 			root_node_id = NodeID::sFromNodeIndex(root_idx);
 		}
-		else
-		{
-			// We can't have a locked node as root, allocate a new root in this case
-			Node &old_root_node = mAllocator->Get(root_node_id.GetNodeIndex());
-			if (old_root_node.mIsLocked)
-			{
-				// Link old root under new root
-				uint32 root_idx = AllocateNode(false);
-				Node &root = mAllocator->Get(root_idx);
-				root.SetChildBounds(0, root_bounds);
-				root.mChildNodeID[0] = root_node_id;
-				root_node_id = NodeID::sFromNodeIndex(root_idx);
-				old_root_node.mParentNodeIndex = root_idx;
-			}
-		}
 	}
 	else
 	{
@@ -348,10 +342,13 @@ void QuadTree::UpdatePrepare(const BodyVector &inBodies, TrackingVector &ioTrack
 		root_node_id = NodeID::sFromNodeIndex(root_idx);
 	}
 
+	// Delete temporary data
+	delete [] node_ids;
+
 	outUpdateState.mRootNodeID = root_node_id;
 }
 
-void QuadTree::UpdateFinalize([[maybe_unused]] const BodyVector &inBodies, [[maybe_unused]] TrackingVector &ioTracking, UpdateState &inUpdateState)
+void QuadTree::UpdateFinalize([[maybe_unused]] const BodyVector &inBodies, [[maybe_unused]] const TrackingVector &inTracking, const UpdateState &inUpdateState)
 {
 	// Tree building is complete, now we switch the old with the new tree
 	uint32 new_root_idx = mRootNodeIndex ^ 1;
@@ -367,11 +364,12 @@ void QuadTree::UpdateFinalize([[maybe_unused]] const BodyVector &inBodies, [[may
 	// All queries that start from now on will use this new tree
 	mRootNodeIndex = new_root_idx;
 
-	// Delete temporary data
-	delete [] inUpdateState.mAllNodeIDs;
+#ifdef JPH_DUMP_BROADPHASE_TREE
+	DumpTree(new_root_node.GetNodeID(), StringFormat("%s_POST", mName).c_str());
+#endif
 
 #ifdef _DEBUG
-	ValidateTree(inBodies, ioTracking, new_root_node.mIndex, mNumBodies);
+	ValidateTree(inBodies, inTracking, new_root_node.mIndex, mNumBodies);
 #endif
 }
 
@@ -387,7 +385,7 @@ void QuadTree::sPartition(NodeID *ioNodeIDs, Vec3 *ioNodeCenters, int inNumber, 
 	// Calculate bounding box of box centers
 	Vec3 center_min = Vec3::sReplicate(cLargeFloat);
 	Vec3 center_max = Vec3::sReplicate(-cLargeFloat);
-	for (Vec3 *c = ioNodeCenters, *c_end = ioNodeCenters + inNumber; c < c_end; ++c)
+	for (const Vec3 *c = ioNodeCenters, *c_end = ioNodeCenters + inNumber; c < c_end; ++c)
 	{
 		Vec3 center = *c;
 		center_min = Vec3::sMin(center_min, center);
@@ -475,7 +473,7 @@ AABox QuadTree::GetNodeOrBodyBounds(const BodyVector &inBodies, NodeID inNodeID)
 	}
 }
 
-QuadTree::NodeID QuadTree::BuildTree(const BodyVector &inBodies, TrackingVector &ioTracking, NodeID *ioNodeIDs, int inNumber, uint32 inParentNodeIndex, bool inLocked, AABox &outBounds)
+QuadTree::NodeID QuadTree::BuildTree(const BodyVector &inBodies, TrackingVector &ioTracking, NodeID *ioNodeIDs, int inNumber, uint inMaxDepthMarkChanged, AABox &outBounds)
 {
 	// Trivial case: No bodies in tree
 	if (inNumber == 0)
@@ -501,7 +499,7 @@ QuadTree::NodeID QuadTree::BuildTree(const BodyVector &inBodies, TrackingVector 
 	Vec3 *centers = new Vec3 [inNumber];
 	JPH_ASSERT(IsAligned(centers, 16));
 	Vec3 *c = centers;
-	for (NodeID *n = ioNodeIDs, *n_end = ioNodeIDs + inNumber; n < n_end; ++n, ++c)
+	for (const NodeID *n = ioNodeIDs, *n_end = ioNodeIDs + inNumber; n < n_end; ++n, ++c)
 		*c = GetNodeOrBodyBounds(inBodies, *n).GetCenter();
 	
 	// The algorithm is a recursive tree build, but to avoid the call overhead we keep track of a stack here
@@ -510,6 +508,7 @@ QuadTree::NodeID QuadTree::BuildTree(const BodyVector &inBodies, TrackingVector 
 		uint32			mNodeIdx;					// Node index of node that is generated
 		int				mChildIdx;					// Index of child that we're currently processing
 		int				mSplit[5];					// Indices where the node ID's have been split to form 4 partitions
+		uint32			mDepth;						// Depth of this node in the tree
 		Vec3			mNodeBoundsMin;				// Bounding box of this node, accumulated while iterating over children
 		Vec3			mNodeBoundsMax;
 	};
@@ -518,8 +517,9 @@ QuadTree::NodeID QuadTree::BuildTree(const BodyVector &inBodies, TrackingVector 
 	int top = 0;
 
 	// Create root node
-	stack[0].mNodeIdx = AllocateNode(inLocked);
+	stack[0].mNodeIdx = AllocateNode(inMaxDepthMarkChanged > 0);
 	stack[0].mChildIdx = -1;
+	stack[0].mDepth = 0;
 	stack[0].mNodeBoundsMin = Vec3::sReplicate(cLargeFloat);
 	stack[0].mNodeBoundsMax = Vec3::sReplicate(-cLargeFloat);
 	sPartition4(ioNodeIDs, centers, 0, inNumber, stack[0].mSplit);
@@ -594,8 +594,10 @@ QuadTree::NodeID QuadTree::BuildTree(const BodyVector &inBodies, TrackingVector 
 				// Allocate new node
 				StackEntry &new_stack = stack[++top];
 				JPH_ASSERT(top < cStackSize / 4);
-				new_stack.mNodeIdx = AllocateNode(inLocked);
+				uint32 next_depth = cur_stack.mDepth + 1;
+				new_stack.mNodeIdx = AllocateNode(inMaxDepthMarkChanged > next_depth);
 				new_stack.mChildIdx = -1;
+				new_stack.mDepth = next_depth;
 				new_stack.mNodeBoundsMin = Vec3::sReplicate(cLargeFloat);
 				new_stack.mNodeBoundsMax = Vec3::sReplicate(-cLargeFloat);
 				sPartition4(ioNodeIDs, centers, low, high, new_stack.mSplit);
@@ -614,19 +616,19 @@ QuadTree::NodeID QuadTree::BuildTree(const BodyVector &inBodies, TrackingVector 
 	return NodeID::sFromNodeIndex(stack[0].mNodeIdx);
 }
 
-void QuadTree::UnlockNodeAndParents(uint32 inNodeIndex)
+void QuadTree::MarkNodeAndParentsChanged(uint32 inNodeIndex)
 {
 	uint32 node_idx = inNodeIndex;
 
 	do
 	{
-		// If node is not locked, parent won't be either
+		// If node has changed, parent will be too
 		Node &node = mAllocator->Get(node_idx);
-		if (!node.mIsLocked)
+		if (node.mIsChanged)
 			break;
 
-		// Mark node as unlocked
-		node.mIsLocked = false;
+		// Mark node as changed
+		node.mIsChanged = true;
 
 		// Get our parent
 		node_idx = node.mParentNodeIndex;
@@ -634,15 +636,15 @@ void QuadTree::UnlockNodeAndParents(uint32 inNodeIndex)
 	while (node_idx != cInvalidNodeIndex);
 }
 
-void QuadTree::WidenAndUnlockNodeAndParents(uint32 inNodeIndex, const AABox &inNewBounds)
+void QuadTree::WidenAndMarkNodeAndParentsChanged(uint32 inNodeIndex, const AABox &inNewBounds)
 {
 	uint32 node_idx = inNodeIndex;
 
 	for (;;)
 	{
-		// Mark node as unlocked
+		// Mark node as changed
 		Node &node = mAllocator->Get(node_idx);
-		node.mIsLocked = false;
+		node.mIsChanged = true;
 
 		// Get our parent
 		uint32 parent_idx = node.mParentNodeIndex;
@@ -665,9 +667,9 @@ void QuadTree::WidenAndUnlockNodeAndParents(uint32 inNodeIndex, const AABox &inN
 		// To avoid any race conditions with other threads we only enlarge bounding boxes
 		if (!parent_node.EncapsulateChildBounds(child_idx, inNewBounds))
 		{
-			// No changes to bounding box, only unlocking remains to be done
-			if (parent_node.mIsLocked)
-				UnlockNodeAndParents(parent_idx);
+			// No changes to bounding box, only marking as changed remains to be done
+			if (!parent_node.mIsChanged)
+				MarkNodeAndParentsChanged(parent_idx);
 			break; 
 		}
 
@@ -691,29 +693,25 @@ bool QuadTree::TryInsertLeaf(TrackingVector &ioTracking, int inNodeIndex, NodeID
 
 	// Find an empty child
 	for (uint32 child_idx = 0; child_idx < 4; ++child_idx)
-		if (node.mChildNodeID[child_idx].IsValid())
+		if (node.mChildNodeID[child_idx].CompareExchange(NodeID::sInvalid(), inLeafID)) // Check if we can claim it
 		{
-			// Check if we can claim it
-			if (node.mChildNodeID[child_idx].CompareExchange(NodeID::sInvalid(), inLeafID))
-			{
-				// We managed to add it to the node
+			// We managed to add it to the node
 
-				// If leaf was a body, we need to update its bookkeeping
-				if (!leaf_is_node)
-					SetBodyLocation(ioTracking, inLeafID.GetBodyID(), inNodeIndex, child_idx);
+			// If leaf was a body, we need to update its bookkeeping
+			if (!leaf_is_node)
+				SetBodyLocation(ioTracking, inLeafID.GetBodyID(), inNodeIndex, child_idx);
 
-				// Now set the bounding box making the child valid for queries
-				node.SetChildBounds(child_idx, inLeafBounds);
+			// Now set the bounding box making the child valid for queries
+			node.SetChildBounds(child_idx, inLeafBounds);
 
-				// Widen the bounds for our parents too
-				WidenAndUnlockNodeAndParents(inNodeIndex, inLeafBounds);
+			// Widen the bounds for our parents too
+			WidenAndMarkNodeAndParentsChanged(inNodeIndex, inLeafBounds);
 
-				// Update body counter
-				mNumBodies += inLeafNumBodies;
+			// Update body counter
+			mNumBodies += inLeafNumBodies;
 
-				// And we're done
-				return true;
-			}
+			// And we're done
+			return true;
 		}
 
 	return false;
@@ -725,15 +723,13 @@ bool QuadTree::TryCreateNewRoot(TrackingVector &ioTracking, atomic<uint32> &ioRo
 	uint32 root_idx = ioRootNodeIndex;
 	Node &root = mAllocator->Get(root_idx);
 
-	// Create new root
-	uint32 new_root_idx = AllocateNode(false);
+	// Create new root, mark this new root as changed as we're not creating a very efficient tree at this point
+	uint32 new_root_idx = AllocateNode(true);
 	Node &new_root = mAllocator->Get(new_root_idx);
-
-	// First child is current root
+	
+	// First child is current root, note that since the tree may be modified concurrently we cannot assume that the bounds of our child will be correct so we set a very large bounding box
 	new_root.mChildNodeID[0] = NodeID::sFromNodeIndex(root_idx);
-	AABox old_root_bounds;
-	root.GetNodeBounds(old_root_bounds);
-	new_root.SetChildBounds(0, old_root_bounds);
+	new_root.SetChildBounds(0, AABox(Vec3::sReplicate(-cLargeFloat), Vec3::sReplicate(cLargeFloat)));
 
 	// Second child is new leaf
 	new_root.mChildNodeID[1] = inLeafID;
@@ -759,11 +755,6 @@ bool QuadTree::TryCreateNewRoot(TrackingVector &ioTracking, atomic<uint32> &ioRo
 		// Store parent node for old root
 		root.mParentNodeIndex = new_root_idx;
 
-		// If a bounds change was in progress while we were assigning the root it will not have updated the root volume (since it did not know the new root)
-		// so we calculate the bounding box again and encapsulate it (to avoid conflicts with other threads which may adjust the old root bounds while we're reading them)
-		root.GetNodeBounds(old_root_bounds);
-		new_root.EncapsulateChildBounds(0, old_root_bounds);
-
 		// Update body counter
 		mNumBodies += inLeafNumBodies;
 
@@ -788,8 +779,9 @@ void QuadTree::AddBodiesPrepare(const BodyVector &inBodies, TrackingVector &ioTr
 		NodeID::sFromBodyID(*b);
 #endif
 
-	// Build subtree for the new bodies
-	outState.mLeafID = BuildTree(inBodies, ioTracking, (NodeID *)ioBodyIDs, inNumber, cInvalidNodeIndex, true, outState.mLeafBounds);
+	// Build subtree for the new bodies, note that we mark all nodes as 'not changed' 
+	// so they will stay together as a batch and will make the tree rebuild cheaper
+	outState.mLeafID = BuildTree(inBodies, ioTracking, (NodeID *)ioBodyIDs, inNumber, 0, outState.mLeafBounds);
 
 #ifdef _DEBUG
 	if (outState.mLeafID.IsNode())
@@ -835,23 +827,20 @@ void QuadTree::AddBodiesAbort(TrackingVector &ioTracking, const AddState &inStat
 		if (child_node_id.IsBody())
 		{
 			// Reset location of body
-			InvalidateBodyLocation(ioTracking, child_node_id.GetBodyID());
+			sInvalidateBodyLocation(ioTracking, child_node_id.GetBodyID());
 		}
 		else
 		{
 			// Process normal node
 			uint32 node_idx = child_node_id.GetNodeIndex();
 			const Node &node = mAllocator->Get(node_idx);
-			for (int i = 0; i < 4; ++i)
-			{
-				NodeID sub_child_node_id = node.mChildNodeID[i];
+			for (NodeID sub_child_node_id : node.mChildNodeID)
 				if (sub_child_node_id.IsValid())
 				{
 					JPH_ASSERT(top < cStackSize);
 					node_stack[top] = sub_child_node_id;
 					top++;
 				}
-			}
 
 			// Mark it to be freed
 			mAllocator->AddObjectToBatch(free_batch, node_idx);
@@ -864,7 +853,7 @@ void QuadTree::AddBodiesAbort(TrackingVector &ioTracking, const AddState &inStat
 	mAllocator->DestructObjectBatch(free_batch);
 }
 
-void QuadTree::RemoveBodies([[maybe_unused]] const BodyVector &inBodies, TrackingVector &ioTracking, BodyID *ioBodyIDs, int inNumber)
+void QuadTree::RemoveBodies([[maybe_unused]] const BodyVector &inBodies, TrackingVector &ioTracking, const BodyID *ioBodyIDs, int inNumber)
 {
 	// Assert sane input
 	JPH_ASSERT(ioBodyIDs != nullptr);
@@ -873,7 +862,7 @@ void QuadTree::RemoveBodies([[maybe_unused]] const BodyVector &inBodies, Trackin
 	// Mark tree dirty
 	mIsDirty = true;
 
-	for (BodyID *cur = ioBodyIDs, *end = ioBodyIDs + inNumber; cur < end; ++cur)
+	for (const BodyID *cur = ioBodyIDs, *end = ioBodyIDs + inNumber; cur < end; ++cur)
 	{
 		// Check if BodyID is correct
 		JPH_ASSERT(inBodies[cur->GetIndex()]->GetID() == *cur, "Provided BodyID doesn't match BodyID in body manager");
@@ -883,7 +872,7 @@ void QuadTree::RemoveBodies([[maybe_unused]] const BodyVector &inBodies, Trackin
 		GetBodyLocation(ioTracking, *cur, node_idx, child_idx);
 
 		// First we reset our internal bookkeeping
-		InvalidateBodyLocation(ioTracking, *cur);
+		sInvalidateBodyLocation(ioTracking, *cur);
 
 		// Then we make the bounding box invalid, no queries can find this node anymore
 		Node &node = mAllocator->Get(node_idx);
@@ -893,20 +882,20 @@ void QuadTree::RemoveBodies([[maybe_unused]] const BodyVector &inBodies, Trackin
 		node.mChildNodeID[child_idx] = NodeID::sInvalid();
 
 		// We don't need to bubble up our bounding box changes to our parents since we never make volumes smaller, only bigger
-		// But we do need to unlock the nodes so that the tree can be rebuilt
-		UnlockNodeAndParents(node_idx);
+		// But we do need to mark the nodes as changed so that the tree can be rebuilt
+		MarkNodeAndParentsChanged(node_idx);
 	}
 
 	mNumBodies -= inNumber;
 }
 
-void QuadTree::NotifyBodiesAABBChanged(const BodyVector &inBodies, const TrackingVector &inTracking, BodyID *ioBodyIDs, int inNumber)
+void QuadTree::NotifyBodiesAABBChanged(const BodyVector &inBodies, const TrackingVector &inTracking, const BodyID *ioBodyIDs, int inNumber)
 {
 	// Assert sane input
 	JPH_ASSERT(ioBodyIDs != nullptr);
 	JPH_ASSERT(inNumber > 0);
 
-	for (BodyID *cur = ioBodyIDs, *end = ioBodyIDs + inNumber; cur < end; ++cur)
+	for (const BodyID *cur = ioBodyIDs, *end = ioBodyIDs + inNumber; cur < end; ++cur)
 	{
 		// Check if BodyID is correct
 		const Body *body = inBodies[cur->GetIndex()];
@@ -927,7 +916,7 @@ void QuadTree::NotifyBodiesAABBChanged(const BodyVector &inBodies, const Trackin
 			mIsDirty = true;
 
 			// If bounds changed, widen the bounds for our parents too
-			WidenAndUnlockNodeAndParents(node_idx, new_bounds);
+			WidenAndMarkNodeAndParentsChanged(node_idx, new_bounds);
 		}
 	}
 }
@@ -1392,15 +1381,11 @@ void QuadTree::FindCollidingPairs(const BodyVector &inBodies, const BodyID *inAc
 					// Collision between dynamic pairs need to be picked up only once
 					const Body &body2 = *inBodies[b2_id.GetIndex()];
 					if (inObjectLayerPairFilter(body1.GetObjectLayer(), body2.GetObjectLayer())
-						&& Body::sFindCollidingPairsCanCollide(body1, body2))
+						&& Body::sFindCollidingPairsCanCollide(body1, body2)
+						&& bounds1.Overlaps(body2.GetWorldSpaceBounds())) // In the broadphase we widen the bounding box when a body moves, do a final check to see if the bounding boxes actually overlap
 					{
-						// In the broadphase we widen the bounding box when a body moves, do a final
-						// check to see if the bounding boxes actually overlap
-						if (bounds1.Overlaps(body2.GetWorldSpaceBounds()))
-						{
-							// Store potential hit between bodies
-							ioPairCollector.AddHit({ b1_id, b2_id });
-						}
+						// Store potential hit between bodies
+						ioPairCollector.AddHit({ b1_id, b2_id });
 					}
 				}
 			}
@@ -1481,8 +1466,8 @@ void QuadTree::ValidateTree(const BodyVector &inBodies, const TrackingVector &in
 		const Node &node = mAllocator->Get(cur_stack.mNodeIndex);
 		JPH_ASSERT(node.mParentNodeIndex == cur_stack.mParentNodeIndex);
 
-		// Validate that when a parent is locked that all of its children are also
-		JPH_ASSERT(cur_stack.mParentNodeIndex == cInvalidNodeIndex || !mAllocator->Get(cur_stack.mParentNodeIndex).mIsLocked || node.mIsLocked);
+		// Validate that when a parent is not-changed that all of its children are also
+		JPH_ASSERT(cur_stack.mParentNodeIndex == cInvalidNodeIndex || mAllocator->Get(cur_stack.mParentNodeIndex).mIsChanged || !node.mIsChanged);
 
 		// Loop children
 		for (uint32 i = 0; i < 4; ++i)
@@ -1494,6 +1479,7 @@ void QuadTree::ValidateTree(const BodyVector &inBodies, const TrackingVector &in
 				{
 					// Child is a node, recurse
 					uint32 child_idx = child_node_id.GetNodeIndex();
+					JPH_ASSERT(top < cStackSize);
 					StackEntry &new_entry = stack[top++];
 					new_entry.mNodeIndex = child_idx;
 					new_entry.mParentNodeIndex = cur_stack.mNodeIndex;
@@ -1538,6 +1524,80 @@ void QuadTree::ValidateTree(const BodyVector &inBodies, const TrackingVector &in
 
 #endif
 
+#ifdef JPH_DUMP_BROADPHASE_TREE
+
+void QuadTree::DumpTree(const NodeID &inRoot, const char *inFileNamePrefix) const
+{
+	// Open DOT file
+	ofstream f;
+	f.open(StringFormat("%s.dot", inFileNamePrefix), ofstream::out | ofstream::trunc);
+	if (!f.is_open())
+		return;
+
+	// Write header
+	f << "digraph {\n";
+
+	// Iterate the entire tree
+	NodeID node_stack[cStackSize];
+	node_stack[0] = inRoot;
+	JPH_ASSERT(node_stack[0].IsValid());
+	int top = 0;
+	do
+	{
+		// Check if node is a body
+		NodeID node_id = node_stack[top];
+		if (node_id.IsBody())
+		{
+			// Output body
+			String body_id = ConvertToString(node_id.GetBodyID().GetIndex());
+			f << "body" << body_id << "[label = \"Body " << body_id << "\"]\n";
+		}
+		else
+		{
+			// Process normal node
+			uint32 node_idx = node_id.GetNodeIndex();
+			const Node &node = mAllocator->Get(node_idx);
+
+			// Get bounding box
+			AABox bounds;
+			node.GetNodeBounds(bounds);
+
+			// Output node
+			String node_str = ConvertToString(node_idx);
+			f << "node" << node_str << "[label = \"Node " << node_str << "\nVolume: " << ConvertToString(bounds.GetVolume()) << "\" color=" << (node.mIsChanged? "red" : "black") << "]\n";
+
+			// Recurse and get all children
+			for (NodeID child_node_id : node.mChildNodeID)
+				if (child_node_id.IsValid())
+				{
+					JPH_ASSERT(top < cStackSize);
+					node_stack[top] = child_node_id;
+					top++;
+
+					// Output link
+					f << "node" << node_str << " -> ";
+					if (child_node_id.IsBody())
+						f << "body" << ConvertToString(child_node_id.GetBodyID().GetIndex());
+					else
+						f << "node" << ConvertToString(child_node_id.GetNodeIndex());
+					f << "\n";
+				}
+		}
+		--top;
+	} 
+	while (top >= 0);
+
+	// Finish DOT file
+	f << "}\n";
+	f.close();
+
+	// Convert to svg file
+	String cmd = StringFormat("dot %s.dot -Tsvg -o %s.svg", inFileNamePrefix, inFileNamePrefix);
+	system(cmd.c_str());
+}
+
+#endif // JPH_DUMP_BROADPHASE_TREE
+
 #ifdef JPH_TRACK_BROADPHASE_STATS
 
 void QuadTree::ReportStats(const char *inName, const LayerToStats &inLayer) const
@@ -1570,4 +1630,18 @@ void QuadTree::ReportStats() const
 
 #endif // JPH_TRACK_BROADPHASE_STATS
 
-} // JPH
+uint QuadTree::GetMaxTreeDepth(const NodeID &inNodeID) const
+{
+	// Reached a leaf?
+	if (!inNodeID.IsValid() || inNodeID.IsBody())
+		return 0;
+
+	// Recurse to children
+	uint max_depth = 0;
+	const Node &node = mAllocator->Get(inNodeID.GetNodeIndex());
+	for (NodeID child_node_id : node.mChildNodeID)
+		max_depth = max(max_depth, GetMaxTreeDepth(child_node_id));
+	return max_depth + 1;
+}
+
+JPH_NAMESPACE_END

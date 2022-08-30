@@ -82,7 +82,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
@@ -95,7 +95,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mtd.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mtd.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;jolt.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\d;..\extern\joltphysics\lib\d;..\extern\assimp\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -111,7 +111,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -139,7 +139,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include\Jolt;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

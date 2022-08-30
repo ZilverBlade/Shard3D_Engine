@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <Math/Vec3.h>
-#include <Math/Vec4.h>
+#include <Jolt/Math/Vec3.h>
+#include <Jolt/Math/Vec4.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Quaternion class, quaternions are 4 dimensional vectors which can describe rotations in 3 dimensional
 /// space if their length is 1.
@@ -28,9 +28,11 @@ namespace JPH {
 /// it easy to extract the rotation axis of the quaternion:
 ///
 /// q = [cos(angle / 2), sin(angle / 2) * rotation_axis]
-class [[nodiscard]] Quat
+class [[nodiscard]] alignas(16) Quat
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	///@name Constructors
 	///@{
 	inline						Quat() = default; ///< Intentionally not initialized for performance reasons
@@ -174,7 +176,7 @@ public:
 	JPH_INLINE Quat				GetPerpendicular() const										{ return Quat(Vec4(1, -1, 1, -1) * mValue.Swizzle<SWIZZLE_Y, SWIZZLE_X, SWIZZLE_W, SWIZZLE_Z>()); }
 
 	/// Get rotation angle around inAxis (uses Swing Twist Decomposition to get the twist quaternion and uses q(axis, angle) = [cos(angle / 2), axis * sin(angle / 2)])
-	JPH_INLINE float			GetRotationAngle(Vec3Arg inAxis) const							{ return GetW() == 0.0f? JPH_PI : 2.0f * atan(GetXYZ().Dot(inAxis) / GetW()); }
+	JPH_INLINE float			GetRotationAngle(Vec3Arg inAxis) const							{ return GetW() == 0.0f? JPH_PI : 2.0f * ATan(GetXYZ().Dot(inAxis) / GetW()); }
 
 	/// Swing Twist Decomposition: any quaternion can be split up as:
 	///
@@ -237,6 +239,6 @@ public:
 
 static_assert(is_trivial<Quat>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "Quat.inl"

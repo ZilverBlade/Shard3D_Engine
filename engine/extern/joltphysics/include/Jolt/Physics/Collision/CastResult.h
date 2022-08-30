@@ -3,15 +3,17 @@
 
 #pragma once
 
-#include <Physics/Body/BodyID.h>
-#include <Physics/Collision/Shape/SubShapeID.h>
+#include <Jolt/Physics/Body/BodyID.h>
+#include <Jolt/Physics/Collision/Shape/SubShapeID.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Structure that holds a ray cast or other object cast hit
 class BroadPhaseCastResult
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Function required by the CollisionCollector. A smaller fraction is considered to be a 'better hit'. For rays/cast shapes we can just use the collision fraction.
 	inline float	GetEarlyOutFraction() const			{ return mFraction; }
 
@@ -23,7 +25,9 @@ public:
 class RayCastResult : public BroadPhaseCastResult
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	SubShapeID		mSubShapeID2;						///< Sub shape ID of shape that we collided against
 };
 
-} // JPH
+JPH_NAMESPACE_END

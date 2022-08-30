@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class PhysicsMaterial;
 
@@ -94,8 +94,8 @@ public:
 			float angle1 = 2.0f * JPH_PI * (float(i) / num_verts);
 			float angle2 = 2.0f * JPH_PI * (float(i + 1) / num_verts);
 
-			Vec3 t1(sin(angle1), 1.0f, cos(angle1));
-			Vec3 t2(sin(angle2), 1.0f, cos(angle2));
+			Vec3 t1(Sin(angle1), 1.0f, Cos(angle1));
+			Vec3 t2(Sin(angle2), 1.0f, Cos(angle2));
 			Vec3 b1 = t1 + bottom_offset;
 			Vec3 b2 = t2 + bottom_offset;
 
@@ -155,7 +155,7 @@ public:
 	}
 
 	/// Add a mesh part and its transform
-	void			AddPart(const Mat44 inLocalToWorld, const Vec3 *inTriangleVertices, size_t inNumTriangleVertices)
+	void			AddPart(Mat44Arg inLocalToWorld, const Vec3 *inTriangleVertices, size_t inNumTriangleVertices)
 	{
 		JPH_ASSERT(inNumTriangleVertices % 3 == 0);
 		
@@ -240,4 +240,4 @@ private:
 	bool					mIsInsideOut;
 };
 
-} // JPH
+JPH_NAMESPACE_END

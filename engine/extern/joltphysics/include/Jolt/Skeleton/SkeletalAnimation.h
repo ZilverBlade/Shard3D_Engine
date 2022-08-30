@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <Core/Reference.h>
-#include <ObjectStream/SerializableObject.h>
+#include <Jolt/Core/Reference.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class SkeletonPose;
 
@@ -26,7 +26,7 @@ public:
 		void							FromMatrix(Mat44Arg inMatrix);
 		
 		/// Convert to matrix representation
-		void							ToMatrix(Mat44 &outMatrix);
+		inline Mat44					ToMatrix() const									{ return Mat44::sRotationTranslation(mRotation, mTranslation); }
 
 		Quat							mRotation = Quat::sIdentity();						///< Local space rotation of the joint
 		Vec3							mTranslation = Vec3::sZero();						///< Local space translation of the joint
@@ -41,7 +41,7 @@ public:
 		float							mTime = 0.0f;										///< Time of keyframe in seconds
 	};
 
-	using KeyframeVector = vector<Keyframe>;
+	using KeyframeVector = Array<Keyframe>;
 
 	/// Contains the animation for a single joint
 	class AnimatedJoint
@@ -49,11 +49,11 @@ public:
 	public:
 		JPH_DECLARE_SERIALIZABLE_NON_VIRTUAL(AnimatedJoint)
 
-		string							mJointName;											///< Name of the joint
+		String							mJointName;											///< Name of the joint
 		KeyframeVector					mKeyframes;											///< List of keyframes over time
 	};
 
-	using AnimatedJointVector = vector<AnimatedJoint>;
+	using AnimatedJointVector = Array<AnimatedJoint>;
 
 	/// Get the length (in seconds) of this animation
 	float								GetDuration() const;
@@ -73,4 +73,4 @@ private:
 	bool								mIsLooping = true;									///< If this animation loops back to start
 };
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,18 +3,18 @@
 
 #pragma once
 
-#include <Core/NonCopyable.h>
+#include <Jolt/Core/NonCopyable.h>
 
 //#define JPH_CONVEX_BUILDER_2D_DEBUG
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// A convex hull builder that tries to create 2D hulls as accurately as possible. Used for offline processing. 
 class ConvexHullBuilder2D : public NonCopyable
 {
 public:
-	using Positions = vector<Vec3>; 
-	using Edges = vector<int>;
+	using Positions = Array<Vec3>; 
+	using Edges = Array<int>;
 
 	/// Constructor
 	/// @param inPositions Positions used to make the hull. Uses X and Y component of Vec3 only!
@@ -53,7 +53,7 @@ private:
 	/// Assigns a position to one of the supplied edges based on which edge is closest.
 	/// @param inPositionIdx Index of the position to add
 	/// @param inEdges List of edges to consider
-	void				AssignPointToEdge(int inPositionIdx, const vector<Edge *> &inEdges) const;
+	void				AssignPointToEdge(int inPositionIdx, const Array<Edge *> &inEdges) const;
 
 #ifdef JPH_CONVEX_BUILDER_2D_DEBUG
 	/// Draw state of algorithm
@@ -65,12 +65,14 @@ private:
 	void				ValidateEdges() const;
 #endif
 
-	using ConflictList = vector<int>;
+	using ConflictList = Array<int>;
 
 	/// Linked list of edges
 	class Edge
 	{
 	public:
+		JPH_OVERRIDE_NEW_DELETE
+
 		/// Constructor
 		explicit		Edge(int inStartIdx)						: mStartIdx(inStartIdx) { }
 
@@ -99,4 +101,4 @@ private:
 #endif
 };
 
-} // JPH
+JPH_NAMESPACE_END

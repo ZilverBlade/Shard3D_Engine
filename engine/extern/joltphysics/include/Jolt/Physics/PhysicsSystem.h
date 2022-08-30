@@ -3,15 +3,16 @@
 
 #pragma once
 
-#include <Physics/Body/BodyInterface.h>
-#include <Physics/Collision/NarrowPhaseQuery.h>
-#include <Physics/Collision/ContactListener.h>
-#include <Physics/Constraints/ContactConstraintManager.h>
-#include <Physics/Constraints/ConstraintManager.h>
-#include <Physics/IslandBuilder.h>
-#include <Physics/PhysicsUpdateContext.h>
+#include <Jolt/Physics/Body/BodyInterface.h>
+#include <Jolt/Physics/Collision/NarrowPhaseQuery.h>
+#include <Jolt/Physics/Collision/ContactListener.h>
+#include <Jolt/Physics/Constraints/ContactConstraintManager.h>
+#include <Jolt/Physics/Constraints/ConstraintManager.h>
+#include <Jolt/Physics/IslandBuilder.h>
+#include <Jolt/Physics/PhysicsUpdateContext.h>
+#include <Jolt/Physics/PhysicsSettings.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class JobSystem;
 class StateRecorder;
@@ -24,6 +25,8 @@ class PhysicsStepListener;
 class PhysicsSystem : public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor / Destructor
 								PhysicsSystem()												: mContactManager(mPhysicsSettings) { }
 								~PhysicsSystem();
@@ -33,9 +36,10 @@ public:
 	/// @param inNumBodyMutexes Number of body mutexes to use. Should be a power of 2 in the range [1, 64], use 0 to auto detect.
 	/// @param inMaxBodyPairs Maximum amount of body pairs to process (anything else will fall through the world), this number should generally be much higher than the max amount of contact points as there will be lots of bodies close that are not actually touching
 	/// @param inMaxContactConstraints Maximum amount of contact constraints to process (anything else will fall through the world)
-	/// @param inObjectToBroadPhaseLayer Maps object layer to broadphase layer, see ObjectToBroadPhaseLayer.
+	/// @param inBroadPhaseLayerInterface Information on the mapping of object layers to broad phase layers, note since this is a virtual interface, the instance needs to stay alive during the lifetime of the PhysicsSystem
+	/// @param inObjectVsBroadPhaseLayerFilter Filter callback function that is used to determine if an object layer collides with a broad phase layer.
 	/// @param inObjectLayerPairFilter Filter callback function that is used to determine if two object layers collide.
-	void						Init(uint inMaxBodies, uint inNumBodyMutexes, uint inMaxBodyPairs, uint inMaxContactConstraints, const ObjectToBroadPhaseLayer &inObjectToBroadPhaseLayer, ObjectVsBroadPhaseLayerFilter inObjectVsBroadPhaseLayerFilter, ObjectLayerPairFilter inObjectLayerPairFilter);
+	void						Init(uint inMaxBodies, uint inNumBodyMutexes, uint inMaxBodyPairs, uint inMaxContactConstraints, const BroadPhaseLayerInterface &inBroadPhaseLayerInterface, ObjectVsBroadPhaseLayerFilter inObjectVsBroadPhaseLayerFilter, ObjectLayerPairFilter inObjectLayerPairFilter);
 	
 	/// Listener that is notified whenever a body is activated/deactivated
 	void						SetBodyActivationListener(BodyActivationListener *inListener) { mBodyManager.SetBodyActivationListener(inListener); }
@@ -57,13 +61,10 @@ public:
 	void						SetPhysicsSettings(const PhysicsSettings &inSettings)		{ mPhysicsSettings = inSettings; }
 	const PhysicsSettings &		GetPhysicsSettings() const									{ return mPhysicsSettings; }
 
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
-	/// Set function that converts a broadphase layer to a human readable string for debugging purposes
-	void						SetBroadPhaseLayerToString(BroadPhaseLayerToString inBroadPhaseLayerToString) { mBroadPhase->SetBroadPhaseLayerToString(inBroadPhaseLayerToString); }
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
-
 	/// Access to the body interface. This interface allows to to create / remove bodies and to change their properties.
+	const BodyInterface &		GetBodyInterface() const									{ return mBodyInterfaceLocking; }
 	BodyInterface &				GetBodyInterface() 											{ return mBodyInterfaceLocking; }
+	const BodyInterface &		GetBodyInterfaceNoLock() const								{ return mBodyInterfaceNoLock; } ///< Version that does not lock the bodies, use with great care!
 	BodyInterface & 			GetBodyInterfaceNoLock()									{ return mBodyInterfaceNoLock; } ///< Version that does not lock the bodies, use with great care!
 
 	/// Access to the broadphase interface that allows coarse collision queries
@@ -84,6 +85,9 @@ public:
 
 	/// Batch remove constraints. Note that the inConstraints array is allowed to have nullptrs, these will be ignored.
 	void						RemoveConstraints(Constraint **inConstraints, int inNumber)	{ mConstraintManager.Remove(inConstraints, inNumber); }
+
+	/// Get a list of all constraints
+	Constraints					GetConstraints() const										{ return mConstraintManager.GetConstraints(); }
 
 	/// Optimize the broadphase, needed only if you've added many bodies prior to calling Update() for the first time.
 	void						OptimizeBroadPhase();
@@ -110,7 +114,7 @@ public:
 	static bool					sDrawMotionQualityLinearCast;								///< Draw debug info for objects that perform continuous collision detection through the linear cast motion quality
 
 	/// Draw the state of the bodies (debugging purposes)
-	void						DrawBodies(const BodyManager::DrawSettings &inSettings, DebugRenderer *inRenderer) { mBodyManager.Draw(inSettings, mPhysicsSettings, inRenderer); }
+	void						DrawBodies(const BodyManager::DrawSettings &inSettings, DebugRenderer *inRenderer, const BodyDrawFilter *inBodyFilter = nullptr) { mBodyManager.Draw(inSettings, mPhysicsSettings, inRenderer, inBodyFilter); }
 
 	/// Draw the constraints only (debugging purposes)
 	void						DrawConstraints(DebugRenderer *inRenderer)					{ mConstraintManager.DrawConstraints(inRenderer); }
@@ -173,11 +177,11 @@ private:
 	void						JobStepListeners(PhysicsUpdateContext::Step *ioStep);
 	void						JobDetermineActiveConstraints(PhysicsUpdateContext::Step *ioStep) const;
 	void						JobApplyGravity(const PhysicsUpdateContext *ioContext, PhysicsUpdateContext::Step *ioStep);	
-	void						JobSetupVelocityConstraints(float inDeltaTime, PhysicsUpdateContext::Step *ioStep);
+	void						JobSetupVelocityConstraints(float inDeltaTime, PhysicsUpdateContext::Step *ioStep) const;
 	void						JobBuildIslandsFromConstraints(PhysicsUpdateContext *ioContext, PhysicsUpdateContext::Step *ioStep);
 	void						JobFindCollisions(PhysicsUpdateContext::Step *ioStep, int inJobIndex);
 	void						JobFinalizeIslands(PhysicsUpdateContext *ioContext);
-	void						JobBodySetIslandIndex(PhysicsUpdateContext *ioContext);
+	void						JobBodySetIslandIndex();
 	void						JobSolveVelocityConstraints(PhysicsUpdateContext *ioContext, PhysicsUpdateContext::SubStep *ioSubStep);
 	void						JobPreIntegrateVelocity(PhysicsUpdateContext *ioContext, PhysicsUpdateContext::SubStep *ioSubStep) const;
 	void						JobIntegrateVelocity(const PhysicsUpdateContext *ioContext, PhysicsUpdateContext::SubStep *ioSubStep);
@@ -236,6 +240,9 @@ private:
 
 	/// The broadphase does quick collision detection between body pairs
 	BroadPhase *				mBroadPhase = nullptr;
+    
+    /// Simulation settings
+	PhysicsSettings				mPhysicsSettings;
 
 	/// The contact manager resolves all contacts during a simulation step
 	ContactConstraintManager	mContactManager;
@@ -250,7 +257,7 @@ private:
 	Mutex						mStepListenersMutex;
 
 	/// List of physics step listeners
-	using StepListeners = vector<PhysicsStepListener *>;
+	using StepListeners = Array<PhysicsStepListener *>;
 	StepListeners				mStepListeners;
 
 	/// This is the global gravity vector
@@ -258,9 +265,6 @@ private:
 
 	/// Previous frame's delta time of one sub step to allow scaling previous frame's constraint impulses
 	float						mPreviousSubStepDeltaTime = 0.0f;
-
-	/// Simulation settings
-	PhysicsSettings				mPhysicsSettings;
 };
 
-} // JPH
+JPH_NAMESPACE_END

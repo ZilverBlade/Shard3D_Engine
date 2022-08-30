@@ -1,24 +1,24 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Collision/Shape/CylinderShape.h>
-#include <Physics/Collision/Shape/ScaleHelpers.h>
-#include <Physics/Collision/Shape/GetTrianglesContext.h>
-#include <Physics/Collision/RayCast.h>
-#include <Physics/Collision/CastResult.h>
-#include <Physics/Collision/CollidePointResult.h>
-#include <Physics/Collision/TransformedShape.h>
-#include <Geometry/RayCylinder.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Collision/Shape/CylinderShape.h>
+#include <Jolt/Physics/Collision/Shape/ScaleHelpers.h>
+#include <Jolt/Physics/Collision/Shape/GetTrianglesContext.h>
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/CollidePointResult.h>
+#include <Jolt/Physics/Collision/TransformedShape.h>
+#include <Jolt/Geometry/RayCylinder.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(CylinderShapeSettings)
 {
@@ -213,8 +213,8 @@ void CylinderShape::GetSupportingFace(Vec3Arg inDirection, Vec3Arg inScale, Supp
 	{
 		// Hitting top or bottom
 		Vec3 multiplier = y < 0.0f? Vec3(scaled_radius, scaled_half_height, scaled_radius) : Vec3(-scaled_radius, -scaled_half_height, scaled_radius);
-		for (int i = 0; i < 8; ++i)
-			outVertices.push_back(multiplier * cTopFace[i]);
+		for (const Vec3 &v : cTopFace)
+			outVertices.push_back(multiplier * v);
 	}
 }
 
@@ -284,8 +284,12 @@ bool CylinderShape::CastRay(const RayCast &inRay, const SubShapeIDCreator &inSub
 	return false;
 }
 
-void CylinderShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector) const
+void CylinderShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector, const ShapeFilter &inShapeFilter) const
 {
+	// Test shape filter
+	if (!inShapeFilter.ShouldCollide(inSubShapeIDCreator.GetID()))
+		return;
+
 	// Check if the point is in the cylinder
 	if (abs(inPoint.GetY()) <= mHalfHeight											// Within the height
 		&& Square(inPoint.GetX()) + Square(inPoint.GetZ()) <= Square(mRadius))		// Within the radius
@@ -346,4 +350,4 @@ void CylinderShape::sRegister()
 	f.mColor = Color::sGreen;
 }
 
-} // JPH
+JPH_NAMESPACE_END

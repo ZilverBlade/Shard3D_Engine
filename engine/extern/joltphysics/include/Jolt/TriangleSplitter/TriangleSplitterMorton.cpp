@@ -1,12 +1,13 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <TriangleSplitter/TriangleSplitterMorton.h>
-#include <Geometry/MortonCode.h>
+#include <Jolt/TriangleSplitter/TriangleSplitterMorton.h>
+#include <Jolt/Geometry/MortonCode.h>
+#include <Jolt/Core/QuickSort.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 TriangleSplitterMorton::TriangleSplitterMorton(const VertexList &inVertices, const IndexedTriangleList &inTriangles) :
 	TriangleSplitter(inVertices, inTriangles)
@@ -25,8 +26,8 @@ TriangleSplitterMorton::TriangleSplitterMorton(const VertexList &inVertices, con
 		mMortonCodes[t] = MortonCode::sGetMortonCode(Vec3(mCentroids[t]), bounds);
 
 	// Sort triangles on morton code
-	const vector<uint32> &morton_codes = mMortonCodes;
-	sort(mSortedTriangleIdx.begin(), mSortedTriangleIdx.end(), [&morton_codes](uint inLHS, uint inRHS) -> bool { return morton_codes[inLHS] < morton_codes[inRHS]; });
+	const Array<uint32> &morton_codes = mMortonCodes;
+	QuickSort(mSortedTriangleIdx.begin(), mSortedTriangleIdx.end(), [&morton_codes](uint inLHS, uint inRHS) { return morton_codes[inLHS] < morton_codes[inRHS]; });
 }
 
 bool TriangleSplitterMorton::Split(const Range &inTriangles, Range &outLeft, Range &outRight)
@@ -58,4 +59,4 @@ bool TriangleSplitterMorton::Split(const Range &inTriangles, Range &outLeft, Ran
 	return outLeft.Count() > 0 && outRight.Count() > 0;
 }
 
-} // JPH
+JPH_NAMESPACE_END

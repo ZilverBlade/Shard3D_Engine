@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Core/Reference.h>
-#include <Core/Result.h>
-#include <ObjectStream/SerializableObject.h>
+#include <Jolt/Core/Reference.h>
+#include <Jolt/Core/Result.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class StreamIn;
 class StreamOut;
@@ -26,24 +26,29 @@ public:
 	public:
 		JPH_DECLARE_SERIALIZABLE_NON_VIRTUAL(Joint)
 
-		string				mName;																	///< Name of the joint
-		string				mParentName;															///< Name of parent joint
-		int					mParentJointIndex = -1;													///< Index of parent joint (in mJoints) or -1 if it has no parent
+							Joint() = default;
+							Joint(const string_view &inName, const string_view &inParentName, int inParentJointIndex) : mName(inName), mParentName(inParentName), mParentJointIndex(inParentJointIndex) { }
+
+		String				mName;																		///< Name of the joint
+		String				mParentName;																///< Name of parent joint
+		int					mParentJointIndex = -1;														///< Index of parent joint (in mJoints) or -1 if it has no parent
 	};
 
-	using JointVector = vector<Joint>;
+	using JointVector = Array<Joint>;
 
 	///@name Access to the joints
 	///@{
-	const JointVector &		GetJoints() const														{ return mJoints; }
-	JointVector &			GetJoints()																{ return mJoints; }
-	int						GetJointCount() const													{ return (int)mJoints.size(); }
-	const Joint &			GetJoint(int inJoint) const												{ return mJoints[inJoint]; }
-	Joint &					GetJoint(int inJoint)													{ return mJoints[inJoint]; }
+	const JointVector &		GetJoints() const															{ return mJoints; }
+	JointVector &			GetJoints()																	{ return mJoints; }
+	int						GetJointCount() const														{ return (int)mJoints.size(); }
+	const Joint &			GetJoint(int inJoint) const													{ return mJoints[inJoint]; }
+	Joint &					GetJoint(int inJoint)														{ return mJoints[inJoint]; }
+	uint					AddJoint(const string_view &inName, const string_view &inParentName = string_view()) { mJoints.emplace_back(inName, inParentName, -1); return (uint)mJoints.size() - 1; }
+	uint					AddJoint(const string_view &inName, int inParentIndex)						{ mJoints.emplace_back(inName, inParentIndex >= 0? mJoints[inParentIndex].mName : String(), inParentIndex); return (uint)mJoints.size() - 1; }
 	///@}
 
 	/// Find joint by name
-	int						GetJointIndex(const string &inName) const;
+	int						GetJointIndex(const string_view &inName) const;
 
 	/// Fill in parent joint indices based on name
 	void					CalculateParentJointIndices();
@@ -59,4 +64,4 @@ private:
 	JointVector				mJoints;
 };
 
-} // JPH
+JPH_NAMESPACE_END

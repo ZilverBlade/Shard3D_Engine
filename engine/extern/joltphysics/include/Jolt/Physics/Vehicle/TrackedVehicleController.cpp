@@ -1,15 +1,18 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Vehicle/TrackedVehicleController.h>
-#include <Physics/PhysicsSystem.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Vehicle/TrackedVehicleController.h>
+#include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
+#ifdef JPH_DEBUG_RENDERER
+	#include <Jolt/Renderer/DebugRenderer.h>
+#endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(TrackedVehicleControllerSettings)
 {
@@ -293,7 +296,7 @@ void TrackedVehicleController::PostCollide(float inDeltaTime, PhysicsSystem &inP
 			float total_radius = 0.0f;
 			for (uint wheel_index : t.mWheels)
 			{
-				WheelTV *w = static_cast<WheelTV *>(wheels[wheel_index]);
+				const WheelTV *w = static_cast<WheelTV *>(wheels[wheel_index]);
 
 				if (w->HasContact())
 					total_radius += w->GetSettings()->mRadius;
@@ -410,7 +413,7 @@ void TrackedVehicleController::Draw(DebugRenderer *inRenderer) const
 	mEngine.DrawRPM(inRenderer, rpm_meter_pos, rpm_meter_fwd, rpm_meter_up, mRPMMeterSize, mTransmission.mShiftDownRPM, mTransmission.mShiftUpRPM);
 
 	// Draw current vehicle state
-	string status = StringFormat("Forward: %.1f, LRatio: %.1f, RRatio: %.1f, Brake: %.1f\n"
+	String status = StringFormat("Forward: %.1f, LRatio: %.1f, RRatio: %.1f, Brake: %.1f\n"
 								 "Gear: %d, Clutch: %.1f, EngineRPM: %.0f, V: %.1f km/h", 
 								 (double)mForwardInput, (double)mLeftRatio, (double)mRightRatio, (double)mBrakeInput, 
 								 mTransmission.GetCurrentGear(), (double)mTransmission.GetClutchFriction(), (double)mEngine.GetCurrentRPM(), (double)body->GetLinearVelocity().Length() * 3.6);
@@ -484,4 +487,4 @@ void TrackedVehicleController::RestoreState(StateRecorder &inStream)
 		t.RestoreState(inStream);
 }
 
-} // JPH
+JPH_NAMESPACE_END

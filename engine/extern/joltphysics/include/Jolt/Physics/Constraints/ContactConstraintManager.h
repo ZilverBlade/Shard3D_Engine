@@ -3,24 +3,30 @@
 
 #pragma once
 
-#include <Core/StaticArray.h>
-#include <Core/LockFreeHashMap.h>
-#include <Physics/Body/BodyPair.h>
-#include <Physics/Collision/Shape/SubShapeIDPair.h>
-#include <Physics/Collision/ManifoldBetweenTwoFaces.h>
-#include <Physics/Constraints/ConstraintPart/AxisConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/DualAxisConstraintPart.h>
-#include <Core/HashCombine.h>
-#include <Core/NonCopyable.h>
+#include <Jolt/Core/StaticArray.h>
+#include <Jolt/Core/LockFreeHashMap.h>
+#include <Jolt/Physics/Body/BodyPair.h>
+#include <Jolt/Physics/Collision/Shape/SubShapeIDPair.h>
+#include <Jolt/Physics/Collision/ManifoldBetweenTwoFaces.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/AxisConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/DualAxisConstraintPart.h>
+#include <Jolt/Core/HashCombine.h>
+#include <Jolt/Core/NonCopyable.h>
+
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <atomic>
+JPH_SUPPRESS_WARNINGS_STD_END
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
+struct PhysicsSettings;
 class PhysicsUpdateContext;
 
 class ContactConstraintManager : public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 	explicit					ContactConstraintManager(const PhysicsSettings &inPhysicsSettings);
 								~ContactConstraintManager();
@@ -35,7 +41,9 @@ public:
 	ContactListener *			GetContactListener() const											{ return mContactListener; }
 
 	/// Callback function to combine the restitution or friction of two bodies
-	using CombineFunction = float (*)(const Body &inBody1, const Body &inBody2);
+	/// Note that when merging manifolds (when PhysicsSettings::mUseManifoldReduction is true) you will only get a callback for the merged manifold.
+	/// It is not possible in that case to get all sub shape ID pairs that were colliding, you'll get the first encountered pair.
+	using CombineFunction = float (*)(const Body &inBody1, const SubShapeID &inSubShapeID1, const Body &inBody2, const SubShapeID &inSubShapeID2);
 
 	/// Set the function that combines the friction of two bodies and returns it
 	/// Default method is the geometric mean: sqrt(friction1 * friction2).
@@ -78,8 +86,8 @@ public:
 
 	/// Check if the contact points from the previous frame are reusable and if so copy them.
 	/// When the cache was usable and the pair has been handled: outPairHandled = true.
-	/// When a contact was produced: outContactFound = true.
-	void						GetContactsFromCache(ContactAllocator &ioContactAllocator, Body &inBody1, Body &inBody2, bool &outPairHandled, bool &outContactFound);
+	/// When a contact constraint was produced: outConstraintCreated = true.
+	void						GetContactsFromCache(ContactAllocator &ioContactAllocator, Body &inBody1, Body &inBody2, bool &outPairHandled, bool &outConstraintCreated);
 
 	/// Handle used to keep track of the current body pair
 	using BodyPairHandle = void *;
@@ -90,10 +98,12 @@ public:
 
 	/// Add a contact constraint for this frame.
 	///
+	/// @param ioContactAllocator The allocator that reserves memory for the contacts
 	/// @param inBodyPair The handle for the contact cache for this body pair
 	/// @param inBody1 The first body that is colliding
 	/// @param inBody2 The second body that is colliding
 	/// @param inManifold The manifold that describes the collision
+	/// @return true if a contact constraint was created (can be false in the case of a sensor)
 	///
 	/// This is using the approach described in 'Modeling and Solving Constraints' by Erin Catto presented at GDC 2009 (and later years with slight modifications).
 	/// We're using the formulas from slide 50 - 53 combined.
@@ -127,7 +137,7 @@ public:
 	/// r1, r2 = contact point relative to center of mass of body 1 and body 2 (r1 = p1 - x1, r2 = p2 - x2).
 	/// v1, v2 = (linear velocity, angular velocity): 6 vectors containing linear and angular velocity for body 1 and 2.
 	/// M = mass matrix, a diagonal matrix of the mass and inertia with diagonal [m1, I1, m2, I2].
-	void						AddContactConstraint(ContactAllocator &ioContactAllocator, BodyPairHandle inBodyPair, Body &inBody1, Body &inBody2, const ContactManifold &inManifold);
+	bool						AddContactConstraint(ContactAllocator &ioContactAllocator, BodyPairHandle inBodyPair, Body &inBody1, Body &inBody2, const ContactManifold &inManifold);
 
 	/// Finalizes the contact cache, the contact cache that was generated during the calls to AddContactConstraint in this update
 	/// will be used from now on to read from.
@@ -144,7 +154,7 @@ public:
 	void						SortContacts(uint32 *inConstraintIdxBegin, uint32 *inConstraintIdxEnd) const;
 
 	/// AddContactConstraint will also setup the velocity constraints for the first sub step. For subsequent sub steps this function must be called prior to warm starting the constraint.
-	void						SetupVelocityConstraints(uint32 *inConstraintIdxBegin, uint32 *inConstraintIdxEnd, float inDeltaTime);
+	void						SetupVelocityConstraints(const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime);
 
 	/// Apply last frame's impulses as an initial guess for this frame's impulses
 	void						WarmStartVelocityConstraints(const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inWarmStartImpulseRatio);
@@ -182,7 +192,7 @@ public:
 	bool						SolveVelocityConstraints(const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd);
 
 	/// Save back the lambdas to the contact cache for the next warm start
-	void						StoreAppliedImpulses(const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd);
+	void						StoreAppliedImpulses(const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd) const;
 
 	/// Solve position constraints.
 	/// This is using the approach described in 'Modeling and Solving Constraints' by Erin Catto presented at GDC 2007.
@@ -209,6 +219,7 @@ public:
 	void						FinishConstraintBuffer();
 
 	/// Called by continuous collision detection to notify the contact listener that a contact was added
+	/// @param ioContactAllocator The allocator that reserves memory for the contacts
 	/// @param inBody1 The first body that is colliding
 	/// @param inBody2 The second body that is colliding
 	/// @param inManifold The manifold that describes the collision
@@ -342,18 +353,18 @@ private:
 		ContactAllocator		GetContactAllocator()						{ return ContactAllocator(mAllocator, cAllocatorBlockSize); }
 
 		/// Find / create cached entry for SubShapeIDPair -> CachedManifold
-		const MKeyValue *		Find(const SubShapeIDPair &inKey, size_t inKeyHash) const;
-		MKeyValue *				Create(ContactAllocator &ioContactAllocator, const SubShapeIDPair &inKey, size_t inKeyHash, int inNumContactPoints);
-		MKVAndCreated			FindOrCreate(ContactAllocator &ioContactAllocator, const SubShapeIDPair &inKey, size_t inKeyHash, int inNumContactPoints);
+		const MKeyValue *		Find(const SubShapeIDPair &inKey, uint64 inKeyHash) const;
+		MKeyValue *				Create(ContactAllocator &ioContactAllocator, const SubShapeIDPair &inKey, uint64 inKeyHash, int inNumContactPoints);
+		MKVAndCreated			FindOrCreate(ContactAllocator &ioContactAllocator, const SubShapeIDPair &inKey, uint64 inKeyHash, int inNumContactPoints);
 		uint32					ToHandle(const MKeyValue *inKeyValue) const;
 		const MKeyValue *		FromHandle(uint32 inHandle) const;
 
 		/// Find / create entry for BodyPair -> CachedBodyPair
-		const BPKeyValue *		Find(const BodyPair &inKey, size_t inKeyHash) const;
-		BPKeyValue *			Create(ContactAllocator &ioContactAllocator, const BodyPair &inKey, size_t inKeyHash);
-		void					GetAllBodyPairsSorted(vector<const BPKeyValue *> &outAll) const;
-		void					GetAllManifoldsSorted(const CachedBodyPair &inBodyPair, vector<const MKeyValue *> &outAll) const;
-		void					GetAllCCDManifoldsSorted(vector<const MKeyValue *> &outAll) const;
+		const BPKeyValue *		Find(const BodyPair &inKey, uint64 inKeyHash) const;
+		BPKeyValue *			Create(ContactAllocator &ioContactAllocator, const BodyPair &inKey, uint64 inKeyHash);
+		void					GetAllBodyPairsSorted(Array<const BPKeyValue *> &outAll) const;
+		void					GetAllManifoldsSorted(const CachedBodyPair &inBodyPair, Array<const MKeyValue *> &outAll) const;
+		void					GetAllCCDManifoldsSorted(Array<const MKeyValue *> &outAll) const;
 		void					ContactPointRemovedCallbacks(ContactListener *inListener);
 
 #ifdef JPH_ENABLE_ASSERTS
@@ -431,8 +442,9 @@ private:
 		Vec3					mWorldSpaceNormal;
 		Body *					mBody1;
 		Body *					mBody2;
-		size_t					mSortKey;
-		ContactSettings			mSettings;
+		uint64					mSortKey;
+		float					mCombinedFriction;
+		float					mCombinedRestitution;
 		WorldContactPoints		mContactPoints;
 	};
 
@@ -445,7 +457,7 @@ private:
 
 	/// Internal helper function to add a contact constraint. Templated to the motion type to reduce the amount of branches and calculations.
 	template <EMotionType Type1, EMotionType Type2>
-	void						TemplatedAddContactConstraint(ContactAllocator &ioContactAllocator, BodyPairHandle inBodyPairHandle, Body &inBody1, Body &inBody2, const ContactManifold &inManifold, Mat44Arg inInvI1, Mat44Arg inInvI2);
+	bool						TemplatedAddContactConstraint(ContactAllocator &ioContactAllocator, BodyPairHandle inBodyPairHandle, Body &inBody1, Body &inBody2, const ContactManifold &inManifold, Mat44Arg inInvI1, Mat44Arg inInvI2);
 
 	/// Internal helper function to warm start contact constraint. Templated to the motion type to reduce the amount of branches and calculations.
 	template <EMotionType Type1, EMotionType Type2>
@@ -462,8 +474,8 @@ private:
 	ContactListener *			mContactListener = nullptr;
 
 	/// Functions that are used to combine friction and restitution of 2 bodies
-	CombineFunction				mCombineFriction = [](const Body &inBody1, const Body &inBody2) { return sqrt(inBody1.GetFriction() * inBody2.GetFriction()); };
-	CombineFunction				mCombineRestitution = [](const Body &inBody1, const Body &inBody2) { return max(inBody1.GetRestitution(), inBody2.GetRestitution()); };
+	CombineFunction				mCombineFriction = [](const Body &inBody1, const SubShapeID &, const Body &inBody2, const SubShapeID &) { return sqrt(inBody1.GetFriction() * inBody2.GetFriction()); };
+	CombineFunction				mCombineRestitution = [](const Body &inBody1, const SubShapeID &, const Body &inBody2, const SubShapeID &) { return max(inBody1.GetRestitution(), inBody2.GetRestitution()); };
 
 	/// The constraints that were added this frame
 	ContactConstraint *			mConstraints = nullptr;
@@ -474,4 +486,4 @@ private:
 	PhysicsUpdateContext *		mUpdateContext;
 };
 
-} // JPH
+JPH_NAMESPACE_END

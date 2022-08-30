@@ -1,16 +1,12 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Core/RTTI.h>
-#include <Core/StringTools.h>
+#include <Jolt/Core/RTTI.h>
+#include <Jolt/Core/StringTools.h>
 
-namespace JPH {
-
-JPH_IMPLEMENT_RTTI_VIRTUAL_BASE(RTTIAttribute)
-{
-}
+JPH_NAMESPACE_BEGIN
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // RTTI
@@ -74,11 +70,11 @@ void RTTI::AddBaseClass(const RTTI *inRTTI, int inOffset)
 	mBaseClasses.push_back(base); 
 
 	// Add attributes of base class
-	for (AttributeRefC a : inRTTI->mAttributes)
-		mAttributes.push_back(a);
+	for (const SerializableAttribute &a : inRTTI->mAttributes)
+		mAttributes.push_back(SerializableAttribute(a, inOffset));
 }
 
-bool RTTI::operator == (const RTTI &inRHS) const							
+bool RTTI::operator == (const RTTI &inRHS) const
 { 
 	// Compare addresses 
 	if (this == &inRHS) 
@@ -128,7 +124,7 @@ const void *RTTI::CastTo(const void *inObject, const RTTI *inRTTI) const
 	return nullptr;
 }
 
-void RTTI::AddAttribute(RTTIAttribute *inAttribute)
+void RTTI::AddAttribute(const SerializableAttribute &inAttribute)
 { 
 	mAttributes.push_back(inAttribute); 
 }
@@ -138,18 +134,9 @@ int RTTI::GetAttributeCount() const
 	return (int)mAttributes.size(); 
 }
 
-const RTTIAttribute *RTTI::GetAttribute(int inIdx) const
+const SerializableAttribute &RTTI::GetAttribute(int inIdx) const
 { 
 	return mAttributes[inIdx]; 
 }
 
-const RTTIAttribute *RTTI::GetAttribute(const RTTI *inRTTI, const char *inName) const
-{
-	for (AttributeRefC a : mAttributes)
-		if (::JPH::IsKindOf(a, inRTTI) && strcmp(inName, a->GetName()) == 0) 
-			return a;
-
-	return nullptr;
-}
-
-} // JPH
+JPH_NAMESPACE_END

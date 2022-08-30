@@ -1,22 +1,26 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Core/JobSystemThreadPool.h>
-#include <Core/Profiler.h>
-#include <Core/FPException.h>
-#include <algorithm>
+#include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Core/Profiler.h>
+#include <Jolt/Core/FPException.h>
 
 #ifdef JPH_PLATFORM_WINDOWS
-	#pragma warning (push, 0)
-	#pragma warning (disable : 5039) // winbase.h(13179): warning C5039: 'TpSetCallbackCleanupGroup': pointer or reference to potentially throwing function passed to 'extern "C"' function under -EHc. Undefined behavior may occur if this function throws an exception.
+	JPH_SUPPRESS_WARNING_PUSH
+	JPH_MSVC_SUPPRESS_WARNING(5039) // winbase.h(13179): warning C5039: 'TpSetCallbackCleanupGroup': pointer or reference to potentially throwing function passed to 'extern "C"' function under -EHc. Undefined behavior may occur if this function throws an exception.
 	#define WIN32_LEAN_AND_MEAN
+#ifndef JPH_COMPILER_MINGW
+	#include <Windows.h>
+#else
 	#include <windows.h>
-	#pragma warning (pop)
 #endif
 
-namespace JPH {
+	JPH_SUPPRESS_WARNING_POP
+#endif
+
+JPH_NAMESPACE_BEGIN
 
 JobSystemThreadPool::Semaphore::Semaphore()
 {
@@ -193,7 +197,7 @@ void JobSystemThreadPool::BarrierImpl::Wait()
 				// Loop through the jobs and execute the first executable job
 				for (uint index = mJobReadIndex; index < mJobWriteIndex; ++index)
 				{
-					atomic<Job *> &job = mJobs[index & (cMaxJobs - 1)];
+					const atomic<Job *> &job = mJobs[index & (cMaxJobs - 1)];
 					Job *job_ptr = job.load();
 					if (job_ptr != nullptr && job_ptr->CanBeExecuted())
 					{
@@ -225,14 +229,16 @@ void JobSystemThreadPool::BarrierImpl::Wait()
 	}
 }
 
-JobSystemThreadPool::JobSystemThreadPool(uint inMaxJobs, uint inMaxBarriers, int inNumThreads)	
+void JobSystemThreadPool::Init(uint inMaxJobs, uint inMaxBarriers, int inNumThreads)
 {
-	// Init freelist of jobs
-	mJobs.Init(inMaxJobs, inMaxJobs);
+	JPH_ASSERT(mBarriers == nullptr); // Already initialized?
 
 	// Init freelist of barriers
 	mMaxBarriers = inMaxBarriers;
 	mBarriers = new BarrierImpl [inMaxBarriers];
+
+	// Init freelist of jobs
+	mJobs.Init(inMaxJobs, inMaxJobs);
 
 	// Init queue
 	for (atomic<Job *> &j : mQueue)
@@ -240,6 +246,11 @@ JobSystemThreadPool::JobSystemThreadPool(uint inMaxJobs, uint inMaxBarriers, int
 
 	// Start the worker threads
 	StartThreads(inNumThreads);
+}
+
+JobSystemThreadPool::JobSystemThreadPool(uint inMaxJobs, uint inMaxBarriers, int inNumThreads)
+{
+	Init(inMaxJobs, inMaxBarriers, inNumThreads);
 }
 
 void JobSystemThreadPool::StartThreads(int inNumThreads)
@@ -256,7 +267,7 @@ void JobSystemThreadPool::StartThreads(int inNumThreads)
 	mQuit = false;
 
 	// Allocate heads
-	mHeads = new atomic<uint> [inNumThreads];
+	mHeads = reinterpret_cast<atomic<uint> *>(Allocate(sizeof(atomic<uint>) * inNumThreads));
 	for (int i = 0; i < inNumThreads; ++i)
 		mHeads[i] = 0;
 
@@ -264,16 +275,7 @@ void JobSystemThreadPool::StartThreads(int inNumThreads)
 	JPH_ASSERT(mThreads.empty());
 	mThreads.reserve(inNumThreads);
 	for (int i = 0; i < inNumThreads; ++i)
-	{
-		// Name the thread
-		stringstream namestream;
-		namestream << "Worker ";
-		namestream << (i + 1);
-		string name = namestream.str();
-
-		// Create thread
-		mThreads.emplace_back([this, name, i] { ThreadMain(name, i); });
-	}
+		mThreads.emplace_back([this, i] { ThreadMain(i); });
 }
 
 JobSystemThreadPool::~JobSystemThreadPool()
@@ -320,7 +322,7 @@ void JobSystemThreadPool::StopThreads()
 	}
 
 	// Destroy heads and reset tail
-	delete [] mHeads;
+	Free(mHeads);
 	mHeads = nullptr;
 	mTail = 0;
 }
@@ -481,7 +483,7 @@ void JobSystemThreadPool::QueueJobs(Job **inJobs, uint inNumJobs)
 	mSemaphore.Release(min(inNumJobs, (uint)mThreads.size()));
 }
 
-#ifdef JPH_PLATFORM_WINDOWS
+#if defined(JPH_PLATFORM_WINDOWS) && !defined(JPH_COMPILER_MINGW) // MinGW doesn't support __try/__except
 
 // Sets the current thread name in MSVC debugger
 static void SetThreadName(const char *inName)
@@ -513,19 +515,23 @@ static void SetThreadName(const char *inName)
 	}
 }
 
-#endif
+#endif // JPH_PLATFORM_WINDOWS && !JPH_COMPILER_MINGW
 
-void JobSystemThreadPool::ThreadMain([[maybe_unused]] const string &inName, int inThreadIndex)
+void JobSystemThreadPool::ThreadMain(int inThreadIndex)
 {
-#ifdef JPH_PLATFORM_WINDOWS
-	SetThreadName(inName.c_str());
-#endif
+	// Name the thread
+	char name[64];
+	snprintf(name, sizeof(name), "Worker %d", int(inThreadIndex + 1));
+
+#if defined(JPH_PLATFORM_WINDOWS) && !defined(JPH_COMPILER_MINGW)
+	SetThreadName(name);
+#endif // JPH_PLATFORM_WINDOWS && !JPH_COMPILER_MINGW
 
 	// Enable floating point exceptions
 	FPExceptionsEnable enable_exceptions;
 	JPH_UNUSED(enable_exceptions);
 
-	JPH_PROFILE_THREAD_START(inName);
+	JPH_PROFILE_THREAD_START(name);
 
 	atomic<uint> &head = mHeads[inThreadIndex];
 
@@ -560,4 +566,4 @@ void JobSystemThreadPool::ThreadMain([[maybe_unused]] const string &inName, int 
 	JPH_PROFILE_THREAD_END();
 }
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <Physics/Constraints/TwoBodyConstraint.h>
-#include <Physics/Constraints/MotorSettings.h>
-#include <Physics/Constraints/ConstraintPart/DualAxisConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/AxisConstraintPart.h>
+#include <Jolt/Physics/Constraints/TwoBodyConstraint.h>
+#include <Jolt/Physics/Constraints/MotorSettings.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/DualAxisConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/AxisConstraintPart.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Slider constraint settings, used to create a slider constraint
 class SliderConstraintSettings final : public TwoBodyConstraintSettings
@@ -20,15 +20,38 @@ public:
 	// See: ConstraintSettings::SaveBinaryState
 	virtual void				SaveBinaryState(StreamOut &inStream) const override;
 
-	/// Create an an instance of this constraint
+	/// Create an an instance of this constraint.
+	/// Note that the rotation constraint will be solved from body 1. This means that if body 1 and body 2 have different masses / inertias (kinematic body = infinite mass / inertia), body 1 should be the heaviest body.
 	virtual TwoBodyConstraint *	Create(Body &inBody1, Body &inBody2) const override;
 
-	/// Axis along which movement is possible (world space direction).
-	Vec3						mSliderAxis = Vec3::sAxisX();
+	/// Simple way of setting the slider and normal axis in world space (assumes the bodies are already oriented correctly when the constraint is created)
+	void						SetSliderAxis(Vec3Arg inSliderAxis);
 
-	/// Bodies are assumed to be placed so that the slider position = 0, movement will be limited between [mLimitsMin, mLimitsMax] where mLimitsMin e [-inf, 0] and mLimitsMax e [0, inf]
+	/// This determines in which space the constraint is setup, all properties below should be in the specified space
+	EConstraintSpace			mSpace = EConstraintSpace::WorldSpace;
+
+	/// When mSpace is WorldSpace mPoint1 and mPoint2 can be automatically calculated based on the positions of the bodies when the constraint is created (the current relative position/orientation is chosen as the '0' position). Set this to false if you want to supply the attachment points yourself.
+	bool						mAutoDetectPoint = false;
+
+	/// Body 1 constraint reference frame (space determined by mSpace).
+	/// Slider axis is the axis along which movement is possible (direction), normal axis is a perpendicular vector to define the frame.
+	Vec3						mPoint1 = Vec3::sZero();
+	Vec3						mSliderAxis1 = Vec3::sAxisX();
+	Vec3						mNormalAxis1 = Vec3::sAxisY();
+	
+	/// Body 2 constraint reference frame (space determined by mSpace)
+	Vec3						mPoint2 = Vec3::sZero();
+	Vec3						mSliderAxis2 = Vec3::sAxisX();
+	Vec3						mNormalAxis2 = Vec3::sAxisY();
+
+	/// When the bodies move so that mPoint1 coincides with mPoint2 the slider position is defined to be 0, movement will be limited between [mLimitsMin, mLimitsMax] where mLimitsMin e [-inf, 0] and mLimitsMax e [0, inf]
 	float						mLimitsMin = -FLT_MAX;
 	float						mLimitsMax = FLT_MAX;
+
+	/// If mFrequency > 0 the constraint limits will be soft and mFrequency specifies the oscillation frequency in Hz and mDamping the damping ratio (0 = no damping, 1 = critical damping).
+	/// If mFrequency <= 0, mDamping is ignored and the limits will be hard.
+	float						mFrequency = 0.0f;
+	float						mDamping = 0.0f;
 
 	/// Maximum amount of friction force to apply (N) when not driven by a motor.
 	float						mMaxFrictionForce = 0.0f;
@@ -45,11 +68,13 @@ protected:
 class SliderConstraint final : public TwoBodyConstraint
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Construct slider constraint
 								SliderConstraint(Body &inBody1, Body &inBody2, const SliderConstraintSettings &inSettings);
 
 	// Generic interface of a constraint
-	virtual EConstraintType		GetType() const override								{ return EConstraintType::Slider; }
+	virtual EConstraintSubType	GetSubType() const override								{ return EConstraintSubType::Slider; }
 	virtual void				SetupVelocityConstraint(float inDeltaTime) override;
 	virtual void				WarmStartVelocityConstraint(float inWarmStartImpulseRatio) override;
 	virtual bool				SolveVelocityConstraint(float inDeltaTime) override;
@@ -60,10 +85,14 @@ public:
 #endif // JPH_DEBUG_RENDERER
 	virtual void				SaveState(StateRecorder &inStream) const override;
 	virtual void				RestoreState(StateRecorder &inStream) override;
+	virtual Ref<ConstraintSettings> GetConstraintSettings() const override;
 
 	// See: TwoBodyConstraint
 	virtual Mat44				GetConstraintToBody1Matrix() const override;
 	virtual Mat44				GetConstraintToBody2Matrix() const override;
+
+	/// Get the current distance from the rest position
+	float						GetCurrentPosition() const;
 
 	/// Friction control
 	void						SetMaxFrictionForce(float inFrictionForce)				{ mMaxFrictionForce = inFrictionForce; }
@@ -87,6 +116,14 @@ public:
 	float						GetLimitsMax() const									{ return mLimitsMax; }
 	bool						HasLimits() const										{ return mHasLimits; }
 
+	/// Update the spring frequency for the limits constraint
+	void						SetFrequency(float inFrequency)							{ JPH_ASSERT(inFrequency >= 0.0f); mFrequency = inFrequency; }
+	float						GetFrequency() const									{ return mFrequency; }
+
+	/// Update the spring damping for the limits constraint
+	void						SetDamping(float inDamping)								{ JPH_ASSERT(inDamping >= 0.0f); mDamping = inDamping; }
+	float						GetDamping() const										{ return mDamping; }
+
 	///@name Get Lagrange multiplier from last physics update (relates to how much force/torque was applied to satisfy the constraint)
 	inline Vector<2> 			GetTotalLambdaPosition() const							{ return mPositionConstraintPart.GetTotalLambda(); }
 	inline float				GetTotalLambdaPositionLimits() const					{ return mPositionLimitsConstraintPart.GetTotalLambda(); }
@@ -98,7 +135,7 @@ private:
 	void						CalculateR1R2U(Mat44Arg inRotation1, Mat44Arg inRotation2);
 	void						CalculateSlidingAxisAndPosition(Mat44Arg inRotation1);
 	void						CalculatePositionConstraintProperties(Mat44Arg inRotation1, Mat44Arg inRotation2);
-	void						CalculatePositionLimitsConstraintProperties(float inDeltaTime, Mat44Arg inRotation1);
+	void						CalculatePositionLimitsConstraintProperties(float inDeltaTime);
 	void						CalculateMotorConstraintProperties(float inDeltaTime);
 
 	// CONFIGURATION PROPERTIES FOLLOW
@@ -110,7 +147,7 @@ private:
 	// Local space sliding direction
 	Vec3						mLocalSpaceSliderAxis1;
 
-	// Local space normals to the sliding direction
+	// Local space normals to the sliding direction (in body 1 space)
 	Vec3						mLocalSpaceNormal1;
 	Vec3						mLocalSpaceNormal2;
 
@@ -121,6 +158,10 @@ private:
 	bool						mHasLimits;
 	float						mLimitsMin;
 	float						mLimitsMax;
+
+	// Soft slider limits
+	float						mFrequency;
+	float						mDamping;
 
 	// Friction
 	float						mMaxFrictionForce;
@@ -157,4 +198,4 @@ private:
 	AxisConstraintPart			mMotorConstraintPart;
 };
 
-} // JPH
+JPH_NAMESPACE_END

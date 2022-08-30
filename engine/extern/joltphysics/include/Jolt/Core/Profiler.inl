@@ -1,21 +1,21 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // ProfileThread
 //////////////////////////////////////////////////////////////////////////////////////////
 
-ProfileThread::ProfileThread(const string &inThreadName) :
+ProfileThread::ProfileThread(const string_view &inThreadName) :
 	mThreadName(inThreadName)
 {
-	Profiler::sInstance.AddThread(this);
+	Profiler::sInstance->AddThread(this);
 }
 
 ProfileThread::~ProfileThread()
 {
-	Profiler::sInstance.RemoveThread(this);
+	Profiler::sInstance->RemoveThread(this);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -84,4 +84,4 @@ ProfileMeasurement::~ProfileMeasurement()
 	}
 }
 
-} // JPH
+JPH_NAMESPACE_END

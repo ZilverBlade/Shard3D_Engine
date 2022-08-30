@@ -10,6 +10,7 @@
 
 #include "../audio/audio.h"
 #include "../../systems/computational/particle_system.h"
+#include "../../systems/computational/physics_system.h"
 
 namespace Shard3D {
 	class LevelPropertiesPanel;
@@ -236,7 +237,7 @@ namespace Shard3D {
 			float friction;
 			float restitution;
 
-			//JPH::Ref<JPH::Shape> shape{};
+			JPH::Body* physicsBody{};
 
 			PhysicsState state = PhysicsState::STATIC;
 		};

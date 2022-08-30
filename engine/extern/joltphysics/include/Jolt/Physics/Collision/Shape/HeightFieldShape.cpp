@@ -1,38 +1,38 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Collision/Shape/HeightFieldShape.h>
-#include <Physics/Collision/Shape/ConvexShape.h>
-#include <Physics/Collision/Shape/ScaleHelpers.h>
-#include <Physics/Collision/Shape/SphereShape.h>
-#include <Physics/Collision/RayCast.h>
-#include <Physics/Collision/ShapeCast.h>
-#include <Physics/Collision/CastResult.h>
-#include <Physics/Collision/CollidePointResult.h>
-#include <Physics/Collision/ShapeFilter.h>
-#include <Physics/Collision/CastConvexVsTriangles.h>
-#include <Physics/Collision/CastSphereVsTriangles.h>
-#include <Physics/Collision/CollideConvexVsTriangles.h>
-#include <Physics/Collision/CollideSphereVsTriangles.h>
-#include <Physics/Collision/TransformedShape.h>
-#include <Physics/Collision/ActiveEdges.h>
-#include <Physics/Collision/CollisionDispatch.h>
-#include <Physics/Collision/SortReverseAndStore.h>
-#include <Core/Profiler.h>
-#include <Core/StringTools.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
-#include <Geometry/AABox4.h>
-#include <Geometry/RayTriangle.h>
-#include <Geometry/RayAABox.h>
-#include <Geometry/OrientedBox.h>
-#include <ObjectStream/TypeDeclarations.h>
+#include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
+#include <Jolt/Physics/Collision/Shape/ConvexShape.h>
+#include <Jolt/Physics/Collision/Shape/ScaleHelpers.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/CollidePointResult.h>
+#include <Jolt/Physics/Collision/ShapeFilter.h>
+#include <Jolt/Physics/Collision/CastConvexVsTriangles.h>
+#include <Jolt/Physics/Collision/CastSphereVsTriangles.h>
+#include <Jolt/Physics/Collision/CollideConvexVsTriangles.h>
+#include <Jolt/Physics/Collision/CollideSphereVsTriangles.h>
+#include <Jolt/Physics/Collision/TransformedShape.h>
+#include <Jolt/Physics/Collision/ActiveEdges.h>
+#include <Jolt/Physics/Collision/CollisionDispatch.h>
+#include <Jolt/Physics/Collision/SortReverseAndStore.h>
+#include <Jolt/Core/Profiler.h>
+#include <Jolt/Core/StringTools.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
+#include <Jolt/Geometry/AABox4.h>
+#include <Jolt/Geometry/RayTriangle.h>
+#include <Jolt/Geometry/RayAABox.h>
+#include <Jolt/Geometry/OrientedBox.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
 
 //#define JPH_DEBUG_HEIGHT_FIELD
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 #ifdef JPH_DEBUG_RENDERER
 bool HeightFieldShape::sDrawTriangleOutlines = false;
@@ -217,7 +217,7 @@ void HeightFieldShape::CalculateActiveEdges()
 	memset(&mActiveEdges[0], 0, mActiveEdges.size());
 
 	// Calculate triangle normals and make normals zero for triangles that are missing
-	vector<Vec3> normals;
+	Array<Vec3> normals;
 	normals.resize(2 * count_min_1_sq);
 	memset(&normals[0], 0, normals.size() * sizeof(Vec3));
 	for (uint y = 0; y < count_min_1; ++y)
@@ -269,7 +269,7 @@ void HeightFieldShape::CalculateActiveEdges()
 		}
 }
 
-void HeightFieldShape::StoreMaterialIndices(const vector<uint8> &inMaterialIndices)
+void HeightFieldShape::StoreMaterialIndices(const Array<uint8> &inMaterialIndices)
 {
 	uint count_min_1 = mSampleCount - 1;
 
@@ -401,7 +401,7 @@ HeightFieldShape::HeightFieldShape(const HeightFieldShapeSettings &inSettings, S
 	}
 
 	// Quantize to uint16
-	vector<uint16> quantized_samples;
+	Array<uint16> quantized_samples;
 	quantized_samples.reserve(mSampleCount * mSampleCount);
 	for (float h : inSettings.mHeightSamples)
 		if (h == cNoCollisionValue)
@@ -441,11 +441,11 @@ HeightFieldShape::HeightFieldShape(const HeightFieldShapeSettings &inSettings, S
 	};
 
 	// Reserve size for temporary range data + reserve 1 extra for a 1x1 grid that we won't store but use for calculating the bounding box
-	vector<vector<Range>> ranges;
+	Array<Array<Range>> ranges;
 	ranges.resize(max_level + 1);
 
 	// Calculate highest detail grid by combining mBlockSize x mBlockSize height samples
-	vector<Range> *cur_range_vector = &ranges.back();
+	Array<Range> *cur_range_vector = &ranges.back();
 	cur_range_vector->resize(n * n);
 	Range *range_dst = &cur_range_vector->front();
 	for (uint y = 0; y < n; ++y)
@@ -891,7 +891,7 @@ void HeightFieldShape::Draw(DebugRenderer *inRenderer, Mat44Arg inCenterOfMassTr
 			for (uint32 bx = 0; bx < mSampleCount; bx += block_size)
 			{
 				// Create vertices for a block
-				vector<DebugRenderer::Triangle> triangles;
+				Array<DebugRenderer::Triangle> triangles;
 				triangles.resize(block_size * block_size * 2);
 				DebugRenderer::Triangle *out_tri = &triangles[0];
 				for (uint32 y = by, max_y = min(by + block_size, mSampleCount - 1); y < max_y; ++y)
@@ -1058,8 +1058,8 @@ public:
 
 		// Allocate space for vertices and 'no collision' flags
 		int array_size = Square(block_size_plus_1);
-		Vec3 *vertices = reinterpret_cast<Vec3 *>(alloca(array_size * sizeof(Vec3)));
-		bool *no_collision = reinterpret_cast<bool *>(alloca(array_size * sizeof(bool)));
+		Vec3 *vertices = reinterpret_cast<Vec3 *>(JPH_STACK_ALLOC(array_size * sizeof(Vec3)));
+		bool *no_collision = reinterpret_cast<bool *>(JPH_STACK_ALLOC(array_size * sizeof(bool)));
 
 		// Splat offsets
 		Vec4 ox = mShape->mOffset.SplatX();
@@ -1435,9 +1435,13 @@ bool HeightFieldShape::CastRay(const RayCast &inRay, const SubShapeIDCreator &in
 	return visitor.mReturnValue;
 }
 
-void HeightFieldShape::CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector) const
+void HeightFieldShape::CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector, const ShapeFilter &inShapeFilter) const
 {
 	JPH_PROFILE_FUNCTION();
+
+	// Test shape filter
+	if (!inShapeFilter.ShouldCollide(inSubShapeIDCreator.GetID()))
+		return;
 
 	struct Visitor
 	{
@@ -1503,7 +1507,7 @@ void HeightFieldShape::CastRay(const RayCast &inRay, const RayCastSettings &inRa
 	WalkHeightField(visitor);
 }
 
-void HeightFieldShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector) const
+void HeightFieldShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector, const ShapeFilter &inShapeFilter) const
 {
 	// A height field doesn't have volume, so we can't test insideness
 }
@@ -1743,7 +1747,7 @@ int HeightFieldShape::GetTrianglesNext(GetTrianglesContext &ioContext, int inMax
 	return context.mNumTrianglesFound;
 }
 
-void HeightFieldShape::sCollideConvexVsHeightField(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector)
+void HeightFieldShape::sCollideConvexVsHeightField(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector, [[maybe_unused]] const ShapeFilter &inShapeFilter)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -1799,7 +1803,7 @@ void HeightFieldShape::sCollideConvexVsHeightField(const Shape *inShape1, const 
 	shape2->WalkHeightField(visitor);
 }
 
-void HeightFieldShape::sCollideSphereVsHeightField(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector)
+void HeightFieldShape::sCollideSphereVsHeightField(const Shape *inShape1, const Shape *inShape2, Vec3Arg inScale1, Vec3Arg inScale2, Mat44Arg inCenterOfMassTransform1, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector, [[maybe_unused]] const ShapeFilter &inShapeFilter)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -1932,4 +1936,4 @@ void HeightFieldShape::sRegister()
 	CollisionDispatch::sRegisterCastShape(EShapeSubType::Sphere, EShapeSubType::HeightField, sCastSphereVsHeightField);
 }
 
-} // JPH
+JPH_NAMESPACE_END

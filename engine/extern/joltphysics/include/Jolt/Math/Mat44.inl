@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Math/Vec3.h>
-#include <Math/Vec4.h>
-#include <Math/Quat.h>
+#include <Jolt/Math/Vec3.h>
+#include <Jolt/Math/Vec4.h>
+#include <Jolt/Math/Quat.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 Mat44::Mat44(Vec4Arg inC1, Vec4Arg inC2, Vec4Arg inC3, Vec4Arg inC4) : 
 	mCol { inC1, inC2, inC3, inC4 } 
@@ -52,22 +52,25 @@ Mat44 Mat44::sLoadFloat4x4Aligned(const Float4 *inV)
 
 Mat44 Mat44::sRotationX(float inX)
 {
-	// TODO: Could be optimized
-	float c = cos(inX), s = sin(inX);
+	Vec4 sv, cv;
+	Vec4::sReplicate(inX).SinCos(sv, cv);
+	float s = sv.GetX(), c = cv.GetX();
 	return Mat44(Vec4(1, 0, 0, 0), Vec4(0, c, s, 0), Vec4(0, -s, c, 0), Vec4(0, 0, 0, 1));
 }
 
 Mat44 Mat44::sRotationY(float inY)
 {
-	// TODO: Could be optimized
-	float c = cos(inY), s = sin(inY);
+	Vec4 sv, cv;
+	Vec4::sReplicate(inY).SinCos(sv, cv);
+	float s = sv.GetX(), c = cv.GetX();
 	return Mat44(Vec4(c, 0, -s, 0), Vec4(0, 1, 0, 0), Vec4(s, 0, c, 0), Vec4(0, 0, 0, 1));
 }
 
 Mat44 Mat44::sRotationZ(float inZ)
 {
-	// TODO: Could be optimized
-	float c = cos(inZ), s = sin(inZ);
+	Vec4 sv, cv;
+	Vec4::sReplicate(inZ).SinCos(sv, cv);
+	float s = sv.GetX(), c = cv.GetX();
 	return Mat44(Vec4(c, s, 0, 0), Vec4(-s, c, 0, 0), Vec4(0, 0, 1, 0), Vec4(0, 0, 0, 1));
 }
 
@@ -76,7 +79,7 @@ Mat44 Mat44::sRotation(QuatArg inQuat)
 	JPH_ASSERT(inQuat.IsNormalized());
 
 	// See: https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation section 'Quaternion-derived rotation matrix'
-#ifdef JPH_USE_SSE
+#ifdef JPH_USE_SSE4_1
 	__m128 xyzw = inQuat.mValue.mValue;
 	__m128 two_xyzw = _mm_add_ps(xyzw, xyzw);
 	__m128 yzxw = _mm_shuffle_ps(xyzw, xyzw, _MM_SHUFFLE(3, 0, 2, 1));
@@ -104,9 +107,9 @@ Mat44 Mat44::sRotation(QuatArg inQuat)
 	float z = inQuat.GetZ();
 	float w = inQuat.GetW();
 
-	float tx = 2.0f * x;
-	float ty = 2.0f * y;
-	float tz = 2.0f * z;
+	float tx = x + x; // Note: Using x + x instead of 2.0f * x to force this function to return the same value as the SSE4.1 version across platforms.
+	float ty = y + y;
+	float tz = z + z;
 
 	float xx = tx * x;
 	float yy = ty * y;
@@ -118,9 +121,9 @@ Mat44 Mat44::sRotation(QuatArg inQuat)
 	float yw = ty * w;
 	float zw = tz * w;
 
-	return Mat44(Vec4(1.0f - yy - zz, xy + zw, xz - yw, 0.0f),
-				 Vec4(xy - zw, 1.0f - xx - zz, yz + xw, 0.0f),
-				 Vec4(xz + yw, yz - xw, 1.0f - xx - yy, 0.0f),
+	return Mat44(Vec4((1.0f - yy) - zz, xy + zw, xz - yw, 0.0f), // Note: Added extra brackets to force this function to return the same value as the SSE4.1 version across platforms.
+				 Vec4(xy - zw, (1.0f - zz) - xx, yz + xw, 0.0f),
+				 Vec4(xz + yw, yz - xw, (1.0f - xx) - yy, 0.0f),
 				 Vec4(0.0f, 0.0f, 0.0f, 1.0f));
 #endif
 }
@@ -167,7 +170,7 @@ Mat44 Mat44::sOuterProduct(Vec3Arg inV1, Vec3Arg inV2)
 
 Mat44 Mat44::sCrossProduct(Vec3Arg inV)
 {
-#ifdef JPH_USE_SSE
+#ifdef JPH_USE_SSE4_1
 	// Zero out the W component
 	__m128 zero = _mm_setzero_ps();
 	__m128 v = _mm_blend_ps(inV.mValue, zero, 0b1000);
@@ -191,6 +194,15 @@ Mat44 Mat44::sCrossProduct(Vec3Arg inV)
 		Vec4(y, -x, 0, 0),
 		Vec4(0, 0, 0, 1));
 #endif
+}
+
+Mat44 Mat44::sLookAt(Vec3Arg inPos, Vec3Arg inTarget, Vec3Arg inUp)
+{
+	Vec3 direction = (inTarget - inPos).NormalizedOr(-Vec3::sAxisZ());
+	Vec3 right = direction.Cross(inUp).NormalizedOr(Vec3::sAxisX());
+	Vec3 up = right.Cross(direction);
+
+	return Mat44(Vec4(right, 0), Vec4(up, 0), Vec4(-direction, 0), Vec4(inPos, 1)).InversedRotationTranslation();	
 }
 
 bool Mat44::operator == (Mat44Arg inM2) const
@@ -295,7 +307,7 @@ Vec3 Mat44::Multiply3x3(Vec3Arg inV) const
 
 Vec3 Mat44::Multiply3x3Transposed(Vec3Arg inV) const
 {
-#if defined(JPH_USE_SSE)
+#if defined(JPH_USE_SSE4_1)
 	__m128 x = _mm_dp_ps(mCol[0].mValue, inV.mValue, 0x7f);
 	__m128 y = _mm_dp_ps(mCol[1].mValue, inV.mValue, 0x7f);
 	__m128 xy = _mm_blend_ps(x, y, 0b0010);
@@ -330,7 +342,6 @@ Mat44 Mat44::Multiply3x3(Mat44Arg inM) const
 		Type t = vmulq_f32(mCol[0].mValue, vdupq_laneq_f32(c, 0));
 		t = vmlaq_f32(t, mCol[1].mValue, vdupq_laneq_f32(c, 1));
 		t = vmlaq_f32(t, mCol[2].mValue, vdupq_laneq_f32(c, 2));
-		t = vmlaq_f32(t, mCol[3].mValue, vdupq_laneq_f32(c, 3));
 		result.mCol[i].mValue = t;
 	}
 #else
@@ -555,8 +566,8 @@ Mat44 Mat44::Inversed() const
 	minor3 = _mm_add_ps(_mm_mul_ps(row1, tmp1), minor3);
 
 	__m128 det = _mm_mul_ps(row0, minor0);
-	det = _mm_add_ps(_mm_shuffle_ps(det, det, _MM_SHUFFLE(1, 0, 3, 2)), det);
-	det = _mm_add_ss(_mm_shuffle_ps(det, det, _MM_SHUFFLE(2, 3, 0, 1)), det);
+	det = _mm_add_ps(_mm_shuffle_ps(det, det, _MM_SHUFFLE(2, 3, 0, 1)), det); // Original code did (x + z) + (y + w), changed to (x + y) + (z + w) to match the ARM code below and make the result cross platform deterministic
+	det = _mm_add_ss(_mm_shuffle_ps(det, det, _MM_SHUFFLE(1, 0, 3, 2)), det);
 	det = _mm_div_ss(_mm_set_ss(1.0f), det);
 	det = _mm_shuffle_ps(det, det, _MM_SHUFFLE(0, 0, 0, 0));
 	
@@ -858,8 +869,8 @@ Mat44 Mat44::Inversed3x3() const
 	minor1 = _mm_sub_ps(minor1, _mm_mul_ps(row3, tmp1));
 
 	__m128 det = _mm_mul_ps(row0, minor0);
-	det = _mm_add_ps(_mm_shuffle_ps(det, det, _MM_SHUFFLE(1, 0, 3, 2)), det);
-	det = _mm_add_ss(_mm_shuffle_ps(det, det, _MM_SHUFFLE(2, 3, 0, 1)), det);
+	det = _mm_add_ps(_mm_shuffle_ps(det, det, _MM_SHUFFLE(2, 3, 0, 1)), det); // Original code did (x + z) + (y + w), changed to (x + y) + (z + w) to match the ARM code below and make the result cross platform deterministic
+	det = _mm_add_ss(_mm_shuffle_ps(det, det, _MM_SHUFFLE(1, 0, 3, 2)), det);
 	det = _mm_div_ss(_mm_set_ss(1.0f), det);
 	det = _mm_shuffle_ps(det, det, _MM_SHUFFLE(0, 0, 0, 0));
 	
@@ -940,7 +951,7 @@ Mat44 Mat44::Inversed3x3() const
 #endif
 }
 
-const Quat Mat44::GetQuaternion() const
+Quat Mat44::GetQuaternion() const
 {
 	JPH_ASSERT(mCol[3] == Vec4(0, 0, 0, 1));
 
@@ -1026,7 +1037,7 @@ Mat44 Mat44::GetRotation() const
 
 Mat44 Mat44::GetRotationSafe() const
 { 
-#if defined(JPH_USE_SSE)
+#if defined(JPH_USE_SSE4_1)
 	__m128 zero = _mm_setzero_ps(); 
 	return Mat44(_mm_blend_ps(mCol[0].mValue, zero, 8),
 				 _mm_blend_ps(mCol[1].mValue, zero, 8),
@@ -1038,7 +1049,10 @@ Mat44 Mat44::GetRotationSafe() const
 				 vsetq_lane_f32(0, mCol[2].mValue, 3),
 				 Vec4(0, 0, 0, 1)); 
 #else
-	#error Unsupported CPU architecture
+	return Mat44(Vec4(mCol[0].mF32[0], mCol[0].mF32[1], mCol[0].mF32[2], 0),
+				 Vec4(mCol[1].mF32[0], mCol[1].mF32[1], mCol[1].mF32[2], 0),
+				 Vec4(mCol[2].mF32[0], mCol[2].mF32[1], mCol[2].mF32[2], 0),
+				 Vec4(0, 0, 0, 1));
 #endif
 }
 
@@ -1047,6 +1061,16 @@ void Mat44::SetRotation(Mat44Arg inRotation)
 	mCol[0] = inRotation.mCol[0];
 	mCol[1] = inRotation.mCol[1];
 	mCol[2] = inRotation.mCol[2];
+}
+
+Mat44 Mat44::PreTranslated(Vec3Arg inTranslation) const
+{
+	return Mat44(mCol[0], mCol[1], mCol[2], Vec4(GetTranslation() + Multiply3x3(inTranslation), 1));
+}
+
+Mat44 Mat44::PostTranslated(Vec3Arg inTranslation) const
+{
+	return Mat44(mCol[0], mCol[1], mCol[2], Vec4(GetTranslation() + inTranslation, 1));
 }
 
 Mat44 Mat44::PreScaled(Vec3Arg inScale) const
@@ -1091,4 +1115,4 @@ Mat44 Mat44::Decompose(Vec3 &outScale) const
 	return Mat44(Vec4(x / outScale.GetX(), 0), Vec4(y / outScale.GetY(), 0), Vec4(z / outScale.GetZ(), 0), GetColumn4(3));
 }
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,19 +3,19 @@
 
 #pragma once
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// The constant \f$\pi\f$
-#define JPH_PI       3.14159265358979323846f
+static constexpr float JPH_PI = 3.14159265358979323846f;
 
 /// Convert a value from degrees to radians
-inline constexpr float DegreesToRadians(float inV)
+constexpr float DegreesToRadians(float inV)
 {
 	return inV * (JPH_PI / 180.0f);
 }
 
 /// Convert a value from radians to degrees
-inline constexpr float RadiansToDegrees(float inV)
+constexpr float RadiansToDegrees(float inV)
 {
 	return inV * (180.0f / JPH_PI);
 }
@@ -41,35 +41,35 @@ inline float CenterAngleAroundZero(float inV)
 
 /// Clamp a value between two values
 template <typename T>
-inline constexpr T Clamp(T inV, T inMin, T inMax)
+constexpr T Clamp(T inV, T inMin, T inMax)
 {
 	return min(max(inV, inMin), inMax);
 }
 
 /// Square a value
 template <typename T>
-inline constexpr T Square(T inV)
+constexpr T Square(T inV)
 {
 	return inV * inV;
 }
 
 /// Returns \f$inV^3\f$.
 template <typename T>
-inline constexpr T Cubed(T inV)
+constexpr T Cubed(T inV)
 {
 	return inV * inV * inV;
 }
 
 /// Get the sign of a value
 template <typename T>
-inline constexpr T Sign(T inV)
+constexpr T Sign(T inV)
 {
 	return inV < 0? T(-1) : T(1);
 }
 
 /// Check if inV is a power of 2
 template <typename T>
-inline constexpr bool IsPowerOf2(T inV)
+constexpr bool IsPowerOf2(T inV)
 {
 	return (inV & (inV - 1)) == 0;
 }
@@ -93,15 +93,19 @@ inline bool IsAligned(T inV, uint64 inAlignment)
 /// Compute number of trailing zero bits (how many low bits are zero)
 inline uint CountTrailingZeros(uint32 inValue)
 {
-#if defined(JPH_CPU_X64)
-	#ifdef JPH_USE_LZCNT
+#if defined(JPH_CPU_X86)
+	#if defined(JPH_USE_TZCNT)
 		return _tzcnt_u32(inValue);
-	#else
+	#elif defined(JPH_COMPILER_MSVC)
 		if (inValue == 0)
 			return 32;
 		unsigned long result;
 		_BitScanForward(&result, inValue);
 		return result;
+	#else
+		if (inValue == 0)
+			return 32;
+		return __builtin_ctz(inValue);
 	#endif
 #elif defined(JPH_CPU_ARM64)
 	return __builtin_clz(__builtin_bitreverse32(inValue));
@@ -113,15 +117,19 @@ inline uint CountTrailingZeros(uint32 inValue)
 /// Compute the number of leading zero bits (how many high bits are zero)
 inline uint CountLeadingZeros(uint32 inValue)
 {
-#if defined(JPH_CPU_X64)
-	#ifdef JPH_USE_LZCNT
+#if defined(JPH_CPU_X86)
+	#if defined(JPH_USE_LZCNT)
 		return _lzcnt_u32(inValue);
-	#else
+	#elif defined(JPH_COMPILER_MSVC)
 		if (inValue == 0)
 			return 32;
 		unsigned long result;
 		_BitScanReverse(&result, inValue);
 		return 31 - result;
+	#else
+		if (inValue == 0)
+			return 32;
+		return __builtin_clz(inValue);
 	#endif
 #elif defined(JPH_CPU_ARM64)
 	return __builtin_clz(inValue);
@@ -133,10 +141,17 @@ inline uint CountLeadingZeros(uint32 inValue)
 /// Count the number of 1 bits in a value
 inline uint CountBits(uint32 inValue)
 {
-#if defined(JPH_CPU_X64)
-	return _mm_popcnt_u32(inValue);
-#elif defined(JPH_CPU_ARM64)
+#if defined(JPH_COMPILER_CLANG) || defined(JPH_COMPILER_GCC)
 	return __builtin_popcount(inValue);
+#elif defined(JPH_COMPILER_MSVC)
+	#if defined(JPH_USE_SSE4_2)
+		return _mm_popcnt_u32(inValue);
+	#else
+		inValue = inValue - ((inValue >> 1) & 0x55555555);
+		inValue = (inValue & 0x33333333) + ((inValue >> 2) & 0x33333333);
+		inValue = (inValue + (inValue >> 4)) & 0x0F0F0F0F;
+		return (inValue * 0x01010101) >> 24;
+	#endif
 #else
 	#error Undefined
 #endif
@@ -148,4 +163,4 @@ inline uint32 GetNextPowerOf2(uint32 inValue)
 	return inValue <= 1? uint32(1) : uint32(1) << (32 - CountLeadingZeros(inValue - 1));
 }
 
-} // JPH
+JPH_NAMESPACE_END

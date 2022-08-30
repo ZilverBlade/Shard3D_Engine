@@ -3,12 +3,14 @@
 
 #pragma once
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Class that holds 2 floats, used as a storage class mainly.
 class [[nodiscard]] Float2
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 						Float2() = default; ///< Intentionally not initialized for performance reasons
 						Float2(const Float2 &inRHS) = default;
 						Float2(float inX, float inY)					: x(inX), y(inY) { }
@@ -29,4 +31,4 @@ public:
 
 static_assert(is_trivial<Float2>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END

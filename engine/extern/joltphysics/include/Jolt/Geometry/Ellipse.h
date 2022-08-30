@@ -3,15 +3,17 @@
 
 #pragma once
 
-#include <Math/Float2.h>
+#include <Jolt/Math/Float2.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Ellipse centered around the origin
 /// @see https://en.wikipedia.org/wiki/Ellipse
 class Ellipse
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Construct ellipse with radius A along the X-axis and B along the Y-axis
 					Ellipse(float inA, float inB) : mA(inA), mB(inB) { JPH_ASSERT(inA > 0.0f); JPH_ASSERT(inB > 0.0f); }
 
@@ -71,4 +73,4 @@ private:
 	float			mB;				///< Radius along Y-axis
 };
 
-} // JPH
+JPH_NAMESPACE_END

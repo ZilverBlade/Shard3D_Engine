@@ -3,15 +3,17 @@
 
 #pragma once
 
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <mutex>
-#include <unordered_map>
+JPH_SUPPRESS_WARNINGS_STD_END
 
-#include <Core/NonCopyable.h>
-#include <Core/TickCounter.h>
+#include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Core/TickCounter.h>
+#include <Jolt/Core/UnorderedMap.h>
 
 #if defined(JPH_EXTERNAL_PROFILE)
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Create this class on the stack to start sampling timing information of a particular scope.
 ///
@@ -28,11 +30,14 @@ private:
 	uint8							mUserData[64];
 };
 
-} // JPH
+JPH_NAMESPACE_END
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Macros to do the actual profiling	
 //////////////////////////////////////////////////////////////////////////////////////////
+
+JPH_SUPPRESS_WARNING_PUSH
+JPH_CLANG_SUPPRESS_WARNING("-Wc++98-compat-pedantic")
 
 // Dummy implementations
 #define JPH_PROFILE_THREAD_START(name)			
@@ -58,9 +63,11 @@ private:
 // Scope profiling for function
 #define JPH_PROFILE_FUNCTION()		JPH_PROFILE(JPH_FUNCTION_NAME)
 
+JPH_SUPPRESS_WARNING_POP
+
 #elif defined(JPH_PROFILE_ENABLED)
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class ProfileSample;
 class ProfileThread;
@@ -69,12 +76,14 @@ class ProfileThread;
 class Profiler : public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Increments the frame counter to provide statistics per frame
 	void						NextFrame();
 
 	/// Dump profiling statistics at the start of the next frame
 	/// @param inTag If not empty, this overrides the auto incrementing number in the filename of the dump file
-	void						Dump(string inTag = string());
+	void						Dump(const string_view &inTag = string_view());
 
 	/// Add a thread to be instrumented
 	void						AddThread(ProfileThread *inThread);
@@ -83,13 +92,13 @@ public:
 	void						RemoveThread(ProfileThread *inThread);
 
 	/// Singleton instance
-	static Profiler				sInstance;
+	static Profiler *			sInstance;
 								
 private:
 	/// Helper class to freeze ProfileSamples per thread while processing them
 	struct ThreadSamples
 	{
-		string					mThreadName;
+		String					mThreadName;
 		ProfileSample *			mSamplesBegin;
 		ProfileSample *			mSamplesEnd;
 	};
@@ -128,28 +137,30 @@ private:
 		uint64					mMaxCyclesInCallWithChildren = 0;									///< Maximum amount of cycles spent per call
 	};							
 
-	using Threads = vector<ThreadSamples>;
-	using Aggregators = vector<Aggregator>;
-	using KeyToAggregator = unordered_map<const char *, size_t>;
+	using Threads = Array<ThreadSamples>;
+	using Aggregators = Array<Aggregator>;
+	using KeyToAggregator = UnorderedMap<const char *, size_t>;
 
 	/// Helper function to aggregate profile sample data
 	static void					sAggregate(int inDepth, uint32 inColor, ProfileSample *&ioSample, const ProfileSample *inEnd, Aggregators &ioAggregators, KeyToAggregator &ioKeyToAggregator);
 
 	/// Dump profiling statistics
 	void						DumpInternal();
-	void						DumpList(string inTag, const Aggregators &inAggregators);
-	void						DumpChart(string inTag, const Threads &inThreads, const KeyToAggregator &inKeyToAggregators, const Aggregators &inAggregators);
+	void						DumpList(const char *inTag, const Aggregators &inAggregators);
+	void						DumpChart(const char *inTag, const Threads &inThreads, const KeyToAggregator &inKeyToAggregators, const Aggregators &inAggregators);
 
 	mutex						mLock;																///< Lock that protects mThreads
-	vector<ProfileThread *>		mThreads;															///< List of all active threads
+	Array<ProfileThread *>		mThreads;															///< List of all active threads
 	bool						mDump = false;														///< When true, the samples are dumped next frame
-	string						mDumpTag;															///< When not empty, this overrides the auto incrementing number of the dump filename
+	String						mDumpTag;															///< When not empty, this overrides the auto incrementing number of the dump filename
 };							
 
 // Class that contains the information of a single scoped measurement
 class alignas(16) ProfileSample : public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	const char *				mName;																///< User defined name of this item
 	uint32						mColor;																///< Color to use for this sample
 	uint8						mDepth;																///< Calculated depth
@@ -162,13 +173,15 @@ public:
 class ProfileThread : public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
-	inline						ProfileThread(const string &inThreadName);
+	inline						ProfileThread(const string_view &inThreadName);
 	inline						~ProfileThread();
 
 	static const uint cMaxSamples = 65536;
 
-	string						mThreadName;														///< Name of the thread that we're collecting information for
+	String						mThreadName;														///< Name of the thread that we're collecting information for
 	ProfileSample				mSamples[cMaxSamples];												///< Buffer of samples
 	uint						mCurrentSample = 0;													///< Next position to write a sample to
 
@@ -190,7 +203,7 @@ private:
 	static bool					sOutOfSamplesReported;
 };
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "Profiler.inl"
 
@@ -198,8 +211,17 @@ private:
 // Macros to do the actual profiling	
 //////////////////////////////////////////////////////////////////////////////////////////
 
+JPH_SUPPRESS_WARNING_PUSH
+JPH_CLANG_SUPPRESS_WARNING("-Wc++98-compat-pedantic")
+
+/// Start instrumenting program
+#define JPH_PROFILE_START(name)			do { Profiler::sInstance = new Profiler; JPH_PROFILE_THREAD_START(name); } while (false)
+
+/// End instrumenting program
+#define JPH_PROFILE_END()				do { JPH_PROFILE_THREAD_END(); delete Profiler::sInstance; Profiler::sInstance = nullptr; } while (false)
+
 /// Start instrumenting a thread
-#define JPH_PROFILE_THREAD_START(name)	ProfileThread::sInstance = new ProfileThread(name)
+#define JPH_PROFILE_THREAD_START(name)	do { if (Profiler::sInstance) ProfileThread::sInstance = new ProfileThread(name); } while (false)
 
 /// End instrumenting a thread
 #define JPH_PROFILE_THREAD_END()		do { delete ProfileThread::sInstance; ProfileThread::sInstance = nullptr; } while (false)
@@ -213,10 +235,12 @@ private:
 #define JPH_PROFILE_FUNCTION()			JPH_PROFILE(JPH_FUNCTION_NAME)
 								
 /// Update frame counter								
-#define JPH_PROFILE_NEXTFRAME()			Profiler::sInstance.NextFrame()
+#define JPH_PROFILE_NEXTFRAME()			Profiler::sInstance->NextFrame()
 
 /// Dump profiling info
-#define JPH_PROFILE_DUMP(...)			Profiler::sInstance.Dump(__VA_ARGS__)
+#define JPH_PROFILE_DUMP(...)			Profiler::sInstance->Dump(__VA_ARGS__)
+
+JPH_SUPPRESS_WARNING_POP
 
 #else
 
@@ -224,11 +248,18 @@ private:
 // Dummy profiling instructions
 //////////////////////////////////////////////////////////////////////////////////////////
 
+JPH_SUPPRESS_WARNING_PUSH
+JPH_CLANG_SUPPRESS_WARNING("-Wc++98-compat-pedantic")
+
+#define JPH_PROFILE_START(name)
+#define JPH_PROFILE_END()
 #define JPH_PROFILE_THREAD_START(name)
 #define JPH_PROFILE_THREAD_END()
 #define JPH_PROFILE(...)
 #define JPH_PROFILE_FUNCTION()
 #define JPH_PROFILE_NEXTFRAME()
 #define JPH_PROFILE_DUMP(...)
+
+JPH_SUPPRESS_WARNING_POP
 
 #endif

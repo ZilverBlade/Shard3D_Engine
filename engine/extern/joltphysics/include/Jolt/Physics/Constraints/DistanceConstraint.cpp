@@ -1,23 +1,24 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/DistanceConstraint.h>
-#include <Physics/Body/Body.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Constraints/DistanceConstraint.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(DistanceConstraintSettings)
 {
 	JPH_ADD_BASE_CLASS(DistanceConstraintSettings, TwoBodyConstraintSettings)
 
+	JPH_ADD_ENUM_ATTRIBUTE(DistanceConstraintSettings, mSpace)
 	JPH_ADD_ATTRIBUTE(DistanceConstraintSettings, mPoint1)
 	JPH_ADD_ATTRIBUTE(DistanceConstraintSettings, mPoint2)
 	JPH_ADD_ATTRIBUTE(DistanceConstraintSettings, mMinDistance)
@@ -30,6 +31,7 @@ void DistanceConstraintSettings::SaveBinaryState(StreamOut &inStream) const
 { 
 	ConstraintSettings::SaveBinaryState(inStream);
 
+	inStream.Write(mSpace);
 	inStream.Write(mPoint1);
 	inStream.Write(mPoint2);
 	inStream.Write(mMinDistance);
@@ -42,6 +44,7 @@ void DistanceConstraintSettings::RestoreBinaryState(StreamIn &inStream)
 {
 	ConstraintSettings::RestoreBinaryState(inStream);
 
+	inStream.Read(mSpace);
 	inStream.Read(mPoint1);
 	inStream.Read(mPoint2);
 	inStream.Read(mMinDistance);
@@ -56,22 +59,29 @@ TwoBodyConstraint *DistanceConstraintSettings::Create(Body &inBody1, Body &inBod
 }
 
 DistanceConstraint::DistanceConstraint(Body &inBody1, Body &inBody2, const DistanceConstraintSettings &inSettings) :
-	TwoBodyConstraint(inBody1, inBody2, inSettings)
+	TwoBodyConstraint(inBody1, inBody2, inSettings),
+	mLocalSpacePosition1(inSettings.mPoint1),
+	mLocalSpacePosition2(inSettings.mPoint2),
+	mMinDistance(inSettings.mMinDistance),
+	mMaxDistance(inSettings.mMaxDistance),
+	mWorldSpacePosition1(inSettings.mPoint1),
+	mWorldSpacePosition2(inSettings.mPoint2)
 {
-	// Store world space positions
-	mWorldSpacePosition1 = inSettings.mPoint1;
-	mWorldSpacePosition2 = inSettings.mPoint2;
-
-	// Store distance
-	mMinDistance = inSettings.mMinDistance;
-	mMaxDistance = inSettings.mMaxDistance;
-
-	// Store local positions
-	mLocalSpacePosition1 = inBody1.GetInverseCenterOfMassTransform() * inSettings.mPoint1;
-	mLocalSpacePosition2 = inBody2.GetInverseCenterOfMassTransform() * inSettings.mPoint2;
+	if (inSettings.mSpace == EConstraintSpace::WorldSpace)
+	{
+		// If all properties were specified in world space, take them to local space now
+		mLocalSpacePosition1 = inBody1.GetInverseCenterOfMassTransform() * mLocalSpacePosition1;
+		mLocalSpacePosition2 = inBody2.GetInverseCenterOfMassTransform() * mLocalSpacePosition2;
+	}
+	else
+	{
+		// If properties were specified in local space, we need to calculate world space positions
+		mWorldSpacePosition1 = inBody1.GetCenterOfMassTransform() * mWorldSpacePosition1;
+		mWorldSpacePosition2 = inBody2.GetCenterOfMassTransform() * mWorldSpacePosition2;
+	}
 
 	// Store distance we want to keep between the world space points
-	float distance = (inSettings.mPoint2 - inSettings.mPoint1).Length();
+	float distance = (mWorldSpacePosition2 - mWorldSpacePosition1).Length();
 	SetDistance(mMinDistance < 0.0f? distance : mMinDistance, mMaxDistance < 0.0f? distance : mMaxDistance);
 
 	// Most likely gravity is going to tear us apart (this is only used when the distance between the points = 0)
@@ -213,4 +223,18 @@ void DistanceConstraint::RestoreState(StateRecorder &inStream)
 	inStream.Read(mWorldSpaceNormal);
 }
 
-} // JPH
+Ref<ConstraintSettings> DistanceConstraint::GetConstraintSettings() const
+{
+	DistanceConstraintSettings *settings = new DistanceConstraintSettings;
+	ToConstraintSettings(*settings);
+	settings->mSpace = EConstraintSpace::LocalToBodyCOM;
+	settings->mPoint1 = mLocalSpacePosition1;
+	settings->mPoint2 = mLocalSpacePosition2;
+	settings->mMinDistance = mMinDistance;
+	settings->mMaxDistance = mMaxDistance;
+	settings->mFrequency = mFrequency;
+	settings->mDamping = mDamping;
+	return settings;
+}
+
+JPH_NAMESPACE_END

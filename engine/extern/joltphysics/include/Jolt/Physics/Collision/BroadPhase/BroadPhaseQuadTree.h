@@ -3,25 +3,27 @@
 
 #pragma once
 
-#include <Physics/Collision/BroadPhase/QuadTree.h>
-#include <Physics/Collision/BroadPhase/BroadPhase.h>
+#include <Jolt/Physics/Collision/BroadPhase/QuadTree.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhase.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Fast SIMD based quad tree BroadPhase that is multithreading aware and tries to do a minimal amount of locking.
 class BroadPhaseQuadTree final : public BroadPhase
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Destructor
 	virtual					~BroadPhaseQuadTree() override;
 
 	// Implementing interface of BroadPhase (see BroadPhase for documentation)
-	virtual void			Init(BodyManager *inBodyManager, const ObjectToBroadPhaseLayer &inObjectToBroadPhaseLayer) override;
+	virtual void			Init(BodyManager *inBodyManager, const BroadPhaseLayerInterface &inLayerInterface) override;
 	virtual void			Optimize() override;
 	virtual void			FrameSync() override;
 	virtual void			LockModifications() override;
 	virtual	UpdateState		UpdatePrepare() override;
-	virtual void			UpdateFinalize(UpdateState &inUpdateState) override;
+	virtual void			UpdateFinalize(const UpdateState &inUpdateState) override;
 	virtual void			UnlockModifications() override;
 	virtual AddState		AddBodiesPrepare(BodyID *ioBodies, int inNumber) override;
 	virtual void			AddBodiesFinalize(BodyID *ioBodies, int inNumber, AddState inAddState) override;
@@ -37,9 +39,6 @@ public:
 	virtual void			CastAABoxNoLock(const AABoxCast &inBox, CastShapeBodyCollector &ioCollector, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter) const override; 
 	virtual void			CastAABox(const AABoxCast &inBox, CastShapeBodyCollector &ioCollector, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter) const override;
 	virtual void			FindCollidingPairs(BodyID *ioActiveBodies, int inNumActiveBodies, float inSpeculativeContactDistance, ObjectVsBroadPhaseLayerFilter inObjectVsBroadPhaseLayerFilter, ObjectLayerPairFilter inObjectLayerPairFilter, BodyPairCollector &ioPairCollector) const override;
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
-	virtual void			SetBroadPhaseLayerToString(BroadPhaseLayerToString inBroadPhaseLayerToString) override;
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
 #ifdef JPH_TRACK_BROADPHASE_STATS
 	virtual void			ReportStats() override;
 #endif // JPH_TRACK_BROADPHASE_STATS
@@ -48,6 +47,8 @@ private:
 	/// Helper struct for AddBodies handle
 	struct LayerState
 	{
+		JPH_OVERRIDE_NEW_DELETE
+
 		BodyID *			mBodyStart = nullptr;
 		BodyID *			mBodyEnd;
 		QuadTree::AddState	mAddState;
@@ -65,8 +66,8 @@ private:
 	/// Node allocator for all trees
 	QuadTree::Allocator		mAllocator;
 
-	/// Mapping table that maps from Object Layer to tree
-	ObjectToBroadPhaseLayer	mObjectToBroadPhaseLayer;
+	/// Information about broad phase layers
+	const BroadPhaseLayerInterface *mBroadPhaseLayerInterface = nullptr;
 
 	/// One tree per object layer
 	QuadTree *				mLayers;
@@ -96,4 +97,4 @@ private:
 	uint32					mNextLayerToUpdate = 0;
 };
 
-} // JPH
+JPH_NAMESPACE_END

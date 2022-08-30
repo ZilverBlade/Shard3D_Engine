@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Physics/Constraints/TwoBodyConstraint.h>
-#include <Physics/Constraints/ConstraintPart/PointConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/AngleConstraintPart.h>
+#include <Jolt/Physics/Constraints/TwoBodyConstraint.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/PointConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/AngleConstraintPart.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Cone constraint settings, used to create a cone constraint
 class ConeConstraintSettings final : public TwoBodyConstraintSettings
@@ -21,11 +21,14 @@ public:
 	/// Create an an instance of this constraint
 	virtual TwoBodyConstraint *	Create(Body &inBody1, Body &inBody2) const override;
 
-	/// Body 1 constraint reference frame (in world space)
+	/// This determines in which space the constraint is setup, all properties below should be in the specified space
+	EConstraintSpace			mSpace = EConstraintSpace::WorldSpace;
+
+	/// Body 1 constraint reference frame (space determined by mSpace)
 	Vec3						mPoint1 = Vec3::sZero();
 	Vec3						mTwistAxis1 = Vec3::sAxisX();
 
-	/// Body 2 constraint reference frame (in world space)
+	/// Body 2 constraint reference frame (space determined by mSpace)
 	Vec3						mPoint2 = Vec3::sZero();
 	Vec3						mTwistAxis2 = Vec3::sAxisX();
 
@@ -65,11 +68,13 @@ protected:
 class ConeConstraint final : public TwoBodyConstraint
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Construct cone constraint
 								ConeConstraint(Body &inBody1, Body &inBody2, const ConeConstraintSettings &inSettings);
 
 	// Generic interface of a constraint
-	virtual EConstraintType		GetType() const override					{ return EConstraintType::Cone; }
+	virtual EConstraintSubType	GetSubType() const override					{ return EConstraintSubType::Cone; }
 	virtual void				SetupVelocityConstraint(float inDeltaTime) override;
 	virtual void				WarmStartVelocityConstraint(float inWarmStartImpulseRatio) override;
 	virtual bool				SolveVelocityConstraint(float inDeltaTime) override;
@@ -80,13 +85,14 @@ public:
 #endif // JPH_DEBUG_RENDERER
 	virtual void				SaveState(StateRecorder &inStream) const override;
 	virtual void				RestoreState(StateRecorder &inStream) override;
+	virtual Ref<ConstraintSettings> GetConstraintSettings() const override;
 
 	// See: TwoBodyConstraint
 	virtual Mat44				GetConstraintToBody1Matrix() const override;
 	virtual Mat44				GetConstraintToBody2Matrix() const override;
 
 	/// Update maximum angle between body 1 and 2 (see ConeConstraintSettings)
-	void						SetHalfConeAngle(float inHalfConeAngle)		{ JPH_ASSERT(inHalfConeAngle >= 0.0f && inHalfConeAngle <= JPH_PI); mCosHalfConeAngle = cos(inHalfConeAngle); }
+	void						SetHalfConeAngle(float inHalfConeAngle)		{ JPH_ASSERT(inHalfConeAngle >= 0.0f && inHalfConeAngle <= JPH_PI); mCosHalfConeAngle = Cos(inHalfConeAngle); }
 	float						GetCosHalfConeAngle() const					{ return mCosHalfConeAngle; }
 
 	///@name Get Lagrange multiplier from last physics update (relates to how much force/torque was applied to satisfy the constraint)
@@ -121,4 +127,4 @@ private:
 	AngleConstraintPart			mAngleConstraintPart;
 };
 
-} // JPH
+JPH_NAMESPACE_END

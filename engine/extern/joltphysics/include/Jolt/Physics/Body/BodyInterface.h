@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <Physics/Body/BodyID.h>
-#include <Physics/EActivation.h>
-#include <Physics/Collision/ObjectLayer.h>
-#include <Physics/Body/MotionType.h>
-#include <Core/Reference.h>
+#include <Jolt/Physics/Body/BodyID.h>
+#include <Jolt/Physics/EActivation.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Body/MotionType.h>
+#include <Jolt/Core/Reference.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class Body;
 class BodyCreationSettings;
@@ -20,15 +20,16 @@ class TransformedShape;
 class PhysicsMaterial;
 class SubShapeID;
 class Shape;
+class TwoBodyConstraintSettings;
+class TwoBodyConstraint;
 
 /// Class that provides operations on bodies using a body ID. Note that if you need to do multiple operations on a single body, it is more efficient to lock the body once and combine the operations.
 /// All quantities are in world space unless otherwise specified.
 class BodyInterface : public NonCopyable
 {
 public:
-	/// Constructor
-								BodyInterface() = default;
-								BodyInterface(BodyLockInterface &inBodyLockInterface, BodyManager &inBodyManager, BroadPhase &inBroadPhase) : mBodyLockInterface(&inBodyLockInterface), mBodyManager(&inBodyManager), mBroadPhase(&inBroadPhase) { }
+	/// Initialize the interface (should only be called by PhysicsSystem)
+	void						Init(BodyLockInterface &inBodyLockInterface, BodyManager &inBodyManager, BroadPhase &inBroadPhase) { mBodyLockInterface = &inBodyLockInterface; mBodyManager = &inBodyManager; mBroadPhase = &inBroadPhase; }
 	
 	/// Create a body
 	/// @return Created body or null when out of bodies
@@ -41,6 +42,8 @@ public:
 	void						DestroyBodies(const BodyID *inBodyIDs, int inNumber);
 
 	/// Add body to the world.
+	/// Note that if you need to add multiple bodies, use the AddBodiesPrepare/AddBodiesFinalize function.
+	/// Adding many bodies, one at a time, results in a really inefficient broadphase until PhysicsSystem::OptimizeBroadPhase is called or when PhysicsSystem::Update rebuilds the tree!
 	/// After adding, to get a body by ID use the BodyLockRead or BodyLockWrite interface!
 	void						AddBody(const BodyID &inBodyID, EActivation inActivationMode);
 	
@@ -71,8 +74,15 @@ public:
 	void						ActivateBody(const BodyID &inBodyID);
 	void						ActivateBodies(const BodyID *inBodyIDs, int inNumber);
 	void						DeactivateBody(const BodyID &inBodyID);
+	void						DeactivateBodies(const BodyID *inBodyIDs, int inNumber);
 	bool						IsActive(const BodyID &inBodyID) const;
 	///@}
+
+	/// Create a two body constraint
+	TwoBodyConstraint *			CreateConstraint(const TwoBodyConstraintSettings *inSettings, const BodyID &inBodyID1, const BodyID &inBodyID2);
+
+	/// Activate non-static bodies attached to a constraint
+	void						ActivateConstraint(const TwoBodyConstraint *inConstraint);
 
 	///@name Access to the shape of a body
 	///@{
@@ -112,6 +122,7 @@ public:
 	void						SetRotation(const BodyID &inBodyID, QuatArg inRotation, EActivation inActivationMode);
 	Quat						GetRotation(const BodyID &inBodyID) const;
 	Mat44						GetWorldTransform(const BodyID &inBodyID) const;
+	Mat44						GetCenterOfMassTransform(const BodyID &inBodyID) const;
 	///@}
 
 	/// Set velocity of body such that it will be positioned at inTargetPosition/Rotation in inDeltaTime seconds (will activate body if needed)
@@ -124,6 +135,7 @@ public:
 	void						SetLinearVelocity(const BodyID &inBodyID, Vec3Arg inLinearVelocity);
 	Vec3						GetLinearVelocity(const BodyID &inBodyID) const;
 	void						AddLinearVelocity(const BodyID &inBodyID, Vec3Arg inLinearVelocity); ///< Add velocity to current velocity
+	void						AddLinearAndAngularVelocity(const BodyID &inBodyID, Vec3Arg inLinearVelocity, Vec3Arg inAngularVelocity); ///< Add linear and angular to current velocities
 	void						SetAngularVelocity(const BodyID &inBodyID, Vec3Arg inAngularVelocity);
 	Vec3						GetAngularVelocity(const BodyID &inBodyID) const;
 	Vec3						GetPointVelocity(const BodyID &inBodyID, Vec3Arg inPoint) const; ///< Velocity of point inPoint (in world space, e.g. on the surface of the body) of the body
@@ -131,6 +143,14 @@ public:
 	/// Set the complete motion state of a body.
 	/// Note that the linear velocity is the velocity of the center of mass, which may not coincide with the position of your object, to correct for this: \f$VelocityCOM = Velocity - AngularVelocity \times ShapeCOM\f$
 	void						SetPositionRotationAndVelocity(const BodyID &inBodyID, Vec3Arg inPosition, QuatArg inRotation, Vec3Arg inLinearVelocity, Vec3Arg inAngularVelocity);
+
+	///@name Add forces to the body
+	///@{
+	void						AddForce(const BodyID &inBodyID, Vec3Arg inForce); ///< See Body::AddForce
+	void						AddForce(const BodyID &inBodyID, Vec3Arg inForce, Vec3Arg inPoint); ///< Applied at inPoint
+	void						AddTorque(const BodyID &inBodyID, Vec3Arg inTorque); ///< See Body::AddTorque
+	void						AddForceAndTorque(const BodyID &inBodyID, Vec3Arg inForce, Vec3Arg inTorque); ///< A combination of Body::AddForce and Body::AddTorque
+	///@}
 
 	///@name Add an impulse to the body
 	///@{
@@ -167,10 +187,13 @@ public:
 	TransformedShape			GetTransformedShape(const BodyID &inBodyID) const;
 
 	/// Get the user data for a body
-	void *						GetUserData(const BodyID &inBodyID) const;
+	uint64						GetUserData(const BodyID &inBodyID) const;
 
 	/// Get the material for a particular sub shape
 	const PhysicsMaterial *		GetMaterial(const BodyID &inBodyID, const SubShapeID &inSubShapeID) const;
+
+	/// Set the Body::EFlags::InvalidateContactCache flag for the specified body. This means that the collision cache is invalid for any body pair involving that body until the next physics step.
+	void						InvalidateContactCache(const BodyID &inBodyID);
 
 private:
 	BodyLockInterface *			mBodyLockInterface = nullptr;
@@ -178,4 +201,4 @@ private:
 	BroadPhase *				mBroadPhase = nullptr;
 };
 
-} // JPH
+JPH_NAMESPACE_END

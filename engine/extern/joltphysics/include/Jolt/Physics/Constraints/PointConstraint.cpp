@@ -1,38 +1,44 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/PointConstraint.h>
-#include <Physics/Body/Body.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Constraints/PointConstraint.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(PointConstraintSettings)
 {
 	JPH_ADD_BASE_CLASS(PointConstraintSettings, TwoBodyConstraintSettings)
 
-	JPH_ADD_ATTRIBUTE(PointConstraintSettings, mCommonPoint)
+	JPH_ADD_ENUM_ATTRIBUTE(PointConstraintSettings, mSpace)
+	JPH_ADD_ATTRIBUTE(PointConstraintSettings, mPoint1)
+	JPH_ADD_ATTRIBUTE(PointConstraintSettings, mPoint2)
 }
 
 void PointConstraintSettings::SaveBinaryState(StreamOut &inStream) const
 { 
 	ConstraintSettings::SaveBinaryState(inStream);
 
-	inStream.Write(mCommonPoint);	
+	inStream.Write(mSpace);
+	inStream.Write(mPoint1);	
+	inStream.Write(mPoint2);
 }
 
 void PointConstraintSettings::RestoreBinaryState(StreamIn &inStream)
 {
 	ConstraintSettings::RestoreBinaryState(inStream);
 
-	inStream.Read(mCommonPoint);
+	inStream.Read(mSpace);
+	inStream.Read(mPoint1);
+	inStream.Read(mPoint2);
 }
 
 TwoBodyConstraint *PointConstraintSettings::Create(Body &inBody1, Body &inBody2) const
@@ -41,11 +47,16 @@ TwoBodyConstraint *PointConstraintSettings::Create(Body &inBody1, Body &inBody2)
 }
 
 PointConstraint::PointConstraint(Body &inBody1, Body &inBody2, const PointConstraintSettings &inSettings) :
-	TwoBodyConstraint(inBody1, inBody2, inSettings)
+	TwoBodyConstraint(inBody1, inBody2, inSettings),
+	mLocalSpacePosition1(inSettings.mPoint1),
+	mLocalSpacePosition2(inSettings.mPoint2)
 {
-	// Store local positions
-	mLocalSpacePosition1 = inBody1.GetInverseCenterOfMassTransform() * inSettings.mCommonPoint;
-	mLocalSpacePosition2 = inBody2.GetInverseCenterOfMassTransform() * inSettings.mCommonPoint;
+	if (inSettings.mSpace == EConstraintSpace::WorldSpace)
+	{
+		// If all properties were specified in world space, take them to local space now
+		mLocalSpacePosition1 = inBody1.GetInverseCenterOfMassTransform() * mLocalSpacePosition1;
+		mLocalSpacePosition2 = inBody2.GetInverseCenterOfMassTransform() * mLocalSpacePosition2;
+	}
 }
 
 void PointConstraint::CalculateConstraintProperties()
@@ -100,4 +111,14 @@ void PointConstraint::RestoreState(StateRecorder &inStream)
 	mPointConstraintPart.RestoreState(inStream);
 }
 
-} // JPH
+Ref<ConstraintSettings> PointConstraint::GetConstraintSettings() const
+{
+	PointConstraintSettings *settings = new PointConstraintSettings;
+	ToConstraintSettings(*settings);
+	settings->mSpace = EConstraintSpace::LocalToBodyCOM;
+	settings->mPoint1 = mLocalSpacePosition1;
+	settings->mPoint2 = mLocalSpacePosition2;
+	return settings;
+}
+
+JPH_NAMESPACE_END

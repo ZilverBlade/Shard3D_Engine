@@ -3,15 +3,17 @@
 
 #pragma once
 
-#include <Geometry/AABox.h>
-#include <Physics/Collision/CollideShape.h>
-#include <Physics/Collision/Shape/Shape.h>
+#include <Jolt/Geometry/AABox.h>
+#include <Jolt/Physics/Collision/CollideShape.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Structure that holds a single shape cast (a shape moving along a linear path in 3d space with no rotation)
 struct ShapeCast
 {
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 								ShapeCast(const Shape *inShape, Vec3Arg inScale, Mat44Arg inCenterOfMassStart, Vec3Arg inDirection, const AABox &inWorldSpaceBounds) :
 		mShape(inShape),
@@ -28,6 +30,12 @@ struct ShapeCast
 	{
 	}
 
+	/// Construct a shape cast using a world transform for a shape instead of a center of mass transform
+	static inline ShapeCast		sFromWorldTransform(const Shape *inShape, Vec3Arg inScale, Mat44Arg inWorldTransform, Vec3Arg inDirection)
+	{
+		return ShapeCast(inShape, inScale, inWorldTransform.PreTranslated(inShape->GetCenterOfMass()), inDirection);
+	}
+
 	/// Transform this shape cast using inTransform. Multiply transform on the left left hand side.
 	ShapeCast					PostTransformed(Mat44Arg inTransform) const
 	{
@@ -38,7 +46,7 @@ struct ShapeCast
 
 	const Shape *				mShape;								///< Shape that's being cast (cannot be mesh shape). Note that this structure does not assume ownership over the shape for performance reasons.
 	const Vec3					mScale;								///< Scale in local space of the shape being cast
-	const Mat44					mCenterOfMassStart;					///< Start position and orientation of the center of mass of the shape (i.e. mCenterOfMassStart = Start * Mat44::sTranslation(mShape->GetCenterOfMass()) if you want to cast the shape in the space it was created)
+	const Mat44					mCenterOfMassStart;					///< Start position and orientation of the center of mass of the shape (construct using sFromWorldTransform if you have a world transform for your shape)
 	const Vec3					mDirection;							///< Direction and length of the cast (anything beyond this length will not be reported as a hit)
 	const AABox					mShapeWorldBounds;					///< Cached shape's world bounds, calculated in constructor
 };
@@ -47,6 +55,8 @@ struct ShapeCast
 class ShapeCastSettings : public CollideSettingsBase
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// How backfacing triangles should be treated (should we report moving out of a triangle?)
 	EBackFaceMode				mBackFaceModeTriangles				= EBackFaceMode::IgnoreBackFaces;
 
@@ -64,6 +74,8 @@ public:
 class ShapeCastResult : public CollideShapeResult
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Default constructor
 								ShapeCastResult() = default;
 
@@ -86,8 +98,37 @@ public:
 	/// Function required by the CollisionCollector. A smaller fraction is considered to be a 'better hit'. For rays/cast shapes we can just use the collision fraction. The fraction and penetration depth are combined in such a way that deeper hits at fraction 0 go first.
 	inline float				GetEarlyOutFraction() const			{ return mFraction > 0.0f? mFraction : -mPenetrationDepth; }
 
+	/// Reverses the hit result, swapping contact point 1 with contact point 2 etc.
+	/// @param inWorldSpaceCastDirection Direction of the shape cast in world space
+	ShapeCastResult				Reversed(Vec3Arg inWorldSpaceCastDirection) const
+	{
+		// Calculate by how much to shift the contact points
+		Vec3 delta = mFraction * inWorldSpaceCastDirection;
+
+		ShapeCastResult result;
+		result.mContactPointOn2 = mContactPointOn1 - delta;
+		result.mContactPointOn1 = mContactPointOn2 - delta;
+		result.mPenetrationAxis = -mPenetrationAxis;
+		result.mPenetrationDepth = mPenetrationDepth;
+		result.mSubShapeID2 = mSubShapeID1;
+		result.mSubShapeID1 = mSubShapeID2;
+		result.mBodyID2 = mBodyID2;
+		result.mFraction = mFraction;
+		result.mIsBackFaceHit = mIsBackFaceHit;
+
+		result.mShape2Face.resize(mShape1Face.size());
+		for (Face::size_type i = 0; i < mShape1Face.size(); ++i)
+			result.mShape2Face[i] = mShape1Face[i] - delta;
+
+		result.mShape1Face.resize(mShape2Face.size());
+		for (Face::size_type i = 0; i < mShape2Face.size(); ++i)
+			result.mShape1Face[i] = mShape2Face[i] - delta;
+
+		return result;
+	}
+
 	float						mFraction;							///< This is the fraction where the shape hit the other shape: CenterOfMassOnHit = Start + value * (End - Start)
 	bool						mIsBackFaceHit;						///< True if the shape was hit from the back side
 };
 
-} // JPH
+JPH_NAMESPACE_END

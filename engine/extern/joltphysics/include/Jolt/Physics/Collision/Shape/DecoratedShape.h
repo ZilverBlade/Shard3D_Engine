@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Class that constructs a DecoratedShape
 class DecoratedShapeSettings : public ShapeSettings
@@ -27,6 +27,8 @@ class DecoratedShapeSettings : public ShapeSettings
 class DecoratedShape : public Shape
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 	explicit						DecoratedShape(EShapeSubType inSubType) : Shape(EShapeType::Decorated, inSubType) { }
 									DecoratedShape(EShapeSubType inSubType, const Shape *inInnerShape) : Shape(EShapeType::Decorated, inSubType), mInnerShape(inInnerShape) { }
@@ -38,6 +40,9 @@ public:
 	// See Shape::MustBeStatic
 	virtual bool					MustBeStatic() const override							{ return mInnerShape->MustBeStatic(); }
 
+	// See Shape::GetCenterOfMass
+	virtual Vec3					GetCenterOfMass() const override						{ return mInnerShape->GetCenterOfMass(); }
+
 	// See Shape::GetSubShapeIDBitsRecursive
 	virtual uint					GetSubShapeIDBitsRecursive() const override				{ return mInnerShape->GetSubShapeIDBitsRecursive(); }
 
@@ -45,7 +50,7 @@ public:
 	virtual const PhysicsMaterial *	GetMaterial(const SubShapeID &inSubShapeID) const override;
 
 	// See Shape::GetSubShapeUserData
-	virtual uint32					GetSubShapeUserData(const SubShapeID &inSubShapeID) const override;
+	virtual uint64					GetSubShapeUserData(const SubShapeID &inSubShapeID) const override;
 
 	// See Shape
 	virtual void					SaveSubShapeState(ShapeList &outSubShapes) const override;
@@ -58,4 +63,4 @@ protected:
 	RefConst<Shape>					mInnerShape;
 };
 
-} // JPH
+JPH_NAMESPACE_END

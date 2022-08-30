@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <TriangleSplitter/TriangleSplitter.h>
-#include <Geometry/AABox.h>
-#include <Core/NonCopyable.h>
+#include <Jolt/TriangleSplitter/TriangleSplitter.h>
+#include <Jolt/Geometry/AABox.h>
+#include <Jolt/Core/NonCopyable.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 struct AABBTreeBuilderStats
 {
@@ -38,6 +38,8 @@ public:
 	class Node : public NonCopyable
 	{
 	public:
+		JPH_OVERRIDE_NEW_DELETE
+
 		/// Constructor
 							Node();
 							~Node();
@@ -70,7 +72,7 @@ public:
 		float				CalculateSAHCost(float inCostTraversal, float inCostLeaf) const;
 
 		/// Recursively get children (breadth first) to get in total inN children (or less if there are no more)
-		void				GetNChildren(uint inN, vector<const Node *> &outChildren) const;
+		void				GetNChildren(uint inN, Array<const Node *> &outChildren) const;
 
 		/// Bounding box
 		AABox				mBounds;
@@ -104,4 +106,4 @@ private:
 	const uint				mMaxTrianglesPerLeaf;
 };
 
-} // JPH
+JPH_NAMESPACE_END

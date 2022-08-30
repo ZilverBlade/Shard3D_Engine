@@ -1,19 +1,22 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Body/BodyCreationSettings.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_NON_VIRTUAL(BodyCreationSettings)
 {
 	JPH_ADD_ATTRIBUTE(BodyCreationSettings, mPosition)
 	JPH_ADD_ATTRIBUTE(BodyCreationSettings, mRotation)
+	JPH_ADD_ATTRIBUTE(BodyCreationSettings, mLinearVelocity)
+	JPH_ADD_ATTRIBUTE(BodyCreationSettings, mAngularVelocity)
+	JPH_ADD_ATTRIBUTE(BodyCreationSettings, mUserData)
 	JPH_ADD_ATTRIBUTE(BodyCreationSettings, mShape)
 	JPH_ADD_ATTRIBUTE(BodyCreationSettings, mCollisionGroup)
 	JPH_ADD_ENUM_ATTRIBUTE(BodyCreationSettings, mObjectLayer)
@@ -37,6 +40,8 @@ void BodyCreationSettings::SaveBinaryState(StreamOut &inStream) const
 {
 	inStream.Write(mPosition);
 	inStream.Write(mRotation);
+	inStream.Write(mLinearVelocity);
+	inStream.Write(mAngularVelocity);
 	mCollisionGroup.SaveBinaryState(inStream);
 	inStream.Write(mObjectLayer);
 	inStream.Write(mMotionType);
@@ -59,6 +64,8 @@ void BodyCreationSettings::RestoreBinaryState(StreamIn &inStream)
 {
 	inStream.Read(mPosition);
 	inStream.Read(mRotation);
+	inStream.Read(mLinearVelocity);
+	inStream.Read(mAngularVelocity);
 	mCollisionGroup.RestoreBinaryState(inStream);
 	inStream.Read(mObjectLayer);
 	inStream.Read(mMotionType);
@@ -244,4 +251,4 @@ BodyCreationSettings::BCSResult BodyCreationSettings::sRestoreWithChildren(Strea
 	return result;
 }
 
-} // JPH
+JPH_NAMESPACE_END

@@ -1,23 +1,24 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/ConeConstraint.h>
-#include <Physics/Body/Body.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Constraints/ConeConstraint.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(ConeConstraintSettings)
 {
 	JPH_ADD_BASE_CLASS(ConeConstraintSettings, TwoBodyConstraintSettings)
 
+	JPH_ADD_ENUM_ATTRIBUTE(ConeConstraintSettings, mSpace)
 	JPH_ADD_ATTRIBUTE(ConeConstraintSettings, mPoint1)
 	JPH_ADD_ATTRIBUTE(ConeConstraintSettings, mTwistAxis1)
 	JPH_ADD_ATTRIBUTE(ConeConstraintSettings, mPoint2)
@@ -29,6 +30,7 @@ void ConeConstraintSettings::SaveBinaryState(StreamOut &inStream) const
 { 
 	ConstraintSettings::SaveBinaryState(inStream);
 
+	inStream.Write(mSpace);
 	inStream.Write(mPoint1);
 	inStream.Write(mTwistAxis1);
 	inStream.Write(mPoint2);
@@ -40,6 +42,7 @@ void ConeConstraintSettings::RestoreBinaryState(StreamIn &inStream)
 {
 	ConstraintSettings::RestoreBinaryState(inStream);
 
+	inStream.Read(mSpace);
 	inStream.Read(mPoint1);
 	inStream.Read(mTwistAxis1);
 	inStream.Read(mPoint2);
@@ -53,24 +56,34 @@ TwoBodyConstraint *ConeConstraintSettings::Create(Body &inBody1, Body &inBody2) 
 }
 
 ConeConstraint::ConeConstraint(Body &inBody1, Body &inBody2, const ConeConstraintSettings &inSettings) :
-	TwoBodyConstraint(inBody1, inBody2, inSettings)
+	TwoBodyConstraint(inBody1, inBody2, inSettings),
+	mLocalSpacePosition1(inSettings.mPoint1),
+	mLocalSpacePosition2(inSettings.mPoint2),
+	mLocalSpaceTwistAxis1(inSettings.mTwistAxis1),
+	mLocalSpaceTwistAxis2(inSettings.mTwistAxis2)
 {
-	Mat44 inv_transform1 = inBody1.GetInverseCenterOfMassTransform();
-	Mat44 inv_transform2 = inBody2.GetInverseCenterOfMassTransform();
-
-	// Store local positions
-	mLocalSpacePosition1 = inv_transform1 * inSettings.mPoint1;
-	mLocalSpacePosition2 = inv_transform2 * inSettings.mPoint2;
-
-	// Store axis
-	mLocalSpaceTwistAxis1 = inv_transform1.Multiply3x3(inSettings.mTwistAxis1);
-	mLocalSpaceTwistAxis2 = inv_transform2.Multiply3x3(inSettings.mTwistAxis2);
-
 	// Store limits
 	SetHalfConeAngle(inSettings.mHalfConeAngle);
 
 	// Initialize rotation axis to perpendicular of twist axis in case the angle between the twist axis is 0 in the first frame
 	mWorldSpaceRotationAxis = inSettings.mTwistAxis1.GetNormalizedPerpendicular();
+
+	if (inSettings.mSpace == EConstraintSpace::WorldSpace)
+	{
+		// If all properties were specified in world space, take them to local space now
+		Mat44 inv_transform1 = inBody1.GetInverseCenterOfMassTransform();
+		mLocalSpacePosition1 = inv_transform1 * mLocalSpacePosition1;
+		mLocalSpaceTwistAxis1 = inv_transform1.Multiply3x3(mLocalSpaceTwistAxis1);
+
+		Mat44 inv_transform2 = inBody2.GetInverseCenterOfMassTransform();
+		mLocalSpacePosition2 = inv_transform2 * mLocalSpacePosition2;
+		mLocalSpaceTwistAxis2 = inv_transform2.Multiply3x3(mLocalSpaceTwistAxis2);
+	}
+	else
+	{
+		// If they were in local space, we need to take the initial rotation axis to world space
+		mWorldSpaceRotationAxis = inBody1.GetRotation() * mWorldSpaceRotationAxis;
+	}
 }
 
 void ConeConstraint::CalculateRotationConstraintProperties(float inDeltaTime, Mat44Arg inRotation1, Mat44Arg inRotation2)
@@ -162,7 +175,7 @@ void ConeConstraint::DrawConstraintLimits(DebugRenderer *inRenderer) const
 	Vec3 twist_axis1 = transform1.Multiply3x3(mLocalSpaceTwistAxis1);
 	Vec3 normal_axis1 = transform1.Multiply3x3(mLocalSpaceTwistAxis1.GetNormalizedPerpendicular());
 
-	inRenderer->DrawOpenCone(position1, twist_axis1, normal_axis1, acos(mCosHalfConeAngle), mDrawConstraintSize * mCosHalfConeAngle, Color::sPurple, DebugRenderer::ECastShadow::Off);
+	inRenderer->DrawOpenCone(position1, twist_axis1, normal_axis1, ACos(mCosHalfConeAngle), mDrawConstraintSize * mCosHalfConeAngle, Color::sPurple, DebugRenderer::ECastShadow::Off);
 }
 #endif // JPH_DEBUG_RENDERER
 
@@ -184,6 +197,19 @@ void ConeConstraint::RestoreState(StateRecorder &inStream)
 	inStream.Read(mWorldSpaceRotationAxis);
 }
 
+Ref<ConstraintSettings> ConeConstraint::GetConstraintSettings() const
+{
+	ConeConstraintSettings *settings = new ConeConstraintSettings;
+	ToConstraintSettings(*settings);
+	settings->mSpace = EConstraintSpace::LocalToBodyCOM;
+	settings->mPoint1 = mLocalSpacePosition1;
+	settings->mTwistAxis1 = mLocalSpaceTwistAxis1;
+	settings->mPoint2 = mLocalSpacePosition2;
+	settings->mTwistAxis2 = mLocalSpaceTwistAxis2;
+	settings->mHalfConeAngle = ACos(mCosHalfConeAngle);
+	return settings;
+}
+
 Mat44 ConeConstraint::GetConstraintToBody1Matrix() const 
 { 
 	Vec3 perp = mLocalSpaceTwistAxis1.GetNormalizedPerpendicular(); 
@@ -200,4 +226,4 @@ Mat44 ConeConstraint::GetConstraintToBody2Matrix() const
 	return Mat44(Vec4(mLocalSpaceTwistAxis2, 0), Vec4(perp, 0), Vec4(perp2, 0), Vec4(mLocalSpacePosition2, 1)); 
 }
 
-} // JPH
+JPH_NAMESPACE_END

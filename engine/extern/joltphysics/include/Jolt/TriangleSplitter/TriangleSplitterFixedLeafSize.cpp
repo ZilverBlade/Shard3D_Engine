@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <TriangleSplitter/TriangleSplitterFixedLeafSize.h>
-#include <TriangleGrouper/TriangleGrouperClosestCentroid.h>
+#include <Jolt/TriangleSplitter/TriangleSplitterFixedLeafSize.h>
+#include <Jolt/TriangleGrouper/TriangleGrouperClosestCentroid.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 TriangleSplitterFixedLeafSize::TriangleSplitterFixedLeafSize(const VertexList &inVertices, const IndexedTriangleList &inTriangles, uint inLeafSize, uint inMinNumBins, uint inMaxNumBins, uint inNumTrianglesPerBin) :
 	TriangleSplitter(inVertices, inTriangles),
@@ -53,7 +53,7 @@ bool TriangleSplitterFixedLeafSize::Split(const Range &inTriangles, Range &outLe
 
 	// Bin in all dimensions
 	uint num_bins = Clamp(inTriangles.Count() / mNumTrianglesPerBin, mMinNumBins, mMaxNumBins);	
-	vector<Bin> bins(num_bins);
+	Array<Bin> bins(num_bins);
 	for (uint dim = 0; dim < 3; ++dim)
 	{
 		float bounds_min = centroid_bounds.mMin[dim];
@@ -117,7 +117,7 @@ bool TriangleSplitterFixedLeafSize::Split(const Range &inTriangles, Range &outLe
 		for (uint b = 1; b < num_bins; ++b) // Start at 1 since selecting bin 0 would result in everything ending up on the right side
 		{
 			// Calculate surface area heuristic and see if it is better than the current best
-			Bin &bin = bins[b];
+			const Bin &bin = bins[b];
 			float cp = bin.mBoundsAccumulatedLeft.GetSurfaceArea() * bin.mNumTrianglesAccumulatedLeft + bin.mBoundsAccumulatedRight.GetSurfaceArea() * bin.mNumTrianglesAccumulatedRight;
 			if (cp < best_cp)
 			{
@@ -166,4 +166,4 @@ bool TriangleSplitterFixedLeafSize::Split(const Range &inTriangles, Range &outLe
 	return true;
 }
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <Core/Reference.h>
-#include <Core/NonCopyable.h>
-#include <Core/Result.h>
-#include <ObjectStream/SerializableObject.h>
+#include <Jolt/Core/Reference.h>
+#include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Core/Result.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class IslandBuilder;
 class BodyManager;
@@ -19,7 +19,15 @@ class StreamOut;
 class DebugRenderer;
 #endif // JPH_DEBUG_RENDERER
 
+/// Enum to identify constraint type
 enum class EConstraintType
+{
+	Constraint,
+	TwoBodyConstraint,
+};
+
+/// Enum to identify constraint sub type
+enum class EConstraintSubType
 {
 	Fixed,
 	Point,
@@ -31,6 +39,8 @@ enum class EConstraintType
 	SixDOF,
 	Path,
 	Vehicle,
+	RackAndPinion,
+	Gear,
 
 	/// User defined constraint types start here
 	User1,
@@ -39,8 +49,15 @@ enum class EConstraintType
 	User4
 };
 
+/// Certain constraints support setting them up in local or world space. This governs what is used.
+enum class EConstraintSpace
+{
+	LocalToBodyCOM,				///< All constraint properties are specified in local space to center of mass of the bodies that are being constrained (so e.g. 'constraint position 1' will be local to body 1 COM, 'constraint position 2' will be local to body 2 COM). Note that this means you need to subtract Shape::GetCenterOfMass() from positions!
+	WorldSpace,					///< All constraint properties are specified in world space
+};
+
 /// Class used to store the configuration of a constraint. Allows run-time creation of constraints.
-class ConstraintSettings : public SerializableObject, public RefTarget<ConstraintSettings>, public NonCopyable
+class ConstraintSettings : public SerializableObject, public RefTarget<ConstraintSettings>
 {
 public:
 	JPH_DECLARE_SERIALIZABLE_VIRTUAL(ConstraintSettings)
@@ -53,6 +70,9 @@ public:
 	/// Creates a constraint of the correct type and restores its contents from the binary stream inStream.
 	static ConstraintResult		sRestoreFromBinaryState(StreamIn &inStream);
 
+	/// If this constraint is enabled initially. Use Constraint::SetEnabled to toggle after creation.
+	bool						mEnabled = true;
+
 	/// Size of constraint when drawing it through the debug renderer
 	float						mDrawConstraintSize = 1.0f;
 
@@ -62,14 +82,17 @@ protected:
 };
 
 /// Base class for all physics constraints. A constraint removes one or more degrees of freedom for a rigid body.
-class Constraint : public RefTarget<Constraint>
+class Constraint : public RefTarget<Constraint>, public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
-	explicit					Constraint([[maybe_unused]] const ConstraintSettings &inSettings)
+	explicit					Constraint(const ConstraintSettings &inSettings) :
 #ifdef JPH_DEBUG_RENDERER
-									: mDrawConstraintSize(inSettings.mDrawConstraintSize)
+		mDrawConstraintSize(inSettings.mDrawConstraintSize),
 #endif // JPH_DEBUG_RENDERER
+		mEnabled(inSettings.mEnabled)
 	{
 	}
 
@@ -77,10 +100,14 @@ public:
 	virtual						~Constraint() = default;
 
 	/// Get the type of a constraint
-	virtual EConstraintType		GetType() const = 0;
+	virtual EConstraintType		GetType() const								{ return EConstraintType::Constraint; }
 
-	/// Enable / disable this constraint. This can e.g. be used to implement a breakable constraint by detecting that the constraint impulse went over a certain limit and then disabling the constraint. 
-	/// Note that although a disabled constraint will not affect the simulation in any way anymore, it does incur some processing overhead. 
+	/// Get the sub type of a constraint
+	virtual EConstraintSubType	GetSubType() const = 0;
+
+	/// Enable / disable this constraint. This can e.g. be used to implement a breakable constraint by detecting that the constraint impulse
+	/// (see e.g. PointConstraint::GetTotalLambdaPosition) went over a certain limit and then disabling the constraint.
+	/// Note that although a disabled constraint will not affect the simulation in any way anymore, it does incur some processing overhead.
 	/// Alternatively you can remove a constraint from the constraint manager (which may be more costly if you want to disable the constraint for a short while).
 	void						SetEnabled(bool inEnabled)					{ mEnabled = inEnabled; }
 
@@ -116,7 +143,13 @@ public:
 	/// Restoring state for replay
 	virtual void				RestoreState(StateRecorder &inStream);
 
+	/// Debug function to convert a constraint to its settings, note that this will not save to which bodies the constraint is connected to
+	virtual Ref<ConstraintSettings> GetConstraintSettings() const = 0;
+
 protected:
+	/// Helper function to copy settings back to constraint settings for this base class
+	void						ToConstraintSettings(ConstraintSettings &outSettings) const;
+
 #ifdef JPH_DEBUG_RENDERER
 	/// Size of constraint when drawing it through the debug renderer
 	float						mDrawConstraintSize;
@@ -135,4 +168,4 @@ private:
 	bool						mEnabled = true;
 };
 
-} // JPH
+JPH_NAMESPACE_END

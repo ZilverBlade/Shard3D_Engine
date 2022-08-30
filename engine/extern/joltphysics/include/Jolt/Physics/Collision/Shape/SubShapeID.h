@@ -3,12 +3,14 @@
 
 #pragma once
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// A sub shape id contains a path to an element (usually a triangle or other primitive type) of a compound shape
 class SubShapeID
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Underlying storage type
 	using Type = uint32;
 
@@ -50,6 +52,18 @@ public:
 	inline bool			IsEmpty() const
 	{
 		return mValue == cEmpty;
+	}
+
+	/// Check equal
+	inline bool			operator == (const SubShapeID &inRHS) const
+	{
+		return mValue == inRHS.mValue;
+	}
+
+	/// Check not-equal
+	inline bool			operator != (const SubShapeID &inRHS) const
+	{
+		return mValue != inRHS.mValue;
 	}
 
 private:
@@ -108,4 +122,4 @@ private:
 	uint				mCurrentBit = 0;
 };
 
-} // JPH
+JPH_NAMESPACE_END

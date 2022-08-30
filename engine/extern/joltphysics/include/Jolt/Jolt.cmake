@@ -8,7 +8,6 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/AABBTree/AABBTreeToBuffer.h
 	${JOLT_PHYSICS_ROOT}/AABBTree/NodeCodec/NodeCodecQuadTreeHalfFloat.h
 	${JOLT_PHYSICS_ROOT}/AABBTree/TriangleCodec/TriangleCodecIndexed8BitPackSOA4Flags.h
-	${JOLT_PHYSICS_ROOT}/Core/AlignedAllocator.h
 	${JOLT_PHYSICS_ROOT}/Core/Atomics.h
 	${JOLT_PHYSICS_ROOT}/Core/ByteBuffer.h
 	${JOLT_PHYSICS_ROOT}/Core/Color.cpp
@@ -22,6 +21,7 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Core/FPException.h
 	${JOLT_PHYSICS_ROOT}/Core/FPFlushDenormals.h
 	${JOLT_PHYSICS_ROOT}/Core/HashCombine.h
+	${JOLT_PHYSICS_ROOT}/Core/InsertionSort.h
 	${JOLT_PHYSICS_ROOT}/Core/IssueReporting.cpp
 	${JOLT_PHYSICS_ROOT}/Core/IssueReporting.h
 	${JOLT_PHYSICS_ROOT}/Core/JobSystem.h
@@ -40,6 +40,7 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Core/Profiler.cpp
 	${JOLT_PHYSICS_ROOT}/Core/Profiler.h
 	${JOLT_PHYSICS_ROOT}/Core/Profiler.inl
+	${JOLT_PHYSICS_ROOT}/Core/QuickSort.h
 	${JOLT_PHYSICS_ROOT}/Core/Reference.h
 	${JOLT_PHYSICS_ROOT}/Core/Result.h
 	${JOLT_PHYSICS_ROOT}/Core/RTTI.cpp
@@ -50,9 +51,14 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Core/StreamWrapper.h
 	${JOLT_PHYSICS_ROOT}/Core/StringTools.cpp
 	${JOLT_PHYSICS_ROOT}/Core/StringTools.h
+	${JOLT_PHYSICS_ROOT}/Core/STLAlignedAllocator.h
+	${JOLT_PHYSICS_ROOT}/Core/STLAllocator.h
+	${JOLT_PHYSICS_ROOT}/Core/STLTempAllocator.h
 	${JOLT_PHYSICS_ROOT}/Core/TempAllocator.h
 	${JOLT_PHYSICS_ROOT}/Core/TickCounter.cpp
 	${JOLT_PHYSICS_ROOT}/Core/TickCounter.h
+	${JOLT_PHYSICS_ROOT}/Core/UnorderedMap.h
+	${JOLT_PHYSICS_ROOT}/Core/UnorderedSet.h
 	${JOLT_PHYSICS_ROOT}/Geometry/AABox.h
 	${JOLT_PHYSICS_ROOT}/Geometry/AABox4.h
 	${JOLT_PHYSICS_ROOT}/Geometry/ClipPoly.h
@@ -101,6 +107,7 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Math/Quat.h
 	${JOLT_PHYSICS_ROOT}/Math/Quat.inl
 	${JOLT_PHYSICS_ROOT}/Math/Swizzle.h
+	${JOLT_PHYSICS_ROOT}/Math/Trigonometry.h
 	${JOLT_PHYSICS_ROOT}/Math/UVec4.cpp
 	${JOLT_PHYSICS_ROOT}/Math/UVec4.h
 	${JOLT_PHYSICS_ROOT}/Math/UVec4.inl
@@ -164,6 +171,10 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Physics/Body/MotionType.h
 	${JOLT_PHYSICS_ROOT}/Physics/Character/Character.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Character/Character.h
+	${JOLT_PHYSICS_ROOT}/Physics/Character/CharacterBase.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/Character/CharacterBase.h
+	${JOLT_PHYSICS_ROOT}/Physics/Character/CharacterVirtual.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/Character/CharacterVirtual.h
 	${JOLT_PHYSICS_ROOT}/Physics/Collision/AABoxCast.h
 	${JOLT_PHYSICS_ROOT}/Physics/Collision/ActiveEdgeMode.h
 	${JOLT_PHYSICS_ROOT}/Physics/Collision/ActiveEdges.h
@@ -270,8 +281,10 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/AngleConstraintPart.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/AxisConstraintPart.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/DualAxisConstraintPart.h
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/GearConstraintPart.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/HingeRotationConstraintPart.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/PointConstraintPart.h
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/RackAndPinionConstraintPart.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/RotationQuatConstraintPart.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/ConstraintPart/SpringPart.h
@@ -282,6 +295,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/DistanceConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/FixedConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/FixedConstraint.h
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/GearConstraint.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/GearConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/HingeConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/HingeConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/MotorSettings.cpp
@@ -294,6 +309,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/PathConstraintPathHermite.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/PointConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/PointConstraint.h
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/RackAndPinionConstraint.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/RackAndPinionConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SixDOFConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SixDOFConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SliderConstraint.cpp
@@ -302,6 +319,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SwingTwistConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/TwoBodyConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/TwoBodyConstraint.h
+	${JOLT_PHYSICS_ROOT}/Physics/DeterminismLog.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/DeterminismLog.h
 	${JOLT_PHYSICS_ROOT}/Physics/EActivation.h
 	${JOLT_PHYSICS_ROOT}/Physics/IslandBuilder.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/IslandBuilder.h
@@ -354,6 +373,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Skeleton/SkeletalAnimation.h
 	${JOLT_PHYSICS_ROOT}/Skeleton/Skeleton.cpp
 	${JOLT_PHYSICS_ROOT}/Skeleton/Skeleton.h
+	${JOLT_PHYSICS_ROOT}/Skeleton/SkeletonMapper.cpp
+	${JOLT_PHYSICS_ROOT}/Skeleton/SkeletonMapper.h
 	${JOLT_PHYSICS_ROOT}/Skeleton/SkeletonPose.cpp
 	${JOLT_PHYSICS_ROOT}/Skeleton/SkeletonPose.h
 	${JOLT_PHYSICS_ROOT}/TriangleGrouper/TriangleGrouper.h
@@ -380,16 +401,16 @@ if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
 	set(JOLT_PHYSICS_SRC_FILES ${JOLT_PHYSICS_SRC_FILES} ${JOLT_PHYSICS_ROOT}/Jolt.natvis)
 endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	# Enable Precompiled Headers for Jolt
-	set_source_files_properties(${JOLT_PHYSICS_SRC_FILES} PROPERTIES COMPILE_FLAGS "/YuJolt.h")
-	set(JOLT_PHYSICS_SRC_FILES ${JOLT_PHYSICS_SRC_FILES} ${JOLT_PHYSICS_ROOT}/pch.cpp)	
-	set_source_files_properties(${JOLT_PHYSICS_ROOT}/pch.cpp PROPERTIES COMPILE_FLAGS "/YcJolt.h")
-endif()
-
 # Group source files
 source_group(TREE ${JOLT_PHYSICS_ROOT} FILES ${JOLT_PHYSICS_SRC_FILES})
 
 # Create Jolt lib
 add_library(Jolt STATIC ${JOLT_PHYSICS_SRC_FILES})
-target_include_directories(Jolt PUBLIC ${JOLT_PHYSICS_ROOT})
+target_include_directories(Jolt PUBLIC ${PHYSICS_REPO_ROOT})
+target_precompile_headers(Jolt PRIVATE ${JOLT_PHYSICS_ROOT}/Jolt.h)
+target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:Debug>:_DEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
+target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:Release>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
+target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:Distribution>:NDEBUG>")
+target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:ReleaseASAN>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DISABLE_TEMP_ALLOCATOR;JPH_DISABLE_CUSTOM_ALLOCATOR;JPH_DEBUG_RENDERER>")
+target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:ReleaseUBSAN>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
+target_compile_definitions(Jolt PUBLIC "$<$<CONFIG:ReleaseCoverage>:NDEBUG>")

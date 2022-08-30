@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <Physics/PhysicsSettings.h>
-#include <Physics/Body/Body.h>
-#include <Physics/Constraints/ConstraintPart/SpringPart.h>
-#include <Physics/StateRecorder.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/SpringPart.h>
+#include <Jolt/Physics/StateRecorder.h>
+#include <Jolt/Physics/DeterminismLog.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Constraint that constrains motion along 1 axis
 ///
@@ -125,6 +125,8 @@ public:
 
 		// Calculate effective mass and spring properties
 		mSpringPart.CalculateSpringProperties(inDeltaTime, inv_effective_mass, inBias, inC, inFrequency, inDamping, mEffectiveMass);
+
+		JPH_DET_LOG("TemplatedCalculateConstraintProperties: dt: " << inDeltaTime << " invI1: " << inInvI1 << " r1PlusU: " << inR1PlusU << " invI2: " << inInvI2 << " r2: " << inR2 << " bias: " << inBias << ", c: " << inC << ", frequency: " << inFrequency << ", damping: " << inDamping << " r1PlusUxAxis: " << mR1PlusUxAxis << " r2xAxis: " << mR2xAxis << " invI1_R1PlusUxAxis: " << mInvI1_R1PlusUxAxis << " invI2_R2xAxis: " << mInvI2_R2xAxis << " effectiveMass: " << mEffectiveMass << " totalLambda: " << mTotalLambda);
 	}
 
 	/// Calculate properties used during the functions below
@@ -324,7 +326,7 @@ public:
 	/// @param inWorldSpaceAxis Axis along which the constraint acts (normalized)
 	/// @param inC Value of the constraint equation (C)
 	/// @param inBaumgarte Baumgarte constant (fraction of the error to correct)
-	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, Vec3Arg inWorldSpaceAxis, float inC, float inBaumgarte)
+	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, Vec3Arg inWorldSpaceAxis, float inC, float inBaumgarte) const
 	{
 		// Only apply position constraint when the constraint is hard, otherwise the velocity bias will fix the constraint
 		if (inC != 0.0f && !mSpringPart.IsActive())
@@ -401,4 +403,4 @@ private:
 	float						mTotalLambda = 0.0f;
 };
 
-} // JPH
+JPH_NAMESPACE_END

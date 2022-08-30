@@ -1,15 +1,16 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/ConstraintManager.h>
-#include <Physics/IslandBuilder.h>
-#include <Physics/StateRecorder.h>
-#include <Physics/PhysicsLock.h>
-#include <Core/Profiler.h>
+#include <Jolt/Physics/Constraints/ConstraintManager.h>
+#include <Jolt/Physics/IslandBuilder.h>
+#include <Jolt/Physics/StateRecorder.h>
+#include <Jolt/Physics/PhysicsLock.h>
+#include <Jolt/Core/Profiler.h>
+#include <Jolt/Core/QuickSort.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 void ConstraintManager::Add(Constraint **inConstraints, int inNumber)						
 { 
@@ -57,6 +58,14 @@ void ConstraintManager::Remove(Constraint **inConstraints, int inNumber)
 	}
 }
 
+Constraints ConstraintManager::GetConstraints() const
+{
+	UniqueLock lock(mConstraintsMutex, EPhysicsLockTypes::ConstraintsList);
+
+	Constraints copy = mConstraints;
+	return copy;
+}
+
 void ConstraintManager::GetActiveConstraints(uint32 inStartConstraintIdx, uint32 inEndConstraintIdx, Constraint **outActiveConstraints, uint32 &outNumActiveConstraints) const
 {
 	JPH_PROFILE_FUNCTION();
@@ -78,7 +87,7 @@ void ConstraintManager::GetActiveConstraints(uint32 inStartConstraintIdx, uint32
 	outNumActiveConstraints = num_active_constraints;
 }
 
-void ConstraintManager::BuildIslands(Constraint **inActiveConstraints, uint32 inNumActiveConstraints, IslandBuilder &ioBuilder, BodyManager &inBodyManager)
+void ConstraintManager::sBuildIslands(Constraint **inActiveConstraints, uint32 inNumActiveConstraints, IslandBuilder &ioBuilder, BodyManager &inBodyManager)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -89,14 +98,14 @@ void ConstraintManager::BuildIslands(Constraint **inActiveConstraints, uint32 in
 	}
 }
 
-void ConstraintManager::SortConstraints(Constraint **inActiveConstraints, uint32 *inConstraintIdxBegin, uint32 *inConstraintIdxEnd) const
+void ConstraintManager::sSortConstraints(Constraint **inActiveConstraints, uint32 *inConstraintIdxBegin, uint32 *inConstraintIdxEnd)
 {
 	JPH_PROFILE_FUNCTION();
 
-	sort(inConstraintIdxBegin, inConstraintIdxEnd, [inActiveConstraints](uint32 inLHS, uint32 inRHS) { return inActiveConstraints[inLHS]->mConstraintIndex < inActiveConstraints[inRHS]->mConstraintIndex; });
+	QuickSort(inConstraintIdxBegin, inConstraintIdxEnd, [inActiveConstraints](uint32 inLHS, uint32 inRHS) { return inActiveConstraints[inLHS]->mConstraintIndex < inActiveConstraints[inRHS]->mConstraintIndex; });
 }
 
-void ConstraintManager::SetupVelocityConstraints(Constraint **inActiveConstraints, uint32 inNumActiveConstraints, float inDeltaTime)
+void ConstraintManager::sSetupVelocityConstraints(Constraint **inActiveConstraints, uint32 inNumActiveConstraints, float inDeltaTime)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -104,7 +113,7 @@ void ConstraintManager::SetupVelocityConstraints(Constraint **inActiveConstraint
 		(*c)->SetupVelocityConstraint(inDeltaTime);
 }
 
-void ConstraintManager::SetupVelocityConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime)
+void ConstraintManager::sSetupVelocityConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -115,7 +124,7 @@ void ConstraintManager::SetupVelocityConstraints(Constraint **inActiveConstraint
 	}
 }
 
-void ConstraintManager::WarmStartVelocityConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inWarmStartImpulseRatio)
+void ConstraintManager::sWarmStartVelocityConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inWarmStartImpulseRatio)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -126,7 +135,7 @@ void ConstraintManager::WarmStartVelocityConstraints(Constraint **inActiveConstr
 	}
 }
 
-bool ConstraintManager::SolveVelocityConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime)
+bool ConstraintManager::sSolveVelocityConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -141,7 +150,7 @@ bool ConstraintManager::SolveVelocityConstraints(Constraint **inActiveConstraint
 	return any_impulse_applied;
 }
 
-bool ConstraintManager::SolvePositionConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime, float inBaumgarte)
+bool ConstraintManager::sSolvePositionConstraints(Constraint **inActiveConstraints, const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime, float inBaumgarte)
 {
 	JPH_PROFILE_FUNCTION();
 
@@ -218,4 +227,4 @@ bool ConstraintManager::RestoreState(StateRecorder &inStream)
 	return true;
 }
 
-} // JPH
+JPH_NAMESPACE_END

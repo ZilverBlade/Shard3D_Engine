@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <Physics/Constraints/TwoBodyConstraint.h>
-#include <Physics/Constraints/MotorSettings.h>
-#include <Physics/Constraints/ConstraintPart/PointConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/HingeRotationConstraintPart.h>
-#include <Physics/Constraints/ConstraintPart/AngleConstraintPart.h>
+#include <Jolt/Physics/Constraints/TwoBodyConstraint.h>
+#include <Jolt/Physics/Constraints/MotorSettings.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/PointConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/HingeRotationConstraintPart.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/AngleConstraintPart.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Hinge constraint settings, used to create a hinge constraint
 class HingeConstraintSettings final : public TwoBodyConstraintSettings
@@ -23,13 +23,16 @@ public:
 	/// Create an an instance of this constraint
 	virtual TwoBodyConstraint *	Create(Body &inBody1, Body &inBody2) const override;
 
-	/// Body 1 constraint reference frame (in world space).
+	/// This determines in which space the constraint is setup, all properties below should be in the specified space
+	EConstraintSpace			mSpace = EConstraintSpace::WorldSpace;
+
+	/// Body 1 constraint reference frame (space determined by mSpace).
 	/// Hinge axis is the axis where rotation is allowed, normal axis defines the 0 angle of the hinge.
 	Vec3						mPoint1 = Vec3::sZero();
 	Vec3						mHingeAxis1 = Vec3::sAxisY();
 	Vec3						mNormalAxis1 = Vec3::sAxisX();
 	
-	/// Body 2 constraint reference frame (in world space)
+	/// Body 2 constraint reference frame (space determined by mSpace)
 	Vec3						mPoint2 = Vec3::sZero();
 	Vec3						mHingeAxis2 = Vec3::sAxisY();
 	Vec3						mNormalAxis2 = Vec3::sAxisX();
@@ -54,11 +57,13 @@ protected:
 class HingeConstraint final : public TwoBodyConstraint
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Construct hinge constraint
 								HingeConstraint(Body &inBody1, Body &inBody2, const HingeConstraintSettings &inSettings);
 
 	// Generic interface of a constraint
-	virtual EConstraintType		GetType() const override								{ return EConstraintType::Hinge; }
+	virtual EConstraintSubType	GetSubType() const override								{ return EConstraintSubType::Hinge; }
 	virtual void				SetupVelocityConstraint(float inDeltaTime) override;
 	virtual void				WarmStartVelocityConstraint(float inWarmStartImpulseRatio) override;
 	virtual bool				SolveVelocityConstraint(float inDeltaTime) override;
@@ -69,10 +74,14 @@ public:
 #endif // JPH_DEBUG_RENDERER
 	virtual void				SaveState(StateRecorder &inStream) const override;
 	virtual void				RestoreState(StateRecorder &inStream) override;
+	virtual Ref<ConstraintSettings> GetConstraintSettings() const override;
 
 	// See: TwoBodyConstraint
 	virtual Mat44				GetConstraintToBody1Matrix() const override;
 	virtual Mat44				GetConstraintToBody2Matrix() const override;
+
+	/// Get the current rotation angle from the rest position
+	float						GetCurrentAngle() const;
 
 	// Friction control
 	void						SetMaxFrictionTorque(float inFrictionTorque)			{ mMaxFrictionTorque = inFrictionTorque; }
@@ -155,4 +164,4 @@ private:
 	AngleConstraintPart			mMotorConstraintPart;
 };
 
-} // JPH
+JPH_NAMESPACE_END

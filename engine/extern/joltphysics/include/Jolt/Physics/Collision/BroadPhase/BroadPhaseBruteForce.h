@@ -3,15 +3,17 @@
 
 #pragma once
 
-#include <Physics/Collision/BroadPhase/BroadPhase.h>
-#include <Core/Mutex.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhase.h>
+#include <Jolt/Core/Mutex.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Test BroadPhase implementation that does not do anything to speed up the operations. Can be used as a reference implementation.
 class BroadPhaseBruteForce final : public BroadPhase
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	// Implementing interface of BroadPhase (see BroadPhase for documentation)
 	virtual void		AddBodiesFinalize(BodyID *ioBodies, int inNumber, AddState inAddState) override;
 	virtual void		RemoveBodies(BodyID *ioBodies, int inNumber) override;
@@ -27,8 +29,8 @@ public:
 	virtual void		FindCollidingPairs(BodyID *ioActiveBodies, int inNumActiveBodies, float inSpeculativeContactDistance, ObjectVsBroadPhaseLayerFilter inObjectVsBroadPhaseLayerFilter, ObjectLayerPairFilter inObjectLayerPairFilter, BodyPairCollector &ioPairCollector) const override;
 
 private:
-	vector<BodyID>		mBodyIDs;
+	Array<BodyID>		mBodyIDs;
 	mutable SharedMutex	mMutex;
 };
 
-} // JPH
+JPH_NAMESPACE_END

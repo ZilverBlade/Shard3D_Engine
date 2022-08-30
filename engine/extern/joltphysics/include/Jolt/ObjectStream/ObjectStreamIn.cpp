@@ -1,17 +1,16 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Core/Factory.h>
-#include <ObjectStream/SerializableAttribute.h>
-#include <ObjectStream/ObjectStreamIn.h>
-#include <ObjectStream/ObjectStreamTextIn.h>
-#include <ObjectStream/ObjectStreamBinaryIn.h>
-#include <ObjectStream/SerializableObject.h>
-#include <unordered_set>
+#include <Jolt/Core/Factory.h>
+#include <Jolt/Core/UnorderedSet.h>
+#include <Jolt/ObjectStream/ObjectStreamIn.h>
+#include <Jolt/ObjectStream/ObjectStreamTextIn.h>
+#include <Jolt/ObjectStream/ObjectStreamBinaryIn.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 ObjectStreamIn::ObjectStreamIn(istream &inStream) :
 	mStream(inStream)
@@ -77,7 +76,7 @@ ObjectStreamIn *ObjectStreamIn::Open(istream &inStream)
 
 void *ObjectStreamIn::Read(const RTTI *inRTTI)
 {
-	using ObjectSet = unordered_set<void *>;
+	using ObjectSet = UnorderedSet<void *>;
 
 	// Read all information on the stream
 	void *main_object = nullptr;
@@ -85,11 +84,11 @@ void *ObjectStreamIn::Read(const RTTI *inRTTI)
 	for (;;)
 	{
 		// Get type of next operation
-		EDataType data_type;
+		EOSDataType data_type;
 		if (!ReadDataType(data_type)) 
 			break;
 
-		if (data_type == EDataType::Declare)
+		if (data_type == EOSDataType::Declare)
 		{	
 			// Read type declaration
 			if (!ReadRTTI()) 
@@ -99,7 +98,7 @@ void *ObjectStreamIn::Read(const RTTI *inRTTI)
 				break;
 			}
 		}
-		else if (data_type == EDataType::Object)
+		else if (data_type == EOSDataType::Object)
 		{	
 			const RTTI *rtti;
 			void *object = ReadObject(rtti);
@@ -160,9 +159,9 @@ void *ObjectStreamIn::Read(const RTTI *inRTTI)
 		}
 
 		// Release unreferenced objects except the main object
-		for (IdentifierMap::const_iterator j = mIdentifierMap.begin(); j != mIdentifierMap.end(); ++j) 
+		for (const IdentifierMap::value_type &j : mIdentifierMap) 
 		{
-			const ObjectInfo &obj_info = j->second;
+			const ObjectInfo &obj_info = j.second;
 
 			if (obj_info.mInstance != main_object) 
 			{
@@ -175,23 +174,14 @@ void *ObjectStreamIn::Read(const RTTI *inRTTI)
 			}
 		}
 
-		// Call OnLoaded callback
-		unordered_set<SerializableObject *> visited_set;
-		OSVisitCompounds(main_object, inRTTI, [&visited_set](const void *inObject, const RTTI *inType) 
-			{ 
-				SerializableObject *so = const_cast<SerializableObject *>(reinterpret_cast<const SerializableObject *>(inType->CastTo(inObject, JPH_RTTI(SerializableObject))));
-				if (so != nullptr && visited_set.insert(so).second)
-					so->OnLoaded(); 
-			});
-
 		return main_object;
 	}
 	else
 	{
 		// Release all objects if a fatal error occurred
-		for (IdentifierMap::iterator i = mIdentifierMap.begin(); i != mIdentifierMap.end(); ++i) 
+		for (const IdentifierMap::value_type &i : mIdentifierMap) 
 		{
-			const ObjectInfo &obj_info = i->second;
+			const ObjectInfo &obj_info = i.second;
 			obj_info.mRTTI->DestructObject(obj_info.mInstance);
 		}
 
@@ -203,7 +193,7 @@ void *ObjectStreamIn::ReadObject(const RTTI *& outRTTI)
 {
 	// Read the object class
 	void *object = nullptr;
-	string class_name;
+	String class_name;
 	if (ReadName(class_name)) 
 	{
 		// Get class description
@@ -229,7 +219,7 @@ void *ObjectStreamIn::ReadObject(const RTTI *& outRTTI)
 					if (ReadClassData(class_desc, object)) 
 					{
 						// Add object to identifier map
-						mIdentifierMap.insert(IdentifierMap::value_type(identifier, ObjectInfo(object, outRTTI)));
+						mIdentifierMap.try_emplace(identifier, object, outRTTI);
 					} 
 					else 
 					{
@@ -260,18 +250,17 @@ void *ObjectStreamIn::ReadObject(const RTTI *& outRTTI)
 bool ObjectStreamIn::ReadRTTI()
 {
 	// Read class name and find it's attribute info
-	string class_name;
+	String class_name;
 	if (!ReadName(class_name)) 
 		return false;
 
 	// Find class 
-	const RTTI *rtti = Factory::sInstance.Find(class_name.c_str());
+	const RTTI *rtti = Factory::sInstance->Find(class_name.c_str());
 	if (rtti == nullptr)
 		Trace("ObjectStreamIn: Unknown class: \"%s\".", class_name.c_str());
 
 	// Insert class description
-	mClassDescriptionMap.insert(ClassDescriptionMap::value_type(class_name, ClassDescription(rtti)));
-	ClassDescription &class_desc = mClassDescriptionMap.find(class_name)->second;
+	ClassDescription &class_desc = mClassDescriptionMap.try_emplace(class_name, rtti).first->second;
 
 	// Read the number of entries in the description
 	uint32 count;
@@ -284,7 +273,7 @@ bool ObjectStreamIn::ReadRTTI()
 		AttributeDescription attribute;
 		
 		// Read name
-		string attribute_name;
+		String attribute_name;
 		if (!ReadName(attribute_name)) 
 			return false;
 		
@@ -293,7 +282,7 @@ bool ObjectStreamIn::ReadRTTI()
 			return false;
 
 		// Read array depth
-		while (attribute.mDataType == EDataType::Array) 
+		while (attribute.mDataType == EOSDataType::Array) 
 		{
 			++attribute.mArrayDepth;
 			if (!ReadDataType(attribute.mDataType)) 
@@ -301,9 +290,9 @@ bool ObjectStreamIn::ReadRTTI()
 		}
 
 		// Read instance/pointer class name
-		if (attribute.mDataType == EDataType::Instance || attribute.mDataType == EDataType::Pointer) 
-			if (!ReadName(attribute.mClassName)) 
-				return false;
+		if ((attribute.mDataType == EOSDataType::Instance || attribute.mDataType == EOSDataType::Pointer) 
+			&& !ReadName(attribute.mClassName)) 
+			return false;
 
 		// Find attribute in rtti
 		if (rtti) 
@@ -311,8 +300,8 @@ bool ObjectStreamIn::ReadRTTI()
 			// Find attribute index
 			for (int idx = 0; idx < rtti->GetAttributeCount(); ++idx)
 			{
-				const SerializableAttribute *attr = DynamicCast<SerializableAttribute, RTTIAttribute>(rtti->GetAttribute(idx));
-				if (attr != nullptr && strcmp(attr->GetName(), attribute_name.c_str()) == 0) 
+				const SerializableAttribute &attr = rtti->GetAttribute(idx);
+				if (strcmp(attr.GetName(), attribute_name.c_str()) == 0) 
 				{
 					attribute.mIndex = idx;
 					break;
@@ -322,8 +311,8 @@ bool ObjectStreamIn::ReadRTTI()
 			// Check if attribute is of expected type
 			if (attribute.mIndex >= 0)
 			{
-				const SerializableAttribute *attr = (const SerializableAttribute *)rtti->GetAttribute(attribute.mIndex);
-				if (!attr->IsType(attribute.mArrayDepth, attribute.mDataType, attribute.mClassName.c_str()))
+				const SerializableAttribute &attr = rtti->GetAttribute(attribute.mIndex);
+				if (!attr.IsType(attribute.mArrayDepth, attribute.mDataType, attribute.mClassName.c_str()))
 					attribute.mIndex = -1;
 			}
 		} 
@@ -355,8 +344,8 @@ bool ObjectStreamIn::ReadClassData(const ClassDescription &inClassDesc, void *in
 		// Read or skip the attribute data
 		if (attr_desc.mIndex >= 0 && inInstance)
 		{
-			const SerializableAttribute *attr = (const SerializableAttribute *)inClassDesc.mRTTI->GetAttribute(attr_desc.mIndex);
-			continue_reading = attr->ReadData(*this, inInstance);
+			const SerializableAttribute &attr = inClassDesc.mRTTI->GetAttribute(attr_desc.mIndex);
+			continue_reading = attr.ReadData(*this, inInstance);
 		}
 		else
 			continue_reading = SkipAttributeData(attr_desc.mArrayDepth, attr_desc.mDataType, attr_desc.mClassName.c_str());
@@ -381,7 +370,7 @@ bool ObjectStreamIn::ReadPointerData(const RTTI *inRTTI, void **inPointer, int i
 		else 
 		{
 			// Put pointer on the list to be resolved later on
-			mUnresolvedLinks.push_back(Link());
+			mUnresolvedLinks.emplace_back();
 			mUnresolvedLinks.back().mPointer = inPointer;
 			mUnresolvedLinks.back().mRefCountOffset = inRefCountOffset;
 			mUnresolvedLinks.back().mIdentifier = identifier;
@@ -394,7 +383,7 @@ bool ObjectStreamIn::ReadPointerData(const RTTI *inRTTI, void **inPointer, int i
 	return false;
 }
 
-bool ObjectStreamIn::SkipAttributeData(int inArrayDepth, EDataType inDataType, const char *inClassName)
+bool ObjectStreamIn::SkipAttributeData(int inArrayDepth, EOSDataType inDataType, const char *inClassName)
 {
 	bool continue_reading = true;
 
@@ -419,7 +408,7 @@ bool ObjectStreamIn::SkipAttributeData(int inArrayDepth, EDataType inDataType, c
 	// Read data for all items
 	if (continue_reading) 
 	{
-		if (inDataType == EDataType::Instance) 
+		if (inDataType == EOSDataType::Instance) 
 		{
 			// Get the class description
 			ClassDescriptionMap::iterator i = mClassDescriptionMap.find(inClassName);
@@ -440,109 +429,109 @@ bool ObjectStreamIn::SkipAttributeData(int inArrayDepth, EDataType inDataType, c
 			{
 				switch (inDataType) 
 				{
-				case EDataType::Pointer:
+				case EOSDataType::Pointer:
 					{	
 						Identifier temporary;
 						continue_reading = ReadIdentifier(temporary);
 						break;
 					}
 
-				case EDataType::T_uint8:
+				case EOSDataType::T_uint8:
 					{	
 						uint8 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 				
-				case EDataType::T_uint16:
+				case EOSDataType::T_uint16:
 					{	
 						uint16 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 				
-				case EDataType::T_int:
+				case EOSDataType::T_int:
 					{	
 						int temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 				
-				case EDataType::T_uint32:
+				case EOSDataType::T_uint32:
 					{	
 						uint32 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 				
-				case EDataType::T_uint64:
+				case EOSDataType::T_uint64:
 					{	
 						uint64 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 				
-				case EDataType::T_float:
+				case EOSDataType::T_float:
 					{	
 						float temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 				
-				case EDataType::T_bool:
+				case EOSDataType::T_bool:
 					{	
 						bool temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 				
-				case EDataType::T_string:
+				case EOSDataType::T_String:
 					{	
-						string temporary;
+						String temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 
-				case EDataType::T_Float3:
+				case EOSDataType::T_Float3:
 					{	
 						Float3 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 
-				case EDataType::T_Vec3:
+				case EOSDataType::T_Vec3:
 					{	
 						Vec3 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 
-				case EDataType::T_Vec4:
+				case EOSDataType::T_Vec4:
 					{	
 						Vec4 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 
-				case EDataType::T_Quat:
+				case EOSDataType::T_Quat:
 					{	
 						Quat temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 
-				case EDataType::T_Mat44:
+				case EOSDataType::T_Mat44:
 					{	
 						Mat44 temporary;
 						continue_reading = ReadPrimitiveData(temporary);
 						break;
 					}
 
-				case EDataType::Array:
-				case EDataType::Object:
-				case EDataType::Declare:
-				case EDataType::Instance:
-				case EDataType::Invalid:
+				case EOSDataType::Array:
+				case EOSDataType::Object:
+				case EOSDataType::Declare:
+				case EOSDataType::Instance:
+				case EOSDataType::Invalid:
 				default:
 					continue_reading = false;
 					break;
@@ -554,14 +543,4 @@ bool ObjectStreamIn::SkipAttributeData(int inArrayDepth, EDataType inDataType, c
 	return continue_reading;
 }
 
-// Define macro to declare functions for a specific primitive type
-#define JPH_DECLARE_PRIMITIVE(name)														\
-	bool	OSReadData(ObjectStreamIn &ioStream, name &outPrimitive)					\
-	{																					\
-		return ioStream.ReadPrimitiveData(outPrimitive);								\
-	}
-
-// This file uses the JPH_DECLARE_PRIMITIVE macro to define all types
-#include <ObjectStream/ObjectStreamTypes.h>
-
-} // JPH
+JPH_NAMESPACE_END

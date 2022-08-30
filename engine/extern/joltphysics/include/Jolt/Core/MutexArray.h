@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Core/NonCopyable.h>
+#include <Jolt/Core/NonCopyable.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// A mutex array protects a number of resources with a limited amount of mutexes.
 /// It uses hashing to find the mutex of a particular object.
@@ -84,6 +84,8 @@ private:
 	/// Align the mutex to a cache line to ensure there is no false sharing (this is platform dependent, we do this to be safe)
 	struct alignas(JPH_CACHE_LINE_SIZE) MutexStorage
 	{
+		JPH_OVERRIDE_NEW_DELETE
+
 		MutexType			mMutex;
 	};
 
@@ -91,5 +93,5 @@ private:
 	uint					mNumMutexes = 0;
 };
 
-} // JPH
+JPH_NAMESPACE_END
 

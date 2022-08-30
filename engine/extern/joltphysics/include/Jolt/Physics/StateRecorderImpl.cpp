@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/StateRecorderImpl.h>
+#include <Jolt/Physics/StateRecorderImpl.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 void StateRecorderImpl::WriteBytes(const void *inData, size_t inNumBytes)
 {
@@ -50,12 +50,12 @@ bool StateRecorderImpl::IsEqual(StateRecorderImpl &inReference)
 {	
 	// Get length of new state
 	mStream.seekg(0, stringstream::end);
-	size_t this_len = mStream.tellg();
+	std::streamoff this_len = mStream.tellg();
 	mStream.seekg(0, stringstream::beg);
 
 	// Get length of old state
 	inReference.mStream.seekg(0, stringstream::end);
-	size_t reference_len = inReference.mStream.tellg();
+	std::streamoff reference_len = inReference.mStream.tellg();
 	inReference.mStream.seekg(0, stringstream::beg);
 
 	// Compare size
@@ -67,7 +67,7 @@ bool StateRecorderImpl::IsEqual(StateRecorderImpl &inReference)
 	}
 
 	// Compare byte by byte
-	for (size_t i = 0, l = this_len; !fail && i < l; ++i)
+	for (std::streamoff i = 0, l = this_len; !fail && i < l; ++i)
 	{
 		fail = inReference.mStream.get() != mStream.get();
 		if (fail)
@@ -80,4 +80,4 @@ bool StateRecorderImpl::IsEqual(StateRecorderImpl &inReference)
 	return true;
 }
 
-} // JPH
+JPH_NAMESPACE_END

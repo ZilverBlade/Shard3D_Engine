@@ -1,19 +1,19 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/PathConstraint.h>
-#include <Physics/Body/Body.h>
-#include <Core/StringTools.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Constraints/PathConstraint.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Core/StringTools.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(PathConstraintSettings)
 {
@@ -62,13 +62,11 @@ TwoBodyConstraint *PathConstraintSettings::Create(Body &inBody1, Body &inBody2) 
 }
 
 PathConstraint::PathConstraint(Body &inBody1, Body &inBody2, const PathConstraintSettings &inSettings) :
-	TwoBodyConstraint(inBody1, inBody2, inSettings)
+	TwoBodyConstraint(inBody1, inBody2, inSettings),
+	mRotationConstraintType(inSettings.mRotationConstraintType),
+	mMaxFrictionForce(inSettings.mMaxFrictionForce),
+	mPositionMotorSettings(inSettings.mPositionMotorSettings)
 {
-	// Copy properties
-	mMaxFrictionForce = inSettings.mMaxFrictionForce;
-	mPositionMotorSettings = inSettings.mPositionMotorSettings;
-	mRotationConstraintType = inSettings.mRotationConstraintType;
-
 	// Calculate transform that takes us from the path start to center of mass space of body 1
 	mPathToBody1 = Mat44::sRotationTranslation(inSettings.mPathRotation, inSettings.mPathPosition - inBody1.GetShape()->GetCenterOfMass());
 
@@ -94,7 +92,7 @@ void PathConstraint::SetPath(const PathConstraintPath *inPath, float inPathFract
 
 		// Calculate initial orientation
 		if (mRotationConstraintType == EPathRotationConstraintType::FullyConstrained)
-			mInvInitialOrientation = RotationQuatConstraintPart::sGetInvInitialOrientation(*mBody1, *mBody2);
+			mInvInitialOrientation = RotationEulerConstraintPart::sGetInvInitialOrientation(*mBody1, *mBody2);
 	}
 }
 
@@ -163,7 +161,7 @@ void PathConstraint::CalculateConstraintProperties(float inDeltaTime)
 		break;
 
 	case EPathRotationConstraintType::ConstaintToPath:
-		// We need to calculate the inverse of the rotation from body 1 to body 2 for the current path position (see: RotationQuatConstraintPart::sGetInvInitialOrientation)
+		// We need to calculate the inverse of the rotation from body 1 to body 2 for the current path position (see: RotationEulerConstraintPart::sGetInvInitialOrientation)
 		// RotationBody2 = RotationBody1 * InitialOrientation <=> InitialOrientation^-1 = RotationBody2^-1 * RotationBody1
 		// We can express RotationBody2 in terms of RotationBody1: RotationBody2 = RotationBody1 * PathToBody1 * RotationClosestPointOnPath * PathToBody2^-1
 		// Combining these two: InitialOrientation^-1 = PathToBody2 * (PathToBody1 * RotationClosestPointOnPath)^-1
@@ -171,7 +169,7 @@ void PathConstraint::CalculateConstraintProperties(float inDeltaTime)
 		[[fallthrough]];
 
 	case EPathRotationConstraintType::FullyConstrained:
-		mRotationConstraintPart.CalculateConstraintProperties(*mBody1, transform1.GetRotation(), *mBody2, transform2.GetRotation(), mInvInitialOrientation);
+		mRotationConstraintPart.CalculateConstraintProperties(*mBody1, transform1.GetRotation(), *mBody2, transform2.GetRotation());
 		break;
 	}
 
@@ -428,4 +426,10 @@ void PathConstraint::RestoreState(StateRecorder &inStream)
 	inStream.Read(mPathFraction);
 }
 
-} // JPH
+Ref<ConstraintSettings> PathConstraint::GetConstraintSettings() const
+{
+	JPH_ASSERT(false); // Not implemented yet
+	return nullptr;
+}
+
+JPH_NAMESPACE_END

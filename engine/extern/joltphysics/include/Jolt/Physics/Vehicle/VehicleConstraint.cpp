@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Vehicle/VehicleConstraint.h>
-#include <Physics/Vehicle/VehicleController.h>
-#include <Physics/PhysicsSystem.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
-#include <Core/Factory.h>
+#include <Jolt/Physics/Vehicle/VehicleConstraint.h>
+#include <Jolt/Physics/Vehicle/VehicleController.h>
+#include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
+#include <Jolt/Core/Factory.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(VehicleConstraintSettings)
 {
@@ -69,7 +69,7 @@ void VehicleConstraintSettings::RestoreBinaryState(StreamIn &inStream)
 
 	uint32 hash = 0;
 	inStream.Read(hash);
-	const RTTI *rtti = Factory::sInstance.Find(hash);
+	const RTTI *rtti = Factory::sInstance->Find(hash);
 	mController = reinterpret_cast<VehicleControllerSettings *>(rtti->CreateObject());
 	mController->RestoreBinaryState(inStream);
 }
@@ -213,7 +213,7 @@ void VehicleConstraint::OnStep(float inDeltaTime, PhysicsSystem &inPhysicsSystem
 
 	// If the wheels are rotating, we don't want to go to sleep yet
 	bool allow_sleep = true;
-	for (Wheel *w : mWheels)
+	for (const Wheel *w : mWheels)
 		if (abs(w->mAngularVelocity) > DegreesToRadians(10.0f))
 			allow_sleep = false;
 	if (mBody->GetAllowSleeping() != allow_sleep)
@@ -223,7 +223,7 @@ void VehicleConstraint::OnStep(float inDeltaTime, PhysicsSystem &inPhysicsSystem
 void VehicleConstraint::BuildIslands(uint32 inConstraintIndex, IslandBuilder &ioBuilder, BodyManager &inBodyManager) 
 {
 	// Find dynamic bodies that our wheels are touching
-	BodyID *body_ids = (BodyID *)alloca((mWheels.size() + 1) * sizeof(BodyID));
+	BodyID *body_ids = (BodyID *)JPH_STACK_ALLOC((mWheels.size() + 1) * sizeof(BodyID));
 	int num_bodies = 0;
 	bool needs_to_activate = false;
 	for (const Wheel *w : mWheels)
@@ -481,4 +481,10 @@ void VehicleConstraint::RestoreState(StateRecorder &inStream)
 	mPitchRollPart.RestoreState(inStream);
 }
 
-} // JPH
+Ref<ConstraintSettings> VehicleConstraint::GetConstraintSettings() const
+{
+	JPH_ASSERT(false); // Not implemented yet
+	return nullptr;
+}
+
+JPH_NAMESPACE_END

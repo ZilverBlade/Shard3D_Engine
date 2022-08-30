@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include <ObjectStream/SerializableObject.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
+#include <Jolt/Core/QuickSort.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class StreamOut;
 class StreamIn;
@@ -38,7 +39,7 @@ public:
 	void				AddPoint(float inX, float inY)					{ mPoints.push_back({ inX, inY }); }
 
 	/// Sort the points on X ascending
-	void				Sort()											{ sort(mPoints.begin(), mPoints.end(), [](const Point &inLHS, const Point &inRHS) { return inLHS.mX < inRHS.mX; }); }
+	void				Sort()											{ QuickSort(mPoints.begin(), mPoints.end(), [](const Point &inLHS, const Point &inRHS) { return inLHS.mX < inRHS.mX; }); }
 
 	/// Get the lowest X value
 	float				GetMinX() const									{ return mPoints.empty()? 0.0f : mPoints.front().mX; }
@@ -58,8 +59,8 @@ public:
 	void				RestoreBinaryState(StreamIn &inStream);
 
 	/// The points on the curve, should be sorted ascending by x
-	using Points = vector<Point>;
+	using Points = Array<Point>;
 	Points				mPoints;
 };
 
-} // JPH
+JPH_NAMESPACE_END

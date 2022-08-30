@@ -1,18 +1,19 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Collision/BroadPhase/BroadPhase.h>
-#include <Physics/Body/Body.h>
-#include <Physics/Body/BodyManager.h>
-#include <Physics/Body/BodyInterface.h>
-#include <Physics/Body/BodyCreationSettings.h>
-#include <Physics/Body/BodyLock.h>
-#include <Physics/Body/BodyLockMulti.h>
-#include <Physics/Collision/PhysicsMaterial.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhase.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/BodyManager.h>
+#include <Jolt/Physics/Body/BodyInterface.h>
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/Body/BodyLock.h>
+#include <Jolt/Physics/Body/BodyLockMulti.h>
+#include <Jolt/Physics/Collision/PhysicsMaterial.h>
+#include <Jolt/Physics/Constraints/TwoBodyConstraint.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 Body *BodyInterface::CreateBody(const BodyCreationSettings &inSettings)
 {
@@ -34,7 +35,7 @@ void BodyInterface::AddBody(const BodyID &inBodyID, EActivation inActivationMode
 	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
 	if (lock.Succeeded())
 	{
-		Body &body = lock.GetBody();
+		const Body &body = lock.GetBody();
 
 		// Add to broadphase
 		BodyID id = inBodyID;
@@ -52,7 +53,7 @@ void BodyInterface::RemoveBody(const BodyID &inBodyID)
 	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
 	if (lock.Succeeded())
 	{
-		Body &body = lock.GetBody();
+		const Body &body = lock.GetBody();
 
 		// Deactivate body
 		if (body.IsActive())
@@ -72,7 +73,7 @@ bool BodyInterface::IsAdded(const BodyID &inBodyID) const
 
 BodyID BodyInterface::CreateAndAddBody(const BodyCreationSettings &inSettings, EActivation inActivationMode)
 {
-	Body *b = CreateBody(inSettings);
+	const Body *b = CreateBody(inSettings);
 	if (b == nullptr)
 		return BodyID(); // Out of bodies
 	AddBody(b->GetID(), inActivationMode);
@@ -117,7 +118,7 @@ void BodyInterface::ActivateBody(const BodyID &inBodyID)
 	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
 	if (lock.Succeeded())
 	{
-		Body &body = lock.GetBody();
+		const Body &body = lock.GetBody();
 
 		if (!body.IsActive())
 			mBodyManager->ActivateBodies(&inBodyID, 1);
@@ -136,17 +137,44 @@ void BodyInterface::DeactivateBody(const BodyID &inBodyID)
 	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
 	if (lock.Succeeded())
 	{
-		Body &body = lock.GetBody();
+		const Body &body = lock.GetBody();
 
 		if (body.IsActive())
 			mBodyManager->DeactivateBodies(&inBodyID, 1);
 	}
 }
 
+void BodyInterface::DeactivateBodies(const BodyID *inBodyIDs, int inNumber)
+{
+	BodyLockMultiWrite lock(*mBodyLockInterface, inBodyIDs, inNumber);
+
+	mBodyManager->DeactivateBodies(inBodyIDs, inNumber);
+}
+
 bool BodyInterface::IsActive(const BodyID &inBodyID) const
 {
 	BodyLockRead lock(*mBodyLockInterface, inBodyID);
 	return lock.Succeeded() && lock.GetBody().IsActive();
+}
+
+TwoBodyConstraint *BodyInterface::CreateConstraint(const TwoBodyConstraintSettings *inSettings, const BodyID &inBodyID1, const BodyID &inBodyID2)
+{
+	BodyID constraint_bodies[] = { inBodyID1, inBodyID2 };
+	BodyLockMultiWrite lock(*mBodyLockInterface, constraint_bodies, 2);
+
+	Body *body1 = lock.GetBody(0);
+	Body *body2 = lock.GetBody(1);
+
+	JPH_ASSERT(body1 != body2);
+	JPH_ASSERT(body1 != nullptr || body2 != nullptr);
+
+	return inSettings->Create(body1 != nullptr? *body1 : Body::sFixedToWorld, body2 != nullptr? *body2 : Body::sFixedToWorld);
+}
+
+void BodyInterface::ActivateConstraint(const TwoBodyConstraint *inConstraint)
+{
+	BodyID bodies[] = { inConstraint->GetBody1()->GetID(), inConstraint->GetBody2()->GetID() };
+	ActivateBodies(bodies, 2);
 }
 
 RefConst<Shape> BodyInterface::GetShape(const BodyID &inBodyID) const
@@ -227,7 +255,8 @@ void BodyInterface::SetObjectLayer(const BodyID &inBodyID, ObjectLayer inLayer)
 		// Check if layer actually changed, updating the broadphase is rather expensive
 		if (body.GetObjectLayer() != inLayer)
 		{
-			body.SetObjectLayerInternal(inLayer);
+			// Update the layer on the body
+			mBodyManager->SetBodyObjectLayerInternal(body, inLayer);
 
 			// Notify broadphase of change
 			if (body.IsInBroadPhase())
@@ -397,6 +426,15 @@ Mat44 BodyInterface::GetWorldTransform(const BodyID &inBodyID) const
 		return Mat44::sIdentity();
 }
 
+Mat44 BodyInterface::GetCenterOfMassTransform(const BodyID &inBodyID) const
+{
+	BodyLockRead lock(*mBodyLockInterface, inBodyID);
+	if (lock.Succeeded())
+		return lock.GetBody().GetCenterOfMassTransform();
+	else
+		return Mat44::sIdentity();
+}
+
 void BodyInterface::MoveKinematic(const BodyID &inBodyID, Vec3Arg inTargetPosition, QuatArg inTargetRotation, float inDeltaTime)
 {
 	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
@@ -490,6 +528,23 @@ void BodyInterface::AddLinearVelocity(const BodyID &inBodyID, Vec3Arg inLinearVe
 	}
 }
 
+void BodyInterface::AddLinearAndAngularVelocity(const BodyID &inBodyID, Vec3Arg inLinearVelocity, Vec3Arg inAngularVelocity)
+{
+	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
+	if (lock.Succeeded())
+	{
+		Body &body = lock.GetBody();
+		if (!body.IsStatic())
+		{
+			body.SetLinearVelocityClamped(body.GetLinearVelocity() + inLinearVelocity);
+			body.SetAngularVelocityClamped(body.GetAngularVelocity() + inAngularVelocity);
+
+			if (!body.IsActive() && (!body.GetLinearVelocity().IsNearZero() || !body.GetAngularVelocity().IsNearZero()))
+				mBodyManager->ActivateBodies(&inBodyID, 1);
+		}
+	}
+}
+
 void BodyInterface::SetAngularVelocity(const BodyID &inBodyID, Vec3Arg inAngularVelocity)
 {
 	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
@@ -530,6 +585,71 @@ Vec3 BodyInterface::GetPointVelocity(const BodyID &inBodyID, Vec3Arg inPoint) co
 	}
 
 	return Vec3::sZero();
+}
+
+void BodyInterface::AddForce(const BodyID &inBodyID, Vec3Arg inForce)
+{
+	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
+	if (lock.Succeeded())
+	{
+		Body &body = lock.GetBody();
+		if (body.IsDynamic())
+		{
+			body.AddForce(inForce);
+
+			if (!body.IsActive())
+				mBodyManager->ActivateBodies(&inBodyID, 1);
+		}
+	}
+}
+
+void BodyInterface::AddForce(const BodyID &inBodyID, Vec3Arg inForce, Vec3Arg inPoint)
+{
+	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
+	if (lock.Succeeded())
+	{
+		Body &body = lock.GetBody();
+		if (body.IsDynamic())
+		{
+			body.AddForce(inForce, inPoint);
+
+			if (!body.IsActive())
+				mBodyManager->ActivateBodies(&inBodyID, 1);
+		}
+	}
+}
+
+void BodyInterface::AddTorque(const BodyID &inBodyID, Vec3Arg inTorque)
+{
+	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
+	if (lock.Succeeded())
+	{
+		Body &body = lock.GetBody();
+		if (body.IsDynamic())
+		{
+			body.AddTorque(inTorque);
+
+			if (!body.IsActive())
+				mBodyManager->ActivateBodies(&inBodyID, 1);
+		}
+	}
+}
+
+void BodyInterface::AddForceAndTorque(const BodyID &inBodyID, Vec3Arg inForce, Vec3Arg inTorque)
+{
+	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
+	if (lock.Succeeded())
+	{
+		Body &body = lock.GetBody();
+		if (body.IsDynamic())
+		{
+			body.AddForce(inForce);
+			body.AddTorque(inTorque);
+
+			if (!body.IsActive())
+				mBodyManager->ActivateBodies(&inBodyID, 1);
+		}
+	}
 }
 
 void BodyInterface::AddImpulse(const BodyID &inBodyID, Vec3Arg inImpulse)
@@ -694,13 +814,13 @@ TransformedShape BodyInterface::GetTransformedShape(const BodyID &inBodyID) cons
 		return TransformedShape();
 }
 
-void *BodyInterface::GetUserData(const BodyID &inBodyID) const
+uint64 BodyInterface::GetUserData(const BodyID &inBodyID) const
 {
 	BodyLockRead lock(*mBodyLockInterface, inBodyID);
 	if (lock.Succeeded())
 		return lock.GetBody().GetUserData();
 	else
-		return nullptr;
+		return 0;
 }
 
 const PhysicsMaterial *BodyInterface::GetMaterial(const BodyID &inBodyID, const SubShapeID &inSubShapeID) const
@@ -712,4 +832,11 @@ const PhysicsMaterial *BodyInterface::GetMaterial(const BodyID &inBodyID, const 
 		return PhysicsMaterial::sDefault;
 }
 
-} // JPH
+void BodyInterface::InvalidateContactCache(const BodyID &inBodyID)
+{
+	BodyLockWrite lock(*mBodyLockInterface, inBodyID);
+	if (lock.Succeeded())
+		mBodyManager->InvalidateContactCacheForBody(lock.GetBody());
+}
+
+JPH_NAMESPACE_END

@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <Physics/Collision/Shape/ConvexShape.h>
-#include <Physics/PhysicsSettings.h>
+#include <Jolt/Physics/Collision/Shape/ConvexShape.h>
+#include <Jolt/Physics/PhysicsSettings.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Class that constructs a BoxShape
 class BoxShapeSettings final : public ConvexShapeSettings
@@ -32,6 +32,8 @@ public:
 class BoxShape final : public ConvexShape
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 							BoxShape() : ConvexShape(EShapeSubType::Box) { }
 							BoxShape(const BoxShapeSettings &inSettings, ShapeResult &outResult);
@@ -68,10 +70,10 @@ public:
 
 	// See Shape::CastRay
 	virtual bool			CastRay(const RayCast &inRay, const SubShapeIDCreator &inSubShapeIDCreator, RayCastResult &ioHit) const override;
-	virtual void			CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector) const override;
+	virtual void			CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const override;
 
 	// See: Shape::CollidePoint
-	virtual void			CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector) const override;
+	virtual void			CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const override;
 
 	// See Shape::GetTrianglesStart
 	virtual void			GetTrianglesStart(GetTrianglesContext &ioContext, const AABox &inBox, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale) const override;
@@ -103,4 +105,4 @@ private:
 	float					mConvexRadius = 0.0f;
 };
 
-} // JPH
+JPH_NAMESPACE_END

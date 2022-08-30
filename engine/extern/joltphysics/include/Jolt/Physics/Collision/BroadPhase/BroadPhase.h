@@ -3,8 +3,10 @@
 
 #pragma once
 
-#include <Physics/Collision/BroadPhase/BroadPhaseQuery.h>
-#include <Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseQuery.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+
+JPH_NAMESPACE_BEGIN
 
 // Shorthand function to ifdef out code if broadphase stats tracking is off
 #ifdef JPH_TRACK_BROADPHASE_STATS
@@ -12,8 +14,6 @@
 #else
 	#define JPH_IF_TRACK_BROADPHASE_STATS(...)
 #endif // JPH_TRACK_BROADPHASE_STATS
-
-namespace JPH {
 
 class BodyManager;
 struct BodyPair;
@@ -26,9 +26,9 @@ class BroadPhase : public BroadPhaseQuery
 public:
 	/// Initialize the broadphase.
 	/// @param inBodyManager The body manager singleton
-	/// @param inObjectToBroadPhaseLayer Maps object layer to broadphase layer, @see ObjectToBroadPhaseLayer. 
+	/// @param inLayerInterface Interface that maps object layers to broadphase layers.
 	/// Note that the broadphase takes a pointer to the data inside inObjectToBroadPhaseLayer so this object should remain static.
-	virtual void		Init(BodyManager *inBodyManager, const ObjectToBroadPhaseLayer &inObjectToBroadPhaseLayer);
+	virtual void		Init(BodyManager *inBodyManager, const BroadPhaseLayerInterface &inLayerInterface);
 
 	/// Should be called after many objects have been inserted to make the broadphase more efficient, usually done on startup only
 	virtual void		Optimize()															{ /* Optionally overridden by implementation */ }
@@ -47,7 +47,7 @@ public:
 	virtual	UpdateState	UpdatePrepare()														{ return UpdateState(); }
 
 	/// Finalizing the update will quickly apply the changes
-	virtual void		UpdateFinalize(UpdateState &inUpdateState)							{ /* Optionally overridden by implementation */ }
+	virtual void		UpdateFinalize(const UpdateState &inUpdateState)					{ /* Optionally overridden by implementation */ }
 
 	/// Must be called after UpdateFinalize to allow modifications to the broadphase
 	virtual void		UnlockModifications()												{ /* Optionally overridden by implementation */ }
@@ -94,11 +94,6 @@ public:
 	/// Same as BroadPhaseQuery::CastAABox but can be implemented in a way to take no broad phase locks.
 	virtual void		CastAABoxNoLock(const AABoxCast &inBox, CastShapeBodyCollector &ioCollector, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter) const = 0; 
 
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
-	/// Set function that converts a broadphase layer to a human readable string for debugging purposes
-	virtual void		SetBroadPhaseLayerToString(BroadPhaseLayerToString inBroadPhaseLayerToString) { /* Can be implemented by derived classes */ }
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
-
 #ifdef JPH_TRACK_BROADPHASE_STATS
 	/// Trace the collected broadphase stats in CSV form.
 	/// This report can be used to judge and tweak the efficiency of the broadphase.
@@ -110,4 +105,4 @@ protected:
 	BodyManager *		mBodyManager = nullptr;
 };
 
-} // JPH
+JPH_NAMESPACE_END

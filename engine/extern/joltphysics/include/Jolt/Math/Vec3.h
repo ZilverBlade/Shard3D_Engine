@@ -3,17 +3,19 @@
 
 #pragma once
 
-#include <Math/Float3.h>
-#include <Math/Swizzle.h>
-#include <Math/MathTypes.h>
+#include <Jolt/Math/Float3.h>
+#include <Jolt/Math/Swizzle.h>
+#include <Jolt/Math/MathTypes.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// 3 component vector (stored as 4 vectors). 
 /// Note that we keep the 4th component the same as the 3rd component to avoid divisions by zero when JPH_FLOATING_POINT_EXCEPTIONS_ENABLED defined
-class [[nodiscard]] Vec3
+class [[nodiscard]] alignas(16) Vec3
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	// Underlying vector type
 #if defined(JPH_USE_SSE)
 	using Type = __m128;
@@ -277,6 +279,6 @@ public:
 
 static_assert(is_trivial<Vec3>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "Vec3.inl"

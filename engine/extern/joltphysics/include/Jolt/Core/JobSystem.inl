@@ -1,17 +1,17 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 void JobSystem::Job::AddDependency(int inCount)
 {
-	JPH_IF_ENABLE_ASSERTS(uint32 old_value =) mNumDependencies.fetch_add(inCount);
+	JPH_IF_ENABLE_ASSERTS(uint32 old_value =) mNumDependencies.fetch_add(inCount, memory_order_relaxed);
 	JPH_ASSERT(old_value > 0 && old_value != cExecutingState && old_value != cDoneState, "Job is queued, running or done, it is not allowed to add a dependency to a running job");
 }
 
 bool JobSystem::Job::RemoveDependency(int inCount)
 {
-	uint32 old_value = mNumDependencies.fetch_sub(inCount);
+	uint32 old_value = mNumDependencies.fetch_sub(inCount, memory_order_release);
 	JPH_ASSERT(old_value != cExecutingState && old_value != cDoneState, "Job is running or done, it is not allowed to add a dependency to a running job");
 	uint32 new_value = old_value - inCount;
 	JPH_ASSERT(old_value > new_value, "Test wrap around, this is a logic error");
@@ -38,7 +38,7 @@ void JobSystem::JobHandle::sRemoveDependencies(JobHandle *inHandles, uint inNumH
 	Job **next_job = jobs_to_queue;
 
 	// Remove the dependencies on all jobs
-	for (JobHandle *handle = inHandles, *handle_end = inHandles + inNumHandles; handle < handle_end; ++handle)
+	for (const JobHandle *handle = inHandles, *handle_end = inHandles + inNumHandles; handle < handle_end; ++handle)
 	{
 		Job *job = handle->GetPtr();
 		JPH_ASSERT(job->GetJobSystem() == job_system); // All jobs should belong to the same job system
@@ -52,4 +52,4 @@ void JobSystem::JobHandle::sRemoveDependencies(JobHandle *inHandles, uint inNumH
 		job_system->QueueJobs(jobs_to_queue, num_jobs_to_queue);
 }
 
-} // JPH
+JPH_NAMESPACE_END

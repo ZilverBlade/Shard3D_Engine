@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Geometry/Indexify.h>
-#include <unordered_map>
+#include <Jolt/Core/UnorderedMap.h>
+#include <Jolt/Geometry/Indexify.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 void Indexify(const TriangleList &inTriangles, VertexList &outVertices, IndexedTriangleList &outTriangles, float inVertexWeldDistance)
 {
@@ -16,7 +16,7 @@ void Indexify(const TriangleList &inTriangles, VertexList &outVertices, IndexedT
 	outVertices.clear();
 
 	// Find unique vertices
-	unordered_map<Float3, uint32> vertex_map;
+	UnorderedMap<Float3, uint32> vertex_map;
 	for (const Triangle &t : inTriangles)
 		for (const Float3 &v : t.mV)
 		{
@@ -68,4 +68,4 @@ void Deindexify(const VertexList &inVertices, const IndexedTriangleList &inTrian
 			outTriangles[t].mV[v] = inVertices[inTriangles[t].mIdx[v]];
 }
 
-} // JPH
+JPH_NAMESPACE_END

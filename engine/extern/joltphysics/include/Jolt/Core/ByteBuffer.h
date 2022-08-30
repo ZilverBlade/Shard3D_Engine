@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <Core/AlignedAllocator.h>
+#include <Jolt/Core/STLAlignedAllocator.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Underlying data type for ByteBuffer
-using ByteBufferVector = vector<uint8, AlignedAllocator<uint8, JPH_CACHE_LINE_SIZE>>;
+using ByteBufferVector = vector<uint8, STLAlignedAllocator<uint8, JPH_CACHE_LINE_SIZE>>;
 
 /// Simple byte buffer, aligned to a cache line
 class ByteBuffer : public ByteBufferVector
@@ -40,7 +40,7 @@ public:
 
 		// Construct elements
 		for (Type *d = data, *d_end = data + inSize; d < d_end; ++d)
-			new (d) Type;
+			::new (d) Type;
 
 		// Return pointer
 		return data;
@@ -48,7 +48,7 @@ public:
 
 	/// Append inData to the buffer
 	template <class Type>
-	void			AppendVector(const vector<Type> &inData)
+	void			AppendVector(const Array<Type> &inData)
 	{
 		size_t size = inData.size() * sizeof(Type);
 		uint8 *data = Allocate<uint8>(size);
@@ -70,4 +70,4 @@ public:
 	}
 };
 
-} // JPH
+JPH_NAMESPACE_END

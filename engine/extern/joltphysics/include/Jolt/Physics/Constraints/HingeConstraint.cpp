@@ -1,23 +1,25 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/HingeConstraint.h>
-#include <Physics/Body/Body.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Constraints/HingeConstraint.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/RotationEulerConstraintPart.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 #ifdef JPH_DEBUG_RENDERER
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_VIRTUAL(HingeConstraintSettings)
 {
 	JPH_ADD_BASE_CLASS(HingeConstraintSettings, TwoBodyConstraintSettings)
 
+	JPH_ADD_ENUM_ATTRIBUTE(HingeConstraintSettings, mSpace)
 	JPH_ADD_ATTRIBUTE(HingeConstraintSettings, mPoint1)
 	JPH_ADD_ATTRIBUTE(HingeConstraintSettings, mHingeAxis1)
 	JPH_ADD_ATTRIBUTE(HingeConstraintSettings, mNormalAxis1)
@@ -34,6 +36,7 @@ void HingeConstraintSettings::SaveBinaryState(StreamOut &inStream) const
 { 
 	ConstraintSettings::SaveBinaryState(inStream);
 
+	inStream.Write(mSpace);
 	inStream.Write(mPoint1);
 	inStream.Write(mHingeAxis1);
 	inStream.Write(mNormalAxis1);
@@ -50,6 +53,7 @@ void HingeConstraintSettings::RestoreBinaryState(StreamIn &inStream)
 {
 	ConstraintSettings::RestoreBinaryState(inStream);
 
+	inStream.Read(mSpace);
 	inStream.Read(mPoint1);
 	inStream.Read(mHingeAxis1);
 	inStream.Read(mNormalAxis1);
@@ -68,54 +72,47 @@ TwoBodyConstraint *HingeConstraintSettings::Create(Body &inBody1, Body &inBody2)
 
 HingeConstraint::HingeConstraint(Body &inBody1, Body &inBody2, const HingeConstraintSettings &inSettings) :
 	TwoBodyConstraint(inBody1, inBody2, inSettings),
+	mLocalSpacePosition1(inSettings.mPoint1),
+	mLocalSpacePosition2(inSettings.mPoint2),
+	mLocalSpaceHingeAxis1(inSettings.mHingeAxis1),
+	mLocalSpaceHingeAxis2(inSettings.mHingeAxis2),
+	mLocalSpaceNormalAxis1(inSettings.mNormalAxis1),
+	mLocalSpaceNormalAxis2(inSettings.mNormalAxis2),
 	mMaxFrictionTorque(inSettings.mMaxFrictionTorque),
 	mMotorSettings(inSettings.mMotorSettings)
 {
-	Mat44 inv_transform1 = inBody1.GetInverseCenterOfMassTransform();
-	Mat44 inv_transform2 = inBody2.GetInverseCenterOfMassTransform();
-
-	// Store local positions
-	mLocalSpacePosition1 = inv_transform1 * inSettings.mPoint1;
-	mLocalSpacePosition2 = inv_transform2 * inSettings.mPoint2;
-
-	// Store local hinge axis
-	mLocalSpaceHingeAxis1 = inv_transform1.Multiply3x3(inSettings.mHingeAxis1).Normalized();
-	mLocalSpaceHingeAxis2 = inv_transform2.Multiply3x3(inSettings.mHingeAxis2).Normalized();
-	
-	// Store local normal axis
-	mLocalSpaceNormalAxis1 = inv_transform1.Multiply3x3(inSettings.mNormalAxis1).Normalized();
-	mLocalSpaceNormalAxis2 = inv_transform2.Multiply3x3(inSettings.mNormalAxis2).Normalized();
-
 	// Store limits
 	JPH_ASSERT(inSettings.mLimitsMin != inSettings.mLimitsMax, "Better use a fixed constraint in this case");
 	SetLimits(inSettings.mLimitsMin, inSettings.mLimitsMax);
 
-	// Store inverse of initial rotation from body 1 to body 2 in body 1 space:
-	//
-	// q20 = q10 r0 
-	// <=> r0 = q10^-1 q20 
-	// <=> r0^-1 = q20^-1 q10
-	//
-	// where:
-	//
-	// q20 = initial orientation of body 2
-	// q10 = initial orientation of body 1
-	// r0 = initial rotation rotation from body 1 to body 2
-	if (inSettings.mHingeAxis1 == inSettings.mHingeAxis2 && inSettings.mNormalAxis1 == inSettings.mNormalAxis2)
+	// Store inverse of initial rotation from body 1 to body 2 in body 1 space
+	mInvInitialOrientation = RotationEulerConstraintPart::sGetInvInitialOrientationXZ(inSettings.mNormalAxis1, inSettings.mHingeAxis1, inSettings.mNormalAxis2, inSettings.mHingeAxis2);
+
+	if (inSettings.mSpace == EConstraintSpace::WorldSpace)
 	{
-		// Bodies are in their neutral poses, no need to take hinge and normal axis into account
-		mInvInitialOrientation = inBody2.GetRotation().Conjugated() * inBody1.GetRotation();
+		// If all properties were specified in world space, take them to local space now
+		Mat44 inv_transform1 = inBody1.GetInverseCenterOfMassTransform();
+		mLocalSpacePosition1 = inv_transform1 * mLocalSpacePosition1;
+		mLocalSpaceHingeAxis1 = inv_transform1.Multiply3x3(mLocalSpaceHingeAxis1).Normalized();
+		mLocalSpaceNormalAxis1 = inv_transform1.Multiply3x3(mLocalSpaceNormalAxis1).Normalized();
+
+		Mat44 inv_transform2 = inBody2.GetInverseCenterOfMassTransform();
+		mLocalSpacePosition2 = inv_transform2 * mLocalSpacePosition2;
+		mLocalSpaceHingeAxis2 = inv_transform2.Multiply3x3(mLocalSpaceHingeAxis2).Normalized();
+		mLocalSpaceNormalAxis2 = inv_transform2.Multiply3x3(mLocalSpaceNormalAxis2).Normalized();
+
+		// Constraints were specified in world space, so we should have replaced c1 with q10^-1 c1 and c2 with q20^-1 c2
+		// => r0^-1 = (q20^-1 c2) (q10^-1 c1)^1 = q20^-1 (c2 c1^-1) q10
+		mInvInitialOrientation = inBody2.GetRotation().Conjugated() * mInvInitialOrientation * inBody1.GetRotation();
 	}
-	else
-	{
-		// Bodies are not in their neutral pose, need to adjust initial rotation for it
-		// Form two world space constraint matrices C1, C2
-		// Body 1 needs to be rotated by D to get it into neutral pose: C2 = D C1 <=> D = C2 C1^1
-		// so instead of using body1 rotation as above use D R1 = C2 C1^-1 R1
-		Mat44 constraint1(Vec4(inSettings.mNormalAxis1, 0), Vec4(inSettings.mHingeAxis1.Cross(inSettings.mNormalAxis1), 0), Vec4(inSettings.mHingeAxis1, 0), Vec4(0, 0, 0, 1));
-		Mat44 constraint2(Vec4(inSettings.mNormalAxis2, 0), Vec4(inSettings.mHingeAxis2.Cross(inSettings.mNormalAxis2), 0), Vec4(inSettings.mHingeAxis2, 0), Vec4(0, 0, 0, 1));
-		mInvInitialOrientation = inBody2.GetRotation().Conjugated() * constraint2.GetQuaternion() * constraint1.GetQuaternion().Conjugated() * inBody1.GetRotation();
-	}
+}
+
+float HingeConstraint::GetCurrentAngle() const
+{
+	// See: CalculateA1AndTheta
+	Quat rotation1 = mBody1->GetRotation();
+	Quat diff = mBody2->GetRotation() * mInvInitialOrientation * rotation1.Conjugated();
+	return diff.GetRotationAngle(rotation1 * mLocalSpaceHingeAxis1);
 }
 
 void HingeConstraint::SetLimits(float inLimitsMin, float inLimitsMax)
@@ -341,6 +338,25 @@ void HingeConstraint::RestoreState(StateRecorder &inStream)
 	inStream.Read(mTargetAngle);
 }
 
+
+Ref<ConstraintSettings> HingeConstraint::GetConstraintSettings() const
+{
+	HingeConstraintSettings *settings = new HingeConstraintSettings;
+	ToConstraintSettings(*settings);
+	settings->mSpace = EConstraintSpace::LocalToBodyCOM;
+	settings->mPoint1 = mLocalSpacePosition1;
+	settings->mHingeAxis1 = mLocalSpaceHingeAxis1;
+	settings->mNormalAxis1 = mLocalSpaceNormalAxis1;
+	settings->mPoint2 = mLocalSpacePosition2;
+	settings->mHingeAxis2 = mLocalSpaceHingeAxis2;
+	settings->mNormalAxis2 = mLocalSpaceNormalAxis2;
+	settings->mLimitsMin = mLimitsMin;
+	settings->mLimitsMax = mLimitsMax;
+	settings->mMaxFrictionTorque = mMaxFrictionTorque;
+	settings->mMotorSettings = mMotorSettings;
+	return settings;
+}
+
 Mat44 HingeConstraint::GetConstraintToBody1Matrix() const
 { 
 	return Mat44(Vec4(mLocalSpaceHingeAxis1, 0), Vec4(mLocalSpaceNormalAxis1, 0), Vec4(mLocalSpaceHingeAxis1.Cross(mLocalSpaceNormalAxis1), 0), Vec4(mLocalSpacePosition1, 1)); 
@@ -351,4 +367,4 @@ Mat44 HingeConstraint::GetConstraintToBody2Matrix() const
 	return Mat44(Vec4(mLocalSpaceHingeAxis2, 0), Vec4(mLocalSpaceNormalAxis2, 0), Vec4(mLocalSpaceHingeAxis2.Cross(mLocalSpaceNormalAxis2), 0), Vec4(mLocalSpacePosition2, 1)); 
 }
 
-} // JPH
+JPH_NAMESPACE_END

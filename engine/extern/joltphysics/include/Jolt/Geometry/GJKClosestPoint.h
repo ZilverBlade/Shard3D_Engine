@@ -3,18 +3,18 @@
 
 #pragma once
 
-#include <Core/NonCopyable.h>
-#include <Core/FPException.h>
-#include <Geometry/ClosestPoint.h>
-#include <Geometry/ConvexSupport.h>
+#include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Core/FPException.h>
+#include <Jolt/Geometry/ClosestPoint.h>
+#include <Jolt/Geometry/ConvexSupport.h>
 
 //#define JPH_GJK_DEBUG
 #ifdef JPH_GJK_DEBUG
-	#include <Core/StringTools.h>
-	#include <Renderer/DebugRenderer.h>
+	#include <Jolt/Core/StringTools.h>
+	#include <Jolt/Renderer/DebugRenderer.h>
 #endif
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Convex vs convex collision detection
 /// Based on: A Fast and Robust GJK Implementation for Collision Detection of Convex Objects - Gino van den Bergen
@@ -73,20 +73,20 @@ private:
 #endif
 
 		float v_len_sq = v.LengthSq();
-		if (v_len_sq >= inPrevVLenSq)
+		if (v_len_sq < inPrevVLenSq) // Note, comparison order important: If v_len_sq is NaN then this expression will be false so we will return false
 		{
-			// No better match found
-#ifdef JPH_GJK_DEBUG
-			Trace("New closer point is further away, failed to converge");
-#endif
-			return false;
+			// Return closest point
+			outV = v;
+			outVLenSq = v_len_sq;
+			outSet = set;
+			return true;
 		}
 
-		// Return closest point
-		outV = v;
-		outVLenSq = v_len_sq;
-		outSet = set;
-		return true;
+		// No better match found
+#ifdef JPH_GJK_DEBUG
+		Trace("New closer point is further away, failed to converge");
+#endif
+		return false;
 	}
 
 	// Get max(|Y_0|^2 .. |Y_n|^2)
@@ -154,7 +154,7 @@ private:
 	}
 
 	// Calculate closest points on A and B
-	void		CalculatePointAAndB(Vec3 &outPointA, Vec3 &outPointB)
+	void		CalculatePointAAndB(Vec3 &outPointA, Vec3 &outPointB) const
 	{
 		switch (mNumPoints)		
 		{
@@ -330,7 +330,7 @@ public:
 
 #ifdef JPH_GJK_DEBUG
 		// Generate the hull of the Minkowski difference for visualization
-		MinkowskiDifference<A, B> diff(inA, inB);
+		MinkowskiDifference diff(inA, inB);
 		mGeometry = DebugRenderer::sInstance->CreateTriangleGeometryForConvex([&diff](Vec3Arg inDirection) { return diff.GetSupport(inDirection); });
 
 		for (int i = 0; i < 4; ++i)
@@ -489,7 +489,7 @@ public:
 
 	/// Get the resulting simplex after the GetClosestPoints algorithm finishes.
 	/// If it returned a squared distance of 0, the origin will be contained in the simplex.
-	void		GetClosestPointsSimplex(Vec3 *outY, Vec3 *outP, Vec3 *outQ, uint &outNumPoints)
+	void		GetClosestPointsSimplex(Vec3 *outY, Vec3 *outP, Vec3 *outQ, uint &outNumPoints) const
 	{
 		uint size = sizeof(Vec3) * mNumPoints;
 		memcpy(outY, mY, size);
@@ -666,12 +666,11 @@ public:
 	bool		CastShape(Mat44Arg inStart, Vec3Arg inDirection, float inTolerance, const A &inA, const B &inB, float &ioLambda)
 	{
 		// Transform the shape to be cast to the starting position
-		using TransformedA = TransformedConvexObject<A>;
-		TransformedA transformed_a(inStart, inA);
+		TransformedConvexObject transformed_a(inStart, inA);
 
 		// Calculate the minkowski difference inB - inA
 		// inA is moving, so we need to add the back side of inB to the front side of inA
-		MinkowskiDifference<B, TransformedA> difference(inB, transformed_a);
+		MinkowskiDifference difference(inB, transformed_a);
 
 		// Do a raycast against the Minkowski difference
 		return CastRay(Vec3::sZero(), inDirection, inTolerance, difference, ioLambda);
@@ -703,15 +702,14 @@ public:
 		float sum_convex_radius = inConvexRadiusA + inConvexRadiusB;
 
 		// Transform the shape to be cast to the starting position
-		using TransformedA = TransformedConvexObject<A>;
-		TransformedA transformed_a(inStart, inA);
+		TransformedConvexObject transformed_a(inStart, inA);
 
 		// Reset state
 		mNumPoints = 0;
 
 		float lambda = 0.0f;
 		Vec3 x = Vec3::sZero(); // Since A is already transformed we can start the cast from zero
-		Vec3 v = -inA.GetSupport(Vec3::sZero());
+		Vec3 v = -inB.GetSupport(Vec3::sZero()) + transformed_a.GetSupport(Vec3::sZero()); // See CastRay: v = x - inA.GetSupport(Vec3::sZero()) where inA is the Minkowski difference inB - transformed_a (see CastShape above) and x is zero
 		float v_len_sq = FLT_MAX;
 		bool allow_restart = false;
 
@@ -963,4 +961,4 @@ private:
 #endif
 };
 
-} // JPH
+JPH_NAMESPACE_END

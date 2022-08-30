@@ -3,13 +3,15 @@
 
 #pragma once
 
-#include <Math/MathTypes.h>
+#include <Jolt/Math/MathTypes.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class [[nodiscard]] Vec8
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 								Vec8() = default; ///< Intentionally not initialized for performance reasons
 								Vec8(const Vec8 &inRHS) = default;
@@ -104,6 +106,6 @@ public:
 
 static_assert(is_trivial<Vec8>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "Vec8.inl"

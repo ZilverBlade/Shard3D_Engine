@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Core/ByteBuffer.h>
-#include <Math/HalfFloat.h>
-#include <AABBTree/AABBTreeBuilder.h>
+#include <Jolt/Core/ByteBuffer.h>
+#include <Jolt/Math/HalfFloat.h>
+#include <Jolt/AABBTree/AABBTreeBuilder.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 template <int Alignment>
 class NodeCodecQuadTreeHalfFloat
@@ -60,8 +60,8 @@ public:
 	class EncodingContext
 	{
 	public:
-		/// Get an upper bound on the amount of bytes needed for a node tree with inNodeCount nodes and inLeafNodeCount leaf nodes (those that contain the triangles)
-		uint							GetPessimisticMemoryEstimate(uint inNodeCount, uint inLeafNodeCount) const
+		/// Get an upper bound on the amount of bytes needed for a node tree with inNodeCount nodes
+		uint							GetPessimisticMemoryEstimate(uint inNodeCount) const
 		{
 			return inNodeCount * (sizeof(Node) + Alignment - 1);
 		}
@@ -71,7 +71,7 @@ public:
 		/// Algorithm can enlarge the bounding boxes of the children during compression and returns these in outChildBoundsMin, outChildBoundsMax
 		/// inNodeBoundsMin, inNodeBoundsMax is the bounding box if inNode possibly widened by compressing the parent node
 		/// Returns uint(-1) on error and reports the error in outError
-		uint							NodeAllocate(const AABBTreeBuilder::Node *inNode, Vec3Arg inNodeBoundsMin, Vec3Arg inNodeBoundsMax, vector<const AABBTreeBuilder::Node *> &ioChildren, Vec3 outChildBoundsMin[NumChildrenPerNode], Vec3 outChildBoundsMax[NumChildrenPerNode], ByteBuffer &ioBuffer, string &outError) const
+		uint							NodeAllocate(const AABBTreeBuilder::Node *inNode, Vec3Arg inNodeBoundsMin, Vec3Arg inNodeBoundsMax, Array<const AABBTreeBuilder::Node *> &ioChildren, Vec3 outChildBoundsMin[NumChildrenPerNode], Vec3 outChildBoundsMax[NumChildrenPerNode], ByteBuffer &ioBuffer, const char *&outError) const
 		{
 			// We don't emit nodes for leafs
 			if (!inNode->HasChildren())
@@ -132,7 +132,7 @@ public:
 		}
 
 		/// Once all nodes have been added, this call finalizes all nodes by patching in the offsets of the child nodes (that were added after the node itself was added)
-		bool						NodeFinalize(const AABBTreeBuilder::Node *inNode, uint inNodeStart, uint inTrianglesStart, uint inNumChildren, const uint *inChildrenNodeStart, const uint *inChildrenTrianglesStart, ByteBuffer &ioBuffer, string &outError) const
+		bool						NodeFinalize(const AABBTreeBuilder::Node *inNode, uint inNodeStart, uint inNumChildren, const uint *inChildrenNodeStart, const uint *inChildrenTrianglesStart, ByteBuffer &ioBuffer, const char *&outError) const
 		{
 			if (!inNode->HasChildren())
 				return true;
@@ -162,7 +162,7 @@ public:
 		}
 
 		/// Once all nodes have been finalized, this will finalize the header of the nodes
-		bool						Finalize(Header *outHeader, const AABBTreeBuilder::Node *inRoot, uint inRootNodeStart, uint inRootTrianglesStart, string &outError) const
+		bool						Finalize(Header *outHeader, const AABBTreeBuilder::Node *inRoot, uint inRootNodeStart, uint inRootTrianglesStart, const char *&outError) const
 		{
 			uint offset = inRoot->HasChildren()? inRootNodeStart : inRootTrianglesStart;
 			if (offset & OFFSET_NON_SIGNIFICANT_MASK)
@@ -207,9 +207,7 @@ public:
 		}
 
 		/// Constructor
-		JPH_INLINE explicit			DecodingContext(const Header *inHeader) :
-			mRootBoundsMin(Vec3::sLoadFloat3Unsafe(inHeader->mRootBoundsMin)),
-			mRootBoundsMax(Vec3::sLoadFloat3Unsafe(inHeader->mRootBoundsMax))
+		JPH_INLINE explicit			DecodingContext(const Header *inHeader)
 		{
 			// Start with the root node on the stack
 			mNodeStack[0] = inHeader->mRootProperties;
@@ -258,7 +256,7 @@ public:
 					uint32 triangle_block_id = node_properties & OFFSET_MASK;
 					const void *triangles = sGetTriangleBlockStart(inBufferStart, triangle_block_id);
 
-					ioVisitor.VisitTriangles(inTriangleContext, mRootBoundsMin, mRootBoundsMax, triangles, tri_count, triangle_block_id);
+					ioVisitor.VisitTriangles(inTriangleContext, triangles, tri_count, triangle_block_id);
 				}
 
 				// Check if we're done
@@ -280,11 +278,9 @@ public:
 		}
 
 	private:
-		Vec3						mRootBoundsMin;
-		Vec3						mRootBoundsMax;
 		uint32						mNodeStack[StackSize];
 		int							mTop = 0;
 	};
 };
 
-} // JPH
+JPH_NAMESPACE_END

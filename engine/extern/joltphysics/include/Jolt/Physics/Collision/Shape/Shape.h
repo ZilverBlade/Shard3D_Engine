@@ -3,16 +3,20 @@
 
 #pragma once
 
-#include <Physics/Body/MassProperties.h>
-#include <Physics/Collision/BackFaceMode.h>
-#include <Physics/Collision/CollisionCollector.h>
-#include <Geometry/AABox.h>
-#include <Core/Reference.h>
-#include <Core/Color.h>
-#include <Core/Result.h>
-#include <ObjectStream/SerializableObject.h>
+#include <Jolt/Physics/Body/MassProperties.h>
+#include <Jolt/Physics/Collision/BackFaceMode.h>
+#include <Jolt/Physics/Collision/CollisionCollector.h>
+#include <Jolt/Physics/Collision/ShapeFilter.h>
+#include <Jolt/Geometry/AABox.h>
+#include <Jolt/Core/Reference.h>
+#include <Jolt/Core/Color.h>
+#include <Jolt/Core/Result.h>
+#include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Core/UnorderedMap.h>
+#include <Jolt/Core/UnorderedSet.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 struct RayCast;
 class RayCastSettings;
@@ -22,7 +26,6 @@ class RayCastResult;
 class ShapeCastResult;
 class CollidePointResult;
 class CollideShapeResult;
-class ShapeFilter;
 class SubShapeIDCreator;
 class SubShapeID;
 class PhysicsMaterial;
@@ -42,9 +45,9 @@ using CollideShapeCollector = CollisionCollector<CollideShapeResult, CollisionCo
 using TransformedShapeCollector = CollisionCollector<TransformedShape, CollisionCollectorTraitsCollideShape>;
 
 using ShapeRefC = RefConst<Shape>;
-using ShapeList = vector<ShapeRefC>;
+using ShapeList = Array<ShapeRefC>;
 using PhysicsMaterialRefC = RefConst<PhysicsMaterial>;
-using PhysicsMaterialList = vector<PhysicsMaterialRefC>;
+using PhysicsMaterialList = Array<PhysicsMaterialRefC>;
 
 /// Shapes are categorized in groups, each shape can return which group it belongs to through its Shape::GetType function.
 enum class EShapeType : uint8
@@ -128,7 +131,7 @@ public:
 	virtual ShapeResult				Create() const = 0;
 
 	/// User data (to be used freely by the application)
-	uint32							mUserData = 0;
+	uint64							mUserData = 0;
 
 protected:
 	mutable ShapeResult				mCachedResult;
@@ -152,9 +155,11 @@ private:
 };
 
 /// Base class for all shapes (collision volume of a body). Defines a virtual interface for collision detection.
-class Shape : public RefTarget<Shape>
+class Shape : public RefTarget<Shape>, public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	using ShapeResult = ShapeSettings::ShapeResult;
 
 	/// Constructor
@@ -169,8 +174,8 @@ public:
 	inline EShapeSubType			GetSubType() const													{ return mShapeSubType; }
 
 	/// User data (to be used freely by the application)
-	uint32							GetUserData() const													{ return mUserData; }
-	void							SetUserData(uint32 inUserData)										{ mUserData = inUserData; }
+	uint64							GetUserData() const													{ return mUserData; }
+	void							SetUserData(uint64 inUserData)										{ mUserData = inUserData; }
 
 	/// Check if this shape can only be used to create a static body or if it can also be dynamic/kinematic
 	virtual bool					MustBeStatic() const												{ return false; }
@@ -199,11 +204,12 @@ public:
 	/// Get the material assigned to a particular sub shape ID
 	virtual const PhysicsMaterial *	GetMaterial(const SubShapeID &inSubShapeID) const = 0;
 
-	/// Get the surface normal of a particular sub shape ID and point on surface (all vectors are relative to center of mass for this shape)
+	/// Get the surface normal of a particular sub shape ID and point on surface (all vectors are relative to center of mass for this shape).
+	/// Note: When you have a CollideShapeResult or ShapeCastResult you should use -mPenetrationAxis.Normalized() as contact normal as GetSurfaceNormal will only return face normals (and not vertex or edge normals).
 	virtual Vec3					GetSurfaceNormal(const SubShapeID &inSubShapeID, Vec3Arg inLocalSurfacePosition) const = 0;
 
 	/// Get the user data of a particular sub shape ID
-	virtual uint32					GetSubShapeUserData(const SubShapeID &inSubShapeID) const			{ return mUserData; }
+	virtual uint64					GetSubShapeUserData(const SubShapeID &inSubShapeID) const			{ return mUserData; }
 
 	/// Get the direct child sub shape and its transform for a sub shape ID.
 	/// @param inSubShapeID Sub shape ID that indicates the path to the leaf shape
@@ -228,31 +234,33 @@ public:
 	virtual void					Draw(DebugRenderer *inRenderer, Mat44Arg inCenterOfMassTransform, Vec3Arg inScale, ColorArg inColor, bool inUseMaterialColors, bool inDrawWireframe) const = 0;
 
 	/// Draw the results of the GetSupportFunction with the convex radius added back on to show any errors introduced by this process (only relevant for convex shapes)
-	virtual void					DrawGetSupportFunction(DebugRenderer *inRenderer, Mat44Arg inCenterOfMassTransform, Vec3Arg inScale, ColorArg inColor, bool inDrawSupportDirection) const { }
+	virtual void					DrawGetSupportFunction(DebugRenderer *inRenderer, Mat44Arg inCenterOfMassTransform, Vec3Arg inScale, ColorArg inColor, bool inDrawSupportDirection) const { /* Only implemented for convex shapes */ }
 
 	/// Draw the results of the GetSupportingFace function to show any errors introduced by this process (only relevant for convex shapes)
-	virtual void					DrawGetSupportingFace(DebugRenderer *inRenderer, Mat44Arg inCenterOfMassTransform, Vec3Arg inScale) const { }
+	virtual void					DrawGetSupportingFace(DebugRenderer *inRenderer, Mat44Arg inCenterOfMassTransform, Vec3Arg inScale) const { /* Only implemented for convex shapes */ }
 #endif // JPH_DEBUG_RENDERER
 
 	/// Cast a ray against this shape, returns true if it finds a hit closer than ioHit.mFraction and updates that fraction. Otherwise ioHit is left untouched and the function returns false.
 	/// Note that the ray should be relative to the center of mass of this shape (i.e. subtract Shape::GetCenterOfMass() from RayCast::mOrigin if you want to cast against the shape in the space it was created).
-	/// If this is a solid shape and the ray starts inside the object, the returned fraction will be 0.
+	/// Convex objects will be treated as solid (meaning if the ray starts inside, you'll get a hit fraction of 0) and back face hits against triangles are returned.
+	/// If you want the surface normal of the hit use GetSurfaceNormal(ioHit.mSubShapeID2, inRay.GetPointOnRay(ioHit.mFraction)).
 	virtual bool					CastRay(const RayCast &inRay, const SubShapeIDCreator &inSubShapeIDCreator, RayCastResult &ioHit) const = 0;
 
-	/// Cast a ray against this shape. Allows returning multiple hits through ioCollector.
-	virtual void					CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector) const = 0;
+	/// Cast a ray against this shape. Allows returning multiple hits through ioCollector. Note that this version is more flexible but also slightly slower than the CastRay function that returns only a single hit.
+	/// If you want the surface normal of the hit use GetSurfaceNormal(collected sub shape ID, inRay.GetPointOnRay(collected faction)).
+	virtual void					CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const = 0;
 
 	/// Check if inPoint is inside this shape. For this tests all shapes are treated as if they were solid. 
 	/// Note that inPoint should be relative to the center of mass of this shape (i.e. subtract Shape::GetCenterOfMass() from inPoint if you want to test against the shape in the space it was created).
 	/// For a mesh shape, this test will only provide sensible information if the mesh is a closed manifold.
 	/// For each shape that collides, ioCollector will receive a hit.
-	virtual void					CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector) const = 0;
+	virtual void					CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const = 0;
 
 	/// Collect the leaf transformed shapes of all leaf shapes of this shape.
 	/// inBox is the world space axis aligned box which leaf shapes should collide with.
 	/// inPositionCOM/inRotation/inScale describes the transform of this shape.
 	/// inSubShapeIDCeator represents the current sub shape ID of this shape.
-	virtual void					CollectTransformedShapes(const AABox &inBox, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale, const SubShapeIDCreator &inSubShapeIDCreator, TransformedShapeCollector &ioCollector) const;
+	virtual void					CollectTransformedShapes(const AABox &inBox, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale, const SubShapeIDCreator &inSubShapeIDCreator, TransformedShapeCollector &ioCollector, const ShapeFilter &inShapeFilter) const;
 	   
 	/// Transforms this shape and all of its children with inTransform, resulting shape(s) are passed to ioCollector.
 	/// Note that not all shapes support all transforms (especially true for scaling), the resulting shape will try to match the transform as accurately as possible.
@@ -298,21 +306,21 @@ public:
 	static ShapeResult				sRestoreFromBinaryState(StreamIn &inStream);
 
 	/// Outputs the material references that this shape has to outMaterials.
-	virtual void					SaveMaterialState(PhysicsMaterialList &outMaterials) const			{ }
+	virtual void					SaveMaterialState(PhysicsMaterialList &outMaterials) const			{ /* By default do nothing */ }
 
 	/// Restore the material references after calling sRestoreFromBinaryState. Note that the exact same materials need to be provided in the same order as returned by SaveMaterialState.
 	virtual void					RestoreMaterialState(const PhysicsMaterialRefC *inMaterials, uint inNumMaterials) { JPH_ASSERT(inNumMaterials == 0); }
 
 	/// Outputs the shape references that this shape has to outSubShapes.
-	virtual void					SaveSubShapeState(ShapeList &outSubShapes) const					{ }
+	virtual void					SaveSubShapeState(ShapeList &outSubShapes) const					{ /* By default do nothing */ }
 
 	/// Restore the shape references after calling sRestoreFromBinaryState. Note that the exact same shapes need to be provided in the same order as returned by SaveSubShapeState.
 	virtual void					RestoreSubShapeState(const ShapeRefC *inSubShapes, uint inNumShapes) { JPH_ASSERT(inNumShapes == 0); }
 
-	using ShapeToIDMap = unordered_map<const Shape *, uint32>;
-	using MaterialToIDMap = unordered_map<const PhysicsMaterial *, uint32>;
-	using IDToShapeMap = vector<Ref<Shape>>;
-	using IDToMaterialMap = vector<Ref<PhysicsMaterial>>;
+	using ShapeToIDMap = UnorderedMap<const Shape *, uint32>;
+	using MaterialToIDMap = UnorderedMap<const PhysicsMaterial *, uint32>;
+	using IDToShapeMap = Array<Ref<Shape>>;
+	using IDToMaterialMap = Array<Ref<PhysicsMaterial>>;
 
 	/// Save this shape, all its children and its materials. Pass in an empty map in ioShapeMap / ioMaterialMap or reuse the same map while saving multiple shapes to the same stream in order to avoid writing duplicates.
 	void							SaveWithChildren(StreamOut &inStream, ShapeToIDMap &ioShapeMap, MaterialToIDMap &ioMaterialMap) const;
@@ -334,7 +342,7 @@ public:
 	/// Get stats of this shape. Use for logging / data collection purposes only. Does not add values from child shapes, use GetStatsRecursive for this.
 	virtual Stats					GetStats() const = 0;
 
-	using VisitedShapes = unordered_set<const Shape *>;
+	using VisitedShapes = UnorderedSet<const Shape *>;
 
 	/// Get the combined stats of this shape and its children.
 	/// @param ioVisitedShapes is used to track which shapes have already been visited, to avoid calculating the wrong memory size.
@@ -357,9 +365,9 @@ protected:
 	virtual void					RestoreBinaryState(StreamIn &inStream);
 
 private:
-	uint32							mUserData = 0;
+	uint64							mUserData = 0;
 	EShapeType						mShapeType;
 	EShapeSubType					mShapeSubType;
 };
 
-} // JPH
+JPH_NAMESPACE_END

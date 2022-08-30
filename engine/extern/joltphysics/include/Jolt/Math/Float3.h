@@ -3,14 +3,16 @@
 
 #pragma once
 
-#include <Core/HashCombine.h>
+#include <Jolt/Core/HashCombine.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Class that holds 3 floats. Used as a storage class. Convert to Vec3 for calculations.
 class [[nodiscard]] Float3
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 				Float3() = default; ///< Intentionally not initialized for performance reasons
 				Float3(const Float3 &inRHS) = default;
 				Float3(float inX, float inY, float inZ) : x(inX), y(inY), z(inZ) { }
@@ -36,11 +38,11 @@ public:
 	float		z;
 };
 
-using VertexList = vector<Float3>;
+using VertexList = Array<Float3>;
 
 static_assert(is_trivial<Float3>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END
 
 // Create a std::hash for Float3
 JPH_MAKE_HASHABLE(JPH::Float3, t.x, t.y, t.z)

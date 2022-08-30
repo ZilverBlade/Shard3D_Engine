@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <Physics/Vehicle/VehicleConstraint.h>
-#include <Physics/Vehicle/VehicleController.h>
-#include <Physics/Vehicle/VehicleEngine.h>
-#include <Physics/Vehicle/VehicleTransmission.h>
-#include <Physics/Vehicle/VehicleDifferential.h>
-#include <Core/LinearCurve.h>
+#include <Jolt/Physics/Vehicle/VehicleConstraint.h>
+#include <Jolt/Physics/Vehicle/VehicleController.h>
+#include <Jolt/Physics/Vehicle/VehicleEngine.h>
+#include <Jolt/Physics/Vehicle/VehicleTransmission.h>
+#include <Jolt/Physics/Vehicle/VehicleDifferential.h>
+#include <Jolt/Core/LinearCurve.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class PhysicsSystem;
 
@@ -40,6 +40,8 @@ public:
 class WheelWV : public Wheel
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 	explicit					WheelWV(const WheelSettingsWV &inWheel);
 
@@ -76,18 +78,20 @@ public:
 
 	VehicleEngineSettings		mEngine;									///< The properties of the engine
 	VehicleTransmissionSettings	mTransmission;								///< The properties of the transmission (aka gear box)
-	vector<VehicleDifferentialSettings> mDifferentials;						///< List of differentials and their properties
+	Array<VehicleDifferentialSettings> mDifferentials;						///< List of differentials and their properties
 };
 
 /// Runtime controller class
 class WheeledVehicleController : public VehicleController
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 								WheeledVehicleController(const WheeledVehicleControllerSettings &inSettings, VehicleConstraint &inConstraint);
 
 	/// Typedefs
-	using Differentials = vector<VehicleDifferentialSettings>;
+	using Differentials = Array<VehicleDifferentialSettings>;
 
 	/// Set input from driver
 	/// @param inForward Value between -1 and 1 for auto transmission and value between 0 and 1 indicating desired driving direction and amount the gas pedal is pressed
@@ -149,4 +153,4 @@ protected:
 #endif // JPH_DEBUG_RENDERER
 };
 
-} // JPH
+JPH_NAMESPACE_END

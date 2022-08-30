@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <Physics/Collision/Shape/Shape.h>
-#include <Physics/Collision/ObjectLayer.h>
-#include <Physics/Collision/CollisionGroup.h>
-#include <Physics/Body/MotionType.h>
-#include <Physics/Body/MotionQuality.h>
-#include <ObjectStream/SerializableObject.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/CollisionGroup.h>
+#include <Jolt/Physics/Body/MotionType.h>
+#include <Jolt/Physics/Body/MotionQuality.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class StreamIn;
 class StreamOut;
@@ -57,8 +57,8 @@ public:
 	/// Restore the state of this object from inStream. Doesn't restore the shape nor the group filter.
 	void					RestoreBinaryState(StreamIn &inStream);
 
-	using GroupFilterToIDMap = unordered_map<const GroupFilter *, uint32>;
-	using IDToGroupFilterMap = vector<RefConst<GroupFilter>>;
+	using GroupFilterToIDMap = UnorderedMap<const GroupFilter *, uint32>;
+	using IDToGroupFilterMap = Array<RefConst<GroupFilter>>;
 	using ShapeToIDMap = Shape::ShapeToIDMap;
 	using IDToShapeMap = Shape::IDToShapeMap;
 	using MaterialToIDMap = Shape::MaterialToIDMap;
@@ -74,11 +74,13 @@ public:
 	/// Restore a shape, all its children and materials. Pass in an empty map in ioShapeMap / ioMaterialMap / ioGroupFilterMap or reuse the same map while reading multiple shapes from the same stream in order to restore duplicates.
 	static BCSResult		sRestoreWithChildren(StreamIn &inStream, IDToShapeMap &ioShapeMap, IDToMaterialMap &ioMaterialMap, IDToGroupFilterMap &ioGroupFilterMap);
 
-	/// Position of the body (not of the center of mass)
-	Vec3					mPosition = Vec3::sZero();
+	Vec3					mPosition = Vec3::sZero();										///< Position of the body (not of the center of mass)
+	Quat					mRotation = Quat::sIdentity();									///< Rotation of the body
+	Vec3					mLinearVelocity = Vec3::sZero();								///< World space linear velocity of the center of mass (m/s)
+	Vec3					mAngularVelocity = Vec3::sZero();								///< World space angular velocity (rad/s)
 
-	/// Rotation of the body
-	Quat					mRotation = Quat::sIdentity();
+	/// User data value (can be used by application)
+	uint64					mUserData = 0;
 
 	///@name Collision settings
 	ObjectLayer				mObjectLayer = 0;												///< The collision layer this body belongs to (determines if two objects can collide)
@@ -87,7 +89,7 @@ public:
 	///@name Simulation properties
 	EMotionType				mMotionType = EMotionType::Dynamic;								///< Motion type, determines if the object is static, dynamic or kinematic
 	bool					mAllowDynamicOrKinematic = false;								///< When this body is created as static, this setting tells the system to create a MotionProperties object so that the object can be switched to kinematic or dynamic
-	bool					mIsSensor = false;												///< If this body is a sensor. A sensor will receive collision callbacks, but will not cause any collision responses and can be used as a trigger volume.
+	bool					mIsSensor = false;												///< If this body is a sensor. A sensor will receive collision callbacks, but will not cause any collision responses and can be used as a trigger volume. See description at Body::SetIsSensor.
 	EMotionQuality			mMotionQuality = EMotionQuality::Discrete;						///< Motion quality, or how well it detects collisions when it has a high velocity
 	bool					mAllowSleeping = true;											///< If this body can go to sleep or not
 	float					mFriction = 0.2f;												///< Friction of the body (dimensionless number, usually between 0 and 1, 0 = no friction, 1 = friction force equals force that presses the two bodies together)
@@ -109,4 +111,4 @@ private:
 	RefConst<Shape>			mShapePtr;														///< Actual shape, cannot be serialized. Mutually exclusive with mShape
 };
 
-} // JPH
+JPH_NAMESPACE_END

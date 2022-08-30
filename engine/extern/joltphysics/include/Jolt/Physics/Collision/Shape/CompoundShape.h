@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Physics/Collision/Shape/Shape.h>
-#include <Physics/Collision/Shape/ScaleHelpers.h>
-#include <Physics/Collision/Shape/SubShapeID.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/ScaleHelpers.h>
+#include <Jolt/Physics/Collision/Shape/SubShapeID.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class CollideShapeSettings;
 class OrientedBox;
@@ -38,7 +38,7 @@ public:
 		uint32						mUserData = 0;											///< User data value (can be used by the application for any purpose)
 	};
 
-	using SubShapes = vector<SubShapeSettings>;
+	using SubShapes = Array<SubShapeSettings>;
 
 	SubShapes						mSubShapes;
 };
@@ -47,6 +47,8 @@ public:
 class CompoundShape : public Shape
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 	explicit						CompoundShape(EShapeSubType inSubType) : Shape(EShapeType::Compound, inSubType) { }
 									CompoundShape(EShapeSubType inSubType, const ShapeSettings &inSettings, ShapeResult &outResult) : Shape(EShapeType::Compound, inSubType, inSettings, outResult) { }
@@ -76,7 +78,7 @@ public:
 	virtual const PhysicsMaterial *	GetMaterial(const SubShapeID &inSubShapeID) const override;
 
 	// See Shape::GetSubShapeUserData
-	virtual uint32					GetSubShapeUserData(const SubShapeID &inSubShapeID) const override;
+	virtual uint64					GetSubShapeUserData(const SubShapeID &inSubShapeID) const override;
 
 	// See Shape::GetSubShapeTransformedShape
 	virtual TransformedShape		GetSubShapeTransformedShape(const SubShapeID &inSubShapeID, Vec3Arg inPositionCOM, QuatArg inRotation, Vec3Arg inScale, SubShapeID &outRemainder) const override;
@@ -226,9 +228,9 @@ public:
 		// 3 padding bytes left
 	};
 
-	static_assert(sizeof(SubShape) == 40, "Compiler added unexpected padding");
+	static_assert(sizeof(SubShape) == (JPH_CPU_ADDRESS_BITS == 64? 40 : 36), "Compiler added unexpected padding");
 
-	using SubShapes = vector<SubShape>;
+	using SubShapes = Array<SubShape>;
 
 	/// Access to the sub shapes of this compound
 	const SubShapes &				GetSubShapes() const									{ return mSubShapes; }
@@ -239,11 +241,11 @@ public:
 	/// Access to a particular sub shape
 	const SubShape &				GetSubShape(uint inIdx) const							{ return mSubShapes[inIdx]; }
 
-	/// Get the user data of sub shape
-	uint32							GetSubShapeUserData(uint inIdx) const					{ return mSubShapes[inIdx].mUserData; }
+	/// Get the user data associated with a shape in this compound
+	uint32							GetCompoundUserData(uint inIdx) const					{ return mSubShapes[inIdx].mUserData; }
 
-	/// Set the user data of a sub shape
-	void							SetSubShapeUserData(uint inIdx, uint32 inUserData)		{ mSubShapes[inIdx].mUserData = inUserData; }
+	/// Set the user data associated with a shape in this compound
+	void							SetCompoundUserData(uint inIdx, uint32 inUserData)		{ mSubShapes[inIdx].mUserData = inUserData; }
 
 	/// Check if a sub shape ID is still valid for this shape
 	/// @param inSubShapeID Sub shape id that indicates the leaf shape relative to this shape
@@ -331,4 +333,4 @@ private:
 	static void						sCastCompoundVsShape(const ShapeCast &inShapeCast, const ShapeCastSettings &inShapeCastSettings, const Shape *inShape, Vec3Arg inScale, const ShapeFilter &inShapeFilter, Mat44Arg inCenterOfMassTransform2, const SubShapeIDCreator &inSubShapeIDCreator1, const SubShapeIDCreator &inSubShapeIDCreator2, CastShapeCollector &ioCollector);
 };
 
-} // JPH
+JPH_NAMESPACE_END

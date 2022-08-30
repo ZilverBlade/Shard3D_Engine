@@ -3,11 +3,10 @@
 
 #pragma once
 
-#include <Physics/PhysicsSettings.h>
-#include <Physics/Body/Body.h>
-#include <Physics/StateRecorder.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/StateRecorder.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Quaternion based constraint that constrains rotation around all axis so that only translation is allowed.
 ///
@@ -87,7 +86,7 @@ class RotationQuatConstraintPart
 {
 private:
 	/// Internal helper function to update velocities of bodies after Lagrange multiplier is calculated
-	JPH_INLINE bool				ApplyVelocityStep(Body &ioBody1, Body &ioBody2, Vec3Arg inLambda)
+	JPH_INLINE bool				ApplyVelocityStep(Body &ioBody1, Body &ioBody2, Vec3Arg inLambda) const
 	{
 		// Apply impulse if delta is not zero
 		if (inLambda != Vec3::sZero())
@@ -163,7 +162,7 @@ public:
 	}
 
 	/// Iteratively update the position constraint. Makes sure C(...) = 0.
-	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, QuatArg inInvInitialOrientation, float inBaumgarte)
+	inline bool					SolvePositionConstraint(Body &ioBody1, Body &ioBody2, QuatArg inInvInitialOrientation, float inBaumgarte) const
 	{
 		// Calculate constraint equation
 		Vec3 c = (ioBody1.GetRotation().Conjugated() * ioBody2.GetRotation() * inInvInitialOrientation).GetXYZ();
@@ -227,4 +226,4 @@ private:
 	Vec3						mTotalLambda { Vec3::sZero() };
 };
 
-} // JPH
+JPH_NAMESPACE_END

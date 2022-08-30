@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Physics/StateRecorder.h>
+#include <Jolt/Physics/StateRecorder.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Implementation of the StateRecorder class that uses a stringstream as underlying store and that implements checking if the state doesn't change upon reading
 class StateRecorderImpl final : public StateRecorder
@@ -33,8 +33,11 @@ public:
 	/// Compare this state with a reference state and ensure they are the same
 	bool				IsEqual(StateRecorderImpl &inReference);
 
+	/// Convert the binary data to a string
+	string				GetData() const												{ return mStream.str(); }
+
 private:
 	stringstream		mStream;
 };
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,16 +3,18 @@
 
 #pragma once
 
-#include <Physics/Body/BodyID.h>
-#include <Physics/Collision/Shape/SubShapeID.h>
-#include <Core/HashCombine.h>
+#include <Jolt/Physics/Body/BodyID.h>
+#include <Jolt/Physics/Collision/Shape/SubShapeID.h>
+#include <Jolt/Core/HashCombine.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// A pair of bodies and their sub shape ID's. Can be used as a key in a map to find a contact point.
 class SubShapeIDPair
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 							SubShapeIDPair() = default;
 							SubShapeIDPair(const BodyID &inBody1ID, const SubShapeID &inSubShapeID1, const BodyID &inBody2ID, const SubShapeID &inSubShapeID2) : mBody1ID(inBody1ID), mSubShapeID1(inSubShapeID1), mBody2ID(inBody2ID), mSubShapeID2(inSubShapeID2) { }
@@ -44,6 +46,8 @@ public:
 	const BodyID &			GetBody2ID() const				{ return mBody2ID; }
 	const SubShapeID &		GetSubShapeID2() const			{ return mSubShapeID2; }
 
+	uint64					GetHash() const					{ return HashBytes(this, sizeof(SubShapeIDPair)); }
+
 private:
 	BodyID					mBody1ID;
 	SubShapeID				mSubShapeID1;
@@ -54,6 +58,21 @@ private:
 static_assert(sizeof(SubShapeIDPair) == 16, "Unexpected size"); 
 static_assert(alignof(SubShapeIDPair) == 4, "Assuming 4 byte aligned");
 
-} // JPH
+JPH_NAMESPACE_END
 
-JPH_MAKE_HASHABLE(JPH::SubShapeIDPair, t.GetBody1ID().GetIndexAndSequenceNumber(), t.GetSubShapeID1().GetValue(), t.GetBody2ID().GetIndexAndSequenceNumber(), t.GetSubShapeID2().GetValue())
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
+
+namespace std
+{
+	/// Declare std::hash for SubShapeIDPair, note that std::hash is platform dependent and we need this one to be consistent because we sort on it in the ContactConstraintManager
+	template <> 
+	struct hash<JPH::SubShapeIDPair>
+	{
+		inline size_t operator () (const JPH::SubShapeIDPair &inRHS) const
+		{
+			return static_cast<size_t>(inRHS.GetHash());
+		}
+	};
+}
+
+JPH_SUPPRESS_WARNINGS_STD_END

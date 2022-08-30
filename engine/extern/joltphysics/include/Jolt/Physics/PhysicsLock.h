@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Core/Mutex.h>
+#include <Jolt/Core/Mutex.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// This is the list of locks used by the physics engine, they need to be locked in a particular order (from top of the list to bottom of the list) in order to prevent deadlocks
 enum class EPhysicsLockTypes
@@ -75,7 +75,7 @@ private:
 
 /// Helper class that is similar to std::unique_lock
 template <class LockType>
-class UniqueLock
+class UniqueLock : public NonCopyable
 {
 public:
 								UniqueLock(LockType &inLock, EPhysicsLockTypes inType)		: mLock(inLock), mType(inType) { PhysicsLock::sLock(mLock, mType); }
@@ -88,7 +88,7 @@ private:
 
 /// Helper class that is similar to std::shared_lock
 template <class LockType>
-class SharedLock
+class SharedLock : public NonCopyable
 {
 public:
 								SharedLock(LockType &inLock, EPhysicsLockTypes inType)		: mLock(inLock), mType(inType) { PhysicsLock::sLockShared(mLock, mType); }
@@ -99,4 +99,4 @@ private:
 	EPhysicsLockTypes			mType;
 };
 
-} // JPH
+JPH_NAMESPACE_END

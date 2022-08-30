@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <Physics/Collision/ObjectLayer.h>
-#include <Physics/Collision/ShapeFilter.h>
-#include <Physics/Collision/Shape/Shape.h>
-#include <Physics/Collision/Shape/SubShapeID.h>
-#include <Physics/Collision/BackFaceMode.h>
-#include <Physics/Body/BodyID.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/ShapeFilter.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/SubShapeID.h>
+#include <Jolt/Physics/Collision/BackFaceMode.h>
+#include <Jolt/Physics/Body/BodyID.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 struct RayCast;
 class CollideShapeSettings;
@@ -23,30 +23,35 @@ class RayCastResult;
 class TransformedShape
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 								TransformedShape() = default;
 								TransformedShape(Vec3Arg inPositionCOM, QuatArg inRotation, const Shape *inShape, const BodyID &inBodyID, const SubShapeIDCreator &inSubShapeIDCreator = SubShapeIDCreator()) : mShapePositionCOM(inPositionCOM), mShapeRotation(inRotation), mShape(inShape), mBodyID(inBodyID), mSubShapeIDCreator(inSubShapeIDCreator) { }
 
-	/// Cast a ray, returns true if it finds a hit closer than ioHit.mFraction and updates ioHit in that case.
+	/// Cast a ray and find the closest hit. Returns true if it finds a hit. Hits further than ioHit.mFraction will not be considered and in this case ioHit will remain unmodified (and the function will return false).
+	/// Convex objects will be treated as solid (meaning if the ray starts inside, you'll get a hit fraction of 0) and back face hits are returned.
+	/// If you want the surface normal of the hit use GetWorldSpaceSurfaceNormal(ioHit.mSubShapeID2, inRay.GetPointOnRay(ioHit.mFraction)) on this object.
 	bool						CastRay(const RayCast &inRay, RayCastResult &ioHit) const;
 
-	/// Cast a ray, allows collecting multiple hits
-	void						CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, CastRayCollector &ioCollector) const;
+	/// Cast a ray, allows collecting multiple hits. Note that this version is more flexible but also slightly slower than the CastRay function that returns only a single hit.
+	/// If you want the surface normal of the hit use GetWorldSpaceSurfaceNormal(collected sub shape ID, inRay.GetPointOnRay(collected fraction)) on this object.
+	void						CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, CastRayCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const;
 
 	/// Check if inPoint is inside any shapes. For this tests all shapes are treated as if they were solid. 
 	/// For a mesh shape, this test will only provide sensible information if the mesh is a closed manifold.
 	/// For each shape that collides, ioCollector will receive a hit
-	void						CollidePoint(Vec3Arg inPoint, CollidePointCollector &ioCollector) const;
+	void						CollidePoint(Vec3Arg inPoint, CollidePointCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const;
 
 	/// Collide a shape and report any hits to ioCollector
-	void						CollideShape(const Shape *inShape, Vec3Arg inShapeScale, Mat44Arg inCenterOfMassTransform, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector) const;
+	void						CollideShape(const Shape *inShape, Vec3Arg inShapeScale, Mat44Arg inCenterOfMassTransform, const CollideShapeSettings &inCollideShapeSettings, CollideShapeCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const;
 
 	/// Cast a shape and report any hits to ioCollector
 	void						CastShape(const ShapeCast &inShapeCast, const ShapeCastSettings &inShapeCastSettings, CastShapeCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const;
 
 	/// Collect the leaf transformed shapes of all leaf shapes of this shape
 	/// inBox is the world space axis aligned box which leaf shapes should collide with
-	void						CollectTransformedShapes(const AABox &inBox, TransformedShapeCollector &ioCollector) const;
+	void						CollectTransformedShapes(const AABox &inBox, TransformedShapeCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const;
 
 	/// Use the context from Shape
 	using GetTrianglesContext = Shape::GetTrianglesContext;
@@ -70,10 +75,10 @@ public:
 	inline void					SetShapeScale(Vec3Arg inScale)				{ inScale.StoreFloat3(&mShapeScale); }
 
 	/// Calculates the transform for this shapes's center of mass (excluding scale)
-	inline const Mat44			GetCenterOfMassTransform() const			{ return Mat44::sRotationTranslation(mShapeRotation, mShapePositionCOM); }
+	inline Mat44				GetCenterOfMassTransform() const			{ return Mat44::sRotationTranslation(mShapeRotation, mShapePositionCOM); }
 
 	/// Calculates the inverse of the transform for this shape's center of mass (excluding scale)
-	inline const Mat44			GetInverseCenterOfMassTransform() const		{ return Mat44::sInverseRotationTranslation(mShapeRotation, mShapePositionCOM); }
+	inline Mat44				GetInverseCenterOfMassTransform() const		{ return Mat44::sInverseRotationTranslation(mShapeRotation, mShapePositionCOM); }
 
 	/// Sets the world transform (including scale) of this transformed shape (not from the center of mass but in the space the shape was created)
 	inline void					SetWorldTransform(Vec3Arg inPosition, QuatArg inRotation, Vec3Arg inScale)
@@ -92,7 +97,7 @@ public:
 	}
 
 	/// Calculates the world transform including scale of this shape (not from the center of mass but in the space the shape was created)
-	inline const Mat44			GetWorldTransform() const					
+	inline Mat44				GetWorldTransform() const					
 	{	
 		Mat44 transform = Mat44::sRotation(mShapeRotation) * Mat44::sScale(GetShapeScale());
 		transform.SetTranslation(mShapePositionCOM - transform.Multiply3x3(mShape->GetCenterOfMass()));
@@ -113,7 +118,8 @@ public:
 		return sub_shape_id;
 	}
 
-	/// Get surface normal of a particular sub shape and its world space surface position on this body
+	/// Get surface normal of a particular sub shape and its world space surface position on this body.
+	/// Note: When you have a CollideShapeResult or ShapeCastResult you should use -mPenetrationAxis.Normalized() as contact normal as GetWorldSpaceSurfaceNormal will only return face normals (and not vertex or edge normals).
 	inline Vec3					GetWorldSpaceSurfaceNormal(const SubShapeID &inSubShapeID, Vec3Arg inPosition) const
 	{
 		Mat44 inv_com = GetInverseCenterOfMassTransform();
@@ -128,7 +134,7 @@ public:
 	}
 
 	/// Get the user data of a particular sub shape
-	inline uint32				GetSubShapeUserData(const SubShapeID &inSubShapeID) const
+	inline uint64				GetSubShapeUserData(const SubShapeID &inSubShapeID) const
 	{
 		return mShape->GetSubShapeUserData(MakeSubShapeIDRelativeToShape(inSubShapeID));
 	}
@@ -156,4 +162,4 @@ public:
 static_assert(sizeof(TransformedShape) == 64, "Not properly packed");
 static_assert(alignof(TransformedShape) == 16, "Not properly aligned");
 
-} // JPH
+JPH_NAMESPACE_END

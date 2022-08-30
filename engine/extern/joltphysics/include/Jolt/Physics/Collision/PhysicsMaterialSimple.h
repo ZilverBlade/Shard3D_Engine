@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Physics/Collision/PhysicsMaterial.h>
+#include <Jolt/Physics/Collision/PhysicsMaterial.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Sample implementation of PhysicsMaterial that just holds the needed properties directly
 class PhysicsMaterialSimple : public PhysicsMaterial
@@ -15,7 +15,7 @@ public:
 
 	/// Constructor
 											PhysicsMaterialSimple() = default;
-											PhysicsMaterialSimple(const string &inName, ColorArg inColor) : mDebugName(inName), mDebugColor(inColor) { }
+											PhysicsMaterialSimple(const string_view &inName, ColorArg inColor) : mDebugName(inName), mDebugColor(inColor) { }
 
 	// Properties
 	virtual const char *					GetDebugName() const override		{ return mDebugName.c_str(); }
@@ -29,8 +29,8 @@ protected:
 	virtual void							RestoreBinaryState(StreamIn &inStream) override;
 
 private:
-	string									mDebugName;							///< Name of the material, used for debugging purposes
+	String									mDebugName;							///< Name of the material, used for debugging purposes
 	Color									mDebugColor = Color::sGrey;			///< Color of the material, used to render the shapes
 };
 
-} // JPH
+JPH_NAMESPACE_END

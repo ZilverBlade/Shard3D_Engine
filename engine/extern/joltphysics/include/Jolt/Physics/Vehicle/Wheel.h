@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <Physics/Body/Body.h>
-#include <Physics/Constraints/ConstraintPart/AxisConstraintPart.h>
-#include <ObjectStream/SerializableObject.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Constraints/ConstraintPart/AxisConstraintPart.h>
+#include <Jolt/ObjectStream/SerializableObject.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class VehicleConstraint;
 
@@ -40,6 +40,8 @@ public:
 class Wheel
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor / destructor
 	explicit				Wheel(const WheelSettings &inSettings);
 	virtual					~Wheel() = default;
@@ -136,6 +138,6 @@ protected:
 	AxisConstraintPart		mLateralPart;								///< Controls movement sideways (slip)
 };
 
-using Wheels = vector<Wheel *>;
+using Wheels = Array<Wheel *>;
 
-} // JPH
+JPH_NAMESPACE_END

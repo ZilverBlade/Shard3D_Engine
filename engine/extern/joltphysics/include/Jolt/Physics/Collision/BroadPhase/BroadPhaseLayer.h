@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <Core/NonCopyable.h>
-#include <Physics/Collision/ObjectLayer.h>
+#include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// An object layer can be mapped to a broadphase layer. Objects with the same broadphase layer will end up in the same sub structure (usually a tree) of the broadphase. 
 /// When there are many layers, this reduces the total amount of sub structures the broad phase needs to manage. Usually you want objects that don't collide with each other 
@@ -20,13 +20,8 @@ public:
 
 	JPH_INLINE 						BroadPhaseLayer() = default;
 	JPH_INLINE explicit constexpr	BroadPhaseLayer(Type inValue) : mValue(inValue) { }
-	JPH_INLINE constexpr			BroadPhaseLayer(const BroadPhaseLayer &inRHS) : mValue(inRHS.mValue) { }
-
-	JPH_INLINE BroadPhaseLayer &	operator = (const BroadPhaseLayer &inRHS)
-	{
-		mValue = inRHS.mValue;
-		return *this;
-	}
+	JPH_INLINE constexpr			BroadPhaseLayer(const BroadPhaseLayer &) = default;
+	JPH_INLINE BroadPhaseLayer &	operator = (const BroadPhaseLayer &) = default;
 
 	JPH_INLINE constexpr bool		operator == (const BroadPhaseLayer &inRHS) const
 	{
@@ -55,16 +50,27 @@ private:
 /// Constant value used to indicate an invalid broad phase layer
 static constexpr BroadPhaseLayer cBroadPhaseLayerInvalid(0xff);
 
-/// An array whose length corresponds to the max amount of object layers that should be supported.
-/// To map these to a broadphase layer you'd do vector[BroadPhaseLayer]. The broadphase layers should be tightly 
-/// packed, i.e. the lowest value should be 0 and the amount of sub structures that are created in the broadphase is max(inObjectToBroadPhaseLayer).
-using ObjectToBroadPhaseLayer = vector<BroadPhaseLayer>;
+/// Interface that the application should implement to allow mapping object layers to broadphase layers
+class BroadPhaseLayerInterface : public NonCopyable
+{
+public:
+	/// Destructor
+	virtual							~BroadPhaseLayerInterface() = default;
+
+	/// Return the number of broadphase layers there are
+	virtual uint					GetNumBroadPhaseLayers() const = 0;
+
+	/// Convert an object layer to the corresponding broadphase layer
+	virtual BroadPhaseLayer			GetBroadPhaseLayer(ObjectLayer inLayer) const = 0;
+
+#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
+	/// Get the user readable name of a broadphase layer (debugging purposes)
+	virtual const char *			GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const = 0;
+#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
+};
 
 /// Function to test if an object can collide with a broadphase layer. Used while finding collision pairs.
 using ObjectVsBroadPhaseLayerFilter = bool (*)(ObjectLayer inLayer1, BroadPhaseLayer inLayer2);
-
-/// Function to convert a broadphase layer to a string for debugging purposes
-using BroadPhaseLayerToString = const char * (*)(BroadPhaseLayer inLayer);
 
 /// Filter class for broadphase layers
 class BroadPhaseLayerFilter : public NonCopyable
@@ -88,13 +94,6 @@ public:
 									DefaultBroadPhaseLayerFilter(ObjectVsBroadPhaseLayerFilter inObjectVsBroadPhaseLayerFilter, ObjectLayer inLayer) :
 		mObjectVsBroadPhaseLayerFilter(inObjectVsBroadPhaseLayerFilter),
 		mLayer(inLayer)
-	{
-	}
-
-	/// Copy constructor
-									DefaultBroadPhaseLayerFilter(const DefaultBroadPhaseLayerFilter &inRHS) :
-		mObjectVsBroadPhaseLayerFilter(inRHS.mObjectVsBroadPhaseLayerFilter),
-		mLayer(inRHS.mLayer)
 	{
 	}
 
@@ -129,4 +128,4 @@ private:
 	BroadPhaseLayer					mLayer;
 };
 
-} // JPH
+JPH_NAMESPACE_END

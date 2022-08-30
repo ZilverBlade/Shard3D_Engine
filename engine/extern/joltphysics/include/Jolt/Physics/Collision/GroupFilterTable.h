@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <Physics/Collision/GroupFilter.h>
-#include <Physics/Collision/CollisionGroup.h>
+#include <Jolt/Physics/Collision/GroupFilter.h>
+#include <Jolt/Physics/Collision/CollisionGroup.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Implementation of GroupFilter that stores a bit table with one bit per sub shape ID pair to determine if they collide or not
 /// 
@@ -83,6 +83,14 @@ public:
 		mTable[bit >> 3] |= 1 << (bit & 0b111);
 	}
 
+	/// Check if the collision between two subgroups is enabled
+	inline bool				IsCollisionEnabled(SubGroupID inSubGroup1, SubGroupID inSubGroup2) const
+	{
+		// Test if the bit is set for this group pair
+		int bit = GetBit(inSubGroup1, inSubGroup2);
+		return (mTable[bit >> 3] & (1 << (bit & 0b111))) != 0;
+	}
+
 	/// Checks if two CollisionGroups collide
 	virtual bool			CanCollide(const CollisionGroup &inGroup1, const CollisionGroup &inGroup2) const override
 	{	
@@ -102,9 +110,8 @@ public:
 		if (inGroup1.GetSubGroupID() == inGroup2.GetSubGroupID())
 			return false;
 
-		// Test if the bit is set for this group pair
-		int bit = GetBit(inGroup1.GetSubGroupID(), inGroup2.GetSubGroupID());
-		return (mTable[bit >> 3] & (1 << (bit & 0b111))) != 0;
+		// Check the bit table
+		return IsCollisionEnabled(inGroup1.GetSubGroupID(), inGroup2.GetSubGroupID());
 	}
 
 	// See: GroupFilter::SaveBinaryState
@@ -116,7 +123,7 @@ protected:
 
 private:
 	uint					mNumSubGroups;									///< The number of subgroups that this group filter supports
-	vector<uint8>			mTable;											///< The table of bits that indicates which pairs collide
+	Array<uint8>			mTable;											///< The table of bits that indicates which pairs collide
 };
 
-} // JPH
+JPH_NAMESPACE_END

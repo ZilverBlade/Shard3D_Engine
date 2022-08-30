@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <Physics/Body/Body.h>
-#include <Core/Mutex.h>
-#include <Core/MutexArray.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Core/Mutex.h>
+#include <Jolt/Core/MutexArray.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 // Classes
 class BodyCreationSettings;
@@ -15,23 +15,26 @@ class BodyActivationListener;
 struct PhysicsSettings;
 #ifdef JPH_DEBUG_RENDERER
 class DebugRenderer;
+class BodyDrawFilter;
 #endif // JPH_DEBUG_RENDERER
 
 /// Array of bodies
-using BodyVector = vector<Body *>;
+using BodyVector = Array<Body *>;
 
 /// Array of body ID's
-using BodyIDVector = vector<BodyID>;
+using BodyIDVector = Array<BodyID>;
 
 /// Class that contains all bodies
 class BodyManager : public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Destructor
 									~BodyManager();
 
 	/// Initialize the manager
-	void							Init(uint inMaxBodies, uint inNumBodyMutexes);
+	void							Init(uint inMaxBodies, uint inNumBodyMutexes, const BroadPhaseLayerInterface &inLayerInterface);
 
 	/// Gets the current amount of bodies that are in the body manager
 	uint							GetNumBodies() const;
@@ -135,6 +138,9 @@ public:
 	/// Unlock all bodies. This should only be done during PhysicsSystem::Update().
 	void							UnlockAllBodies() const;
 
+	/// Function to update body's layer (should only be called by the BodyInterface since it also requires updating the broadphase)
+	inline void						SetBodyObjectLayerInternal(Body &ioBody, ObjectLayer inLayer) const { ioBody.mObjectLayer = inLayer; ioBody.mBroadPhaseLayer = mBroadPhaseLayerInterface->GetBroadPhaseLayer(inLayer); }
+
 	/// Set the Body::EFlags::InvalidateContactCache flag for the specified body. This means that the collision cache is invalid for any body pair involving that body until the next physics step.
 	void							InvalidateContactCacheForBody(Body &ioBody);
 
@@ -173,11 +179,10 @@ public:
 		bool						mDrawVelocity = false;							///< Draw the velocity vector for each body
 		bool						mDrawMassAndInertia = false;					///< Draw the mass and inertia (as the box equivalent) for each body
 		bool						mDrawSleepStats = false;						///< Draw stats regarding the sleeping algorithm of each body
-		bool						mDrawNames = false;								///< (Debug only) Draw the object names for each body
 	};
 
 	/// Draw the state of the bodies (debugging purposes)
-	void							Draw(const DrawSettings &inSettings, const PhysicsSettings &inPhysicsSettings, DebugRenderer *inRenderer);
+	void							Draw(const DrawSettings &inSettings, const PhysicsSettings &inPhysicsSettings, DebugRenderer *inRenderer, const BodyDrawFilter *inBodyFilter = nullptr);
 #endif // JPH_DEBUG_RENDERER
 
 #ifdef JPH_ENABLE_ASSERTS
@@ -212,7 +217,7 @@ public:
 
 private:
 	/// Increment and get the sequence number of the body
-#ifdef __clang__
+#ifdef JPH_COMPILER_CLANG
 	__attribute__((no_sanitize("implicit-conversion"))) // We intentionally overflow the uint8 sequence number
 #endif
 	inline uint8					GetNextSequenceNumber(int inBodyIndex)		{ return ++mBodySequenceNumbers[inBodyIndex]; }
@@ -246,7 +251,7 @@ private:
 	mutable BodyMutexes				mBodyMutexes;
 
 	/// List of next sequence number for a body ID
-	vector<uint8>					mBodySequenceNumbers;
+	Array<uint8>					mBodySequenceNumbers;
 
 	/// Mutex that protects the mActiveBodies array
 	mutable Mutex					mActiveBodiesMutex;
@@ -269,6 +274,9 @@ private:
 	/// Listener that is notified whenever a body is activated/deactivated
 	BodyActivationListener *		mActivationListener = nullptr;
 
+	/// Cached broadphase layer interface
+	const BroadPhaseLayerInterface *mBroadPhaseLayerInterface = nullptr;
+
 #ifdef JPH_ENABLE_ASSERTS
 	/// Debug system that tries to limit changes to active bodies during the PhysicsSystem::Update()
 	bool							mActiveBodiesLocked = false;
@@ -277,4 +285,4 @@ private:
 #endif
 };
 
-} // JPH
+JPH_NAMESPACE_END

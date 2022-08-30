@@ -3,9 +3,11 @@
 
 #pragma once
 
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <atomic>
+JPH_SUPPRESS_WARNINGS_STD_END
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 // Forward declares
 template <class T> class Ref;
@@ -34,35 +36,46 @@ class RefTarget
 {	
 public:
 	/// Constructor
-	inline					RefTarget()										: mRefCount(0) { }
-	inline					RefTarget(const RefTarget &)					: mRefCount(0) { }
-	inline					~RefTarget()									{ JPH_ASSERT(mRefCount == 0 || mRefCount == cEmbedded); } ///< assert no one is referencing us
+	inline					RefTarget() = default;
+	inline					RefTarget(const RefTarget &)					{ /* Do not copy refcount */ }
+	inline					~RefTarget()									{ JPH_IF_ENABLE_ASSERTS(uint32 value = mRefCount.load(memory_order_relaxed);) JPH_ASSERT(value == 0 || value == cEmbedded); } ///< assert no one is referencing us
 
 	/// Mark this class as embedded, this means the type can be used in a compound or constructed on the stack.
 	/// The Release function will never destruct the object, it is assumed the destructor will be called by whoever allocated
 	/// the object and at that point in time it is checked that no references are left to the structure.
-	inline void				SetEmbedded()									{ JPH_ASSERT(mRefCount < cEmbedded); mRefCount += cEmbedded; }
+	inline void				SetEmbedded() const								{ JPH_IF_ENABLE_ASSERTS(uint32 old = ) mRefCount.fetch_add(cEmbedded, memory_order_relaxed); JPH_ASSERT(old < cEmbedded); }
 
 	/// Assignment operator
-	inline RefTarget &		operator = (const RefTarget &inRHS)				{ return *this; }
+	inline RefTarget &		operator = (const RefTarget &)					{ /* Don't copy refcount */ return *this; }
 
 	/// Get current refcount of this object
-	uint32					GetRefCount() const								{ return mRefCount; }
+	uint32					GetRefCount() const								{ return mRefCount.load(memory_order_relaxed); }
 
 	/// Add or release a reference to this object
-	inline void				AddRef() const									{ ++mRefCount; }
-	inline void				Release() const									{ if (--mRefCount == 0) delete static_cast<const T *>(this); }
+	inline void				AddRef() const
+	{
+		// Adding a reference can use relaxed memory ordering
+		mRefCount.fetch_add(1, memory_order_relaxed);
+	}
+
+	inline void				Release() const
+	{
+		// Releasing a reference must use release semantics...
+		if (mRefCount.fetch_sub(1, memory_order_release) == 1)
+		{
+			// ... so that we can use aquire to ensure that we see any updates from other threads that released a ref before deleting the object
+			atomic_thread_fence(memory_order_acquire);
+			delete static_cast<const T *>(this);
+		}
+	}
 
 	/// INTERNAL HELPER FUNCTION USED BY SERIALIZATION
 	static int				sInternalGetRefCountOffset()					{ return offsetof(T, mRefCount); }
 
-	/// INTERNAL HELPER FUNCTION TO OVERRIDE THE REFCOUNT OF AN OBJECT. USE WITH GREAT CARE! 
-	inline void				SetRefCountInternal(uint32 inRefCount)			{ JPH_ASSERT(inRefCount >= 0); mRefCount = inRefCount; }
-
 protected:
 	static constexpr uint32 cEmbedded = 0x0ebedded;							///< A large value that gets added to the refcount to mark the object as embedded
 
-	mutable atomic<uint32>	mRefCount;										///< Current reference count
+	mutable atomic<uint32>	mRefCount = 0;									///< Current reference count
 };							
 
 /// Pure virtual version of RefTarget
@@ -186,7 +199,10 @@ private:
 	const T *				mPtr;											///< Pointer to object that we are reference counting
 };						
 
-} // JPH
+JPH_NAMESPACE_END
+
+JPH_SUPPRESS_WARNING_PUSH
+JPH_CLANG_SUPPRESS_WARNING("-Wc++98-compat")
 
 namespace std
 {
@@ -210,3 +226,5 @@ namespace std
 		}
 	};
 }
+
+JPH_SUPPRESS_WARNING_POP

@@ -1,17 +1,21 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Physics/Constraints/SwingTwistConstraint.h>
-#include <Physics/Ragdoll/Ragdoll.h>
-#include <Physics/PhysicsSystem.h>
-#include <Physics/Body/BodyLockMulti.h>
-#include <ObjectStream/TypeDeclarations.h>
-#include <Core/StreamIn.h>
-#include <Core/StreamOut.h>
+#include <Jolt/Physics/Constraints/SwingTwistConstraint.h>
+#include <Jolt/Physics/Ragdoll/Ragdoll.h>
+#include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/Physics/Body/BodyLockMulti.h>
+#include <Jolt/Physics/Collision/GroupFilterTable.h>
+#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
+#include <Jolt/Physics/Collision/CollideShape.h>
+#include <Jolt/Physics/Collision/CollisionDispatch.h>
+#include <Jolt/ObjectStream/TypeDeclarations.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/StreamOut.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 JPH_IMPLEMENT_SERIALIZABLE_NON_VIRTUAL(RagdollSettings::Part)
 {
@@ -31,7 +35,7 @@ static inline BodyInterface &sGetBodyInterface(PhysicsSystem *inSystem, bool inL
 	return inLockBodies? inSystem->GetBodyInterface() : inSystem->GetBodyInterfaceNoLock();
 }
 
-static inline const BodyLockInterface &sGetBodyLockInterface(PhysicsSystem *inSystem, bool inLockBodies)
+static inline const BodyLockInterface &sGetBodyLockInterface(const PhysicsSystem *inSystem, bool inLockBodies)
 {
 	return inLockBodies? static_cast<const BodyLockInterface &>(inSystem->GetBodyLockInterface()) : static_cast<const BodyLockInterface &>(inSystem->GetBodyLockInterfaceNoLock());
 }
@@ -49,7 +53,7 @@ bool RagdollSettings::Stabilize()
 
 	// The skeleton can contain one or more static bodies. We can't modify the mass for those so we start a new stabilization chain for each joint under a static body until we reach the next static body.
 	// This array keeps track of which joints have been processed.
-	vector<bool> visited;
+	Array<bool> visited;
 	visited.resize(mSkeleton->GetJointCount());
 	for (size_t v = 0; v < visited.size(); ++v)
 	{
@@ -74,7 +78,7 @@ bool RagdollSettings::Stabilize()
 		{
 			// Find all children of first_idx and their children up to the next static part
 			int next_to_process = 0;
-			vector<int> indices;
+			Array<int> indices;
 			indices.reserve(mSkeleton->GetJointCount());
 			visited[first_idx] = true;
 			indices.push_back(first_idx);
@@ -98,7 +102,7 @@ bool RagdollSettings::Stabilize()
 	
 			// Ensure that the mass ratio from parent to child is within a range
 			float total_mass_ratio = 1.0f;
-			vector<float> mass_ratios;
+			Array<float> mass_ratios;
 			mass_ratios.resize(mSkeleton->GetJointCount());
 			mass_ratios[indices[0]] = 1.0f;
 			for (int i = 1; i < (int)indices.size(); ++i)
@@ -138,7 +142,7 @@ bool RagdollSettings::Stabilize()
 				Vec3	mDiagonal;
 				float	mChildSum = 0.0f;
 			};	
-			vector<Principal> principals;
+			Array<Principal> principals;
 			principals.resize(mParts.size());
 			for (int i : indices)
 				if (!mParts[i].mMassPropertiesOverride.DecomposePrincipalMomentsOfInertia(principals[i].mRotation, principals[i].mDiagonal))
@@ -175,6 +179,73 @@ bool RagdollSettings::Stabilize()
 	}
 
 	return true;
+}
+
+void RagdollSettings::DisableParentChildCollisions(const Mat44 *inJointMatrices, float inMinSeparationDistance)
+{
+	int joint_count = mSkeleton->GetJointCount();
+	JPH_ASSERT(joint_count == (int)mParts.size());
+
+	// Create a group filter table that disables collisions between parent and child
+	Ref<GroupFilterTable> group_filter = new GroupFilterTable(joint_count);
+	for (int joint_idx = 0; joint_idx < joint_count; ++joint_idx)
+	{
+		int parent_joint = mSkeleton->GetJoint(joint_idx).mParentJointIndex;
+		if (parent_joint >= 0)
+			group_filter->DisableCollision(joint_idx, parent_joint);
+	}
+
+	// If joint matrices are provided
+	if (inJointMatrices != nullptr)
+	{
+		// Loop over all joints
+		for (int j1 = 0; j1 < joint_count; ++j1)
+		{
+			// Shape and transform for joint 1
+			const Part &part1 = mParts[j1];
+			const Shape *shape1 = part1.GetShape();
+			Vec3 scale1;
+			Mat44 com1 = (inJointMatrices[j1].PreTranslated(shape1->GetCenterOfMass())).Decompose(scale1);
+
+			// Loop over all other joints
+			for (int j2 = j1 + 1; j2 < joint_count; ++j2)
+				if (group_filter->IsCollisionEnabled(j1, j2)) // Only if collision is still enabled we need to test
+				{
+					// Shape and transform for joint 2
+					const Part &part2 = mParts[j2];
+					const Shape *shape2 = part2.GetShape();
+					Vec3 scale2;
+					Mat44 com2 = (inJointMatrices[j2].PreTranslated(shape2->GetCenterOfMass())).Decompose(scale2);
+					
+					// Collision settings
+					CollideShapeSettings settings;
+					settings.mActiveEdgeMode = EActiveEdgeMode::CollideWithAll;
+					settings.mBackFaceMode = EBackFaceMode::CollideWithBackFaces;
+					settings.mMaxSeparationDistance = inMinSeparationDistance;
+
+					// Only check if one of the two bodies can become dynamic
+					if (part1.HasMassProperties() || part2.HasMassProperties())
+					{
+						// If there is a collision, disable the collision between the joints
+						AnyHitCollisionCollector<CollideShapeCollector> collector;
+						if (part1.HasMassProperties()) // Ensure that the first shape is always a dynamic one (we can't check mesh vs convex but we can check convex vs mesh)
+							CollisionDispatch::sCollideShapeVsShape(shape1, shape2, scale1, scale2, com1, com2, SubShapeIDCreator(), SubShapeIDCreator(), settings, collector);
+						else
+							CollisionDispatch::sCollideShapeVsShape(shape2, shape1, scale2, scale1, com2, com1, SubShapeIDCreator(), SubShapeIDCreator(), settings, collector);
+						if (collector.HadHit())
+							group_filter->DisableCollision(j1, j2);
+					}
+				}
+		}
+	}
+
+	// Loop over the body parts and assign them a sub group ID and the group filter
+	for (int joint_idx = 0; joint_idx < joint_count; ++joint_idx)
+	{
+		Part &part = mParts[joint_idx];
+		part.mCollisionGroup.SetSubGroupID(joint_idx);
+		part.mCollisionGroup.SetGroupFilter(group_filter);
+	}
 }
 
 void RagdollSettings::SaveBinaryState(StreamOut &inStream, bool inSaveShapes, bool inSaveGroupFilter) const
@@ -263,7 +334,7 @@ RagdollSettings::RagdollResult RagdollSettings::sRestoreFromBinaryState(StreamIn
 	return result;
 }
 
-Ragdoll *RagdollSettings::CreateRagdoll(CollisionGroup::GroupID inCollisionGroup, void *inUserData, PhysicsSystem *inSystem) const
+Ragdoll *RagdollSettings::CreateRagdoll(CollisionGroup::GroupID inCollisionGroup, uint64 inUserData, PhysicsSystem *inSystem) const
 {
 	Ragdoll *r = new Ragdoll(inSystem);
 	r->mRagdollSettings = this;
@@ -284,9 +355,6 @@ Ragdoll *RagdollSettings::CreateRagdoll(CollisionGroup::GroupID inCollisionGroup
 		}
 		body2->GetCollisionGroup().SetGroupID(inCollisionGroup);
 		body2->SetUserData(inUserData);
-#ifdef _DEBUG
-		body2->SetDebugName(mSkeleton->GetJoint(joint_idx).mName);
-#endif
 
 		// Temporarily store body pointer for hooking up constraints
 		bodies[joint_idx] = body2;
@@ -418,6 +486,27 @@ void Ragdoll::SetPose(const Mat44 *inJointMatrices, bool inLockBodies)
 	}
 }
 
+void Ragdoll::GetPose(SkeletonPose &outPose, bool inLockBodies)
+{
+	JPH_ASSERT(outPose.GetSkeleton() == mRagdollSettings->mSkeleton);
+
+	GetPose(outPose.GetJointMatrices().data(), inLockBodies);
+}
+
+void Ragdoll::GetPose(Mat44 *outJointMatrices, bool inLockBodies)
+{
+	// Lock the bodies
+	int body_count = (int)mBodyIDs.size();
+	BodyLockMultiRead lock(sGetBodyLockInterface(mSystem, inLockBodies), mBodyIDs.data(), body_count);
+
+	// Get pose
+	for (int b = 0; b < body_count; ++b)
+	{
+		const Body *body = lock.GetBody(b);
+		outJointMatrices[b] = body->GetWorldTransform();
+	}
+}
+
 void Ragdoll::DriveToPoseUsingKinematics(const SkeletonPose &inPose, float inDeltaTime, bool inLockBodies)
 {
 	JPH_ASSERT(inPose.GetSkeleton() == mRagdollSettings->mSkeleton);
@@ -503,7 +592,7 @@ void Ragdoll::GetRootTransform(Vec3 &outPosition, Quat &outRotation, bool inLock
 	}
 }
 
-const AABox Ragdoll::GetWorldSpaceBounds(bool inLockBodies) const
+AABox Ragdoll::GetWorldSpaceBounds(bool inLockBodies) const
 {
 	// Lock the bodies
 	int body_count = (int)mBodyIDs.size();
@@ -520,4 +609,4 @@ const AABox Ragdoll::GetWorldSpaceBounds(bool inLockBodies) const
 	return bounds;
 }
 
-} // JPH
+JPH_NAMESPACE_END

@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <Physics/Vehicle/VehicleConstraint.h>
-#include <Physics/Vehicle/VehicleController.h>
-#include <Physics/Vehicle/VehicleEngine.h>
-#include <Physics/Vehicle/VehicleTransmission.h>
-#include <Physics/Vehicle/VehicleTrack.h>
+#include <Jolt/Physics/Vehicle/VehicleConstraint.h>
+#include <Jolt/Physics/Vehicle/VehicleController.h>
+#include <Jolt/Physics/Vehicle/VehicleEngine.h>
+#include <Jolt/Physics/Vehicle/VehicleTransmission.h>
+#include <Jolt/Physics/Vehicle/VehicleTrack.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class PhysicsSystem;
 
@@ -31,6 +31,8 @@ public:
 class WheelTV : public Wheel
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 	explicit					WheelTV(const WheelSettingsTV &inWheel);
 
@@ -75,6 +77,8 @@ public:
 class TrackedVehicleController : public VehicleController
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 								TrackedVehicleController(const TrackedVehicleControllerSettings &inSettings, VehicleConstraint &inConstraint);
 
@@ -141,4 +145,4 @@ protected:
 #endif // JPH_DEBUG_RENDERER
 };
 
-} // JPH
+JPH_NAMESPACE_END

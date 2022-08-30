@@ -3,12 +3,14 @@
 
 #pragma once
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// A simple triangle and its material
 class Triangle
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 					Triangle() = default;
 					Triangle(const Float3 &inV1, const Float3 &inV2, const Float3 &inV3) : mV { inV1, inV2, inV3 } { }
@@ -26,6 +28,6 @@ public:
 	uint32			mMaterialIndex = 0;			///< Follows mV[3] so that we can read mV as 4 vectors
 };
 
-using TriangleList = vector<Triangle>;
+using TriangleList = Array<Triangle>;
 
-} // JPH
+JPH_NAMESPACE_END

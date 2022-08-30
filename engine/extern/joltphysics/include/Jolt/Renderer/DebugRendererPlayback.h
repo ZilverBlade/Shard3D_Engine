@@ -7,11 +7,11 @@
 	#error This file should only be included when JPH_DEBUG_RENDERER is defined
 #endif // !JPH_DEBUG_RENDERER
 
-#include <Renderer/DebugRendererRecorder.h>
-#include <Core/StreamIn.h>
-#include <map>
+#include <Jolt/Renderer/DebugRendererRecorder.h>
+#include <Jolt/Core/StreamIn.h>
+#include <Jolt/Core/UnorderedMap.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Class that can read a recorded stream from DebugRendererRecorder and plays it back trough a DebugRenderer
 class DebugRendererPlayback
@@ -34,14 +34,14 @@ private:
 	DebugRenderer &						mRenderer;
 
 	/// Mapping of ID to batch
-	map<uint32, DebugRenderer::Batch>	mBatches;
+	UnorderedMap<uint32, DebugRenderer::Batch> mBatches;
 
 	/// Mapping of ID to geometry
-	map<uint32, DebugRenderer::GeometryRef> mGeometries;
+	UnorderedMap<uint32, DebugRenderer::GeometryRef> mGeometries;
 
 	/// The list of parsed frames
 	using Frame = DebugRendererRecorder::Frame;
-	vector<Frame>						mFrames;
+	Array<Frame>						mFrames;
 };
 
-} // JPH
+JPH_NAMESPACE_END

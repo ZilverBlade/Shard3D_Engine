@@ -3,18 +3,19 @@
 
 #pragma once
 
-#include <Core/NonCopyable.h>
-#include <Geometry/AABox.h>
-#include <Physics/Collision/Shape/Shape.h>
-#include <Physics/Collision/ObjectLayer.h>
-#include <Physics/Collision/CollisionGroup.h>
-#include <Physics/Collision/TransformedShape.h>
-#include <Physics/Body/MotionProperties.h>
-#include <Physics/Body/BodyID.h>
-#include <Physics/Body/BodyAccess.h>
-#include <Core/StringTools.h>
+#include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Geometry/AABox.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/CollisionGroup.h>
+#include <Jolt/Physics/Collision/TransformedShape.h>
+#include <Jolt/Physics/Body/MotionProperties.h>
+#include <Jolt/Physics/Body/BodyID.h>
+#include <Jolt/Physics/Body/BodyAccess.h>
+#include <Jolt/Core/StringTools.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class StateRecorder;
 class BodyCreationSettings;
@@ -30,19 +31,13 @@ class BodyCreationSettings;
 class Body : public NonCopyable
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Default constructor
 							Body() = default;
 
 	/// Destructor							
 							~Body()															{ JPH_ASSERT(mMotionProperties == nullptr); }
-
-#ifdef _DEBUG
-	/// Name of the body for debugging purposes
-	void					SetDebugName(const string &inName)								{ mDebugName = inName; }
-	string					GetDebugName() const;
-#else
-	string					GetDebugName() const											{ return ConvertToString(mID.GetIndex()); }
-#endif
 
 	/// Get the id of this body
 	inline const BodyID &	GetID() const													{ return mID; }
@@ -62,12 +57,22 @@ public:
 	/// Check if a body could be made kinematic or dynamic (if it was created dynamic or with mAllowDynamicOrKinematic set to true)
 	inline bool				CanBeKinematicOrDynamic() const									{ return mMotionProperties != nullptr; }
 
-	/// Check if this body is a sensor. A sensor will receive collision callbacks, but will not cause any collision responses and can be used as a trigger volume.
+	/// Change the body to a sensor. A sensor will receive collision callbacks, but will not cause any collision responses and can be used as a trigger volume.
+	/// The cheapest sensor (in terms of CPU usage) is a sensor with motion type Static (they can be moved around using BodyInterface::SetPosition/SetPositionAndRotation).
+	/// These sensors will only detect collisions with active Dynamic or Kinematic bodies. As soon as a body go to sleep, the contact point with the sensor will be lost.
+	/// If you make a sensor Dynamic or Kinematic and activate them, the sensor will be able to detect collisions with sleeping bodies too. An active sensor will never go to sleep automatically.
+	/// When you make a Dynamic or Kinematic sensor, make sure it is in an ObjectLayer that does not collide with Static bodies or other sensors to avoid extra overhead in the broad phase.
+	inline void				SetIsSensor(bool inIsSensor)									{ if (inIsSensor) mFlags.fetch_or(uint8(EFlags::IsSensor), memory_order_relaxed); else mFlags.fetch_and(uint8(~uint8(EFlags::IsSensor)), memory_order_relaxed); }
+
+	/// Check if this body is a sensor.
 	inline bool				IsSensor() const												{ return (mFlags.load(memory_order_relaxed) & uint8(EFlags::IsSensor)) != 0; }
 
 	/// Motion type of this body
 	inline EMotionType		GetMotionType() const											{ return mMotionType; }
 	void					SetMotionType(EMotionType inMotionType);
+
+	/// Get broadphase layer, this determines in which broad phase sub-tree the object is placed
+	inline BroadPhaseLayer	GetBroadPhaseLayer() const										{ return mBroadPhaseLayer; }	
 
 	/// Get object layer, this determines which other objects it collides with
 	inline ObjectLayer		GetObjectLayer() const											{ return mObjectLayer; }
@@ -113,8 +118,11 @@ public:
 	/// Velocity of point inPoint (in world space, e.g. on the surface of the body) of the body (unit: m/s)
 	inline Vec3				GetPointVelocity(Vec3Arg inPoint) const							{ JPH_ASSERT(BodyAccess::sCheckRights(BodyAccess::sPositionAccess, BodyAccess::EAccess::Read)); return GetPointVelocityCOM(inPoint - mPosition); }
 
-	/// Add force (unit: N) for the next time step, will be reset after the next call to PhysicsSimulation::Update
+	/// Add force (unit: N) at center of mass for the next time step, will be reset after the next call to PhysicsSimulation::Update
 	inline void				AddForce(Vec3Arg inForce)										{ JPH_ASSERT(IsDynamic()); (Vec3::sLoadFloat3Unsafe(mMotionProperties->mForce) + inForce).StoreFloat3(&mMotionProperties->mForce); }
+
+	/// Add force (unit: N) at inPosition for the next time step, will be reset after the next call to PhysicsSimulation::Update
+	inline void				AddForce(Vec3Arg inForce, Vec3Arg inPosition);
 
 	/// Add torque (unit: N m) for the next time step, will be reset after the next call to PhysicsSimulation::Update
 	inline void				AddTorque(Vec3Arg inTorque)										{ JPH_ASSERT(IsDynamic()); (Vec3::sLoadFloat3Unsafe(mMotionProperties->mTorque) + inTorque).StoreFloat3(&mMotionProperties->mTorque); }
@@ -142,7 +150,8 @@ public:
 	/// @param inFluidVelocity The average velocity of the fluid (in m/s) in which the body resides
 	/// @param inGravity The graviy vector (pointing down)
 	/// @param inDeltaTime Delta time of the next simulation step (in s)
-	void					ApplyBuoyancyImpulse(const Plane &inSurface, float inBuoyancy, float inLinearDrag, float inAngularDrag, Vec3Arg inFluidVelocity, Vec3Arg inGravity, float inDeltaTime);
+	/// @return true if an impulse was applied, false if the body was not in the fluid
+	bool					ApplyBuoyancyImpulse(const Plane &inSurface, float inBuoyancy, float inLinearDrag, float inAngularDrag, Vec3Arg inFluidVelocity, Vec3Arg inGravity, float inDeltaTime);
 
 	/// Check if this body has been added to the physics system
 	inline bool				IsInBroadPhase() const											{ return (mFlags.load(memory_order_relaxed) & uint8(EFlags::IsInBroadPhase)) != 0; }
@@ -182,9 +191,9 @@ public:
 	const MotionProperties *GetMotionPropertiesUnchecked() const							{ return mMotionProperties; }
 	MotionProperties *		GetMotionPropertiesUnchecked()									{ return mMotionProperties; }
 
-	/// Access to the user data pointer
-	void *					GetUserData() const												{ return mUserData; }
-	void					SetUserData(void *inUserData)									{ mUserData = inUserData; }
+	/// Access to the user data, can be used for anything by the application
+	uint64					GetUserData() const												{ return mUserData; }
+	void					SetUserData(uint64 inUserData)									{ mUserData = inUserData; }
 
 	/// Get surface normal of a particular sub shape and its world space surface position on this body
 	inline Vec3				GetWorldSpaceSurfaceNormal(const SubShapeID &inSubShapeID, Vec3Arg inPosition) const;
@@ -225,9 +234,6 @@ public:
 	/// Updates world space bounding box (should only be called by the PhysicsSystem)
 	void					CalculateWorldSpaceBoundsInternal();
 
-	/// Function to update body's layer (should only be called by the BodyInterface since it also requires updating the broadphase)
-	void					SetObjectLayerInternal(ObjectLayer inLayer)						{ mObjectLayer = inLayer; }
-
 	/// Function to update body's position (should only be called by the BodyInterface since it also requires updating the broadphase)
 	void					SetPositionAndRotationInternal(Vec3Arg inPosition, QuatArg inRotation);
 
@@ -261,7 +267,7 @@ public:
 
 	///@}
 
-	static const uint32		cInactiveIndex = uint32(-1);									///< Constant indicating that body is not active
+	static constexpr uint32	cInactiveIndex = uint32(-1);									///< Constant indicating that body is not active
 
 private:
 	friend class BodyManager;
@@ -286,7 +292,7 @@ private:
 	// 8 byte aligned
 	RefConst<Shape>			mShape;															///< Shape representing the volume of this body
 	MotionProperties *		mMotionProperties = nullptr;									///< If this is a keyframed or dynamic object, this object holds all information about the movement
-	void *					mUserData = nullptr;											///< User data pointer, can be used for anything by the application
+	uint64					mUserData = 0;													///< User data, can be used for anything by the application
 	CollisionGroup			mCollisionGroup;												///< The collision group this body belongs to (determines if two objects can collide)
 
 	// 4 byte aligned
@@ -298,21 +304,21 @@ private:
 	ObjectLayer				mObjectLayer;													///< The collision layer this body belongs to (determines if two objects can collide)
 
 	// 1 byte aligned
+	BroadPhaseLayer			mBroadPhaseLayer;												///< The broad phase layer this body belongs to
 	EMotionType				mMotionType;													///< Type of motion (static, dynamic or kinematic)
 	atomic<uint8>			mFlags = 0;														///< See EFlags for possible flags
 	
-	// 120 bytes up to here
+	// 121 bytes up to here (64-bit mode)
 
-#ifdef _DEBUG
-	string					mDebugName;														///< Name for debugging purposes
+#if JPH_CPU_ADDRESS_BITS == 32
+	// Padding for 32 bit mode
+	char					mPadding[19];
 #endif
 };
 
-#ifndef _DEBUG
-	static_assert(sizeof(Body) == 128, "Body should be 128 bytes");
-	static_assert(alignof(Body) == 16, "Body should align to 16 bytes");
-#endif
+static_assert(sizeof(Body) == 128, "Body should be 128 bytes");
+static_assert(alignof(Body) == 16, "Body should align to 16 bytes");
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "Body.inl"

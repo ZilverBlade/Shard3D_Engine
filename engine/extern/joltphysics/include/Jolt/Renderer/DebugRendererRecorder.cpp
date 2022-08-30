@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
 #ifdef JPH_DEBUG_RENDERER
 
-#include <Renderer/DebugRendererRecorder.h>
+#include <Jolt/Renderer/DebugRendererRecorder.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 void DebugRendererRecorder::DrawLine(const Float3 &inFrom, const Float3 &inTo, ColorArg inColor) 
 { 
@@ -92,7 +92,7 @@ void DebugRendererRecorder::DrawGeometry(Mat44Arg inModelMatrix, const AABox &in
 	mCurrentFrame.mGeometries.push_back({ inModelMatrix, inModelColor, geometry_id, inCullMode, inCastShadow, inDrawMode });
 }
 
-void DebugRendererRecorder::DrawText3D(Vec3Arg inPosition, const string &inString, ColorArg inColor, float inHeight)
+void DebugRendererRecorder::DrawText3D(Vec3Arg inPosition, const string_view &inString, ColorArg inColor, float inHeight)
 { 	
 	lock_guard lock(mMutex);  
 
@@ -151,6 +151,6 @@ void DebugRendererRecorder::EndFrame()
 	mCurrentFrame.mGeometries.clear();
 }
 
-} // JPH
+JPH_NAMESPACE_END
 
 #endif // JPH_DEBUG_RENDERER

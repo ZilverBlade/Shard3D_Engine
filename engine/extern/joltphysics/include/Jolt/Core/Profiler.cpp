@@ -1,22 +1,26 @@
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
-#include <Jolt.h>
+#include <Jolt/Jolt.h>
 
-#include <Core/Profiler.h>
-#include <Core/Color.h>
-#include <Core/StringTools.h>
+#include <Jolt/Core/Profiler.h>
+#include <Jolt/Core/Color.h>
+#include <Jolt/Core/StringTools.h>
+#include <Jolt/Core/QuickSort.h>
+
+JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <fstream>
+JPH_SUPPRESS_WARNINGS_STD_END
 
 #ifdef JPH_PROFILE_ENABLED
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Profiler
 //////////////////////////////////////////////////////////////////////////////////////////
 
-Profiler Profiler::sInstance;
+Profiler *Profiler::sInstance = nullptr;
 thread_local ProfileThread *ProfileThread::sInstance = nullptr;
 
 bool ProfileMeasurement::sOutOfSamplesReported = false;
@@ -35,7 +39,7 @@ void Profiler::NextFrame()
 		t->mCurrentSample = 0;
 }
 
-void Profiler::Dump(string inTag)
+void Profiler::Dump(const string_view &inTag)
 {
 	mDump = true;
 	mDumpTag = inTag;
@@ -52,7 +56,7 @@ void Profiler::RemoveThread(ProfileThread *inThread)
 { 
 	lock_guard lock(mLock); 
 	
-	vector<ProfileThread *>::iterator i = find(mThreads.begin(), mThreads.end(), inThread); 
+	Array<ProfileThread *>::iterator i = find(mThreads.begin(), mThreads.end(), inThread); 
 	JPH_ASSERT(i != mThreads.end()); 
 	mThreads.erase(i); 
 }
@@ -93,7 +97,7 @@ void Profiler::sAggregate(int inDepth, uint32 inColor, ProfileSample *&ioSample,
 	if (aggregator_idx == ioKeyToAggregator.end())
 	{
 		// Not found, add to map and insert in array
-		ioKeyToAggregator.insert(KeyToAggregator::value_type(ioSample->mName, ioAggregators.size()));
+		ioKeyToAggregator.try_emplace(ioSample->mName, ioAggregators.size());
 		ioAggregators.emplace_back(ioSample->mName);
 		aggregator = &ioAggregators.back();
 	}
@@ -107,7 +111,7 @@ void Profiler::sAggregate(int inDepth, uint32 inColor, ProfileSample *&ioSample,
 	aggregator->AccumulateMeasurement(cycles_this_with_children, cycles_in_children);
 
 	// Update ioSample to the last child of ioSample
-	JPH_ASSERT(sample[-1].mStartCycle < ioSample->mEndCycle);
+	JPH_ASSERT(sample[-1].mStartCycle <= ioSample->mEndCycle);
 	JPH_ASSERT(sample >= inEnd || sample->mStartCycle >= ioSample->mEndCycle);
 	ioSample = sample - 1;
 }
@@ -135,7 +139,7 @@ void Profiler::DumpInternal()
 		}
 
 	// Determine tag of this profile
-	string tag;
+	String tag;
 	if (mDumpTag.empty())
 	{
 		// Next sequence number
@@ -158,25 +162,25 @@ void Profiler::DumpInternal()
 			sAggregate(0, Color::sGetDistinctColor(0).GetUInt32(), s, end, aggregators, key_to_aggregators);
 
 	// Dump as list
-	DumpList(tag, aggregators);
+	DumpList(tag.c_str(), aggregators);
 
 	// Dump as chart
-	DumpChart(tag, threads, key_to_aggregators, aggregators);
+	DumpChart(tag.c_str(), threads, key_to_aggregators, aggregators);
 }
 
-static string sHTMLEncode(string inString)
+static String sHTMLEncode(const char *inString)
 {
-	string str = inString;
+	String str(inString);
 	StringReplace(str, "<", "&lt;");
 	StringReplace(str, ">", "&gt;");
 	return str;
 }
 
-void Profiler::DumpList(string inTag, const Aggregators &inAggregators)
+void Profiler::DumpList(const char *inTag, const Aggregators &inAggregators)
 {
 	// Open file
 	ofstream f;
-	f.open(StringFormat("profile_list_%s.html", inTag.c_str()).c_str(), ofstream::out | ofstream::trunc);
+	f.open(StringFormat("profile_list_%s.html", inTag).c_str(), ofstream::out | ofstream::trunc);
 	if (!f.is_open()) 
 		return;
 
@@ -218,7 +222,7 @@ void Profiler::DumpList(string inTag, const Aggregators &inAggregators)
 	
 	// Sort the list
 	Aggregators aggregators = inAggregators;
-	sort(aggregators.begin(), aggregators.end());
+	QuickSort(aggregators.begin(), aggregators.end());
 	
 	// Write all aggregators
 	for (const Aggregator &item : aggregators)
@@ -252,11 +256,11 @@ void Profiler::DumpList(string inTag, const Aggregators &inAggregators)
 	f << R"(</tbody></table></body></html>)";
 }
 
-void Profiler::DumpChart(string inTag, const Threads &inThreads, const KeyToAggregator &inKeyToAggregators, const Aggregators &inAggregators)
+void Profiler::DumpChart(const char *inTag, const Threads &inThreads, const KeyToAggregator &inKeyToAggregators, const Aggregators &inAggregators)
 {
 	// Open file
 	ofstream f;
-	f.open(StringFormat("profile_chart_%s.html", inTag.c_str()).c_str(), ofstream::out | ofstream::trunc);
+	f.open(StringFormat("profile_chart_%s.html", inTag).c_str(), ofstream::out | ofstream::trunc);
 	if (!f.is_open()) 
 		return;
 
@@ -342,7 +346,7 @@ void Profiler::DumpChart(string inTag, const Threads &inThreads, const KeyToAggr
 		if (!first)
 			f << ",";
 		first = false;
-		string name = "\"" + sHTMLEncode(a.mName) + "\"";
+		String name = "\"" + sHTMLEncode(a.mName) + "\"";
 		f << name;
 	}
 	f << "],\ncalls: [";
@@ -392,6 +396,6 @@ void Profiler::DumpChart(string inTag, const Threads &inThreads, const KeyToAggr
 </tbody></table></body></html>)";
 }
 
-} // JPH
+JPH_NAMESPACE_END
 
 #endif // JPH_PROFILE_ENABLED

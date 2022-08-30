@@ -3,13 +3,15 @@
 
 #pragma once
 
-#include <Math/Vec8.h>
+#include <Jolt/Math/Vec8.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 class [[nodiscard]] UVec8
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 								UVec8() = default; ///< Intentionally not initialized for performance reasons
 								UVec8(const UVec8 &inRHS) = default;
 	JPH_INLINE					UVec8(__m256i inRHS) : mValue(inRHS)				{ }
@@ -92,6 +94,6 @@ public:
 
 static_assert(is_trivial<UVec8>(), "Is supposed to be a trivial type!");
 
-} // JPH
+JPH_NAMESPACE_END
 
 #include "UVec8.inl"

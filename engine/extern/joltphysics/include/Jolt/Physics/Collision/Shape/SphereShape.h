@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <Physics/Collision/Shape/ConvexShape.h>
+#include <Jolt/Physics/Collision/Shape/ConvexShape.h>
 
-namespace JPH {
+JPH_NAMESPACE_BEGIN
 
 /// Class that constructs a SphereShape
 class SphereShapeSettings final : public ConvexShapeSettings
@@ -30,6 +30,8 @@ public:
 class SphereShape final : public ConvexShape
 {
 public:
+	JPH_OVERRIDE_NEW_DELETE
+
 	/// Constructor
 							SphereShape() : ConvexShape(EShapeSubType::Sphere) { }
 							SphereShape(const SphereShapeSettings &inSettings, ShapeResult &outResult);
@@ -71,10 +73,10 @@ public:
 
 	// See Shape::CastRay
 	virtual bool			CastRay(const RayCast &inRay, const SubShapeIDCreator &inSubShapeIDCreator, RayCastResult &ioHit) const override;
-	virtual void			CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector) const override;
+	virtual void			CastRay(const RayCast &inRay, const RayCastSettings &inRayCastSettings, const SubShapeIDCreator &inSubShapeIDCreator, CastRayCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const override;
 
 	// See: Shape::CollidePoint
-	virtual void			CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector) const override;
+	virtual void			CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubShapeIDCreator, CollidePointCollector &ioCollector, const ShapeFilter &inShapeFilter = { }) const override;
 
 	// See Shape::TransformShape
 	virtual void			TransformShape(Mat44Arg inCenterOfMassTransform, TransformedShapeCollector &ioCollector) const override;
@@ -115,4 +117,4 @@ private:
 	float					mRadius = 0.0f;
 };
 
-} // JPH
+JPH_NAMESPACE_END

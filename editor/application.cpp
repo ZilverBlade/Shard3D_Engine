@@ -211,6 +211,14 @@ namespace Shard3D {
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
 
+		//Actor phys = level->createActor();
+		//phys.addComponent<Components::RigidbodyComponent>();
+		//auto boxShape = physicsSystem.createBoxShape(JPH::BoxShapeSettings(JPH::Vec3(100.0f, 1.0f, 100.0f)));
+		//
+		//phys.getComponent<Components::RigidbodyComponent>().physicsBody = physicsSystem.createBody(JPH::BodyCreationSettings(boxShape.GetPtr(), JPH::Vec3(0, 10, 0), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, 5));
+
+
+
 		ResourceHandler::init(engineDevice);
 
 		{
@@ -310,6 +318,7 @@ beginWhileLoop:
 			editor_cameraActor = level->getActorFromUUID(0);
 
 			if (level->simulationState == PlayState::Playing) {
+				physicsSystem.simulate(level, frameTime);
 				SHARD3D_STAT_RECORD();
 				level->tick(frameTime);
 				SHARD3D_STAT_RECORD_END({ "Level", "Tick" });
