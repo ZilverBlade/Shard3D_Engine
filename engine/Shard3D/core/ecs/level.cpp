@@ -39,9 +39,9 @@ namespace Shard3D {
 			auto& dstLvlRegistry = newLvl->registry;
 
 			auto idView = srcLvlRegistry.view<Components::UUIDComponent>();
-			for (auto e : idView) {
-				UUID guid = srcLvlRegistry.get<Components::UUIDComponent>(e).id;
-				Actor newActor = newLvl->createActorWithUUID(guid, srcLvlRegistry.get<Components::TagComponent>(e).tag);
+			for (auto it = idView.begin(); it != idView.end(); ++it) {
+				UUID guid = srcLvlRegistry.get<Components::UUIDComponent>(idView[it.index()]).id;
+				Actor newActor = newLvl->createActorWithUUID(guid, srcLvlRegistry.get<Components::TagComponent>(idView[it.index()]).tag);
 				enttMap[guid] = newActor.actorHandle;
 			}
 
@@ -297,7 +297,7 @@ namespace Shard3D {
 		void Level::killEverything() {
 			registry.each([&](auto actorGUID) { ECS::Actor actor = { actorGUID, this };
 				if (actor.isInvalid()) return;
-				killActor(actor);
+				actorKillQueue.emplace_back(actor);
 			});
 		}
 	}

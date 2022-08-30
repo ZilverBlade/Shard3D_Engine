@@ -161,6 +161,7 @@ ALPHA:
 		- Icon updates
 		- Added actor parenting
 		- Added Bloom
+		- Fixed age old bug with the level capture iterating backwards, flipping the list of actors with each play/stop
 
 		:: TODO, proper events sytem, add editor layouts, use premake
 		:: Fix: change vertex and index buffers to draw offset, dont use 64 bit integers for shaders (e.g. HUD system)
