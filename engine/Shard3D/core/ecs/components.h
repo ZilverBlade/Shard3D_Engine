@@ -10,7 +10,9 @@
 
 #include "../audio/audio.h"
 #include "../../systems/computational/particle_system.h"
-#include "../../systems/computational/physics_system.h"
+
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Body/BodyID.h>
 
 namespace Shard3D {
 	class LevelPropertiesPanel;
@@ -65,6 +67,25 @@ namespace Shard3D {
 
 			glm::mat4 calculateMat4();
 			glm::mat3 calculateNormalMatrix();
+
+			void setGlobalTranslationDirect(glm::vec3 _t) {
+				translation = glm::vec3(_t.x, _t.z, _t.y); 
+				transformMatrix = calculateMat4(); 
+				normalMatrix = calculateNormalMatrix();
+			}
+
+			void setGlobalRotationDirect(glm::vec3 _r) {
+				rotation = glm::vec3(_r.x, _r.z, _r.y);
+			}
+
+			void setGlobalScaleDirect(glm::vec3 _s) {
+				scale = glm::vec3(_s.x, _s.z, _s.y);
+			}
+
+			void recalculateMatrix() {
+				transformMatrix = calculateMat4();
+				normalMatrix = calculateNormalMatrix();
+			}
 
 			bool dirty = true;
 		private:
@@ -237,7 +258,7 @@ namespace Shard3D {
 			float friction;
 			float restitution;
 
-			JPH::Body* physicsBody{};
+			JPH::BodyID physicsBody{};
 
 			PhysicsState state = PhysicsState::STATIC;
 		};

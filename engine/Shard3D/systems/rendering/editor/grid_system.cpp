@@ -30,16 +30,16 @@ namespace Shard3D {
     }
 
     void GridSystem::createPipeline(VkRenderPass renderPass) {
-        SHARD3D_ASSERT(pipelineLayout != nullptr, "Cannot create pipeline before pipeline layout");
+        SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-        PipelineConfigInfo pipelineConfig{};
-        EnginePipeline::pipelineConfig(pipelineConfig)
-            .defaultPipelineConfigInfo()
+        GraphicsPipelineConfigInfo pipelineConfig{};
+        GraphicsPipeline::pipelineConfig(pipelineConfig)
+            .defaultGraphicsPipelineConfigInfo()
             .enableAlphaBlending(VK_BLEND_OP_ADD);
 
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-        enginePipeline = make_uPtr<EnginePipeline>(
+        graphicsPipeline = make_uPtr<GraphicsPipeline>(
             *engineDevice,
             "assets/shaderdata/_editor/grid.vert.spv",
             "assets/shaderdata/_editor/grid.frag.spv",
@@ -48,7 +48,7 @@ namespace Shard3D {
     }
 
     void GridSystem::render(FrameInfo& frameInfo) {
-        enginePipeline->bind(frameInfo.commandBuffer);
+        graphicsPipeline->bind(frameInfo.commandBuffer);
         vkCmdSetCullMode(frameInfo.commandBuffer, VK_CULL_MODE_NONE);
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,

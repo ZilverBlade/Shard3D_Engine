@@ -49,14 +49,14 @@ namespace Shard3D {
 	void _EditorBillboardRenderer::createPipeline(VkRenderPass renderPass) {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-		PipelineConfigInfo pipelineConfig{};
-		EnginePipeline::pipelineConfig(pipelineConfig)
-			.defaultPipelineConfigInfo()
-			.setCullingMode(VK_CULL_MODE_FRONT_BIT);
+		GraphicsPipelineConfigInfo pipelineConfig{};
+		GraphicsPipeline::pipelineConfig(pipelineConfig)
+			.defaultGraphicsPipelineConfigInfo()
+			.setCullMode(VK_CULL_MODE_FRONT_BIT);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		enginePipeline = make_uPtr<EnginePipeline>(
+		graphicsPipeline = make_uPtr<GraphicsPipeline>(
 			engineDevice,
 			"assets/shaderdata/_editor/editor_svabill.vert.spv",
 			"assets/shaderdata/_editor/editor_svabill.frag.spv",
@@ -65,7 +65,7 @@ namespace Shard3D {
 	}
 
 	void _EditorBillboardRenderer::render(FrameInfo &frameInfo) {
-		enginePipeline->bind(frameInfo.commandBuffer);
+		graphicsPipeline->bind(frameInfo.commandBuffer);
 		vkCmdBindDescriptorSets(
 			frameInfo.commandBuffer,
 			VK_PIPELINE_BIND_POINT_GRAPHICS,

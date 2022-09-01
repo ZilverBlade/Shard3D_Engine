@@ -2,7 +2,7 @@
 #include "../../s3dstd.h"
 #include "../../vulkan_abstr.h"
 #include "../../core/misc/frame_info.h"	  
-
+#include "../../core/vulkan_api/pipeline_compute.h"
 namespace Shard3D {
 	class ComputeSystem {
 	public:
@@ -21,7 +21,7 @@ namespace Shard3D {
 		EngineDevice& engineDevice;
 		VkDescriptorImageInfo srcImageInfo{};
 		VkDescriptorImageInfo dstImageInfo{};
-		uPtr<EnginePipeline> enginePipeline;
+		uPtr<ComputePipeline> computePipeline;
 		VkPipelineLayout pipelineLayout;
 		uPtr<EngineDescriptorSetLayout> computeSystemLayout;
 	};

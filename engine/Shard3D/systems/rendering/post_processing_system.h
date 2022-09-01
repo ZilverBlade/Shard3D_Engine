@@ -4,9 +4,16 @@
 #include "../../core/misc/frame_info.h"	  
 
 namespace Shard3D {
+	class FrameBufferAttachment;
+	struct PostProcessingGBufferInput {
+		FrameBufferAttachment* baseRenderedScene;
+		FrameBufferAttachment* depthBufferSceneInfo;
+		FrameBufferAttachment* positionSceneInfo;
+		FrameBufferAttachment* normalSceneInfo;
+	};
 	class PostProcessingSystem {
 	public:
-		PostProcessingSystem(EngineDevice& device, VkRenderPass renderPass, VkImageView inputImageView, VkSampler inputSampler);
+		PostProcessingSystem(EngineDevice& device, VkRenderPass renderPass, PostProcessingGBufferInput imageInput);
 		~PostProcessingSystem();
 
 		PostProcessingSystem(const PostProcessingSystem&) = delete;
@@ -19,9 +26,13 @@ namespace Shard3D {
 		
 		EngineDevice& engineDevice;
 
-		uPtr<EnginePipeline> enginePipeline;
+		uPtr<GraphicsPipeline> graphicsPipeline;
 		VkDescriptorSet ppo_InputDescriptorSet{};
-		VkDescriptorImageInfo ppo_InputImageInfo{};
+
+		VkDescriptorImageInfo ppoDescriptor_BaseRenderedScene;
+		VkDescriptorImageInfo ppoDescriptor_DepthBufferSceneInfo;
+		VkDescriptorImageInfo ppoDescriptor_PositionSceneInfo;
+		VkDescriptorImageInfo ppoDescriptor_NormalSceneInfo;
 
 		uPtr<EngineDescriptorSetLayout> ppo_Layout{};
 		VkPipelineLayout pipelineLayout{};

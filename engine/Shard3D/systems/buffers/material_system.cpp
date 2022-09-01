@@ -30,13 +30,13 @@ namespace Shard3D {
 			SHARD3D_FATAL("failed to create pipeline layout!");
 		}
 	}
-	void MaterialSystem::createSurfacePipeline(uPtr<EnginePipeline>* pipeline, VkPipelineLayout pipelineLayout, PipelineConfigInfo& pipelineConfig, const std::string& fragment_shader) {
+	void MaterialSystem::createSurfacePipeline(uPtr<GraphicsPipeline>* pipeline, VkPipelineLayout pipelineLayout, GraphicsPipelineConfigInfo& pipelineConfig, const std::string& fragment_shader) {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		pipelineConfig.renderPass = mRenderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 
-		*pipeline = make_uPtr<EnginePipeline>(
+		*pipeline = make_uPtr<GraphicsPipeline>(
 			*mDevice,
 			"assets/shaderdata/mesh_shader.vert.spv",
 			fragment_shader,

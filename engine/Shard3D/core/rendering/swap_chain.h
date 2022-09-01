@@ -47,9 +47,26 @@ namespace Shard3D {
   void createFramebuffers();
   void createSyncObjects();
 
+  VkSurfaceFormatKHR chooseSwapSurfaceFormat_NGC(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+  VkSurfaceFormatKHR chooseSwapSurfaceFormat_GC(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+
   // Helper functions
-  VkSurfaceFormatKHR chooseSwapSurfaceFormat(
-      const std::vector<VkSurfaceFormatKHR> &availableFormats);
+  inline VkSurfaceFormatKHR chooseSwapSurfaceFormat(
+      const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+//#ifdef SHARD3D_EDITOR
+      return chooseSwapSurfaceFormat_GC(availableFormats);
+//#endif
+//#ifdef SHARD3D_RUNTIME
+//      return chooseSwapSurfaceFormat_NGC(availableFormats);
+//#endif
+//
+//#ifndef SHARD3D_EDITOR
+//      SHARD3D_FATAL("No Shard3D runtime application defined");
+//      return chooseSwapSurfaceFormat_GC(availableFormats);
+//#endif
+  }
+
+
   VkPresentModeKHR chooseSwapPresentMode(
       const std::vector<VkPresentModeKHR> &availablePresentModes);
   VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);

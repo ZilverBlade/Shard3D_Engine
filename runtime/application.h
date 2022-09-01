@@ -1,4 +1,6 @@
 #pragma once
+#define SHARD3D_RUNTIME
+
 #include <Shard3D/core.h>
 #include <Shard3D/s3dpch.h>
 #include <Shard3D/ecs.h>

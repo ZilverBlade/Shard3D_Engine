@@ -24,7 +24,7 @@ namespace Shard3D {
 		void createPipelineLayout();
 		void createPipeline(VkRenderPass renderPass);
 
-		uPtr<EnginePipeline> enginePipeline;
+		uPtr<GraphicsPipeline> graphicsPipeline;
 		uPtr<EngineDescriptorSetLayout> guiSystemLayout;
 		uPtr<EngineDescriptorSetLayout> ssboLayout;
 

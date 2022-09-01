@@ -44,6 +44,7 @@ namespace Shard3D {
 			nullptr
 		);
 
+	// TODO: remove, as this is not supported with older GPUs
 		vkCmdSetCullMode(commandBuffer, drawData.culling);
 	}
 #pragma region helper functions
@@ -113,15 +114,15 @@ namespace Shard3D {
 				.writeImage(5, &normalTex_imageInfo)
 				.build(materialDescriptorInfo.textures);
 
-		materialPipelineConfig = make_uPtr<MaterialPipelineConfigInfo>();
+		materialPipelineConfig = make_uPtr<MaterialGraphicsPipelineConfigInfo>();
 		MaterialSystem::createSurfacePipelineLayout(
 			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
 			materialDescriptorInfo.textureLayout->getDescriptorSetLayout(),
 			&materialPipelineConfig->shaderPipelineLayout
 		);
-		PipelineConfigInfo pipelineConfigInfo{};
-		EnginePipeline::pipelineConfig(pipelineConfigInfo)
-			.defaultPipelineConfigInfo()
+		GraphicsPipelineConfigInfo pipelineConfigInfo{};
+		GraphicsPipeline::pipelineConfig(pipelineConfigInfo)
+			.defaultGraphicsPipelineConfigInfo()
 			.enableVertexDescriptions();
 		MaterialSystem::createSurfacePipeline(
 			&materialPipelineConfig->shaderPipeline,
@@ -166,6 +167,22 @@ namespace Shard3D {
 		ResourceHandler::loadTexture(this->shininessTex);
 		ResourceHandler::loadTexture(this->metallicTex);
 	}
+	// experimental
+	/*
+		void SurfaceMaterial_ShadedMasked::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
+			// pseudo code
+
+			std::string foo{};
+			std::string foo2{};
+
+			foo = "shaders/__experimental/blueprints/surface_shaded.frag";
+
+			if (type == shadedopaque)
+			foo2 = "shaders/__experimental/blueprints/surface_opaque.frag";
+
+			built = true;
+		}
+	*/
 
 	void SurfaceMaterial_ShadedMasked::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
 		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
@@ -223,15 +240,15 @@ namespace Shard3D {
 			.writeImage(6, &maskTex_imageInfo)
 			.build(materialDescriptorInfo.textures);
 
-		materialPipelineConfig = make_uPtr<MaterialPipelineConfigInfo>();
+		materialPipelineConfig = make_uPtr<MaterialGraphicsPipelineConfigInfo>();
 		MaterialSystem::createSurfacePipelineLayout(
 			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
 			materialDescriptorInfo.textureLayout->getDescriptorSetLayout(),
 			&materialPipelineConfig->shaderPipelineLayout
 		);
-		PipelineConfigInfo pipelineConfigInfo{};
-		EnginePipeline::pipelineConfig(pipelineConfigInfo)
-			.defaultPipelineConfigInfo()
+		GraphicsPipelineConfigInfo pipelineConfigInfo{};
+		GraphicsPipeline::pipelineConfig(pipelineConfigInfo)
+			.defaultGraphicsPipelineConfigInfo()
 			.enableVertexDescriptions();
 		MaterialSystem::createSurfacePipeline(
 			&materialPipelineConfig->shaderPipeline,
@@ -337,15 +354,15 @@ namespace Shard3D {
 			.writeImage(6, &opacityTex_imageInfo)
 			.build(materialDescriptorInfo.textures);
 
-		materialPipelineConfig = make_uPtr<MaterialPipelineConfigInfo>();
+		materialPipelineConfig = make_uPtr<MaterialGraphicsPipelineConfigInfo>();
 		MaterialSystem::createSurfacePipelineLayout(
 			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
 			materialDescriptorInfo.textureLayout->getDescriptorSetLayout(),
 			&materialPipelineConfig->shaderPipelineLayout
 		);
-		PipelineConfigInfo pipelineConfigInfo{};
-		EnginePipeline::pipelineConfig(pipelineConfigInfo)
-			.defaultPipelineConfigInfo()
+		GraphicsPipelineConfigInfo pipelineConfigInfo{};
+		GraphicsPipeline::pipelineConfig(pipelineConfigInfo)
+			.defaultGraphicsPipelineConfigInfo()
 			.enableAlphaBlending(VK_BLEND_OP_ADD)
 			.enableVertexDescriptions();
 		MaterialSystem::createSurfacePipeline(

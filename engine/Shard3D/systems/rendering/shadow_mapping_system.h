@@ -30,7 +30,7 @@ namespace Shard3D {
 		FrameBuffer* shadowFrameBuffer;
 		SimpleRenderPass* shadowRenderpass;
 
-		uPtr<EnginePipeline> enginePipeline;
+		uPtr<GraphicsPipeline> graphicsPipeline;
 		VkPipelineLayout pipelineLayout;
 		uPtr<EngineDescriptorSetLayout> billboardSystemLayout;
 	};

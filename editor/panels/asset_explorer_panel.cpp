@@ -195,7 +195,7 @@ namespace Shard3D {
 				if (check.good()) {
 					std::string dest = std::string(currentDir.string() + AssetUtils::truncatePath(file));
 					std::replace(dest.begin(), dest.end(), '\\', '/');
-					AssetManager::importMesh(file, dest, MeshLoadInfo());
+					AssetManager::importMesh(file, dest, Mesh3DLoadInfo());
 					refreshIterator(currentDir);
 				}
 				else {

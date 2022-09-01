@@ -80,10 +80,9 @@ VkResult EngineSwapChain::acquireNextImage(uint32_t *imageIndex) {
 VkResult EngineSwapChain::submitCommandBuffers(
     const VkCommandBuffer *buffers, uint32_t *imageIndex) {
   if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
-    vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+      vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
   }
   imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
-
   VkSubmitInfo submitInfo = {};
   submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -367,15 +366,31 @@ void EngineSwapChain::createSyncObjects() {
   }
 }
 
-VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat(
+
+VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat_NGC(
+    const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+    // allow use of VK_FORMAT_A2B10G10R10_UNORM_PACK32
+    for (const auto& availableFormat : availableFormats) {
+        if (availableFormat.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            return availableFormat;
+        }
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            return availableFormat;
+        }
+    }
+    SHARD3D_WARN("VK_FORMAT_B8G8R8A8_UNORM or VK_FORMAT_A2B10G10R10_UNORM_PACK32 not available colour formats!");
+    return availableFormats[0];
+}
+
+VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat_GC(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
-    
+    // allow use of VK_FORMAT_A2B10G10R10_UNORM_PACK32
   for (const auto &availableFormat : availableFormats) {  
       if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
           return availableFormat;
       }
   }
-  SHARD3D_WARN("VK_FORMAT_B8G8R8A8_SRGB and or VK_COLOR_SPACE_SRGB_NONLINEAR_KHR not available colour modes!");
+  SHARD3D_WARN("VK_FORMAT_B8G8R8A8_SRGB is not an available colour format!");
   return availableFormats[0];
 }
 

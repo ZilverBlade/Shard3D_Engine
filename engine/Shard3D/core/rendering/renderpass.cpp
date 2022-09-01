@@ -4,7 +4,7 @@
 // Basic RenderPass abstraction (single subpass)
 
 namespace Shard3D {
-	SimpleRenderPass::SimpleRenderPass(EngineDevice& device, std::vector<AttachmentInfo> attachments) : engineDevice(device) {
+	SimpleRenderPass::SimpleRenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments) : engineDevice(device) {
 		std::vector<VkAttachmentDescription> attachmentDescriptions;
 		attachmentDescriptions.resize(attachments.size());
 
@@ -16,7 +16,6 @@ namespace Shard3D {
 			attachmentDescription.samples = attachments[i].frameBufferAttachment->getDescription().samples;
 			attachmentDescription.loadOp = attachments[i].loadOp;
 			attachmentDescription.storeOp = attachments[i].storeOp;
-			attachmentDescription.samples = attachments[i].frameBufferAttachment->getDescription().samples;
 			attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
@@ -43,8 +42,8 @@ namespace Shard3D {
 				VkAttachmentReference attachmentRef{ i, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, };
 				depthAttachments.push_back(attachmentRef);
 			} break;
-			case (AttachmentType::Resolve):{
-				VkAttachmentReference attachmentRef{ i, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
+			case (AttachmentType::Resolve): {
+				VkAttachmentReference attachmentRef{ i, attachments[i].frameBufferAttachment->getDescription().finalLayout };
 				resolveAttachments.push_back(attachmentRef);
 			} break;
 			}

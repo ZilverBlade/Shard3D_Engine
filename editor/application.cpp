@@ -44,13 +44,14 @@ namespace Shard3D {
 				}, AttachmentType::Color);
 
 			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				VK_FORMAT_D24_UNORM_S8_UINT,
-				VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+				engineRenderer.getSwapchain()->findDepthFormat(),
+				VK_IMAGE_ASPECT_DEPTH_BIT,
 				glm::ivec3(1920, 1080, 1),
 				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+				VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
 				GraphicsSettings::get().MSAASamples
 				}, AttachmentType::Depth);
+
 
 			mainResolveFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -76,11 +77,13 @@ namespace Shard3D {
 			resolveAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			resolveAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
+			
 			mainRenderpass = new SimpleRenderPass(
 				engineDevice, {
 				colorAttachmentInfo,
 				depthAttachmentInfo,
 				resolveAttachmentInfo
+				//depthresolveAttachmentInfo
 				});
 
 			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainResolveFramebufferAttachment });
@@ -97,7 +100,7 @@ namespace Shard3D {
 				}, AttachmentType::Color);
 			ppoDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_D24_UNORM_S8_UINT,
-				VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+				VK_IMAGE_ASPECT_DEPTH_BIT,
 				glm::ivec3(1920, 1080, 1),
 				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
@@ -156,10 +159,7 @@ namespace Shard3D {
 		
 		GraphicsSettings::init(&engineWindow);
 
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		ini.LoadFile(ENGINE_SETTINGS_PATH);
-		ini.LoadFile(EDITOR_SETTINGS_PATH);
+		ShaderSystem::init();
 	}
 
 	void EngineApplication::setWindowCallbacks() {
@@ -201,7 +201,7 @@ namespace Shard3D {
 		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 #endif
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem{ engineDevice, ppoRenderpass->getRenderPass(), mainResolveFramebufferAttachment->getImageView(), mainResolveFramebufferAttachment->getSampler() };
+		PostProcessingSystem ppoSystem{ engineDevice, ppoRenderpass->getRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}};
 		ShadowMappingSystem shadowSystem{ engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -211,12 +211,7 @@ namespace Shard3D {
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
 
-		//Actor phys = level->createActor();
-		//phys.addComponent<Components::RigidbodyComponent>();
-		//auto boxShape = physicsSystem.createBoxShape(JPH::BoxShapeSettings(JPH::Vec3(100.0f, 1.0f, 100.0f)));
-		//
-		//phys.getComponent<Components::RigidbodyComponent>().physicsBody = physicsSystem.createBody(JPH::BodyCreationSettings(boxShape.GetPtr(), JPH::Vec3(0, 10, 0), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, 5));
-
+		level->setPhysicsSystem(&physicsSystem);
 
 
 		ResourceHandler::init(engineDevice);
@@ -318,7 +313,9 @@ beginWhileLoop:
 			editor_cameraActor = level->getActorFromUUID(0);
 
 			if (level->simulationState == PlayState::Playing) {
-				physicsSystem.simulate(level, frameTime);
+				SHARD3D_STAT_RECORD(); 
+				physicsSystem.simulate(level.get(), frameTime);
+				SHARD3D_STAT_RECORD_END({ "Level", "Physics" });
 				SHARD3D_STAT_RECORD();
 				level->tick(frameTime);
 				SHARD3D_STAT_RECORD_END({ "Level", "Tick" });
@@ -443,5 +440,24 @@ beginWhileLoop:
 
 	void EngineApplication::loadStaticObjects() {
 		
+		Actor phys = level->createActor();
+		phys.addComponent<Components::RigidbodyComponent>();
+		auto boxShape = level->physicsSystemPtr->createBoxShape(JPH::BoxShapeSettings(JPH::Vec3(100.0f, 1.0f, 100.0f)));
+		phys.getComponent<Components::TransformComponent>().setScale({ 100.f, 100.f, 1.f });
+		phys.getComponent<Components::TransformComponent>().setTranslation({ 0.0f, 100.0f, -2.0f });
+		phys.getComponent<Components::RigidbodyComponent>().physicsBody = 
+			level->physicsSystemPtr->createBody(JPH::BodyCreationSettings(boxShape, JPH::Vec3(0.0f, -2.0f, 100.0f), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING));
+
+
+		Actor sphere = level->createActor();
+		sphere.addComponent<Components::RigidbodyComponent>();
+		auto sphereShape = level->physicsSystemPtr->createSphereShape(JPH::SphereShapeSettings(0.5f));
+		sphere.getComponent<Components::TransformComponent>().setScale({ 0.5f, 0.5f, 0.5f });
+		sphere.getComponent<Components::RigidbodyComponent>().physicsBody =
+			level->physicsSystemPtr->createBody(JPH::BodyCreationSettings(sphereShape, JPH::Vec3(0.0f, 2.0f, 0.0f), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING));
+		sphere.getComponent<Components::TransformComponent>().setTranslation({ 0.f, 0.f, 2.f });
+
+		level->physicsSystemPtr->getInterface().SetGravityFactor(sphere.getComponent<Components::RigidbodyComponent>().physicsBody, 1.f);
+		level->physicsSystemPtr->getInterface().SetRestitution(sphere.getComponent<Components::RigidbodyComponent>().physicsBody, 1.0f);
 	}
 }

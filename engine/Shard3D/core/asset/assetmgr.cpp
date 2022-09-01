@@ -136,7 +136,7 @@ namespace Shard3D {
 		fout.close();
 	}
 
-	void AssetManager::importMesh(const std::string& sourcepath, const std::string& destpath, MeshLoadInfo info) {
+	void AssetManager::importMesh(const std::string& sourcepath, const std::string& destpath, Mesh3DLoadInfo info) {
 		if (!(strUtils::hasStarting(destpath, "assets/") || strUtils::hasStarting(destpath, "assets\\"))) {
 			SHARD3D_ERROR("Cannot emplace a texture outside of the assets folder!");
 			return;
@@ -146,7 +146,7 @@ namespace Shard3D {
 
 		std::ofstream fout(destpath + ENGINE_ASSET_SUFFIX);
 
-		uPtr<EngineMesh> tempreadInfo = EngineMesh::createMeshFromFile(*engineDevice, destpath, MeshLoadInfo());
+		uPtr<Mesh3D> tempreadInfo = Mesh3D::createMeshFromFile(*engineDevice, destpath, Mesh3DLoadInfo());
 
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -156,10 +156,10 @@ namespace Shard3D {
 		out << YAML::Key << "AssetOrig" << YAML::Value << sourcepath;
 		out << YAML::Key << "Materials" << YAML::Value << tempreadInfo->materials;
 		
-		MeshLoadInfo _info[1] = { info };
-		std::vector<uint8_t> data = IOUtils::getStackBinary(_info, sizeof(MeshLoadInfo));
+		Mesh3DLoadInfo _info[1] = { info };
+		std::vector<uint8_t> data = IOUtils::getStackBinary(_info, sizeof(Mesh3DLoadInfo));
 
-		out << YAML::Key << "Properties" << YAML::Value << YAML::Binary(data.data(), sizeof(MeshLoadInfo));
+		out << YAML::Key << "Properties" << YAML::Value << YAML::Binary(data.data(), sizeof(Mesh3DLoadInfo));
 		out << YAML::EndMap;
 
 		fout << out.c_str();
@@ -236,13 +236,13 @@ namespace Shard3D {
 		} 
 		
 		// Hacky binary read
-		MeshLoadInfo loadInfo = *reinterpret_cast<MeshLoadInfo*>(reinterpret_cast<uintptr_t>(data["Properties"].as<YAML::Binary>().data()));
+		Mesh3DLoadInfo loadInfo = *reinterpret_cast<Mesh3DLoadInfo*>(reinterpret_cast<uintptr_t>(data["Properties"].as<YAML::Binary>().data()));
 		
 		input.close();
 		if (meshAssets.find(assetPath) != meshAssets.end()) 
 			return;	
 		
-		rPtr<EngineMesh> mesh = EngineMesh::loadMeshFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
+		rPtr<Mesh3D> mesh = Mesh3D::loadMeshFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
 		if (!mesh) return;
 		SHARD3D_LOG("Loaded asset to resource map '{0}'", assetPath.getFile());
 		mesh->materials = data["Materials"].as<std::vector<AssetID>>();
@@ -254,10 +254,10 @@ namespace Shard3D {
 		destroyMeshQueue.push_back(asset);
 	}
 
-	rPtr<EngineMesh>& ResourceHandler::retrieveMesh_unsafe(const AssetID& asset) {
+	rPtr<Mesh3D>& ResourceHandler::retrieveMesh_unsafe(const AssetID& asset) {
 		return meshAssets.at(asset);
 	}
-	rPtr<EngineMesh>& ResourceHandler::retrieveMesh_safe(const AssetID& asset) {
+	rPtr<Mesh3D>& ResourceHandler::retrieveMesh_safe(const AssetID& asset) {
 		if (meshAssets.find(asset) != meshAssets.cend())
 			return meshAssets.at(asset);
 		return meshAssets.at(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
@@ -295,7 +295,7 @@ namespace Shard3D {
 		if (textureAssets.find(textureAsset) != textureAssets.end()) 
 			return;
 		
-		rPtr<EngineTexture> texture = EngineTexture::createTextureFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
+		rPtr<Texture2D> texture = Texture2D::createTextureFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
 		if (!texture) return;
 		SHARD3D_LOG("Loaded texture to resource map '{0}'", textureAsset.getFile());
 		textureAssets[textureAsset] = texture;
@@ -305,10 +305,10 @@ namespace Shard3D {
 		destroyTexQueue.push_back(asset);
 	}
 
-	rPtr<EngineTexture>& ResourceHandler::retrieveTexture_unsafe(const AssetID& asset) {
+	rPtr<Texture2D>& ResourceHandler::retrieveTexture_unsafe(const AssetID& asset) {
 		return textureAssets.at(asset);
 	}
-	rPtr<EngineTexture>& ResourceHandler::retrieveTexture_safe(const AssetID& asset) {
+	rPtr<Texture2D>& ResourceHandler::retrieveTexture_safe(const AssetID& asset) {
 		if (textureAssets.find(asset) != textureAssets.cend())
 			return textureAssets.at(asset);
 		return textureAssets.at(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
@@ -362,8 +362,8 @@ void Shard3D::_special_assets::_editor_icons_load() {
 		auto& readIco = icon[1];
 		TextureLoadInfo loadInfo{};
 		loadInfo.filter = (readIco == "assets/_engine/tex/_editor/icon_null") ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
-		rPtr<EngineTexture> tex =
-			EngineTexture::createTextureFromFile(*AssetManager::engineDevice, icon[1],
+		rPtr<Texture2D> tex =
+			Texture2D::createTextureFromFile(*AssetManager::engineDevice, icon[1],
 				loadInfo);
 		_editor_icons[icon[0]] = tex;
 	}

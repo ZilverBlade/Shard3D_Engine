@@ -37,12 +37,12 @@ namespace Shard3D {
         int texWidth, texHeight, texChannels;
 
         std::vector<stbi_uc*> pixels;
-        pixels.push_back(EngineTexture::getSTBImage(filepath + "/top.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
-        pixels.push_back(EngineTexture::getSTBImage(filepath + "/left.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
-        pixels.push_back(EngineTexture::getSTBImage(filepath + "/right.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
-        pixels.push_back(EngineTexture::getSTBImage(filepath + "/front.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
-        pixels.push_back(EngineTexture::getSTBImage(filepath + "/bottom.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
-        pixels.push_back(EngineTexture::getSTBImage(filepath + "/back.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
+        pixels.push_back(Texture2D::getSTBImage(filepath + "/top.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
+        pixels.push_back(Texture2D::getSTBImage(filepath + "/left.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
+        pixels.push_back(Texture2D::getSTBImage(filepath + "/right.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
+        pixels.push_back(Texture2D::getSTBImage(filepath + "/front.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
+        pixels.push_back(Texture2D::getSTBImage(filepath + "/bottom.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
+        pixels.push_back(Texture2D::getSTBImage(filepath + "/back.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha));
         VkDeviceSize imageSize = 512 * 512 * 4 * 6;
         
         {int i = 0;
@@ -78,7 +78,7 @@ namespace Shard3D {
         vkUnmapMemory(mDevice.device(), stagingBufferMemory);
 
         for (uint32_t i = 0; i < 6; i++) {
-            EngineTexture::freeSTBImage(pixels[i]);
+            Texture2D::freeSTBImage(pixels[i]);
         }
 
         mFormat = VK_FORMAT_R8G8B8A8_SRGB;

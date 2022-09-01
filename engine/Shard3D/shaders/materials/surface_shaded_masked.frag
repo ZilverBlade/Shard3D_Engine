@@ -113,6 +113,7 @@ vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint
 // shader code
 void main(){
 	if (texture(tex_mask, fragUV).x < 0.5) discard;
+
 	const float material_specular = texture(tex_specular, fragUV).x * factor.specular;
 	const float material_shininess = texture(tex_shininess, fragUV).x * factor.shininess;
 	const float material_metallic = texture(tex_metallic, fragUV).x * factor.metallic;

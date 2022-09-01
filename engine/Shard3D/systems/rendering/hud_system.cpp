@@ -88,15 +88,15 @@ namespace Shard3D {
 	void HUDRenderSystem::createPipeline(VkRenderPass renderPass) {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-		PipelineConfigInfo pipelineConfig{};
-		EnginePipeline::pipelineConfig(pipelineConfig)
-			.defaultPipelineConfigInfo()
+		GraphicsPipelineConfigInfo pipelineConfig{};
+		GraphicsPipeline::pipelineConfig(pipelineConfig)
+			.defaultGraphicsPipelineConfigInfo()
 			.forceSampleCount(VK_SAMPLE_COUNT_1_BIT)
 			.enableAlphaBlending(VK_BLEND_OP_ADD);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout; 
-		enginePipeline = make_uPtr<EnginePipeline>(
+		graphicsPipeline = make_uPtr<GraphicsPipeline>(
 			*device,
 			"assets/shaderdata/hud_element.vert.spv",
 			"assets/shaderdata/hud_element.frag.spv",
@@ -112,7 +112,7 @@ namespace Shard3D {
 			mousePos = { x,y };
 		}
 		float ar = GraphicsSettings::getRuntimeInfo().aspectRatio;
-		enginePipeline->bind(frameInfo.commandBuffer);
+		graphicsPipeline->bind(frameInfo.commandBuffer);
 		
 		auto bufferInfo = pickBuffer->descriptorInfo();
 		EngineDescriptorWriter(*ssboLayout, frameInfo.perDrawDescriptorPool)

@@ -69,15 +69,15 @@ namespace Shard3D {
 	void ShadowMappingSystem::createPipeline() {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-		PipelineConfigInfo pipelineConfig{};
-		EnginePipeline::pipelineConfig(pipelineConfig)
-			.defaultPipelineConfigInfo()
+		GraphicsPipelineConfigInfo pipelineConfig{};
+		GraphicsPipeline::pipelineConfig(pipelineConfig)
+			.defaultGraphicsPipelineConfigInfo()
 			.enableVertexDescriptions()
 			.forceSampleCount(VK_SAMPLE_COUNT_1_BIT);
 
 		pipelineConfig.renderPass = shadowRenderpass->getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout; // support only view plane aligned atm
-		enginePipeline = make_uPtr<EnginePipeline>(
+		graphicsPipeline = make_uPtr<GraphicsPipeline>(
 			engineDevice,
 			"assets/shaderdata/shadow_directional.vert.spv",
 			"assets/shaderdata/fragment_blank.frag.spv",
@@ -87,7 +87,7 @@ namespace Shard3D {
 
 	void ShadowMappingSystem::render(FrameInfo& frameInfo) {
 		shadowRenderpass->beginRenderPass(frameInfo, shadowFrameBuffer);
-		enginePipeline->bind(frameInfo.commandBuffer);
+		graphicsPipeline->bind(frameInfo.commandBuffer);
 		vkCmdSetCullMode(frameInfo.commandBuffer, VK_CULL_MODE_NONE);
 		ShadowPushConstants push{};
 

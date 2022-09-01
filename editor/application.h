@@ -1,4 +1,6 @@
 #pragma once
+#define SHARD3D_EDITOR
+
 #include <Shard3D/core.h>
 #include <Shard3D/s3dpch.h>
 #include <Shard3D/ecs.h>
@@ -11,6 +13,7 @@
 #include <Shard3D/core/rendering/renderpass.h>
 
 #include <Shard3D/layer/layer_stack.h>
+
 
 namespace Shard3D {
 	class EngineApplication {
@@ -39,7 +42,9 @@ namespace Shard3D {
 		
 		FrameBufferAttachment* mainColorFramebufferAttachment;
 		FrameBufferAttachment* mainDepthFramebufferAttachment;
+
 		FrameBufferAttachment* mainResolveFramebufferAttachment;
+		FrameBufferAttachment* mainDepthResolveFramebufferAttachment;
 		FrameBuffer* mainFrameBuffer;
 		SimpleRenderPass* mainRenderpass;
 

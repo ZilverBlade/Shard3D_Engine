@@ -6,50 +6,23 @@
 #include "../misc/graphics_settings.h"
 namespace Shard3D {
 
-	EnginePipeline::EnginePipeline(
+	GraphicsPipeline::GraphicsPipeline(
 		EngineDevice& device,
 		const std::string& vertFilePath,
 		const std::string& fragFilePath,
-		const PipelineConfigInfo& configInfo, 
-		bool recreate
+		const GraphicsPipelineConfigInfo& configInfo
 	)
 		: engineDevice{device} {
-		if (!recreate) { createGraphicsPipeline(vertFilePath, fragFilePath, configInfo); return; }
-
-		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
-		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
-		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
-		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
 		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
 	}
 
-	EnginePipeline::EnginePipeline(
-		std::string trash,
-		EngineDevice& device,
-		VkShaderStageFlagBits shaderStageFlag,
-		VkPipelineLayout& pipelineLayout,
-		const std::string& shaderFilePath,
-		const PipelineConfigInfo& configInfo,
-		bool recreate
-	)
-		: engineDevice{ device } {
-		if (!recreate) { if(shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputePipeline(pipelineLayout, shaderFilePath, configInfo); return; }
-
+	GraphicsPipeline::~GraphicsPipeline() {
 		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
-		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
-		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
-		if (shaderStageFlag == VK_SHADER_STAGE_COMPUTE_BIT)createComputePipeline(pipelineLayout, shaderFilePath, configInfo);
-	}
-
-	EnginePipeline::~EnginePipeline() {
-		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
-		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
-		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
 		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
 	}
 
-	std::vector<char> EnginePipeline::readFile(const std::string& filePath) {
+	std::vector<char> GraphicsPipeline::readFile(const std::string& filePath) {
 		std::ifstream file{ filePath, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
@@ -66,10 +39,10 @@ namespace Shard3D {
 		return buffer;
 	}
 
-	void EnginePipeline::createGraphicsPipeline(
+	void GraphicsPipeline::createGraphicsPipeline(
 		const std::string& vertFilePath,
 		const std::string& fragFilePath,
-		const PipelineConfigInfo& configInfo
+		const GraphicsPipelineConfigInfo& configInfo
 	) {
 		SHARD3D_ASSERT(
 			configInfo.pipelineLayout != VK_NULL_HANDLE &&
@@ -135,54 +108,13 @@ namespace Shard3D {
 		}
 	}
 
-	void EnginePipeline::createComputePipeline(
-		VkPipelineLayout& pipelineLayout,
-		const std::string& shaderFilePath,
-		const PipelineConfigInfo& configInfo
+
+	void GraphicsPipeline::destroyGraphicsPipeline( 
 	) {
-		SHARD3D_ASSERT(
-			configInfo.pipelineLayout != VK_NULL_HANDLE &&
-			"Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
-		SHARD3D_ASSERT(
-			configInfo.renderPass != VK_NULL_HANDLE &&
-			"Cannot create graphics pipeline:: no renderPass provided in configInfo");
-		auto shaderCode = readFile(shaderFilePath);
-
-
-		VkPipelineShaderStageCreateInfo shaderStages[1];
-		createShaderModule(shaderCode, &computeShaderModule);
-		shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		shaderStages[0].stage = VK_SHADER_STAGE_COMPUTE_BIT;
-		shaderStages[0].module = computeShaderModule;
-		shaderStages[0].pName = "main";
-		shaderStages[0].flags = 0;
-		shaderStages[0].pNext = nullptr;
-		shaderStages[0].pSpecializationInfo = nullptr;
-
-		auto& bindingDescriptions = configInfo.bindingDescriptions;
-		auto& attributeDescriptions = configInfo.attributeDescriptions;
-
-		VkComputePipelineCreateInfo computePipelineCreateInfo {};
-		computePipelineCreateInfo.stage = shaderStages[0];
-		computePipelineCreateInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-		computePipelineCreateInfo.layout = pipelineLayout;
-		computePipelineCreateInfo.flags = 0;
-
-		if (vkCreateComputePipelines(engineDevice.device(), VK_NULL_HANDLE, 1, &computePipelineCreateInfo, nullptr, &computePipeline) != VK_SUCCESS) {
-			SHARD3D_FATAL("failed to create compute pipeline!");
-		}
-	}
-
-	void EnginePipeline::destroyGraphicsPipeline( 
-	) {
-		/*
-		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
-		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
-		*/
 		vkDestroyPipeline(engineDevice.device(), graphicsPipeline, nullptr);
 	}
 
-	void EnginePipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
+	void GraphicsPipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		createInfo.codeSize = code.size();
@@ -193,15 +125,11 @@ namespace Shard3D {
 		}
 	}
 
-	void EnginePipeline::bind(VkCommandBuffer commandBuffer) {
+	void GraphicsPipeline::bind(VkCommandBuffer commandBuffer) {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 
-	void EnginePipeline::bindCompute(VkCommandBuffer commandBuffer) {
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computePipeline);
-	}
-
-	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::defaultPipelineConfigInfo() {
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::defaultGraphicsPipelineConfigInfo() {
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
@@ -226,7 +154,7 @@ namespace Shard3D {
 		configInfo.rasterizationInfo.depthBiasSlopeFactor = 0.0f;     // Optional
 
 		configInfo.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-		configInfo.multisampleInfo.sampleShadingEnable = VK_FALSE;
+		configInfo.multisampleInfo.sampleShadingEnable = !(GraphicsSettings::get().MSAASamples == VK_SAMPLE_COUNT_1_BIT);;
 		configInfo.multisampleInfo.rasterizationSamples = GraphicsSettings::get().MSAASamples;
 		configInfo.multisampleInfo.minSampleShading = 1.0f;           // Optional
 		configInfo.multisampleInfo.pSampleMask = nullptr;             // Optional
@@ -272,12 +200,12 @@ namespace Shard3D {
 		configInfo.dynamicStateInfo.flags = 0;	
 		return _pipeline_cfg(configInfo);
 	}
-	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::enableVertexDescriptions() {
-		configInfo.bindingDescriptions = EngineMesh::Vertex::getBindingDescriptions();
-		configInfo.attributeDescriptions = EngineMesh::Vertex::getAttributeDescriptions();
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::enableVertexDescriptions() {
+		configInfo.bindingDescriptions = Mesh3D::Vertex::getBindingDescriptions();
+		configInfo.attributeDescriptions = Mesh3D::Vertex::getAttributeDescriptions();
 		return _pipeline_cfg(configInfo);
 	}
-	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::enableAlphaBlending(VkBlendOp blendOp) {
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::enableAlphaBlending(VkBlendOp blendOp) {
 		configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 		configInfo.colorBlendAttachment.colorWriteMask =
 			VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
@@ -290,21 +218,27 @@ namespace Shard3D {
 		configInfo.colorBlendAttachment.alphaBlendOp = blendOp;
 		return _pipeline_cfg(configInfo);
 	}
-	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::lineRasterizer(float thickness) {
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::lineRasterizer(float thickness) {
 		configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
 		configInfo.rasterizationInfo.lineWidth = thickness;
 		return _pipeline_cfg(configInfo);
 	}
-	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::setCullingMode(VkCullModeFlags cullMode) {
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::setCullMode(VkCullModeFlags cullMode) {
 		configInfo.rasterizationInfo.cullMode = cullMode;
 		return _pipeline_cfg(configInfo);
 	}
-	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::discardRasterizer() {
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::discardRasterizer() {
 		configInfo.rasterizationInfo.rasterizerDiscardEnable = VK_TRUE;
 		return _pipeline_cfg(configInfo);
 	}
-	EnginePipeline::_pipeline_cfg EnginePipeline::_pipeline_cfg::forceSampleCount(VkSampleCountFlagBits samples) {
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::forceSampleCount(VkSampleCountFlagBits samples) {
 		configInfo.multisampleInfo.rasterizationSamples = samples;
+		configInfo.multisampleInfo.sampleShadingEnable = !(samples == VK_SAMPLE_COUNT_1_BIT);
+		return _pipeline_cfg(configInfo);
+	}
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::disableDepthTest() {
+		configInfo.depthStencilInfo.depthTestEnable = VK_FALSE;
+		configInfo.depthStencilInfo.depthWriteEnable = VK_FALSE;
 		return _pipeline_cfg(configInfo);
 	}
 }

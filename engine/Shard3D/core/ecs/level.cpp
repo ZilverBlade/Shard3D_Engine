@@ -8,6 +8,8 @@
 #include "../../scripting/dynamic_script_engine.h"
 #include "../ui/hud.h"
 #include "../../workarounds.h"
+#include "../../systems/computational/physics_system.h"
+
 namespace Shard3D {
 	namespace ECS {
 		Level::Level(const std::string &lvlName) : name(lvlName) {}
@@ -54,13 +56,17 @@ namespace Shard3D {
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::ScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
-			
+			copyComponent<Components::RigidbodyComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+
 			// Secret components
 			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::RelationshipComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
 			newLvl->possessedCameraActorGUID = other->getPossessedCameraActor().getUUID();
-			//newLvl->actor_parent_comparison = other->actor_parent_comparison;
+			newLvl->currentpath = other->currentpath;
+			newLvl->name = other->name;
+			newLvl->physicsSystemPtr = other->physicsSystemPtr;
+
 			return newLvl;
 		}
 
@@ -150,6 +156,7 @@ namespace Shard3D {
 
 		
 		void Level::begin() {
+			SHARD3D_ASSERT(physicsSystemPtr != nullptr && "Physics system not set!");
 			SHARD3D_INFO("Level: Initializing scripts");
 			simulationState = PlayState::Playing;
 			{
@@ -171,6 +178,7 @@ namespace Shard3D {
 				for (HUD* hud : TEMPORARY::hudList) for (auto& element : hud->elements)
 						DynamicScriptEngine::hudScript().begin(element.second.get());
 			}
+			physicsSystemPtr->begin(this);
 			SHARD3D_INFO("Beginning simulation");
 		}
 
@@ -223,6 +231,7 @@ namespace Shard3D {
 				for (HUD* hud : TEMPORARY::hudList) for (auto& element : hud->elements)
 					DynamicScriptEngine::hudScript().end(element.second.get());
 			}
+			physicsSystemPtr->end(this);
 			DynamicScriptEngine::runtimeStop();
 			setPossessedCameraActor(0);
 			SHARD3D_LOG("Reloading level");

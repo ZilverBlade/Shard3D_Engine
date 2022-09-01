@@ -168,6 +168,11 @@ ALPHA:
 		- Fixed bug when loaded a level, cant save it directly
 		- Cleaned up editor_layout.ini
 		- Added experimental standalone game runtime application
-		
+		- Added experimental physics
+		- Improved bloom
+		- Improved MSAA
+		- Fixed issue with x64 toolset not being used
+		- Changed naming for several classes and made use of inline namespaces for resources
+
 		:: TODO, proper events sytem, add editor layouts, use premake
 		:: Fix: change vertex and index buffers to draw offset, dont use 64 bit integers for shaders (e.g. HUD system)

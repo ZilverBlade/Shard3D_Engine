@@ -5,7 +5,6 @@ layout(location = 1) in vec3 fragNormalWorld;
 layout(location = 2) in vec2 fragUV;
 
 layout (location = 0) out vec4 outColor;
-
 struct Pointlight {
 	vec4 position;
 	vec4 color;
@@ -111,7 +110,7 @@ vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint
 	
 // shader code
 void main(){
-	
+
 	const float material_specular = texture(tex_specular, fragUV).x * factor.specular;
 	const float material_shininess = texture(tex_shininess, fragUV).x * factor.shininess;
 	const float material_metallic = texture(tex_metallic, fragUV).x * factor.metallic;

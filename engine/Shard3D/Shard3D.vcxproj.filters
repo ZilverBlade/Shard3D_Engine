@@ -361,6 +361,12 @@
     <ClInclude Include="systems\rendering\shadow_mapping_system.h">
       <Filter>Header Files\systems\rendering</Filter>
     </ClInclude>
+    <ClInclude Include="systems\computational\shader_system.h">
+      <Filter>Header Files\systems\computational</Filter>
+    </ClInclude>
+    <ClInclude Include="core\vulkan_api\pipeline_compute.h">
+      <Filter>Header Files\core\vkapi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="s3dpch.cpp">
@@ -509,6 +515,12 @@
     </ClCompile>
     <ClCompile Include="systems\rendering\shadow_mapping_system.cpp">
       <Filter>Source Files\systems\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\computational\shader_system.cpp">
+      <Filter>Source Files\systems\computational</Filter>
+    </ClCompile>
+    <ClCompile Include="core\vulkan_api\pipeline_compute.cpp">
+      <Filter>Source Files\core\vkapi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -44,9 +44,9 @@ namespace Shard3D {
 		uPtr<EngineDescriptorSetLayout> textureLayout{};
 	};
 
-	struct MaterialPipelineConfigInfo {
+	struct MaterialGraphicsPipelineConfigInfo {
 		VkPipelineLayout shaderPipelineLayout{};
-		uPtr<EnginePipeline> shaderPipeline{};
+		uPtr<GraphicsPipeline> shaderPipeline{};
 	};
 
 	/*
@@ -72,7 +72,7 @@ namespace Shard3D {
 		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig->shaderPipelineLayout; }
 	protected:
 		bool built = false;
-		uPtr<MaterialPipelineConfigInfo> materialPipelineConfig{};
+		uPtr<MaterialGraphicsPipelineConfigInfo> materialPipelineConfig{};
 		SurfaceMaterialShaderDescriptorInfo materialDescriptorInfo{};
 		uPtr<EngineBuffer> factorsBuffer;
 	};	

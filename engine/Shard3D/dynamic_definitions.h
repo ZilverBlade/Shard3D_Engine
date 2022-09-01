@@ -9,5 +9,5 @@ namespace Shard3D {
 	// engine settings
 	#define ENSET_WINDOW_ICON_PATH						"shardwinico.png"
 	
-	#define ENSET_ENABLE_PLUGINS						
+	#define ENSET_ENABLE_PLUGINS		
 }

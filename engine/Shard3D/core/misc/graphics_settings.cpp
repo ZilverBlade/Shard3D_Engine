@@ -42,7 +42,7 @@ namespace Shard3D {
 		graphics.ShadowQuality = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "ShadowQuality");
 		graphics.ReflectionQuality = (GraphicsEnum)ini.GetLongValue("GRAPHICS", "ReflectionQuality");
 	}
-	GraphicsSettings::Settings& GraphicsSettings::get() {
+	Settings& GraphicsSettings::get() {
 		return graphics;
 	}
 	void GraphicsSettings::set(Settings sets) {

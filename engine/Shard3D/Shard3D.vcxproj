@@ -82,7 +82,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
@@ -95,7 +95,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mtd.lib;ImGui_NodeEditor_d.lib;yaml-cpp_d.lib;jolt.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;shadercd.lib;shaderc_combinedd.lib;shaderc_sharedd.lib;shaderc_utild.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mtd.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\d;..\extern\joltphysics\lib\d;..\extern\assimp\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -111,9 +111,11 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -124,7 +126,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
@@ -139,9 +141,11 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\object_loaders\tinyobjloader\include;..\extern\object_loaders\tinygltf\include;..\extern\imgui;..\extern\spdlog;..\extern\joltphysics\include;..\extern\imgui-node-editor;..\extern\entt\1include;..\extern\jsonhpp\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -152,7 +156,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ImGui.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;ImGui_NodeEditor.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -162,6 +166,8 @@
     <ClInclude Include="core\asset\assetid.h" />
     <ClInclude Include="core\rendering\frame_buffer.h" />
     <ClInclude Include="core\rendering\renderpass.h" />
+    <ClInclude Include="core\vulkan_api\pipeline_compute.h" />
+    <ClInclude Include="systems\computational\shader_system.h" />
     <ClInclude Include="systems\rendering\shadow_mapping_system.h" />
     <ClInclude Include="workarounds.h" />
     <ClInclude Include="core.h" />
@@ -394,6 +400,11 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="core\vulkan_api\pipeline_compute.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="layer\layer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
@@ -438,6 +449,11 @@
     <ClCompile Include="systems\computational\physics_system.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="systems\computational\shader_system.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="systems\rendering\billboard_system.cpp">

@@ -33,7 +33,7 @@ namespace Shard3D {
 		void endFrame();
 		void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
 		void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
-
+		uPtr<EngineSwapChain>& getSwapchain() { return engineSwapChain; }
 	private:
 		void createCommandBuffers();
 		void freeCommandBuffers();

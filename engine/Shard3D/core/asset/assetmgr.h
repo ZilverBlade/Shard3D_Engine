@@ -24,7 +24,7 @@ namespace Shard3D {
 		static void loadLevelAssets();
 
 		static void importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info);
-		static void importMesh(const std::string& sourcepath, const std::string& destpath, MeshLoadInfo info);
+		static void importMesh(const std::string& sourcepath, const std::string& destpath, Mesh3DLoadInfo info);
 		static void createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material);
 		
 		static void purgeAsset(const std::string& assetPath);
@@ -56,7 +56,7 @@ namespace Shard3D {
 
 		static void loadMesh(const AssetID& asset);
 		static void unloadMesh(const AssetID& asset);
-		static inline rPtr<EngineMesh>& retrieveMesh(const AssetID& asset) {
+		static inline rPtr<Mesh3D>& retrieveMesh(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveMesh_safe(asset);
 #else			
@@ -66,7 +66,7 @@ namespace Shard3D {
 
 		static void loadTexture(const AssetID& asset);
 		static void unloadTexture(const AssetID& asset);
-		static inline rPtr<EngineTexture>& retrieveTexture(const AssetID& asset) {
+		static inline rPtr<Texture2D>& retrieveTexture(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveTexture_safe(asset);
 #else
@@ -99,14 +99,14 @@ namespace Shard3D {
 		static inline std::vector<rPtr<SurfaceMaterial>> rebuildSurfaceMaterialQueue;
 		static void _buildSurfaceMaterial(rPtr<SurfaceMaterial> material);
 
-		static rPtr<EngineTexture>& retrieveTexture_unsafe			(const AssetID& asset);
-		static rPtr<EngineTexture>& retrieveTexture_safe			(const AssetID& asset);
-		static rPtr<EngineMesh>& retrieveMesh_unsafe				(const AssetID& asset);
-		static rPtr<EngineMesh>& retrieveMesh_safe					(const AssetID& asset);
+		static rPtr<Texture2D>& retrieveTexture_unsafe			(const AssetID& asset);
+		static rPtr<Texture2D>& retrieveTexture_safe			(const AssetID& asset);
+		static rPtr<Mesh3D>& retrieveMesh_unsafe				(const AssetID& asset);
+		static rPtr<Mesh3D>& retrieveMesh_safe					(const AssetID& asset);
 		static rPtr<SurfaceMaterial>& retrieveSurfaceMaterial_safe	(const AssetID& asset);
 
-		static inline hashMap<AssetKey, rPtr<EngineMesh>> meshAssets;
-		static inline hashMap<AssetKey, rPtr<EngineTexture>> textureAssets;
+		static inline hashMap<AssetKey, rPtr<Mesh3D>> meshAssets;
+		static inline hashMap<AssetKey, rPtr<Texture2D>> textureAssets;
 		static inline hashMap<AssetKey, rPtr<SurfaceMaterial>> surfaceMaterialAssets;
 
 		static inline EngineDevice* engineDevice{};
@@ -125,7 +125,7 @@ namespace Shard3D {
 		// engine only function, do not call this
 		static void _editor_icons_destroy();
 		// engine only function, do not call this
-		static inline hashMap<std::string, rPtr<EngineTexture>> _editor_icons;
+		static inline hashMap<std::string, rPtr<Texture2D>> _editor_icons;
 
 		static inline const char* _editor_icons_array[][2]{
 			{"editor.play",						"assets/_engine/_editor/icon_play.png"			},

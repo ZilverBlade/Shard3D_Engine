@@ -6,6 +6,7 @@
 #include "../vulkan_api/device.h"
 #include "../rendering/camera.h"
 namespace Shard3D {
+	class PhysicsSystem;
 	class EngineApplication;
 	namespace ECS {
 		class Actor;
@@ -57,6 +58,8 @@ namespace Shard3D {
 */
 			void end();
 
+			void setPhysicsSystem(PhysicsSystem* _physicsSystemPtr) { physicsSystemPtr = _physicsSystemPtr; }
+
 			void simulationStateCallback();
 
 			PlayState simulationState = PlayState::Stopped;
@@ -72,6 +75,7 @@ namespace Shard3D {
 		private:
 			//should only be called by system processes
 			Actor createActorWithUUID(UUID guid, const std::string& name = "Some kind of actor");
+			PhysicsSystem* physicsSystemPtr;
 
 			void rebuildTransforms();
 			void rebuildRelations(Actor child);

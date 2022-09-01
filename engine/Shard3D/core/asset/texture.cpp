@@ -9,15 +9,15 @@
 #include <cmath>
 #include "../misc/graphics_settings.h"
 
-namespace Shard3D {
-    EngineTexture::EngineTexture(EngineDevice& device, const std::string& textureFilepath, TextureLoadInfo loadInfo) : mDevice{ device } {
+namespace Shard3D::Resources {
+    Texture2D::Texture2D(EngineDevice& device, const std::string& textureFilepath, TextureLoadInfo loadInfo) : mDevice{ device } {
         mLoadInfo = loadInfo;
         createTextureImage(textureFilepath);
         createTextureImageView(VK_IMAGE_VIEW_TYPE_2D);
         createTextureSampler();
         updateDescriptor();
     }
-    EngineTexture::EngineTexture(EngineDevice& device) : mDevice{ device } { 
+    Texture2D::Texture2D(EngineDevice& device) : mDevice{ device } { 
         mLoadInfo.filter = VK_FILTER_LINEAR;
         mLoadInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
         mLoadInfo.addressMode = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
@@ -25,36 +25,36 @@ namespace Shard3D {
         updateDescriptor();
     }
   
-    EngineTexture::~EngineTexture() {
+    Texture2D::~Texture2D() {
         vkDestroySampler(mDevice.device(), mTextureSampler, nullptr);
         vkDestroyImageView(mDevice.device(), mTextureImageView, nullptr);
         vkDestroyImage(mDevice.device(), mTextureImage, nullptr);
         vkFreeMemory(mDevice.device(), mTextureImageMemory, nullptr);
     }
 
-    uPtr<EngineTexture> EngineTexture::createTextureFromFile(
+    uPtr<Texture2D> Texture2D::createTextureFromFile(
         EngineDevice& device, const std::string& filepath, TextureLoadInfo loadInfo) {
-        return make_uPtr<EngineTexture>(device, filepath, loadInfo);
+        return make_uPtr<Texture2D>(device, filepath, loadInfo);
     }
 
-    uPtr<EngineTexture> EngineTexture::createEmptyTexture(EngineDevice& device)
+    uPtr<Texture2D> Texture2D::createEmptyTexture(EngineDevice& device)
     {
-        return make_uPtr<EngineTexture>(device);
+        return make_uPtr<Texture2D>(device);
     }
 
-    void EngineTexture::updateDescriptor() {
+    void Texture2D::updateDescriptor() {
         mDescriptor.sampler = mTextureSampler;
         mDescriptor.imageView = mTextureImageView;
         mDescriptor.imageLayout = mTextureLayout;
     }
-    unsigned char* EngineTexture::getSTBImage(const std::string& filepath, int* x, int* y, int* comp, int req_comp) {
+    unsigned char* Texture2D::getSTBImage(const std::string& filepath, int* x, int* y, int* comp, int req_comp) {
         SHARD3D_LOG("Loading STBImage {0}", filepath);
         return stbi_load(filepath.c_str(), x, y, comp, req_comp);
     }
-    void EngineTexture::freeSTBImage(void* pixels) {
+    void Texture2D::freeSTBImage(void* pixels) {
         stbi_image_free(pixels);
     }
-    void EngineTexture::createBlankTextureImage() {
+    void Texture2D::createBlankTextureImage() {
 
         VkImageCreateInfo imageCreateInfo{};
         imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -110,7 +110,7 @@ namespace Shard3D {
         viewInfo.image = mTextureImage;
          vkCreateImageView(mDevice.device(), &viewInfo, nullptr, &mTextureImageView);
     }
-    void EngineTexture::createTextureImage(const std::string& filepath) {
+    void Texture2D::createTextureImage(const std::string& filepath) {
         int texWidth, texHeight, texChannels;
         // stbi_set_flip_vertically_on_load(1);  // todo determine why texture coordinates are flipped
         stbi_uc* pixels =
@@ -194,7 +194,7 @@ namespace Shard3D {
         vkFreeMemory(mDevice.device(), stagingBufferMemory, nullptr);
     }
 
-    void EngineTexture::createTextureImageView(VkImageViewType viewType) {
+    void Texture2D::createTextureImageView(VkImageViewType viewType) {
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         viewInfo.image = mTextureImage;
@@ -211,7 +211,7 @@ namespace Shard3D {
         }
     }
 
-    void EngineTexture::createTextureSampler() {
+    void Texture2D::createTextureSampler() {
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
         samplerInfo.magFilter = mLoadInfo.filter;
@@ -242,7 +242,7 @@ namespace Shard3D {
         }
     }
 
-    void EngineTexture::transitionLayout(
+    void Texture2D::transitionLayout(
         VkCommandBuffer commandBuffer, VkImageLayout oldLayout, VkImageLayout newLayout) {
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;

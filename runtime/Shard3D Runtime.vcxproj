@@ -32,7 +32,7 @@
     <ProjectGuid>{B4836232-E14E-4786-95E0-2879B5B8D68C}</ProjectGuid>
     <RootNamespace>Shard3DGameProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Shard3D Runtime</ProjectName>
+    <ProjectName>Shard3DRuntime</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

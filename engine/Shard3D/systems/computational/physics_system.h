@@ -31,10 +31,12 @@
 #include <iostream> 
 #include <Jolt/Core/JobSystem.h>
 
-#include "../../core/misc/frame_info.h"	  
-#include "../../core/ecs/level.h"
+#include "../../core/misc/frame_info.h"	
 
 namespace Shard3D {
+	namespace ECS {
+		class Level;
+	}
 	static void TraceImpl(const char* inFMT, ...)
 	{
 		// Format the message
@@ -44,7 +46,7 @@ namespace Shard3D {
 		vsnprintf(buffer, sizeof(buffer), inFMT, list);
 
 		// Print to the TTY
-		std::cout << buffer << std::endl;
+		SHARD3D_LOG("[PHYSICS] {0}",buffer);
 	}
 
 
@@ -183,19 +185,59 @@ namespace Shard3D {
 			std::cout << "A body went to sleep" << std::endl;
 		}
 	};
+
+	class MyStateRecorder : public JPH::StateRecorder {
+	public:
+		/// Read a string of bytes from the binary stream
+		virtual void		ReadBytes(void* outData, size_t inNumBytes) override {
+			uint8_t* raw_out_data = reinterpret_cast<uint8_t*>(outData);
+
+			for (size_t i = 0; i < bytes.size(); i++) {
+				raw_out_data[i] = bytes[i];
+			}
+			inNumBytes = bytes.size();
+		};
+
+		/// Returns true when an attempt has been made to read past the end of the file
+		virtual bool		IsEOF() const override {
+
+			SHARD3D_ERROR("filended");
+			return false;
+		};
+
+		/// Write a string of bytes to the binary stream
+		virtual void		WriteBytes(const void* inData, size_t inNumBytes) override {
+			bytes.clear();
+			uint8_t* raw_data = reinterpret_cast<uint8_t*>(const_cast<void*>(inData));
+
+			for (size_t i = 0; i < inNumBytes; i++) {
+				bytes.push_back(raw_data[i]);
+			}
+		};
+
+		/// Returns true if there was an IO failure
+		virtual bool		IsFailed() const override {
+			SHARD3D_ERROR("shit");
+			return false;
+		};
+	private:
+		std::vector<uint8_t> bytes;
+	};
+
 	class PhysicsSystem {
 	public:
 		PhysicsSystem();
 		~PhysicsSystem();
-		void simulate(sPtr<ECS::Level> level, float frameTime);
-		JPH::Ref<JPH::Shape> createBoxShape(const JPH::BoxShapeSettings& settings);
-		JPH::Ref<JPH::Shape> createSphereShape(const JPH::SphereShapeSettings& settings);
+		void begin(ECS::Level* level);
+		void end(ECS::Level* level);
+		void simulate(ECS::Level* level, float frameTime);
+		JPH::ShapeRefC createBoxShape(const JPH::BoxShapeSettings& settings);
+		JPH::ShapeRefC  createSphereShape(const JPH::SphereShapeSettings& settings);
 		JPH::Ref<JPH::Shape> createConvexHullShape(const JPH::ConvexHullShapeSettings& settings);
-		
-		JPH::Body* createBody(const JPH::BodyCreationSettings& settings);
+		JPH::BodyID createBody(const JPH::BodyCreationSettings& settings, bool activate = false);
 	
 		void dumpShapeToBin(JPH::Ref<JPH::Shape> shape, const std::string& path);
-		
+		JPH::BodyInterface& getInterface() { return physics_system->GetBodyInterface(); }
 	private:
 		// force in m/s^2
 		float gravity = 9.8f; 
@@ -220,12 +262,16 @@ namespace Shard3D {
 		// Note: This value is low because this is a simple test. For a real project use something in the order of 10240.
 		const uint32_t cMaxContactConstraints = 1024;
 
+
 		// Create mapping table from object layer to broadphase layer
 		// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
 		uPtr<JPH::PhysicsSystem> physics_system;
 		uPtr<MyBodyActivationListener> body_activation_listener;
 		uPtr<MyContactListener> contact_listener;
+		uPtr<JPH::TempAllocatorImpl> temp_allocator;
+		BPLayerInterfaceImpl broad_phase_layer_interface;
 
+		MyStateRecorder myRecorder{};
 		uPtr<JPH::JobSystem> jobsystem;
 	};
 }

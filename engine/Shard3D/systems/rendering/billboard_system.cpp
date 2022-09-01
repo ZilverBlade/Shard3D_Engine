@@ -50,15 +50,15 @@ namespace Shard3D {
 	void BillboardRenderSystem::createPipeline(VkRenderPass renderPass) {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-		PipelineConfigInfo pipelineConfig{};
-		EnginePipeline::pipelineConfig(pipelineConfig)
-			.defaultPipelineConfigInfo()
+		GraphicsPipelineConfigInfo pipelineConfig{};
+		GraphicsPipeline::pipelineConfig(pipelineConfig)
+			.defaultGraphicsPipelineConfigInfo()
 			//.enableAlphaBlending(VK_BLEND_OP_ADD)
-			.setCullingMode(VK_CULL_MODE_FRONT_BIT);
+			.setCullMode(VK_CULL_MODE_FRONT_BIT);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout; // support only view plane aligned atm
-		enginePipeline = make_uPtr<EnginePipeline>(
+		graphicsPipeline = make_uPtr<GraphicsPipeline>(
 			engineDevice,
 			"assets/shaderdata/billboard_sva.vert.spv",
 			"assets/shaderdata/billboard_sva.frag.spv",
@@ -67,7 +67,7 @@ namespace Shard3D {
 	}
 
 	void BillboardRenderSystem::render(FrameInfo& frameInfo) {
-		enginePipeline->bind(frameInfo.commandBuffer);
+		graphicsPipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
 			frameInfo.commandBuffer,

@@ -16,9 +16,9 @@ namespace Shard3D {
 		);
 
 		static void createSurfacePipeline(
-			uPtr<EnginePipeline>* pipeline,
+			uPtr<GraphicsPipeline>* pipeline,
 			VkPipelineLayout pipelineLayout,
-			PipelineConfigInfo& pipelineConfig,
+			GraphicsPipelineConfigInfo& pipelineConfig,
 			const std::string& fragment_shader
 		);
 

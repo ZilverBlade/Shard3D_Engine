@@ -24,7 +24,7 @@ namespace Shard3D {
 
 		EngineDevice& engineDevice;
 		uPtr<EngineDescriptorSetLayout> billboardSystemLayout;
-		uPtr<EnginePipeline> enginePipeline;
+		uPtr<GraphicsPipeline> graphicsPipeline;
 		VkPipelineLayout pipelineLayout;
 	};
 }

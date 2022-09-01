@@ -16,7 +16,7 @@ namespace Shard3D {
     }
 
     void ComputeSystem::createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) {
-        std::shared_ptr<EngineTexture> outputTargetImg = EngineTexture::createEmptyTexture(engineDevice);
+        std::shared_ptr<Texture2D> outputTargetImg = Texture2D::createEmptyTexture(engineDevice);
         //pipeline layout
         computeSystemLayout =
             EngineDescriptorSetLayout::Builder(engineDevice)
@@ -43,18 +43,10 @@ namespace Shard3D {
         //pipeline
         SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-        PipelineConfigInfo pipelineConfig{};
-        EnginePipeline::pipelineConfig(pipelineConfig).defaultPipelineConfigInfo();
-        pipelineConfig.renderPass = renderPass;
-        pipelineConfig.pipelineLayout = pipelineLayout;
-
-        enginePipeline = make_uPtr<EnginePipeline>(
-            "had to add this because std::make_unique gets the wrong overload",
+        computePipeline = make_uPtr<ComputePipeline>(
             engineDevice,
-            VK_SHADER_STAGE_COMPUTE_BIT,
             pipelineLayout,
-            "assets/shaderdata/test.comp.spv",
-            pipelineConfig
+            "assets/shaderdata/test.comp.spv"
         );
 
         srcImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
@@ -68,7 +60,7 @@ namespace Shard3D {
 
     void ComputeSystem::render(FrameInfo& frameInfo) {
 
-        enginePipeline->bindCompute(frameInfo.commandBuffer);
+        computePipeline->bindCompute(frameInfo.commandBuffer);
 
         //srcImageInfo.imageView = Singleton::mainOffScreen.getImageView();
         //srcImageInfo.sampler = Singleton::mainOffScreen.getSampler();

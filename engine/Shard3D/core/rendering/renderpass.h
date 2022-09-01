@@ -27,7 +27,7 @@ namespace Shard3D {
 	
 	class SimpleRenderPass {
 	public:
-		SimpleRenderPass(EngineDevice& device, std::vector<AttachmentInfo> attachments);
+		SimpleRenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments);
 		~SimpleRenderPass();
 
 		SimpleRenderPass(const SimpleRenderPass&) = delete;
