@@ -43,4 +43,4 @@ make sure for the first build to switch 'Use (/Yu)' to 'Create (/Yc)', and then 
 ### Scripting
 
 Shard3D supports scripting in both C# and Visual Basic, and you may use them interchangeably.
-C++ Native scripting is also available, but does not have the same flexibility as previously mentined languages, and must be hard-coded in the project.
+C++ Native scripting is also available, but does not have the same flexibility as previously mentioned languages, and must be hard-coded in the project.
