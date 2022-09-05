@@ -522,6 +522,7 @@
     <None Include="shaders\post_processing\combined.frag" />
     <None Include="shaders\post_processing\debander.frag" />
     <None Include="shaders\post_processing\bloom.frag" />
+    <None Include="shaders\post_processing\debander_10bit.frag" />
     <None Include="shaders\post_processing\gamma_correction.frag" />
     <None Include="shaders\post_processing\hdr.frag" />
     <None Include="shaders\shadow_directional.vert" />

@@ -25,22 +25,21 @@ vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
 
 void main()	{
     vec2 tex_offset = 1.0 / textureSize(inputRenderedScene, 0); // gets size of single texel
-   
-    vec3 bloomHorizontal = texture(inputRenderedScene, fragUV).xyz * weight[0]; //= blur9(inputImage, fragUV, vec2(1920.0, 1080.0), vec2(1.0, 0.0));
-	vec3 bloomVertical =  texture(inputRenderedScene, fragUV).xyz * weight[0];//= blur9(inputImage, fragUV, vec2(1920.0, 1080.0), vec2(0.0, 1.0));
+    vec3 bloomHorizontal = max(texture(inputRenderedScene, fragUV).xyz - 1.0, 0.0) * weight[0]; //= blur9(inputImage, fragUV, vec2(1920.0, 1080.0), vec2(1.0, 0.0));
+	vec3 bloomVertical = bloomHorizontal;//= blur9(inputImage, fragUV, vec2(1920.0, 1080.0), vec2(0.0, 1.0));
 
 	for(int i = 1; i < 6; ++i)
     {
-        bloomHorizontal += texture(inputRenderedScene, fragUV + vec2(tex_offset.x * i, 0.0)).xyz * weight[i];
-        bloomHorizontal += texture(inputRenderedScene, fragUV - vec2(tex_offset.x * i, 0.0)).xyz * weight[i];
+        bloomHorizontal += max(texture(inputRenderedScene, fragUV + vec2(tex_offset.x * i, 0.0)).xyz - 1.0, 0.0) * weight[i];
+        bloomHorizontal += max(texture(inputRenderedScene, fragUV - vec2(tex_offset.x * i, 0.0)).xyz - 1.0, 0.0) * weight[i];
     }
     for(int i = 1; i < 6; ++i)
     {
-        bloomVertical += texture(inputRenderedScene, fragUV + vec2(0.0, tex_offset.y * i)).xyz * weight[i];
-        bloomVertical += texture(inputRenderedScene, fragUV - vec2(0.0, tex_offset.y * i)).xyz * weight[i];
+        bloomVertical += max(texture(inputRenderedScene, fragUV + vec2(0.0, tex_offset.y * i)).xyz - 1.0, 0.0) * weight[i];
+        bloomVertical += max(texture(inputRenderedScene, fragUV - vec2(0.0, tex_offset.y * i)).xyz - 1.0, 0.0) * weight[i];
     }
 
-   vec3 bloomTerm = max((bloomHorizontal + bloomVertical) - vec3(bloomThreshold * 2.0), vec3(0.0));
+    vec3 bloomTerm = bloomHorizontal + bloomVertical;
 
 	outColor = vec4(texture(inputRenderedScene, fragUV).xyz + bloomTerm, 1.0);
 }

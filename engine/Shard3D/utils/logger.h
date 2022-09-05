@@ -50,9 +50,11 @@ Unlike the other logging macros, this only takes a string value.
 (use for catching potential mistakes in debugging).
 Unlike the other logging macros, this only takes a string value.
 */
-#ifndef SHARD3D_NO_ASSERT
+#ifndef NDEBUG
 #define SHARD3D_ASSERT(__EXPRESSION__) if (!(__EXPRESSION__)) Shard3D::LOGGER::logFatal("Assertion failed! '"#__EXPRESSION__"'")
 #define SHARD3D_SILENT_ASSERT(__EXPRESSION__) if (!(__EXPRESSION__)) Shard3D::LOGGER::getErrorLogger()->error("Assertion failed! '"#__EXPRESSION__"'")
-#elif
-#define SHARD3D_ASSERT(__EXPRESSION__, __MESSAGE__)
+#endif
+#ifdef NDEBUG
+#define SHARD3D_ASSERT(__EXPRESSION__)
+#define SHARD3D_SILENT_ASSERT(__EXPRESSION__)
 #endif

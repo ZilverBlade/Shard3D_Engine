@@ -5,7 +5,7 @@ layout (location = 0) out vec4 outColor;
 
 layout (set = 0, binding = 0, rgba32f) uniform image2D postProcessImage;
 
-const highp float NOISE_GRANULARITY = 0.3/255.0;
+const highp float NOISE_GRANULARITY = 0.3/1023.0;
 
 highp float random(vec2 coords) {
    return fract(sin(dot(coords.xy, vec2(12.9898,78.233))) * 43758.5453);

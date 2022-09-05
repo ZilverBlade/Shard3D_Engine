@@ -32,10 +32,9 @@ namespace Shard3D {
 			push.normalMatrix = transform.normalMatrix;
 
 			auto& model = ResourceHandler::retrieveMesh(component.asset);
-			SHARD3D_ASSERT(model->buffers.size() == component.materials.size() && "Mesh Component and 3D model do not match!");
-			for (int i = 0; i < model->buffers.size(); i++) {
-				auto& buffer = model->buffers[i];
-				rPtr<SurfaceMaterial> material = ResourceHandler::retrieveSurfaceMaterial(component.materials[i]);
+			SHARD3D_ASSERT(model->materialSlots.size() == component.materials.size() && "Mesh Component and 3D model do not match!");
+			for (int i = 0; i < model->bind(frameInfo.commandBuffer); i++) {
+				rPtr<SurfaceMaterial> material = ResourceHandler::retrieveSurfaceMaterial(component.materials[i]);	
 				material->bind(frameInfo.commandBuffer, frameInfo.globalDescriptorSet);
 				vkCmdPushConstants(
 					frameInfo.commandBuffer,
@@ -45,8 +44,7 @@ namespace Shard3D {
 					sizeof(MeshPushConstantData),
 					&push
 				);
-				model->bind(frameInfo.commandBuffer, buffer);
-				model->draw(frameInfo.commandBuffer, buffer);
+				model->draw(frameInfo.commandBuffer, i);
 			}
 		}
 	}

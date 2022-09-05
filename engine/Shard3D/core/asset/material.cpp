@@ -15,9 +15,9 @@ namespace Shard3D {
 			return;
 		}
 		
-		if (blendMode == SurfaceMaterialBlendModeMasked)
+		if (maskedInfo)
 			delete maskedInfo;
-		if (blendMode == SurfaceMaterialBlendModeTranslucent)
+		if (translucentInfo)
 			delete translucentInfo;
 
 		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);

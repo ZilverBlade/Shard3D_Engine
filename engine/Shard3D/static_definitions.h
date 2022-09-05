@@ -8,7 +8,7 @@ namespace Shard3D {
 
 // Definitions are engine only, requires recompiling static library to take effect
 
-const static Version ENGINE_VERSION = { VersionState::Alpha, 1, 2, 7, 5 };	// Shard3D 
+const static Version ENGINE_VERSION = { VersionState::Alpha, 1, 2, 7, 6 };	// Shard3D 
 
 #define ENGINE_SETTINGS_PATH						"assets/configdata/engine_settings.ini"
 #define EDITOR_SETTINGS_PATH						"assets/configdata/editor_settings.ini"
@@ -49,7 +49,7 @@ const static Version ENGINE_VERSION = { VersionState::Alpha, 1, 2, 7, 5 };	// Sh
 #define ENSET_BETA_DEBUG_TOOLS		
 //	#define ENSET_ENABLE_COMPUTE_SHADERS					// Compute shaders can be very useful, however as of now they have not been fully implemented, only enable for development
 
-#ifdef _DEPLOY
+#ifdef NDEBUG
 #define SHARD3D_NO_ASSERT	// Disable assertions for slight performance boost
 #endif
 }

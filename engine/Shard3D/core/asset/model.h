@@ -37,14 +37,19 @@ namespace Shard3D {
 				sPtr<EngineBuffer> indexBuffer{};
 				sPtr<EngineBuffer> vertexBuffer{};
 
-				uint32_t vertexCount{};
-				uint32_t indexCount{};
+				std::vector<uint32_t> vertexCounts{};
+				std::vector<uint32_t> indexCounts{};
+				std::vector<uint32_t> vertexOffsets{};
+				std::vector<uint32_t> indexOffsets{};
+
 				bool hasIndexBuffer = false;
 			};
 
 			struct Builder {
-				//    <Material Slot> <Submesh>
-				hashMap<std::string, SubmeshData> submeshes;
+				//		<Material Slot>	 <Submesh>
+				std::map<std::string, SubmeshData> submeshes;
+				std::vector<SubmeshData*> submeshPtrs;
+				std::vector<std::string> slotPtrs;
 				void loadScene(const std::string& filepath, bool createMaterials);
 				void processNode(aiNode* node, const aiScene* scene, bool createMaterials);
 				void loadSubmesh(aiMesh* mesh, const aiScene* scene, bool createMaterials);
@@ -68,16 +73,16 @@ namespace Shard3D {
 				const AssetID& asset,
 				Model3DLoadInfo loadInfo
 			);
-			void bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
-			void draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
+			uint32_t bind(VkCommandBuffer commandBuffer);
+			void draw(VkCommandBuffer commandBuffer, uint32_t index);
 
-			//			<Buffer Data>
-			std::vector<SubmeshBuffers> buffers{};
+			//		<Buffer Data>
+			SubmeshBuffers buffers{};
 			std::vector<std::string> materialSlots{};
 			std::vector<AssetID> materials{};
 		private:
-			void createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
-			void createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers);
+			void createVertexBuffers(std::vector<SubmeshData*> mapdata);
+			void createIndexBuffers(std::vector<SubmeshData*> mapdata);
 
 			EngineDevice* device;
 		};

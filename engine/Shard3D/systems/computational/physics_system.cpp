@@ -91,8 +91,7 @@ namespace Shard3D {
 			JPH::Vec3 rotation = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform().GetRotationSafe().GetQuaternion().GetXYZ();
 			SHARD3D_LOG("Physics Actor {0} new transform [ {1}, {2}, {3} ]", phys.physicsBody.GetIndex(), translation.GetX(), translation.GetZ(), translation.GetY());
 			
-			// Override matrix (scale isnt taken into account & normal matrices dont work either)
-			// 
+			// Override matrix
 			JPH::Mat44 base = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform();
 			glm::mat4 converted{ 1.f };
 			converted[0] = { base.GetColumn4(0).GetX(), base.GetColumn4(0).GetY(), base.GetColumn4(0).GetZ(), base.GetColumn4(0).GetW() };

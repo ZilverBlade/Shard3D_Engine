@@ -587,5 +587,8 @@
     <None Include="shaders\post_processing\combined.frag">
       <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
     </None>
+    <None Include="shaders\post_processing\debander_10bit.frag">
+      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    </None>
   </ItemGroup>
 </Project>

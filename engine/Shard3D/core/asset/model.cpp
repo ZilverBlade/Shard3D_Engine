@@ -26,14 +26,13 @@ namespace std {
 namespace Shard3D::Resources {
 
 	Model3D::Model3D(EngineDevice& dvc, const Model3D::Builder &builder) : device(&dvc) {
-		for (auto& submesh : builder.submeshes) {
-			SubmeshBuffers _buffers{};
-			auto& data = submesh.second;
-			createVertexBuffers(data, _buffers);
-			createIndexBuffers(data, _buffers);
-			buffers.push_back(_buffers);
-			materialSlots.push_back(submesh.first);
-			materials.push_back(data.materialAsset);
+		createVertexBuffers(builder.submeshPtrs);
+		createIndexBuffers(builder.submeshPtrs);
+		for (int i = 0; i < builder.submeshes.size(); i++) {
+			materialSlots.push_back(builder.slotPtrs[i]);
+			materials.push_back(builder.submeshPtrs[i]->materialAsset);
+
+			SHARD3D_LOG("Creating buffer for slot {0} with index {1}", builder.slotPtrs[i], i);
 		}
 	}
 	Model3D::~Model3D() {}
@@ -52,8 +51,8 @@ namespace Shard3D::Resources {
 		
 		if (ini.GetBoolValue("LOGGING", "log.Model3DLoadInfo") == true) {
 			uint64_t vcount{};
-			for (auto& primitive : builder.submeshes)
-				vcount += primitive.second.vertices.size();
+			for (auto& primitive : builder.submeshPtrs)
+				vcount += primitive->vertices.size();
 			SHARD3D_INFO("Loaded model: '{0}'\n\t\tMesh vertex count: {1}", filepath, vcount);
 		}
 		return make_uPtr<Model3D>(dvc, builder);
@@ -70,81 +69,110 @@ namespace Shard3D::Resources {
 		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", asset.getFile()); return uPtr<Model3D>(nullptr); };
 
 		builder.loadScene(asset, false);
+
 		return make_uPtr<Model3D>(dvc, builder);
 	}
 
-	void Model3D::createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
-		_buffers.vertexCount = static_cast<uint32_t>(submesh.vertices.size());
-		SHARD3D_ASSERT(_buffers.vertexCount >= 3 && "Vertex count must be at least 3");
+	void Model3D::createVertexBuffers(std::vector<SubmeshData*> mapdata) {
+		std::vector<Vertex> vertexData;
+		for (int i = 0; i < mapdata.size(); i++) {
+			uint32_t vertexcount = static_cast<uint32_t>(mapdata[i]->vertices.size());
+			SHARD3D_ASSERT(vertexcount >= 3 && "Vertex count must be at least 3");
+			buffers.vertexCounts.emplace_back(vertexcount);
+			vertexData.reserve(vertexcount);
+			for (Vertex vertex : mapdata[i]->vertices)
+				vertexData.emplace_back(vertex);
+			if (buffers.vertexOffsets.size() == 0) { buffers.vertexOffsets.push_back(0); continue; }
+			buffers.vertexOffsets.push_back(buffers.vertexOffsets[i - 1] + buffers.vertexCounts[i - 1]);
+		}
 
-		VkDeviceSize bufferSize = sizeof(submesh.vertices[0]) * _buffers.vertexCount;
-		uint32_t vertexSize = sizeof(submesh.vertices[0]);
+		uint32_t fullVertexCount{};
+		for (uint32_t count : buffers.vertexCounts) {
+			fullVertexCount += count;
+		}
+	
+		VkDeviceSize bufferSize = sizeof(Vertex) * fullVertexCount;
+		uint32_t vertexSize = sizeof(Vertex);
 
 		EngineBuffer stagingBuffer{
 			*device,
 			vertexSize,
-			_buffers.vertexCount,
+			fullVertexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		};
 
 		stagingBuffer.map();
-		stagingBuffer.writeToBuffer((void*)submesh.vertices.data());
-
-		_buffers.vertexBuffer = make_sPtr<EngineBuffer>(
+		stagingBuffer.writeToBuffer((void*)vertexData.data());
+		buffers.vertexBuffer = make_sPtr<EngineBuffer>(
 			*device,
 			vertexSize,
-			_buffers.vertexCount,
+			fullVertexCount,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
-		device->copyBuffer(stagingBuffer.getBuffer(), _buffers.vertexBuffer->getBuffer(), bufferSize);
+		device->copyBuffer(stagingBuffer.getBuffer(), buffers.vertexBuffer->getBuffer(), bufferSize);
 	}
 
-	void Model3D::createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
-		_buffers.indexCount = static_cast<uint32_t>(submesh.indices.size());
-		_buffers.hasIndexBuffer = _buffers.indexCount > 0;
+	void Model3D::createIndexBuffers(std::vector<SubmeshData*>mapdata) {
+		std::vector<uint32_t> indexData;
+		for (int i = 0; i < mapdata.size(); i++) {
+			uint32_t indexcount = static_cast<uint32_t>(mapdata[i]->indices.size());
+			buffers.indexCounts.emplace_back(indexcount);
+			for (uint32_t index : mapdata[i]->indices)
+				indexData.emplace_back(index);
+			if (buffers.indexOffsets.size() == 0) { buffers.indexOffsets.push_back(0); continue; }
+			buffers.indexOffsets.push_back(buffers.indexOffsets[i - 1] + buffers.indexCounts[i - 1]);
+		}
 
-		if (!_buffers.hasIndexBuffer) return;
-		VkDeviceSize bufferSize = sizeof(submesh.indices[0]) * _buffers.indexCount;
-		uint32_t indexSize = sizeof(submesh.indices[0]);
+		uint32_t fullIndexCount{};
+		for (uint32_t count : buffers.indexCounts) {
+			fullIndexCount += count;
+		}
+
+		buffers.hasIndexBuffer = fullIndexCount > 0;
+
+		if (!buffers.hasIndexBuffer) return;
+		VkDeviceSize bufferSize = sizeof(uint32_t) * fullIndexCount;
+		uint32_t indexSize = sizeof(uint32_t);
 
 		EngineBuffer stagingBuffer{
 			*device,
 			indexSize,
-			_buffers.indexCount,
+			fullIndexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		};
 
 		stagingBuffer.map();
-		stagingBuffer.writeToBuffer((void*)submesh.indices.data());
+		stagingBuffer.writeToBuffer((void*)indexData.data());
 		
-		_buffers.indexBuffer = make_sPtr<EngineBuffer>(
+		buffers.indexBuffer = make_sPtr<EngineBuffer>(
 			*device,
 			indexSize,
-			_buffers.indexCount,
+			fullIndexCount,
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
 
-		device->copyBuffer(stagingBuffer.getBuffer(), _buffers.indexBuffer->getBuffer(), bufferSize);
+		device->copyBuffer(stagingBuffer.getBuffer(), buffers.indexBuffer->getBuffer(), bufferSize);
 	}
 
-	void Model3D::bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
+	uint32_t Model3D::bind(VkCommandBuffer commandBuffer) {
 		VkBuffer _buffers[] = { buffers.vertexBuffer->getBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, _buffers, offsets);
 		if (buffers.hasIndexBuffer) {
 			vkCmdBindIndexBuffer(commandBuffer, buffers.indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		}
+		return buffers.vertexOffsets.size();
 	}
 
-	void Model3D::draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
+	void Model3D::draw(VkCommandBuffer commandBuffer, uint32_t index) {
 		if (buffers.hasIndexBuffer) {
-			vkCmdDrawIndexed(commandBuffer, buffers.indexCount, 1, 0, 0, 0);
+			vkCmdDrawIndexed(commandBuffer, buffers.indexCounts[index], 1, buffers.indexOffsets[index], buffers.vertexOffsets[index], 0);
 		} else {
-			vkCmdDraw(commandBuffer, buffers.vertexCount, 1, 0, 0);
+			vkCmdDraw(commandBuffer, buffers.vertexCounts[index], 1, buffers.vertexOffsets[index], 0);
 		}
 	}
 
@@ -203,8 +231,12 @@ namespace Shard3D::Resources {
 		const std::string& materialSlot = material->GetName().C_Str();
 
 		if (submeshes.find(materialSlot) == submeshes.end()) { // create new slot if none exist
-			SubmeshData submesh{}; 
+			SubmeshData submesh{};
 			submeshes[materialSlot] = submesh;
+			submeshPtrs.push_back(&submeshes[materialSlot]);
+			slotPtrs.push_back(materialSlot);
+
+			SHARD3D_LOG("Creating primitive data for slot {0} with index {1}", materialSlot, slotPtrs.size() - 1);
 		}
 		hashMap<Vertex, uint32_t> uniqueVertices{};
 		for (uint32_t i = 0; i < mesh->mNumVertices; i++) {

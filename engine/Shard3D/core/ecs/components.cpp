@@ -105,7 +105,7 @@ namespace Shard3D {
 		}
 		void MeshComponent::validate() {
 			auto& model = ResourceHandler::retrieveMesh(asset);
-			if (model->buffers.size() == materials.size()) return;
+			if (model->materialSlots.size() == materials.size()) return;
 			SHARD3D_WARN("MeshComponent validation failed! Resetting materials...");
 			materials = model->materials;
 		}

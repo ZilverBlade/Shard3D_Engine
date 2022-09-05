@@ -179,7 +179,6 @@ namespace Shard3D {
 						SHARD3D_WARN("Incorrect engine version");
 						return LevelMgrResults::OldEngineVersionResult;
 					}// change this to check if the version is less or more
-				
 				}
 
 				ResourceHandler::clearAllAssets(); // remove since new stuff will be loaded into memory

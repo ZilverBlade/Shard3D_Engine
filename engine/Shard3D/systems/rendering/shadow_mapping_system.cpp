@@ -117,11 +117,8 @@ namespace Shard3D {
 					&push
 				);
 
-				for (int i = 0; i < model->buffers.size(); i++) {
-					auto& buffer = model->buffers[i];
-
-					model->bind(frameInfo.commandBuffer, buffer);
-					model->draw(frameInfo.commandBuffer, buffer);
+				for (int i = 0; i < model->bind(frameInfo.commandBuffer); i++) {
+					model->draw(frameInfo.commandBuffer, i);
 				}
 			}
 		}
