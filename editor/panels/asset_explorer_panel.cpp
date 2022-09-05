@@ -26,8 +26,8 @@ namespace Shard3D {
 				continue;
 			}
 			switch (AssetUtils::discoverAssetType("assets\\" + relativePath.string())) {
-			case (AssetType::Mesh3D):
-				directoryEntries.types.push_back(AssetType::Mesh3D);
+			case (AssetType::Model3D):
+				directoryEntries.types.push_back(AssetType::Model3D);
 				directoryEntries.icons.push_back(&mesh3dIcon);
 				continue;
 			case (AssetType::Texture):
@@ -125,7 +125,7 @@ namespace Shard3D {
 					case(AssetType::Texture):
 						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.TEX", item, strlen(item) + 1, ImGuiCond_Once);
 						break;
-					case(AssetType::Mesh3D):
+					case(AssetType::Model3D):
 						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.MESH", item, strlen(item) + 1, ImGuiCond_Once);
 						break;
 					case(AssetType::Level):
@@ -195,7 +195,7 @@ namespace Shard3D {
 				if (check.good()) {
 					std::string dest = std::string(currentDir.string() + AssetUtils::truncatePath(file));
 					std::replace(dest.begin(), dest.end(), '\\', '/');
-					AssetManager::importMesh(file, dest, Mesh3DLoadInfo());
+					AssetManager::importMesh(file, dest, Model3DLoadInfo());
 					refreshIterator(currentDir);
 				}
 				else {
@@ -211,8 +211,8 @@ namespace Shard3D {
 				ImGui::CloseCurrentPopup();
 			}
 			if (ImGui::BeginMenu("Create Surface Material")) {
-				if (ImGui::MenuItem("Shaded Opaque")) {
-					rPtr<SurfaceMaterial_ShadedOpaque> worldgrid = make_rPtr<SurfaceMaterial_ShadedOpaque>();
+				if (ImGui::MenuItem("Shaded")) {
+					rPtr<SurfaceMaterial_Shaded> worldgrid = make_rPtr<SurfaceMaterial_Shaded>();
 					worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
 					worldgrid->shininess = 0.05f;
 					worldgrid->specular = 0.3f;
@@ -221,32 +221,11 @@ namespace Shard3D {
 					refreshIterator(currentDir);
 					ImGui::CloseCurrentPopup();
 				}
-				if (ImGui::MenuItem("Shaded Masked")) {
-					rPtr<SurfaceMaterial_ShadedMasked> worldgrid = make_rPtr<SurfaceMaterial_ShadedMasked>();
-					worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
-					worldgrid->shininess = 0.05f;
-					worldgrid->specular = 0.3f;
-					std::string dest = std::string(currentDir.string() + "/Some kind of material");
-					AssetManager::createMaterial(dest, worldgrid);
-					refreshIterator(currentDir);
-					ImGui::CloseCurrentPopup();
-				}
-				if (ImGui::MenuItem("Shaded Translucent")) {
-					rPtr<SurfaceMaterial_ShadedTranslucent> worldgrid = make_rPtr<SurfaceMaterial_ShadedTranslucent>();
-					worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
-					worldgrid->shininess = 0.05f;
-					worldgrid->specular = 0.3f;
-					std::string dest = std::string(currentDir.string() + "/Some kind of material");
-					AssetManager::createMaterial(dest, worldgrid);
-					refreshIterator(currentDir);
-					ImGui::CloseCurrentPopup();
-				}
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndPopup();
 		}
-
-
 		ImGui::End();
 	}
 }

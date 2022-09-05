@@ -105,7 +105,7 @@ namespace Shard3D {
 		frameInfo.activeLevel->registry.view<T, Components::TransformComponent>().each([&](auto light, auto transform) {
 			Billboard push{};
 		
-			push.position = transform.transformMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
+			push.position = transform.transformMatrix[3];
 
 			vkCmdPushConstants(
 				frameInfo.commandBuffer,

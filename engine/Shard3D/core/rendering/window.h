@@ -24,7 +24,7 @@ namespace Shard3D {
 		EngineWindow& operator=(const EngineWindow&) = delete;
 
 		void setEventCallback(const EventCallbackFunc& cbf) { _wndData.eventCallback = cbf; }
-
+		
 		bool shouldClose() { return glfwWindowShouldClose(window); }
 		VkExtent2D getExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
 		bool wasWindowResized() { return framebufferResized; }

@@ -173,6 +173,11 @@ ALPHA:
 		- Improved MSAA
 		- Fixed issue with x64 toolset not being used
 		- Changed naming for several classes and made use of inline namespaces for resources
+		- Restructured material system
+		- Removed dynamically set cull modes due to device compatibility issues
+		- Improved post processing (including a de-bander) 
+		- Improved script engine structure
+		- Added try catch statements for YAML deserialisation to prevent unnecessary crashes.
 
 		:: TODO, proper events sytem, add editor layouts, use premake
 		:: Fix: change vertex and index buffers to draw offset, dont use 64 bit integers for shaders (e.g. HUD system)

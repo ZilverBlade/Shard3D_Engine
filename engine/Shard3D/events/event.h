@@ -11,12 +11,14 @@ namespace Shard3D::Events {
 	enum class EventType {
 		Null = 0,
 		KeyPress, KeyDown, KeyRelease,
-		MouseClick, MouseButtonDown, MouseButtonRelease, MouseHover, MouseScroll
+		MouseClick, MouseButtonDown, MouseButtonRelease, MouseHover, MouseScroll,
+		WindowResize
 	};
 
 	enum EventCategory {
 		EventCategoryKeyboard = BIT(0),
 		EventCategoryMouse = BIT(1),
+		EventCategoryWindow = BIT(2),
 	};
 	
 	class Event {
@@ -45,6 +47,7 @@ namespace Shard3D::Events {
 			}
 			return false;
 		}
+
 	private:
 		Event& event;
 	};

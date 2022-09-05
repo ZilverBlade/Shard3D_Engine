@@ -126,7 +126,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;shaderc_combined.lib;shaderc_shared.lib;shaderc_util.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
@@ -137,7 +137,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_DEPLOY;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
@@ -156,7 +156,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;shaderc_combined.lib;shaderc_shared.lib;shaderc_util.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -165,8 +165,9 @@
     <ClInclude Include="core\asset\serializer.h" />
     <ClInclude Include="core\asset\assetid.h" />
     <ClInclude Include="core\rendering\frame_buffer.h" />
-    <ClInclude Include="core\rendering\renderpass.h" />
+    <ClInclude Include="core\rendering\render_pass.h" />
     <ClInclude Include="core\vulkan_api\pipeline_compute.h" />
+    <ClInclude Include="events\wnd_event.h" />
     <ClInclude Include="systems\computational\shader_system.h" />
     <ClInclude Include="systems\rendering\shadow_mapping_system.h" />
     <ClInclude Include="workarounds.h" />
@@ -214,8 +215,8 @@
     <ClInclude Include="plugins\plugin_link.h" />
     <ClInclude Include="plugins\script_engine_plugin_link.h" />
     <ClInclude Include="s3dpch.h" />
-    <ClInclude Include="scripting\dynamic_script_engine.h" />
-    <ClInclude Include="scripting\dynamic_script_engine_linker.h" />
+    <ClInclude Include="scripting\script_engine.h" />
+    <ClInclude Include="scripting\script_engine_linker.h" />
     <ClInclude Include="scripting\script_handler.h" />
     <ClInclude Include="utils\logger.h" />
     <ClInclude Include="utils\simple_ini.h" />
@@ -344,7 +345,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="core\rendering\renderpass.cpp">
+    <ClCompile Include="core\rendering\render_pass.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
@@ -416,12 +417,12 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="s3dpch.cpp" />
-    <ClCompile Include="scripting\dynamic_script_engine.cpp">
+    <ClCompile Include="scripting\script_engine.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="scripting\dynamic_script_engine_linker.cpp">
+    <ClCompile Include="scripting\script_engine_linker.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
@@ -518,7 +519,11 @@
     <None Include="shaders\materials\surface_shaded_opaque.frag" />
     <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
+    <None Include="shaders\post_processing\combined.frag" />
+    <None Include="shaders\post_processing\debander.frag" />
     <None Include="shaders\post_processing\bloom.frag" />
+    <None Include="shaders\post_processing\gamma_correction.frag" />
+    <None Include="shaders\post_processing\hdr.frag" />
     <None Include="shaders\shadow_directional.vert" />
     <None Include="shaders\_editor\editor_svabill.frag" />
     <None Include="shaders\_editor\editor_svabill.vert" />

@@ -2,7 +2,7 @@
 #include "frame_buffer.h"
 
 namespace Shard3D {
-	FrameBufferAttachment::FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, AttachmentType attachmentType) : engineDevice(device), description(attachmentDescription), _attachmentType(attachmentType) {
+	FrameBufferAttachment::FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler) : engineDevice(device), description(attachmentDescription), _attachmentType(attachmentType) {
 		VkImageCreateInfo imageCreateInfo{};
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -15,7 +15,7 @@ namespace Shard3D {
 		imageCreateInfo.samples = attachmentDescription.samples;
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		// We will sample directly from the color attachment
-		imageCreateInfo.usage = attachmentDescription.usage | VK_IMAGE_USAGE_SAMPLED_BIT;
+		imageCreateInfo.usage = attachmentDescription.usage | (VK_IMAGE_USAGE_SAMPLED_BIT * hasSampler);
 		VkMemoryAllocateInfo memAlloc = {};
 		memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		VkMemoryRequirements memReqs;
@@ -48,30 +48,31 @@ namespace Shard3D {
 		if (vkCreateImageView(device.device(), &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS) {
 			SHARD3D_ERROR("Failed to create image view!");
 		}
-
-		// Create sampler to sample from the attachment in the fragment shader
-		VkSamplerCreateInfo samplerInfo = {};
-		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		samplerInfo.magFilter = VK_FILTER_LINEAR;
-		samplerInfo.minFilter = VK_FILTER_LINEAR;
-		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		samplerInfo.addressModeV = samplerInfo.addressModeU;
-		samplerInfo.addressModeW = samplerInfo.addressModeU;
-		samplerInfo.mipLodBias = 0.0f;
-		samplerInfo.maxAnisotropy = 1.0f;
-		samplerInfo.minLod = 0.0f;
-		samplerInfo.maxLod = 1.0f;
-		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		if (vkCreateSampler(device.device(), &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
-			SHARD3D_ERROR("Failed to create sampler");
-		}
-
+		
+		if (hasSampler) {
+			// Create sampler to sample from the attachment in the fragment shader
+			VkSamplerCreateInfo samplerInfo = {};
+			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+			samplerInfo.magFilter = VK_FILTER_LINEAR;
+			samplerInfo.minFilter = VK_FILTER_LINEAR;
+			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			samplerInfo.addressModeV = samplerInfo.addressModeU;
+			samplerInfo.addressModeW = samplerInfo.addressModeU;
+			samplerInfo.mipLodBias = 0.0f;
+			samplerInfo.maxAnisotropy = 1.0f;
+			samplerInfo.minLod = 0.0f;
+			samplerInfo.maxLod = 1.0f;
+			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+			if (vkCreateSampler(device.device(), &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
+				SHARD3D_ERROR("Failed to create sampler");
+			}
+		
 		// Fill a descriptor for later use in a descriptor set
 		descriptor.imageLayout = attachmentDescription.finalLayout;
 		descriptor.imageView = imageView;
 		descriptor.sampler = sampler;
-
+		}
 		dimensions = { attachmentDescription.dimensions.x, attachmentDescription.dimensions.y, attachmentDescription.dimensions.z };
 	}
 
@@ -111,4 +112,9 @@ namespace Shard3D {
 	FrameBuffer::~FrameBuffer() {
 		vkDestroyFramebuffer(engineDevice.device(), frameBuffer, nullptr);
 	}
+
+	void FrameBuffer::resize(glm::ivec3 newDimensions) {
+
+	}
+
 }

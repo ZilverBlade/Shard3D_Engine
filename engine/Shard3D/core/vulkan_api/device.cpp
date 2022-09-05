@@ -196,7 +196,6 @@ void EngineDevice::requestDeviceFeatures(VkPhysicalDeviceFeatures& features) {
     features.shaderInt64 = VK_TRUE;
     if (msaaSamples != VK_SAMPLE_COUNT_1_BIT)
         features.sampleRateShading = VK_TRUE;
-    features.independentBlend = VK_TRUE;
 }
 void EngineDevice::createLogicalDevice() {
   QueueFamilyIndices indices = findQueueFamilies(physicalDevice_);

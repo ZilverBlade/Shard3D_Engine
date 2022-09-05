@@ -25,6 +25,10 @@ namespace Shard3D {
 		glm::vec4 ambientLightColor = { 1.0f, 1.0f, 1.0f, 0.01f };;
 	};
 
+	struct NonModifyableStaticInfo {
+		std::string gameName = "My Shard3D Game";
+	};
+
 	struct Settings {
 		Settings() = default;
 		//	[WINDOW]
@@ -105,11 +109,11 @@ namespace Shard3D {
 	};
 	class GraphicsSettings {
 	protected:
-
 		friend class EngineRenderer;
 	private:
 		static inline Settings graphics{};
 		static inline RuntimeInfo r_info{};
+		static inline NonModifyableStaticInfo constInfo{};
 		static inline CSimpleIniA ini;
 		static inline EngineWindow* engineWindow;
 	public:
@@ -121,6 +125,9 @@ namespace Shard3D {
 		static RuntimeInfo& getRuntimeInfo() { return r_info; }
 	// as this getter passes the value by reference, you may modify its contents
 		static Settings& get();
+
+		static NonModifyableStaticInfo getStaticApplicationInfo() { return constInfo; }
+
 		static void set(Settings sets);
 		 
 		static void setWindowMode(WindowType winType);

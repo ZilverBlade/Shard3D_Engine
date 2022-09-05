@@ -1,3 +1,5 @@
+#include "..\editor\application.h"
+#include "..\editor\application.h"
 #include "application.h"
 
 #include <thread>
@@ -34,7 +36,7 @@ namespace Shard3D {
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				GraphicsSettings::get().MSAASamples
-				}, AttachmentType::Color);
+				}, FrameBufferAttachmentType::Color);
 
 			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_D24_UNORM_S8_UINT,
@@ -43,7 +45,7 @@ namespace Shard3D {
 				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
 				GraphicsSettings::get().MSAASamples
-				}, AttachmentType::Depth);
+				}, FrameBufferAttachmentType::Depth);
 
 			mainResolveFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -52,7 +54,7 @@ namespace Shard3D {
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 				VK_SAMPLE_COUNT_1_BIT
-				}, AttachmentType::Resolve);
+				}, FrameBufferAttachmentType::Resolve);
 
 			AttachmentInfo colorAttachmentInfo{};
 			colorAttachmentInfo.frameBufferAttachment = mainColorFramebufferAttachment;
@@ -69,13 +71,13 @@ namespace Shard3D {
 			resolveAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			resolveAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
-			mainRenderpass = new SimpleRenderPass(
+			mainRenderpass = new RenderPass(
 				engineDevice, {
 				colorAttachmentInfo,
 				depthAttachmentInfo,
 				resolveAttachmentInfo
 				});
-
+			
 			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainResolveFramebufferAttachment });
 		}
 	}
@@ -92,7 +94,7 @@ namespace Shard3D {
 	void EngineApplication::setupEngineFeatures() {
 		EngineAudio::init();
 		GraphicsSettings::init(nullptr);
-		DynamicScriptEngine::init();
+		ScriptEngine::init();
 
 		//mainOffScreen.setViewportSize({ 1920, 1080 });
 		Input::setWindow(engineWindow);
@@ -116,8 +118,6 @@ namespace Shard3D {
 	void EngineApplication::setWindowCallbacks() {
 		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, EngineApplication::eventEvent);
 	}
-
-	
 
 	void EngineApplication::eventEvent(Events::Event& e) {
 		//SHARD3D_LOG("{0}", e.toString());
@@ -149,7 +149,7 @@ namespace Shard3D {
 		
 		
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), mainResolveFramebufferAttachment->getImageView(), mainResolveFramebufferAttachment->getSampler() };
+		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr} };
 		ShadowMappingSystem shadowSystem{ engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -175,8 +175,9 @@ namespace Shard3D {
 
 		ECS::MasterManager::loadLevel(levelpath);	
 		ECS::MasterManager::executeQueue(level, engineDevice);
-		level->begin();
 
+		level->setPhysicsSystem(&physicsSystem);
+		level->begin();
 		auto currentTime = std::chrono::high_resolution_clock::now();
 beginWhileLoop:
 		while (!engineWindow.shouldClose()) {
@@ -249,7 +250,7 @@ beginWhileLoop:
 
 		level->end();
 
-		DynamicScriptEngine::destroy();
+		ScriptEngine::destroy();
 		vkDeviceWaitIdle(engineDevice.device());
 
 		ResourceHandler::destroy();

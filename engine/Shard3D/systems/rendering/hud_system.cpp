@@ -135,22 +135,18 @@ namespace Shard3D {
 				.writeImage(2, &imageInfo)
 				.build(descriptorSet1);
 
+			VkDescriptorSet sets[2] = {
+				descriptorSet1,
+				ssboDescriptorSet
+			};
+
 			vkCmdBindDescriptorSets(
 				frameInfo.commandBuffer,
 				VK_PIPELINE_BIND_POINT_GRAPHICS,
 				pipelineLayout,
 				0,  // first set
-				1,  // set count
-				&descriptorSet1,
-				0,
-				nullptr);
-			vkCmdBindDescriptorSets(
-				frameInfo.commandBuffer,
-				VK_PIPELINE_BIND_POINT_GRAPHICS,
-				pipelineLayout,
-				1,  // first set
-				1,  // set count
-				&ssboDescriptorSet,
+				2,  // set count
+				sets,
 				0,
 				nullptr);
 			HUDPushConstants push{};

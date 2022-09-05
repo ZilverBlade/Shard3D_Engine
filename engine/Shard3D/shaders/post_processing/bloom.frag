@@ -11,7 +11,6 @@ layout (set = 0, binding = 0) uniform sampler2D inputRenderedScene;
 
 const float weight[6] = float[] (0.252135, 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
 
-
 vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
   vec4 color = vec4(0.0);
   vec2 off1 = vec2(1.3846153846) * direction;
@@ -32,8 +31,6 @@ void main()	{
 
 	for(int i = 1; i < 6; ++i)
     {
-        bloomHorizontal += texture(inputRenderedScene, fragUV + vec2(tex_offset.x * i, 0.0)).xyz * weight[i];
-        bloomHorizontal += texture(inputRenderedScene, fragUV - vec2(tex_offset.x * i, 0.0)).xyz * weight[i];
         bloomHorizontal += texture(inputRenderedScene, fragUV + vec2(tex_offset.x * i, 0.0)).xyz * weight[i];
         bloomHorizontal += texture(inputRenderedScene, fragUV - vec2(tex_offset.x * i, 0.0)).xyz * weight[i];
     }

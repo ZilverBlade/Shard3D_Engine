@@ -7,7 +7,7 @@ namespace Shard3D {
 		{
 			int lightIndex = 0;
 			frameInfo.activeLevel->registry.view<Components::PointlightComponent, Components::TransformComponent>().each([&](Components::PointlightComponent light, Components::TransformComponent transform) {
-				ubo.pointlights[lightIndex].position = transform.transformMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
+				ubo.pointlights[lightIndex].position = transform.transformMatrix[3];
 				ubo.pointlights[lightIndex].color = glm::vec4(light.color, light.lightIntensity);
 				ubo.pointlights[lightIndex].attenuationMod = glm::vec4(light.attenuationMod, 0.f);
 				ubo.pointlights[lightIndex].specularMod = light.specularMod;
@@ -22,7 +22,7 @@ namespace Shard3D {
 				glm::vec3 r = transform.getRotation();
 				glm::vec3 t = transform.getTranslation();
 
-				ubo.spotlights[lightIndex].position = transform.transformMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
+				ubo.spotlights[lightIndex].position = transform.transformMatrix[3];
 				ubo.spotlights[lightIndex].color = glm::vec4(light.color, light.lightIntensity);
 				ubo.spotlights[lightIndex].direction = glm::vec4(r.x, r.z, r.y, 1.f);
 				ubo.spotlights[lightIndex].angle = glm::vec2(light.outerAngle, light.innerAngle);
@@ -39,7 +39,7 @@ namespace Shard3D {
 				glm::vec3 r = transform.getRotation();
 				glm::vec3 t = transform.getTranslation();
 
-				ubo.directionalLights[lightIndex].position = transform.transformMatrix * glm::vec4(0.f, 0.f, 0.f, 1.f);
+				ubo.directionalLights[lightIndex].position = transform.transformMatrix[3];
 				ubo.directionalLights[lightIndex].color = glm::vec4(light.color, light.lightIntensity);
 				ubo.directionalLights[lightIndex].direction = glm::vec4(r.x, r.z, r.y, 1.f);
 				ubo.directionalLights[lightIndex].specularMod = light.specularMod;

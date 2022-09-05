@@ -5,7 +5,7 @@
 
 #include <imgui_internal.h>
 
-#include <Shard3D/scripting/dynamic_script_engine.h>
+#include <Shard3D/scripting/script_engine.h>
 #include <fstream>
 namespace Shard3D {
 	LevelPropertiesPanel::LevelPropertiesPanel(const sPtr<Level>& levelContext) {
@@ -170,19 +170,26 @@ namespace Shard3D {
 			}
 			if (open) {
 				bool exists = false;
-				static char buffer[32];
 
 				auto& name = actor.getComponent<Components::ScriptComponent>().name;
-				memset(buffer, 0, 32);
-				strncpy(buffer, name.c_str(), 32);
-				//const auto& actorClasses = DynamicScriptEngine::getActorClasses(actor.getComponent<Components::ScriptComponent>().lang);
-				exists = DynamicScriptEngine::doesClassExist("Shard3D.Scripts." + name, actor.getComponent<Components::ScriptComponent>().lang);
+				const auto& actorClasses = ScriptEngine::getActorClasses(actor.getComponent<Components::ScriptComponent>().lang);
+				exists = ScriptEngine::doesClassExist("Shard3D.Scripts." + name, actor.getComponent<Components::ScriptComponent>().lang);
 				if (!exists) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4, 0.7f, 1.0f));
-				if (ImGui::InputText("Script Class", buffer, 32)) {
-					name = std::string(buffer);
+				if (ImGui::BeginCombo("##combo", name.c_str()))  {
+					for (auto& class_ : actorClasses) {
+						std::string className = class_.first.substr(sizeof("Shard3D.Scripts"));
+						bool is_selected = (name == className);
+						if (ImGui::Selectable(className.c_str(), is_selected))
+							name = className;
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
 				}
+
+
 				if (!exists) ImGui::PopStyleColor();
-				ImGui::Combo("Language", &actor.getComponent<Components::ScriptComponent>().lang, "C#\0Visual Basic");
+				ImGui::Combo("Language", &actor.getComponent<Components::ScriptComponent>().lang, "C#\0Visual Basic\0");
 				
 				ImGui::TreePop();
 			}
@@ -268,7 +275,7 @@ namespace Shard3D {
 					}
 				}
 				if (ImGui::Button("Load Texture")) {
-					std::ifstream ifile(fileBuffer);
+					std::ifstream ifile(fileBuffer);  
 					if (ifile.good()) {
 						SHARD3D_LOG("Reloading texture '{0}'", rfile);
 						actor.getComponent<Components::BillboardComponent>().asset = AssetID(rfile);

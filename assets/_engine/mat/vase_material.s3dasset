@@ -1,10 +1,11 @@
 Shard3D: 1.2.6.r5-alpha
 AssetType: surface_material
 SurfaceMaterial:
-  - Material: Some kind of material
+  - Material: Vase Material
     Physics:
       MaterialType: SurfaceMaterial
-      MaterialClass: class Shard3D::SurfaceMaterial_ShadedOpaque
+      Class: class Shard3D::SurfaceMaterial_Shaded
+      BlendMode: 0
     Draw:
       VkCullModeFlags: 0
       VkPolygonMode: 0

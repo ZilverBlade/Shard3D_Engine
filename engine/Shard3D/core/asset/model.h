@@ -9,10 +9,10 @@ extern "C" {
 }
 namespace Shard3D {
 	inline namespace Resources {
-		struct Mesh3DLoadInfo {
+		struct Model3DLoadInfo {
 			int x;
 		};
-		class Mesh3D {
+		class Model3D {
 		public:
 			struct Vertex {
 				glm::vec3 position{};
@@ -52,21 +52,21 @@ namespace Shard3D {
 				std::string workingDir;
 			};
 
-			Mesh3D(EngineDevice& dvc, const Mesh3D::Builder& builder);
-			~Mesh3D();
+			Model3D(EngineDevice& dvc, const Model3D::Builder& builder);
+			~Model3D();
 
-			Mesh3D(const Mesh3D&) = delete;
-			Mesh3D& operator=(const Mesh3D&) = delete;
+			Model3D(const Model3D&) = delete;
+			Model3D& operator=(const Model3D&) = delete;
 
-			static uPtr<Mesh3D> createMeshFromFile(
+			static uPtr<Model3D> createMeshFromFile(
 				EngineDevice& dvc,
 				const std::string& filepath,
-				Mesh3DLoadInfo loadInfo
+				Model3DLoadInfo loadInfo
 			);
-			static uPtr<Mesh3D> loadMeshFromFile(
+			static uPtr<Model3D> loadMeshFromFile(
 				EngineDevice& dvc,
 				const AssetID& asset,
-				Mesh3DLoadInfo loadInfo
+				Model3DLoadInfo loadInfo
 			);
 			void bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);
 			void draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers);

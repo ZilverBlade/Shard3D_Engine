@@ -4,7 +4,8 @@ SurfaceMaterial:
   - Material: World Grid Material
     Physics:
       MaterialType: SurfaceMaterial
-      MaterialClass: class Shard3D::SurfaceMaterial_ShadedOpaque
+      Class: class Shard3D::SurfaceMaterial_Shaded
+      BlendMode: 0
     Draw:
       VkCullModeFlags: 0
       VkPolygonMode: 0

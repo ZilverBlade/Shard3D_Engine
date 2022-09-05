@@ -309,10 +309,10 @@
     <ClInclude Include="scripting\script_handler.h">
       <Filter>Header Files\scripting</Filter>
     </ClInclude>
-    <ClInclude Include="scripting\dynamic_script_engine.h">
+    <ClInclude Include="scripting\script_engine.h">
       <Filter>Header Files\scripting</Filter>
     </ClInclude>
-    <ClInclude Include="scripting\dynamic_script_engine_linker.h">
+    <ClInclude Include="scripting\script_engine_linker.h">
       <Filter>Header Files\scripting</Filter>
     </ClInclude>
     <ClInclude Include="utils\simple_ini.h">
@@ -352,7 +352,7 @@
     <ClInclude Include="core\asset\assetid.h">
       <Filter>Header Files\core\asset</Filter>
     </ClInclude>
-    <ClInclude Include="core\rendering\renderpass.h">
+    <ClInclude Include="core\rendering\render_pass.h">
       <Filter>Header Files\core\rendering</Filter>
     </ClInclude>
     <ClInclude Include="core\rendering\frame_buffer.h">
@@ -366,6 +366,9 @@
     </ClInclude>
     <ClInclude Include="core\vulkan_api\pipeline_compute.h">
       <Filter>Header Files\core\vkapi</Filter>
+    </ClInclude>
+    <ClInclude Include="events\wnd_event.h">
+      <Filter>Header Files\events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -444,10 +447,10 @@
     <ClCompile Include="layer\layer_stack.cpp">
       <Filter>Source Files\layer</Filter>
     </ClCompile>
-    <ClCompile Include="scripting\dynamic_script_engine_linker.cpp">
+    <ClCompile Include="scripting\script_engine_linker.cpp">
       <Filter>Source Files\scripting</Filter>
     </ClCompile>
-    <ClCompile Include="scripting\dynamic_script_engine.cpp">
+    <ClCompile Include="scripting\script_engine.cpp">
       <Filter>Source Files\scripting</Filter>
     </ClCompile>
     <ClCompile Include="utils\logger.cpp">
@@ -507,7 +510,7 @@
     <ClCompile Include="core\asset\assetid.cpp">
       <Filter>Source Files\core\asset</Filter>
     </ClCompile>
-    <ClCompile Include="core\rendering\renderpass.cpp">
+    <ClCompile Include="core\rendering\render_pass.cpp">
       <Filter>Source Files\core\rendering</Filter>
     </ClCompile>
     <ClCompile Include="core\rendering\frame_buffer.cpp">
@@ -571,6 +574,18 @@
     </None>
     <None Include="shaders\shadow_directional.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\post_processing\hdr.frag">
+      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    </None>
+    <None Include="shaders\post_processing\debander.frag">
+      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    </None>
+    <None Include="shaders\post_processing\gamma_correction.frag">
+      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    </None>
+    <None Include="shaders\post_processing\combined.frag">
+      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
     </None>
   </ItemGroup>
 </Project>

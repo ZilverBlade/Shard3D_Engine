@@ -7,13 +7,13 @@
 #include <Shard3D/vulkan_abstr.h>
 
 #include <Shard3D/events/event.h>
+#include <Shard3D/events/wnd_event.h>
 #include <Shard3D/core/rendering/window.h>
 #include <Shard3D/core/rendering/swap_chain.h>
+#include <Shard3D/core/rendering/render_pass.h>
 #include <Shard3D/core/rendering/renderer.h>
-#include <Shard3D/core/rendering/renderpass.h>
 
 #include <Shard3D/layer/layer_stack.h>
-
 
 namespace Shard3D {
 	class EngineApplication {
@@ -33,6 +33,7 @@ namespace Shard3D {
 		void destroyRenderPasses();
 		void loadStaticObjects();
 
+		void windowResizeEvent(Events::WindowResizeEvent& e);
 		void eventEvent(Events::Event& e);
 
 		// Engine components
@@ -46,12 +47,7 @@ namespace Shard3D {
 		FrameBufferAttachment* mainResolveFramebufferAttachment;
 		FrameBufferAttachment* mainDepthResolveFramebufferAttachment;
 		FrameBuffer* mainFrameBuffer;
-		SimpleRenderPass* mainRenderpass;
-
-		FrameBufferAttachment* ppoColorFramebufferAttachment;
-		FrameBufferAttachment* ppoDepthFramebufferAttachment;
-		FrameBuffer* ppoFrameBuffer;
-		SimpleRenderPass* ppoRenderpass;
+		RenderPass* mainRenderpass;
 
 		// ECS
 		sPtr<ECS::Level> level;

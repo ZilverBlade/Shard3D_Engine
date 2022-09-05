@@ -2,7 +2,7 @@
 #include "../../s3dstd.h"
 #include "../../vulkan_abstr.h"
 #include "../../core/misc/frame_info.h"	  
-#include "../../core/rendering/renderpass.h"
+#include "../../core/rendering/render_pass.h"
 
 namespace Shard3D {
 	class ShadowMappingSystem {
@@ -28,7 +28,7 @@ namespace Shard3D {
 
 		FrameBufferAttachment* shadowDepthFramebufferAttachment;
 		FrameBuffer* shadowFrameBuffer;
-		SimpleRenderPass* shadowRenderpass;
+		RenderPass* shadowRenderpass;
 
 		uPtr<GraphicsPipeline> graphicsPipeline;
 		VkPipelineLayout pipelineLayout;

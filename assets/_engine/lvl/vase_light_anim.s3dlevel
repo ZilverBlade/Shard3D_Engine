@@ -1,6 +1,6 @@
-Shard3D: 1.2.7.r0-alpha
-Level: Some kind of level
-LastSavedEditorCameraPos: [-4.2684164, 4.16105747, 2.99879885]
+Shard3D: 1.2.7.r5-alpha
+Level: \vase_light_anim.s3dlevel
+LastSavedEditorCameraPos: [-3.7552793, -4.39770937, 2.77859068]
 Actors:
   - Actor: 15092527220797592573
     TagComponent:

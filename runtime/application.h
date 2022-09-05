@@ -10,7 +10,7 @@
 #include <Shard3D/core/rendering/window.h>
 #include <Shard3D/core/rendering/swap_chain.h>
 #include <Shard3D/core/rendering/renderer.h>
-#include <Shard3D/core/rendering/renderpass.h>
+#include <Shard3D/core/rendering/render_pass.h>
 
 
 namespace Shard3D {
@@ -42,7 +42,7 @@ namespace Shard3D {
 		FrameBufferAttachment* mainDepthFramebufferAttachment;
 		FrameBufferAttachment* mainResolveFramebufferAttachment;
 		FrameBuffer* mainFrameBuffer;
-		SimpleRenderPass* mainRenderpass;
+		RenderPass* mainRenderpass;
 
 		// ECS
 		sPtr<ECS::Level> level;

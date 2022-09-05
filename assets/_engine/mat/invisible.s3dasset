@@ -4,9 +4,10 @@ SurfaceMaterial:
   - Material: Invis
     Physics:
       MaterialType: SurfaceMaterial
-      MaterialClass: class Shard3D::SurfaceMaterial_ShadedMasked
+      Class: class Shard3D::SurfaceMaterial_Shaded
+      BlendMode: 1
     Draw:
-      VkCullModeFlags: 0
+      VkCullModeFlags: 1
       VkPolygonMode: 0
     Data:
       diffuseColor: [1, 1, 1]

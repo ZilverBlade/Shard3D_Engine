@@ -1,7 +1,7 @@
 
 #include "hud_layer.h"
 
-#include "../../scripting/dynamic_script_engine.h"
+#include "../../scripting/script_engine.h"
 #include "../misc/graphics_settings.h"
 #include "../../workarounds.h"
 #include "../../core.h"
@@ -33,9 +33,9 @@ namespace Shard3D {
         if (frameInfo.activeLevel->simulationState == ECS::PlayState::Playing ||
             frameInfo.activeLevel->simulationState == ECS::PlayState::PausedRuntime) {
             if (isPress)
-                DynamicScriptEngine::hudScript().pressEvent(element.get(), frameInfo.frameTime);
+                ScriptEngine::hudScript().pressEvent(element.get(), frameInfo.frameTime);
             else
-                DynamicScriptEngine::hudScript().hoverEvent(element.get(), frameInfo.frameTime);
+                ScriptEngine::hudScript().hoverEvent(element.get(), frameInfo.frameTime);
         }
   
       //  SHARD3D_EVENT_BIND_HANDLER_PTR(windowHUDLayer::eventEvent);
@@ -74,7 +74,7 @@ namespace Shard3D {
         //    const uint64_t& id = hudRenderSystem.getSelectedID();
         //    if (id == 0) return false;
         //    const auto& element = getSelectedElement();
-        //        DynamicScriptEngine::hudScript().clickEvent(element.get());
+        //        ScriptEngine::hudScript().clickEvent(element.get());
         //}
         return false;
     }

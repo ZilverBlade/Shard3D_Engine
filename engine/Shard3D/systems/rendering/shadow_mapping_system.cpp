@@ -36,14 +36,14 @@ namespace Shard3D {
 			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
 			VK_SAMPLE_COUNT_1_BIT
-			}, AttachmentType::Depth);
+			}, FrameBufferAttachmentType::Depth);
 
 		AttachmentInfo depthAttachmentInfo{};
 		depthAttachmentInfo.frameBufferAttachment = shadowDepthFramebufferAttachment;
 		depthAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
-		shadowRenderpass = new SimpleRenderPass(
+		shadowRenderpass = new RenderPass(
 			engineDevice, {
 			depthAttachmentInfo
 			});
@@ -82,16 +82,14 @@ namespace Shard3D {
 			"assets/shaderdata/shadow_directional.vert.spv",
 			"assets/shaderdata/fragment_blank.frag.spv",
 			pipelineConfig
-			);
+		);
 	}
 
 	void ShadowMappingSystem::render(FrameInfo& frameInfo) {
 		shadowRenderpass->beginRenderPass(frameInfo, shadowFrameBuffer);
 		graphicsPipeline->bind(frameInfo.commandBuffer);
-		vkCmdSetCullMode(frameInfo.commandBuffer, VK_CULL_MODE_NONE);
 		ShadowPushConstants push{};
 
-		
 		auto viewCam = frameInfo.activeLevel->registry.view<Components::DirectionalLightComponent, Components::TransformComponent>();
 		for (auto obj : viewCam) {
 			ECS::Actor actor = { obj, frameInfo.activeLevel.get() };

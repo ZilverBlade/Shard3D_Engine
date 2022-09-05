@@ -56,7 +56,7 @@ layout(set = 2, binding = 2) uniform sampler2D tex_specular;
 layout(set = 2, binding = 3) uniform sampler2D tex_shininess;
 layout(set = 2, binding = 4) uniform sampler2D tex_metallic;
 layout(set = 2, binding = 5) uniform sampler2D tex_normal;
-layout(set = 2, binding = 6) uniform sampler2D tex_opacity;
+layout(set = 2, binding = 7) uniform sampler2D tex_opacity;
 
 layout(push_constant) uniform Push {
 	mat4 modelMatrix; 

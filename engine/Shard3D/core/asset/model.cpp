@@ -14,8 +14,8 @@
 
 namespace std {
 	template <>
-	struct hash<Shard3D::Resources::Mesh3D::Vertex> {
-		size_t operator()(Shard3D::Mesh3D::Vertex const& vertex) const {
+	struct hash<Shard3D::Resources::Model3D::Vertex> {
+		size_t operator()(Shard3D::Model3D::Vertex const& vertex) const {
 			size_t seed = 0;
 			Shard3D::hashCombine(seed, vertex.position, vertex.normal, vertex.uv);
 			return seed;
@@ -25,7 +25,7 @@ namespace std {
 
 namespace Shard3D::Resources {
 
-	Mesh3D::Mesh3D(EngineDevice& dvc, const Mesh3D::Builder &builder) : device(&dvc) {
+	Model3D::Model3D(EngineDevice& dvc, const Model3D::Builder &builder) : device(&dvc) {
 		for (auto& submesh : builder.submeshes) {
 			SubmeshBuffers _buffers{};
 			auto& data = submesh.second;
@@ -36,9 +36,9 @@ namespace Shard3D::Resources {
 			materials.push_back(data.materialAsset);
 		}
 	}
-	Mesh3D::~Mesh3D() {}
+	Model3D::~Model3D() {}
 
-	uPtr<Mesh3D> Mesh3D::createMeshFromFile(EngineDevice& dvc, const std::string& filepath, Mesh3DLoadInfo loadInfo) {
+	uPtr<Model3D> Model3D::createMeshFromFile(EngineDevice& dvc, const std::string& filepath, Model3DLoadInfo loadInfo) {
 		Builder builder{};	
 		CSimpleIniA ini;
 
@@ -46,20 +46,20 @@ namespace Shard3D::Resources {
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 		
 		std::ifstream f(filepath.c_str());
-		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", filepath); return uPtr<Mesh3D>(nullptr); };
+		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", filepath); return uPtr<Model3D>(nullptr); };
 
 		builder.loadScene(filepath, true);
 		
-		if (ini.GetBoolValue("LOGGING", "log.Mesh3DLoadInfo") == true) {
+		if (ini.GetBoolValue("LOGGING", "log.Model3DLoadInfo") == true) {
 			uint64_t vcount{};
 			for (auto& primitive : builder.submeshes)
 				vcount += primitive.second.vertices.size();
 			SHARD3D_INFO("Loaded model: '{0}'\n\t\tMesh vertex count: {1}", filepath, vcount);
 		}
-		return make_uPtr<Mesh3D>(dvc, builder);
+		return make_uPtr<Model3D>(dvc, builder);
 	}
 
-	uPtr<Mesh3D> Mesh3D::loadMeshFromFile(EngineDevice& dvc, const AssetID& asset, Mesh3DLoadInfo loadInfo) {
+	uPtr<Model3D> Model3D::loadMeshFromFile(EngineDevice& dvc, const AssetID& asset, Model3DLoadInfo loadInfo) {
 		Builder builder{};
 		CSimpleIniA ini;
 
@@ -67,13 +67,13 @@ namespace Shard3D::Resources {
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
 		std::ifstream f(asset.getFile());
-		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", asset.getFile()); return uPtr<Mesh3D>(nullptr); };
+		if (!f.good()) { SHARD3D_ERROR("Invalid model, file '{0}' not found", asset.getFile()); return uPtr<Model3D>(nullptr); };
 
 		builder.loadScene(asset, false);
-		return make_uPtr<Mesh3D>(dvc, builder);
+		return make_uPtr<Model3D>(dvc, builder);
 	}
 
-	void Mesh3D::createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
+	void Model3D::createVertexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
 		_buffers.vertexCount = static_cast<uint32_t>(submesh.vertices.size());
 		SHARD3D_ASSERT(_buffers.vertexCount >= 3 && "Vertex count must be at least 3");
 
@@ -101,7 +101,7 @@ namespace Shard3D::Resources {
 		device->copyBuffer(stagingBuffer.getBuffer(), _buffers.vertexBuffer->getBuffer(), bufferSize);
 	}
 
-	void Mesh3D::createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
+	void Model3D::createIndexBuffers(const SubmeshData& submesh, SubmeshBuffers& _buffers) {
 		_buffers.indexCount = static_cast<uint32_t>(submesh.indices.size());
 		_buffers.hasIndexBuffer = _buffers.indexCount > 0;
 
@@ -131,7 +131,7 @@ namespace Shard3D::Resources {
 		device->copyBuffer(stagingBuffer.getBuffer(), _buffers.indexBuffer->getBuffer(), bufferSize);
 	}
 
-	void Mesh3D::bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
+	void Model3D::bind(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
 		VkBuffer _buffers[] = { buffers.vertexBuffer->getBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, _buffers, offsets);
@@ -140,7 +140,7 @@ namespace Shard3D::Resources {
 		}
 	}
 
-	void Mesh3D::draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
+	void Model3D::draw(VkCommandBuffer commandBuffer, SubmeshBuffers buffers) {
 		if (buffers.hasIndexBuffer) {
 			vkCmdDrawIndexed(commandBuffer, buffers.indexCount, 1, 0, 0, 0);
 		} else {
@@ -148,11 +148,11 @@ namespace Shard3D::Resources {
 		}
 	}
 
-	std::vector<VkVertexInputBindingDescription> Mesh3D::Vertex::getBindingDescriptions() {
+	std::vector<VkVertexInputBindingDescription> Model3D::Vertex::getBindingDescriptions() {
 		return { {0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX} };
 	}
 	
-	std::vector<VkVertexInputAttributeDescription> Mesh3D::Vertex::getAttributeDescriptions() {
+	std::vector<VkVertexInputAttributeDescription> Model3D::Vertex::getAttributeDescriptions() {
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 		attributeDescriptions.reserve(3); 
 		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)	});
@@ -161,7 +161,7 @@ namespace Shard3D::Resources {
 		return attributeDescriptions;
 	}
 	
-	void Mesh3D::Builder::loadScene(const std::string& filepath, bool createMaterials) {
+	void Model3D::Builder::loadScene(const std::string& filepath, bool createMaterials) {
 		auto newTime = std::chrono::high_resolution_clock::now();
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filepath,
@@ -186,7 +186,7 @@ namespace Shard3D::Resources {
 			(std::chrono::high_resolution_clock::now() - newTime).count());
 	}
 
-	void Mesh3D::Builder::processNode(aiNode* node, const aiScene* scene, bool createMaterials) {
+	void Model3D::Builder::processNode(aiNode* node, const aiScene* scene, bool createMaterials) {
 		// process all the node's meshes (if any)
 		for (uint32_t i = 0; i < node->mNumMeshes; i++) {
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -198,7 +198,7 @@ namespace Shard3D::Resources {
 		}
 	}
 
-	void Mesh3D::Builder::loadSubmesh(aiMesh* mesh, const aiScene* scene, bool createMaterials) {
+	void Model3D::Builder::loadSubmesh(aiMesh* mesh, const aiScene* scene, bool createMaterials) {
 		const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 		const std::string& materialSlot = material->GetName().C_Str();
 
@@ -246,7 +246,7 @@ namespace Shard3D::Resources {
 			float metallic{0.f};
 			aiGetMaterialFloat(material, AI_MATKEY_METALLIC_FACTOR, &metallic);
 
-			rPtr<SurfaceMaterial_ShadedOpaque> grid_material = make_rPtr<SurfaceMaterial_ShadedOpaque>();
+			rPtr<SurfaceMaterial_Shaded> grid_material = make_rPtr<SurfaceMaterial_Shaded>();
 			grid_material->materialTag = materialSlot;
 			grid_material->diffuseColor = { color.r, color.g, color.b };
 			grid_material->diffuseTex = AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);

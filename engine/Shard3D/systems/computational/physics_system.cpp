@@ -57,7 +57,6 @@ namespace Shard3D {
 	}
 	void PhysicsSystem::begin(ECS::Level* level) {
 		level->registry.view<Components::RigidbodyComponent, Components::TransformComponent>().each([&](Components::RigidbodyComponent& phys, Components::TransformComponent& transform) {
-			physics_system->GetBodyInterface().SetLinearVelocity(phys.physicsBody, { 0.f, 0.f, 0.f });
 			physics_system->GetBodyInterface().ActivateBody(phys.physicsBody);
 			glm::mat4 transformMat = transform.transformMatrix;
 			JPH::Mat44 matr = JPH::Mat44();
@@ -66,17 +65,16 @@ namespace Shard3D {
 			matr.SetColumn4(2, { transformMat[2][0], transformMat[2][1], transformMat[2][2], transformMat[2][3], });
 			matr.SetColumn4(3, { transformMat[3][0], transformMat[3][1], transformMat[3][2], transformMat[3][3], });
 			physics_system->GetBodyInterface().SetPosition(phys.physicsBody, { transform.getTranslation().x, transform.getTranslation().z, transform.getTranslation().y }, JPH::EActivation::Activate);
-			
 
 			//physics_system->GetBodyInterface().SetAngularVelocity(phys.physicsBody, { 0.f, 0.f, 0.f });
 			physics_system->GetBodyInterface().SetGravityFactor(phys.physicsBody, 1.f);
 		});
 		physics_system->OptimizeBroadPhase();
-		physics_system->SaveState(myRecorder);
+		//physics_system->SaveState(myRecorder);
 		SHARD3D_INFO("Activated physics");
 	}
 	void PhysicsSystem::end(ECS::Level* level) {
-		physics_system->RestoreState(myRecorder);
+		//physics_system->RestoreState(myRecorder);
 		SHARD3D_INFO("Deactivated physics");
 	}
 #define KILLZ -1000.f
@@ -92,23 +90,21 @@ namespace Shard3D {
 			JPH::Vec3 translation = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform().GetTranslation();
 			JPH::Vec3 rotation = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform().GetRotationSafe().GetQuaternion().GetXYZ();
 			SHARD3D_LOG("Physics Actor {0} new transform [ {1}, {2}, {3} ]", phys.physicsBody.GetIndex(), translation.GetX(), translation.GetZ(), translation.GetY());
-			transform.setGlobalTranslationDirect({ translation.GetX(), translation.GetZ(), translation.GetY() });
-			transform.setGlobalRotationDirect({ rotation.GetX(), rotation.GetZ(), rotation.GetY() });
-			transform.recalculateMatrix();
-
+			
+			// Override matrix (scale isnt taken into account & normal matrices dont work either)
+			// 
+			JPH::Mat44 base = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform();
+			glm::mat4 converted{ 1.f };
+			converted[0] = { base.GetColumn4(0).GetX(), base.GetColumn4(0).GetY(), base.GetColumn4(0).GetZ(), base.GetColumn4(0).GetW() };
+			converted[1] = { base.GetColumn4(1).GetX(), base.GetColumn4(1).GetY(), base.GetColumn4(1).GetZ(), base.GetColumn4(1).GetW() };
+			converted[2] = { base.GetColumn4(2).GetX(), base.GetColumn4(2).GetY(), base.GetColumn4(2).GetZ(), base.GetColumn4(2).GetW() };
+			converted[3] = { base.GetColumn4(3).GetX(), base.GetColumn4(3).GetY(), base.GetColumn4(3).GetZ(), base.GetColumn4(3).GetW() };
+			transform.transformMatrix = glm::scale(converted, { transform.getScale().x,transform.getScale().z, transform.getScale().y });
+			transform.normalMatrix = glm::transpose(glm::inverse(transform.transformMatrix));
 
 			if (translation.GetY() < KILLZ) {
 				SHARD3D_LOG("Physics Actor {0} is out of bounds by {1} meters!", phys.physicsBody.GetIndex(), transform.getTranslation().z - KILLZ);
 			}
-			// Override matrix (scale isnt taken into account & normal matrices dont work either)
-			// 
-			//JPH::Mat44 base = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform();
-			//glm::mat4 converted{ 1.f };
-			//converted[0] = { base.GetColumn4(0).GetX(), base.GetColumn4(0).GetY(), base.GetColumn4(0).GetZ(), base.GetColumn4(0).GetW() };
-			//converted[1] = { base.GetColumn4(1).GetX(), base.GetColumn4(1).GetY(), base.GetColumn4(1).GetZ(), base.GetColumn4(1).GetW() };
-			//converted[2] = { base.GetColumn4(2).GetX(), base.GetColumn4(2).GetY(), base.GetColumn4(2).GetZ(), base.GetColumn4(2).GetW() };
-			//converted[3] = { base.GetColumn4(3).GetX(), base.GetColumn4(3).GetY(), base.GetColumn4(3).GetZ(), base.GetColumn4(3).GetW() };
-			//transform.transformMatrix = converted;
 		});
 	}
 	JPH::ShapeRefC PhysicsSystem::createBoxShape(const JPH::BoxShapeSettings& settings) {

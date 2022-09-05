@@ -49,7 +49,6 @@ namespace Shard3D {
 
     void GridSystem::render(FrameInfo& frameInfo) {
         graphicsPipeline->bind(frameInfo.commandBuffer);
-        vkCmdSetCullMode(frameInfo.commandBuffer, VK_CULL_MODE_NONE);
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
             VK_PIPELINE_BIND_POINT_GRAPHICS,

@@ -28,11 +28,6 @@ int main(int argc, char* argv[], char* env[]) {
 
     SHARD3D_ASSERT(argc == 2 && "Too many / Too little arguments provided for runtime!");
     SHARD3D_INFO("Level file chosen: {0}", argv[1]);
-    try {
-        app.run(argv[1]);
-    }
-    catch (std::exception ex) {
-        SHARD3D_ERROR("{0}", ex.what());
-    }
+    app.run(argv[1]);
     return EXIT_SUCCESS;
 }

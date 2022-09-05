@@ -9,7 +9,7 @@
 
 namespace Shard3D {
 	enum class AssetType {
-		Unknown, Texture, Mesh3D, SurfaceMaterial, Level
+		Unknown, Texture, Model3D, SurfaceMaterial, Level
 	};
 	class AssetUtils {
 	public:
@@ -24,7 +24,7 @@ namespace Shard3D {
 		static void loadLevelAssets();
 
 		static void importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info);
-		static void importMesh(const std::string& sourcepath, const std::string& destpath, Mesh3DLoadInfo info);
+		static void importMesh(const std::string& sourcepath, const std::string& destpath, Model3DLoadInfo info);
 		static void createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material);
 		
 		static void purgeAsset(const std::string& assetPath);
@@ -56,7 +56,7 @@ namespace Shard3D {
 
 		static void loadMesh(const AssetID& asset);
 		static void unloadMesh(const AssetID& asset);
-		static inline rPtr<Mesh3D>& retrieveMesh(const AssetID& asset) {
+		static inline rPtr<Model3D>& retrieveMesh(const AssetID& asset) {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveMesh_safe(asset);
 #else			
@@ -101,11 +101,11 @@ namespace Shard3D {
 
 		static rPtr<Texture2D>& retrieveTexture_unsafe			(const AssetID& asset);
 		static rPtr<Texture2D>& retrieveTexture_safe			(const AssetID& asset);
-		static rPtr<Mesh3D>& retrieveMesh_unsafe				(const AssetID& asset);
-		static rPtr<Mesh3D>& retrieveMesh_safe					(const AssetID& asset);
+		static rPtr<Model3D>& retrieveMesh_unsafe				(const AssetID& asset);
+		static rPtr<Model3D>& retrieveMesh_safe					(const AssetID& asset);
 		static rPtr<SurfaceMaterial>& retrieveSurfaceMaterial_safe	(const AssetID& asset);
 
-		static inline hashMap<AssetKey, rPtr<Mesh3D>> meshAssets;
+		static inline hashMap<AssetKey, rPtr<Model3D>> meshAssets;
 		static inline hashMap<AssetKey, rPtr<Texture2D>> textureAssets;
 		static inline hashMap<AssetKey, rPtr<SurfaceMaterial>> surfaceMaterialAssets;
 
@@ -154,7 +154,7 @@ namespace Shard3D {
 			{"component.light.point",			"assets/_engine/_editor/icon_lightpoint.png"	},
 			{"component.light.spot",			"assets/_engine/_editor/icon_lightspot.png"		},
 			{"component.light.directional",		"assets/_engine/_editor/icon_lightdir.png"		},
-			{"component.audio",					"assets/_engine/_editor/icon_audio"				},
+			{"component.audio",					"assets/_engine/_editor/icon_audio.png"			},
 			{"component.camera",				"assets/_engine/_editor/icon_camera.png"		},
 		};
 	};

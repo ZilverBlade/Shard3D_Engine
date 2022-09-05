@@ -1,9 +1,11 @@
 #include "../../s3dpch.h" 
 
 #include "post_processing_system.h"
+#include "../computational/shader_system.h"
 #include "../../core/vulkan_api/pipeline.h"
 #include "../../core/vulkan_api/descriptors.h"
-#include "../../core/rendering/renderpass.h"
+#include "../../core/rendering/render_pass.h"
+#include "../../core/rendering/frame_buffer.h"
 
 namespace Shard3D {
 	static bool setVkDescriptorImageInfo(VkDescriptorImageInfo* descriptor, FrameBufferAttachment* attachment) {
@@ -14,7 +16,9 @@ namespace Shard3D {
 		return true;
 	}
 
-	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass renderPass, PostProcessingGBufferInput imageInput) : engineDevice(device) {
+	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainRenderPass, PostProcessingGBufferInput imageInput) : engineDevice(device) {
+		createOffscreenRenderPass();
+
 		setVkDescriptorImageInfo(&ppoDescriptor_BaseRenderedScene, imageInput.baseRenderedScene);
 		bool x1 = setVkDescriptorImageInfo(&ppoDescriptor_DepthBufferSceneInfo, imageInput.depthBufferSceneInfo);
 		bool x2 = setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
@@ -39,16 +43,45 @@ namespace Shard3D {
 			writer.writeImage(2, &ppoDescriptor_PositionSceneInfo);
 		if (x3)
 			writer.writeImage(3, &ppoDescriptor_NormalSceneInfo);
-		
+
 		writer.build(ppo_InputDescriptorSet);
 
 
 		createPipelineLayout();
-		createPipeline(renderPass);
+		createPipelines(swapchainRenderPass);
 	}
 
 	PostProcessingSystem::~PostProcessingSystem() {
+		delete ppoFrameBuffer;
+		delete ppoRenderpass;
+		delete ppoColorFramebufferAttachment;
+
 		vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
+	}
+
+	void PostProcessingSystem::createOffscreenRenderPass() {
+		{ // Post processing
+			ppoColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+			VK_FORMAT_B8G8R8A8_SRGB,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color);
+
+			AttachmentInfo colorAttachmentInfo{};
+			colorAttachmentInfo.frameBufferAttachment = ppoColorFramebufferAttachment;
+			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			colorAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			ppoRenderpass = new RenderPass(
+				engineDevice, {
+				colorAttachmentInfo
+				});
+
+			ppoFrameBuffer = new FrameBuffer(engineDevice, ppoRenderpass->getRenderPass(), { ppoColorFramebufferAttachment });
+		}
 	}
 
 	void PostProcessingSystem::createPipelineLayout() {
@@ -67,7 +100,7 @@ namespace Shard3D {
 		}
 	}
 
-	void PostProcessingSystem::createPipeline(VkRenderPass renderPass) {
+	void PostProcessingSystem::createPipelines(VkRenderPass renderPass) {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		GraphicsPipelineConfigInfo pipelineConfig{};
@@ -77,18 +110,48 @@ namespace Shard3D {
 			.setCullMode(VK_CULL_MODE_FRONT_BIT)
 			.disableDepthTest();
 
-		pipelineConfig.renderPass = renderPass;
+		pipelineConfig.renderPass = ppoRenderpass->getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		graphicsPipeline = make_uPtr<GraphicsPipeline>(
+
+		
+		//hdrShaderPipeline = make_uPtr<GraphicsPipeline>(
+		//	engineDevice,
+		//	"assets/shaderdata/fullscreen_quad.vert.spv",
+		//	"assets/shaderdata/post_processing/hdr.frag.spv",
+		//	pipelineConfig
+		//	);
+		//bloomShaderPipeline = make_uPtr<GraphicsPipeline>(
+		//	engineDevice,
+		//	"assets/shaderdata/fullscreen_quad.vert.spv",
+		//	"assets/shaderdata/post_processing/bloom.frag.spv",
+		//	pipelineConfig
+		//	);
+		//debanderShaderPipeline = make_uPtr<GraphicsPipeline>(
+		//	engineDevice,
+		//	"assets/shaderdata/fullscreen_quad.vert.spv",
+		//	"assets/shaderdata/post_processing/debander.frag.spv",
+		//	pipelineConfig
+		//	);
+		//
+		entireShaderPipeline = make_uPtr<GraphicsPipeline>(
 			engineDevice,
 			"assets/shaderdata/fullscreen_quad.vert.spv",
-			"assets/shaderdata/post_processing/bloom.frag.spv",
+			"assets/shaderdata/post_processing/combined.frag.spv",
 			pipelineConfig
-		);
+			);
+
+		//pipelineConfig.renderPass = renderPass;
+		//
+		//gammaCorrectionShaderPipeline = make_uPtr<GraphicsPipeline>(
+		//	engineDevice,
+		//	"assets/shaderdata/fullscreen_quad.vert.spv",
+		//	"assets/shaderdata/post_processing/gamma_correction.frag.spv",
+		//	pipelineConfig
+		//	);
 	}
 
 	void PostProcessingSystem::render(FrameInfo& frameInfo) {
-		graphicsPipeline->bind(frameInfo.commandBuffer);
+		ppoRenderpass->beginRenderPass(frameInfo, ppoFrameBuffer);
 		vkCmdBindDescriptorSets(frameInfo.commandBuffer,
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
 			pipelineLayout,
@@ -99,6 +162,23 @@ namespace Shard3D {
 			nullptr
 		);
 
+		entireShaderPipeline->bind(frameInfo.commandBuffer);
+		vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
+
+		ppoRenderpass->endRenderPass(frameInfo);
+	}
+
+	void PostProcessingSystem::renderGammaCorrectionForSwapchainRenderPass(FrameInfo& frameInfo) {
+		gammaCorrectionShaderPipeline->bind(frameInfo.commandBuffer);
+		vkCmdBindDescriptorSets(frameInfo.commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			pipelineLayout,
+			0,
+			1,
+			&ppo_InputDescriptorSet,
+			0,
+			nullptr
+		);
 		vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
 	}
 }

@@ -1,19 +1,20 @@
-Shard3D: 1.2.7.r0-alpha
+Shard3D: 1.2.7.r5-alpha
 AssetType: surface_material
 SurfaceMaterial:
   - Material: Tyre
     Physics:
       MaterialType: SurfaceMaterial
-      MaterialClass: class Shard3D::SurfaceMaterial_ShadedOpaque
+      Class: class Shard3D::SurfaceMaterial_Shaded
+      BlendMode: 0
     Draw:
       VkCullModeFlags: 1
       VkPolygonMode: 0
     Data:
-      diffuseColor: [0, 0, 0]
+      diffuseColor: [0.0196078438, 0.0196078438, 0.0196078438]
       diffuseTex: assets/_engine/tex/0xffffff.png.s3dasset
-      specularFactor: 0.0500000007
+      specularFactor: 0.769999981
       specularTex: assets/_engine/tex/0xffffff.png.s3dasset
-      shininessFactor: 0.0879999995
+      shininessFactor: 0.217999995
       shininessTex: assets/_engine/tex/0xffffff.png.s3dasset
       metallicFactor: 0
       metallicTex: assets/_engine/tex/0xffffff.png.s3dasset

@@ -3,7 +3,7 @@
 #include <imgui.h>
 #include <Shard3D/core/ui/hudmgr.h>
 #include <Shard3D/core/asset/assetmgr.h>
-#include <Shard3D/scripting/dynamic_script_engine.h>
+#include <Shard3D/scripting/script_engine.h>
 
 #include <Shard3D/utils/dialogs.h>
 #include <fstream>
@@ -211,8 +211,8 @@ namespace Shard3D {
                 auto& name = element->scriptmodule;
                 memset(buffer, 0, 32);
                 strncpy(buffer, name.c_str(), 32);
-                //const auto& actorClasses = DynamicScriptEngine::getActorClasses(actor.getComponent<Components::ScriptComponent>().lang);
-                exists = DynamicScriptEngine::doesHUDClassExist("Shard3D.UI." + name, element->scriptlang);
+                //const auto& actorClasses = ScriptEngine::getActorClasses(actor.getComponent<Components::ScriptComponent>().lang);
+                exists = ScriptEngine::doesHUDClassExist("Shard3D.UI." + name, element->scriptlang);
                 if (!exists) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.4, 0.7f, 1.0f));
                 if (ImGui::InputText("Script Class", buffer, 32)) {
                     name = std::string(buffer);

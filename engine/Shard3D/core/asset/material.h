@@ -32,10 +32,16 @@ namespace YAML {
 }
 
 namespace Shard3D {
+	struct MaterialGraphicsPipelineConfigInfo {
+		VkPipelineLayout shaderPipelineLayout{};
+		uPtr<GraphicsPipeline> shaderPipeline{};
+	};
+
 	struct DrawData {
 		VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
 		VkCullModeFlags culling = VK_CULL_MODE_NONE;
 	};
+
 	struct SurfaceMaterialShaderDescriptorInfo {
 		VkDescriptorSet factors{};
 		VkDescriptorSet textures{};
@@ -44,10 +50,23 @@ namespace Shard3D {
 		uPtr<EngineDescriptorSetLayout> textureLayout{};
 	};
 
-	struct MaterialGraphicsPipelineConfigInfo {
-		VkPipelineLayout shaderPipelineLayout{};
-		uPtr<GraphicsPipeline> shaderPipeline{};
+	enum SurfaceMaterialBlendMode {
+		SurfaceMaterialBlendModeOpaque = 0,
+		SurfaceMaterialBlendModeMasked = BIT(0),
+		SurfaceMaterialBlendModeTranslucent = BIT(1)
 	};
+
+#define SurfaceMaterialBlendMode_T uint32_t
+
+	struct SurfaceMaterial_BlendModeMasked {
+		AssetID maskTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+	};
+
+	struct SurfaceMaterial_BlendModeTranslucent {
+		AssetID opacityTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
+		float opacity{ 1.f };
+	};
+
 
 	/*
 	*	Material that can be used on meshes.
@@ -56,7 +75,13 @@ namespace Shard3D {
 	class SurfaceMaterial {
 	public:
 		SurfaceMaterial();
-		~SurfaceMaterial();
+		virtual ~SurfaceMaterial();
+
+		SurfaceMaterial_BlendModeMasked* maskedInfo{};
+		SurfaceMaterial_BlendModeTranslucent* translucentInfo{};
+
+		uint32_t getBlendMode() { return blendMode; }
+		void setBlendMode(SurfaceMaterialBlendMode_T mode);
 
 		std::string materialTag = "Some kind of material";
 
@@ -75,67 +100,13 @@ namespace Shard3D {
 		uPtr<MaterialGraphicsPipelineConfigInfo> materialPipelineConfig{};
 		SurfaceMaterialShaderDescriptorInfo materialDescriptorInfo{};
 		uPtr<EngineBuffer> factorsBuffer;
+		SurfaceMaterialBlendMode_T blendMode = SurfaceMaterialBlendModeOpaque;
 	};	
 
-	// SSMR (Specular/Shininess/Metallic Rendering), Opaque
-	class SurfaceMaterial_ShadedOpaque : public SurfaceMaterial {
+	// SSMR (Specular/Shininess/Metallic Rendering)
+	class SurfaceMaterial_Shaded : public SurfaceMaterial {
 	public:
 		AssetID normalTex = std::string(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
-
-		glm::vec3 emissiveColor{ 0.f };
-		AssetID emissiveTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		glm::vec3 diffuseColor{ 1.f };
-		AssetID diffuseTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		float specular = 0.5f;
-		AssetID specularTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		float shininess = 0.5f;
-		AssetID shininessTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		float metallic = 0.f;
-		AssetID metallicTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-		void serialize(YAML::Emitter* out) override;
-		void deserialize(YAML::Node* data) override;
-		void loadAllTextures() override;
-	};
-
-	// SSMR (Specular/Shininess/Metallic Rendering), Masked
-	class SurfaceMaterial_ShadedMasked : public SurfaceMaterial {
-	public:
-		AssetID normalTex = std::string(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
-		AssetID maskTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		glm::vec3 emissiveColor{ 0.f };
-		AssetID emissiveTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		glm::vec3 diffuseColor{ 1.f };
-		AssetID diffuseTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		float specular = 0.5f;
-		AssetID specularTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		float shininess = 0.5f;
-		AssetID shininessTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		float metallic = 0.f;
-		AssetID metallicTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-
-		void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) override;
-		void serialize(YAML::Emitter* out) override;
-		void deserialize(YAML::Node* data) override;
-		void loadAllTextures() override;
-	};
-
-	// SSCR (Specular/Shininess/Clarity Rendering), Translucent
-	class SurfaceMaterial_ShadedTranslucent : public SurfaceMaterial {
-	public:
-		AssetID normalTex = std::string(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
-		AssetID opacityTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
-		float opacity{ 1.f };
 
 		glm::vec3 emissiveColor{ 0.f };
 		AssetID emissiveTex = std::string(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);

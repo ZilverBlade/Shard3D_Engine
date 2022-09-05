@@ -5,6 +5,7 @@
 #include "../misc/cheat_codes.h"
 #include "../asset/texture.h"
 #include "../../events/input.h"
+#include "../../events/wnd_event.h"
 
 namespace Shard3D {
 	EngineWindow::EngineWindow(int w, int h, std::string name) : width{ w }, height{ h }, windowName{ name } {
@@ -159,5 +160,8 @@ namespace Shard3D {
 		engineWindow->framebufferResized = true;
 		engineWindow->width = width;
 		engineWindow->height = height;
+
+		Events::WindowResizeEvent _event(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+		engineWindow->_wndData.eventCallback(_event);
 	}
 }

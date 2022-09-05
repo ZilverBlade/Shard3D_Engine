@@ -147,4 +147,17 @@ namespace Shard3D.Core
         KEY_MENU              = 348
                                   
     }
+
+    public static class Input
+    {
+        public static bool IsKeyDown(KeyInput key)
+        {
+            return InternalCalls.IsKeyDown(key);
+        }
+        public static bool IsMouseButtonDown(MouseInput mouseBtn)
+        {
+            return InternalCalls.IsMouseButtonDown(mouseBtn);
+        }
+    }
+
 }

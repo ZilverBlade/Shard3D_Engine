@@ -20,9 +20,7 @@ namespace Shard3D {
 		MaterialSystem::setRenderPassContext(renderPass);
 		MaterialSystem::setGlobalSetLayout(globalSetLayout);
 	}
-	ForwardRenderSystem::~ForwardRenderSystem() {
-		
-	}
+	ForwardRenderSystem::~ForwardRenderSystem() {}
 
 	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {;
 		auto view = frameInfo.activeLevel->registry.view<Components::MeshComponent, Components::TransformComponent>();

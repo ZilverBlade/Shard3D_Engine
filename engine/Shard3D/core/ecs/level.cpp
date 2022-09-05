@@ -5,7 +5,7 @@
 #include "mmgr.h"
 
 #include "../asset/assetmgr.h"
-#include "../../scripting/dynamic_script_engine.h"
+#include "../../scripting/script_engine.h"
 #include "../ui/hud.h"
 #include "../../workarounds.h"
 #include "../../systems/computational/physics_system.h"
@@ -169,14 +169,14 @@ namespace Shard3D {
 				});
 			}
 			{
-				DynamicScriptEngine::runtimeStart(this);
+				ScriptEngine::runtimeStart(this);
 				registry.view<Components::ScriptComponent>().each([&](auto actor, auto& scr) {
-					DynamicScriptEngine::actorScript().beginEvent({ actor, this });
+					ScriptEngine::actorScript().beginEvent({ actor, this });
 				});
 			}
 			{
 				for (HUD* hud : TEMPORARY::hudList) for (auto& element : hud->elements)
-						DynamicScriptEngine::hudScript().begin(element.second.get());
+						ScriptEngine::hudScript().begin(element.second.get());
 			}
 			physicsSystemPtr->begin(this);
 			SHARD3D_INFO("Beginning simulation");
@@ -190,7 +190,7 @@ namespace Shard3D {
 				});
 			}	
 			{ // Actor loop gets managed by the script engine
-				DynamicScriptEngine::actorScript().tickEvent(dt);
+				ScriptEngine::actorScript().tickEvent(dt);
 			}
 		}
 
@@ -225,14 +225,14 @@ namespace Shard3D {
 				}); 
 			}
 			{
-				DynamicScriptEngine::actorScript().endEvent();
+				ScriptEngine::actorScript().endEvent();
 			}
 			{
 				for (HUD* hud : TEMPORARY::hudList) for (auto& element : hud->elements)
-					DynamicScriptEngine::hudScript().end(element.second.get());
+					ScriptEngine::hudScript().end(element.second.get());
 			}
 			physicsSystemPtr->end(this);
-			DynamicScriptEngine::runtimeStop();
+			ScriptEngine::runtimeStop();
 			setPossessedCameraActor(0);
 			SHARD3D_LOG("Reloading level");
 			loadRegistryCapture = true;
@@ -250,7 +250,7 @@ namespace Shard3D {
 				}	next:;
 				if (!actor.hasComponent<Components::ScriptComponent>()) goto _next;
 				{
-					DynamicScriptEngine::actorScript().killEvent(actor);
+					ScriptEngine::actorScript().killEvent(actor);
 				}	_next:;
 			}
 

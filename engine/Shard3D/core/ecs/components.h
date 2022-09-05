@@ -150,7 +150,8 @@ namespace Shard3D {
 		struct MeshComponent {
 			AssetID asset{ "" };
 			std::vector<AssetID> materials;
-
+			// resets materials to be whatever mesh is loaded if the material size doesnt match the asset
+			void validate();
 			bool hideInGame = false;
 
 			MeshComponent() = default;
