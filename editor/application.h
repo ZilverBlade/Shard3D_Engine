@@ -49,6 +49,10 @@ namespace Shard3D {
 		FrameBuffer* mainFrameBuffer;
 		RenderPass* mainRenderpass;
 
+		FrameBufferAttachment* ppoColorFramebufferAttachment;
+		FrameBuffer* ppoFrameBuffer;
+		RenderPass* ppoRenderpass;
+
 		// ECS
 		sPtr<ECS::Level> level;
 

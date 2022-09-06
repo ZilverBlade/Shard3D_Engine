@@ -367,31 +367,27 @@ void EngineSwapChain::createSyncObjects() {
 }
 
 
-VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat_NGC(
+VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR>& availableFormats) {
     // allow use of VK_FORMAT_A2B10G10R10_UNORM_PACK32
+
+    VkSurfaceFormatKHR finalFormat{};
     for (const auto& availableFormat : availableFormats) {
-        if (availableFormat.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-            return availableFormat;
-        }
         if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-            return availableFormat;
+            finalFormat = availableFormat;
+        }
+        if (availableFormat.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            GraphicsSettings::getRuntimeInfo().is10BitColor = true;
+            SHARD3D_INFO("Using 10 bit color format");
+            finalFormat = availableFormat;
+            break;
         }
     }
+
+    return finalFormat;
+
     SHARD3D_WARN("VK_FORMAT_B8G8R8A8_UNORM or VK_FORMAT_A2B10G10R10_UNORM_PACK32 not available colour formats!");
     return availableFormats[0];
-}
-
-VkSurfaceFormatKHR EngineSwapChain::chooseSwapSurfaceFormat_GC(
-    const std::vector<VkSurfaceFormatKHR> &availableFormats) {
-    // allow use of VK_FORMAT_A2B10G10R10_UNORM_PACK32
-  for (const auto &availableFormat : availableFormats) {  
-      if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-          return availableFormat;
-      }
-  }
-  SHARD3D_WARN("VK_FORMAT_B8G8R8A8_SRGB is not an available colour format!");
-  return availableFormats[0];
 }
 
 VkPresentModeKHR EngineSwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {

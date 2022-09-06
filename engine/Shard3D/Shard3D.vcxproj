@@ -519,12 +519,12 @@
     <None Include="shaders\materials\surface_shaded_opaque.frag" />
     <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
-    <None Include="shaders\post_processing\combined.frag" />
     <None Include="shaders\post_processing\debander.frag" />
-    <None Include="shaders\post_processing\bloom.frag" />
+    <None Include="shaders\post_processing\bloom.comp" />
     <None Include="shaders\post_processing\debander_10bit.frag" />
-    <None Include="shaders\post_processing\gamma_correction.frag" />
-    <None Include="shaders\post_processing\hdr.frag" />
+    <None Include="shaders\post_processing\gamma_correction.comp" />
+    <None Include="shaders\post_processing\hdr.comp" />
+    <None Include="shaders\post_processing\lens_flare.frag" />
     <None Include="shaders\shadow_directional.vert" />
     <None Include="shaders\_editor\editor_svabill.frag" />
     <None Include="shaders\_editor\editor_svabill.vert" />

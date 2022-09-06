@@ -2,8 +2,7 @@
 layout (location = 0) in vec2 fragUV;
 
 layout (location = 0) out vec4 outColor;
-
-layout (set = 0, binding = 0, rgba32f) uniform image2D postProcessImage;
+layout (set = 0, binding = 1) uniform sampler2D postProcessImage;
 
 const highp float NOISE_GRANULARITY = 0.3/255.0;
 
@@ -12,9 +11,9 @@ highp float random(vec2 coords) {
 }
 
 void main()	{
-    highp vec2 coordinates = gl_FragCoord.xy / vec2(imageSize(postProcessImage));
+    highp vec2 coordinates = gl_FragCoord.xy / vec2(textureSize(postProcessImage, 0));
 
-    highp vec3 pixelColor = imageLoad(postProcessImage, ivec2(gl_FragCoord.xy)).rgb;
+    highp vec3 pixelColor = texture(postProcessImage, fragUV).rgb;
 
     highp float fragmentColor_r = pixelColor.x;
     highp float fragmentColor_g = pixelColor.y;
@@ -22,6 +21,6 @@ void main()	{
     fragmentColor_r += mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random(coordinates));
 	fragmentColor_g += mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random(coordinates));
 	fragmentColor_b += mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random(coordinates));
-	
-    outColor = vec4(fragmentColor_r, fragmentColor_g, fragmentColor_b, 1.0);
+
+     outColor = vec4(fragmentColor_r, fragmentColor_g, fragmentColor_b, 1.0);
 }

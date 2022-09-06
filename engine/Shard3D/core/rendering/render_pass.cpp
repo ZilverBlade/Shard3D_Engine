@@ -326,9 +326,9 @@ namespace Shard3D {
 
 		VkViewport viewport = {};
 		viewport.x = 0.0f;
-		viewport.y = static_cast<float>(frameBuffer->getDimensions().y);
+		viewport.y = 0.0f;
 		viewport.width = static_cast<float>(frameBuffer->getDimensions().x);
-		viewport.height = -static_cast<float>(frameBuffer->getDimensions().y);
+		viewport.height = static_cast<float>(frameBuffer->getDimensions().y);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);

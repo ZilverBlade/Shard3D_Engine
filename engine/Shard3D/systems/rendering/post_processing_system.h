@@ -2,6 +2,7 @@
 #include "../../s3dstd.h"
 #include "../../vulkan_abstr.h"
 #include "../../core/misc/frame_info.h"	  
+#include "../../core/vulkan_api/pipeline_compute.h"
 
 namespace Shard3D {
 	class RenderPass;
@@ -13,34 +14,33 @@ namespace Shard3D {
 		FrameBufferAttachment* positionSceneInfo;
 		FrameBufferAttachment* normalSceneInfo;
 	};
+
+	struct PPO_Material {
+		PPO_Material(sPtr<ComputePipeline>&& _pipeline, glm::ivec3 _workgroups) : pipeline(_pipeline), workgroups(_workgroups) {}
+		void dispatch(VkCommandBuffer commandBuffer);
+		sPtr<ComputePipeline> pipeline;
+		glm::ivec3 workgroups;
+	};
+
 	class PostProcessingSystem {
 	public:
-		PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainRenderPass, PostProcessingGBufferInput imageInput);
+		PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainpresentingRenderPassRenderPass, PostProcessingGBufferInput imageInput, bool doGammaCorrection);
 		~PostProcessingSystem();
 
 		PostProcessingSystem(const PostProcessingSystem&) = delete;
 		PostProcessingSystem& operator=(const PostProcessingSystem&) = delete;
 
 		void render(FrameInfo& frameInfo);
-		void renderGammaCorrectionForSwapchainRenderPass(FrameInfo& frameInfo);
-
-		FrameBufferAttachment* getFrameBufferAttachment() { return ppoColorFramebufferAttachment; }
+		void renderImageFlipForPresenting(FrameInfo& frameInfo);
 	private:
-		void createOffscreenRenderPass();
 		void createPipelineLayout();
 		void createPipelines(VkRenderPass renderPass);
 		
-		FrameBufferAttachment* ppoColorFramebufferAttachment;
-		FrameBuffer* ppoFrameBuffer;
-		RenderPass* ppoRenderpass;
-
 		EngineDevice& engineDevice;
 
-		uPtr<GraphicsPipeline> gammaCorrectionShaderPipeline;
-		uPtr<GraphicsPipeline> hdrShaderPipeline;
-		uPtr<GraphicsPipeline> bloomShaderPipeline;
 		uPtr<GraphicsPipeline> debanderShaderPipeline;
-		uPtr<GraphicsPipeline> entireShaderPipeline;
+		uPtr<ComputePipeline> hdrShaderPipeline;
+		uPtr<ComputePipeline> bloomShaderPipeline;
 
 		VkDescriptorSet ppo_InputDescriptorSet{};
 
@@ -50,9 +50,12 @@ namespace Shard3D {
 		VkDescriptorImageInfo ppoDescriptor_NormalSceneInfo;
 
 		uPtr<EngineDescriptorSetLayout> ppo_Layout{};
-		uPtr<EngineBuffer> ssboImageBuffer;
 
 		VkPipelineLayout pipelineLayout{};
+
+		std::vector<PPO_Material> postProcessMaterials{};
+
+		bool doGammaCorrectionEX;
 	};
 
 }

@@ -6,16 +6,16 @@
 namespace Shard3D {
 	class ComputeSystem {
 	public:
-		ComputeSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		ComputeSystem(EngineDevice& device);
 		~ComputeSystem();
 
 		ComputeSystem(const ComputeSystem&) = delete;
 		ComputeSystem& operator=(const ComputeSystem&) = delete;
 
-		void render(FrameInfo& frameInfo);
+		void execute(FrameInfo& frameInfo);
 	private:
 
-		void createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		void createPipeline();
 		VkDescriptorSet descriptorSet1;
 
 		EngineDevice& engineDevice;

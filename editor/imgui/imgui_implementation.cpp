@@ -70,6 +70,8 @@
 #ifdef _MSC_VER
 #pragma warning (disable: 4127) // condition expression is constant
 #endif
+#include <fstream>
+#include <vector>
 
 // Reusable buffers used for rendering 1 current in-flight frame, for ImGui_ImplVulkan_RenderDrawData()
 // [Please zero-clear before use!]
@@ -314,7 +316,7 @@ layout(set=0, binding=0) uniform sampler2D sTexture;
 layout(location = 0) in struct { vec4 Color; vec2 UV; } In;
 void main()
 {
-    fColor = pow(In.Color * texture(sTexture, In.UV.st), 0.454545);
+    fColor = vec4(pow(In.Color.xyz * texture(sTexture, In.UV.st).xyz, vec3(0.454545)), In.Color.w * texture(sTexture, In.UV.st).w);
 }
 */
 static uint32_t __glsl_shader_frag_spv[] =
@@ -790,19 +792,47 @@ static void ImGui_ImplVulkan_CreateShaderModules(VkDevice device, const VkAlloca
     ImGui_ImplVulkan_Data* bd = ImGui_ImplVulkan_GetBackendData();
     if (bd->ShaderModuleVert == VK_NULL_HANDLE)
     {
+        std::ifstream file{ "assets/shaderdata/_editor/imgui.vert.spv", std::ios::ate | std::ios::binary };
+
+        if (!file.is_open()) {
+            throw std::exception("failed to read shader: assets/shaderdata/_editor/imgui.vert.spv");
+        }
+
+        size_t fileSize = static_cast<size_t>(file.tellg());
+        std::vector<char> buffer(fileSize);
+
+        file.seekg(0);
+        file.read(buffer.data(), fileSize);
+
+        file.close();
         VkShaderModuleCreateInfo vert_info = {};
         vert_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        vert_info.codeSize = sizeof(__glsl_shader_vert_spv);
-        vert_info.pCode = (uint32_t*)__glsl_shader_vert_spv;
+
+        vert_info.codeSize = buffer.size();
+        vert_info.pCode = reinterpret_cast<uint32_t*>(buffer.data());
         VkResult err = vkCreateShaderModule(device, &vert_info, allocator, &bd->ShaderModuleVert);
         check_vk_result(err);
     }
     if (bd->ShaderModuleFrag == VK_NULL_HANDLE)
     {
+        std::ifstream file{ "assets/shaderdata/_editor/imgui.frag.spv", std::ios::ate | std::ios::binary };
+
+        if (!file.is_open()) {
+            throw std::exception("failed to read shader: assets/shaderdata/_editor/imgui.frag.spv");
+        }
+
+        size_t fileSize = static_cast<size_t>(file.tellg());
+        std::vector<char> buffer(fileSize);
+
+        file.seekg(0);
+        file.read(buffer.data(), fileSize);
+
+        file.close();
+
         VkShaderModuleCreateInfo frag_info = {};
         frag_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        frag_info.codeSize = sizeof(__glsl_shader_frag_spv);
-        frag_info.pCode = (uint32_t*)__glsl_shader_frag_spv;
+        frag_info.codeSize  = buffer.size();
+        frag_info.pCode     = reinterpret_cast<uint32_t*>(buffer.data());
         VkResult err = vkCreateShaderModule(device, &frag_info, allocator, &bd->ShaderModuleFrag);
         check_vk_result(err);
     }
@@ -1668,7 +1698,7 @@ static void ImGui_ImplVulkan_CreateWindow(ImGuiViewport* viewport)
     }
 
     // Select Surface Format
-    const VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_SRGB, VK_FORMAT_B8G8R8_SRGB, VK_FORMAT_R8G8B8_SRGB };
+    const VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM };
     const VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     wd->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(v->PhysicalDevice, wd->Surface, requestSurfaceImageFormat, (size_t)IM_ARRAYSIZE(requestSurfaceImageFormat), requestSurfaceColorSpace);
 

@@ -180,6 +180,8 @@ ALPHA:
 		- Added try catch statements for YAML deserialisation to prevent unnecessary crashes.
 		- Optimised draw times
 		- Fixed post processing issues
+		- Added 10 bit colour support
+		- Added compute shader support
 
 		:: TODO, proper events sytem, add editor layouts, use premake
 		:: Fix: change vertex and index buffers to draw offset, dont use 64 bit integers for shaders (e.g. HUD system)

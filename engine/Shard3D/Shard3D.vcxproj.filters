@@ -130,11 +130,14 @@
     <Filter Include="Resource Files\Shaders\vertex">
       <UniqueIdentifier>{8be44975-76b6-47ee-b923-25ff06c823b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shaders\fragment\material">
-      <UniqueIdentifier>{2c5f8343-f0cf-409a-857f-b1bfe2c89ace}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Shaders\fragment\post_processing">
+    <Filter Include="Resource Files\Shaders\post_processing">
       <UniqueIdentifier>{5abb4171-03ea-4239-9722-7a7a9c7a1adf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\post_processing\final">
+      <UniqueIdentifier>{98dd48c9-412b-4001-9dff-838dedc81f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\material">
+      <UniqueIdentifier>{2c5f8343-f0cf-409a-857f-b1bfe2c89ace}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -552,22 +555,22 @@
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\materials\surface_shaded_opaque.frag">
-      <Filter>Resource Files\Shaders\fragment\material</Filter>
+      <Filter>Resource Files\Shaders\material</Filter>
     </None>
     <None Include="shaders\mesh_shader.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
     <None Include="shaders\materials\surface_shaded_masked.frag">
-      <Filter>Resource Files\Shaders\fragment\material</Filter>
+      <Filter>Resource Files\Shaders\material</Filter>
     </None>
     <None Include="shaders\materials\surface_shaded_translucent.frag">
-      <Filter>Resource Files\Shaders\fragment\material</Filter>
+      <Filter>Resource Files\Shaders\material</Filter>
     </None>
     <None Include="shaders\fullscreen_quad.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
-    <None Include="shaders\post_processing\bloom.frag">
-      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    <None Include="shaders\post_processing\bloom.comp">
+      <Filter>Resource Files\Shaders\post_processing</Filter>
     </None>
     <None Include="shaders\fragment_blank.frag">
       <Filter>Resource Files\Shaders\fragment</Filter>
@@ -575,20 +578,20 @@
     <None Include="shaders\shadow_directional.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
-    <None Include="shaders\post_processing\hdr.frag">
-      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    <None Include="shaders\post_processing\hdr.comp">
+      <Filter>Resource Files\Shaders\post_processing</Filter>
     </None>
-    <None Include="shaders\post_processing\debander.frag">
-      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    <None Include="shaders\post_processing\gamma_correction.comp">
+      <Filter>Resource Files\Shaders\post_processing</Filter>
     </None>
-    <None Include="shaders\post_processing\gamma_correction.frag">
-      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
-    </None>
-    <None Include="shaders\post_processing\combined.frag">
-      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+    <None Include="shaders\post_processing\lens_flare.frag">
+      <Filter>Resource Files\Shaders\post_processing</Filter>
     </None>
     <None Include="shaders\post_processing\debander_10bit.frag">
-      <Filter>Resource Files\Shaders\fragment\post_processing</Filter>
+      <Filter>Resource Files\Shaders\post_processing\final</Filter>
+    </None>
+    <None Include="shaders\post_processing\debander.frag">
+      <Filter>Resource Files\Shaders\post_processing\final</Filter>
     </None>
   </ItemGroup>
 </Project>

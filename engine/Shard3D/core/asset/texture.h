@@ -49,7 +49,6 @@ namespace Shard3D {
             void createTextureImage(const std::string& filepath);
 
             void createTextureImageView(VkImageViewType viewType);
-            void createBlankTextureImageView(VkImageViewType viewType);
             void createTextureSampler();
 
             VkDescriptorImageInfo mDescriptor{};

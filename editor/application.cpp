@@ -59,8 +59,8 @@ namespace Shard3D {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				glm::ivec3(1920, 1080, 1),
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Resolve);
 
@@ -90,7 +90,28 @@ namespace Shard3D {
 
 			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainResolveFramebufferAttachment });
 		}
+		{ // Post processing
+			ppoColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+			VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color);
 
+			AttachmentInfo colorAttachmentInfo{};
+			colorAttachmentInfo.frameBufferAttachment = ppoColorFramebufferAttachment;
+			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			colorAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			ppoRenderpass = new RenderPass(
+				engineDevice, {
+				colorAttachmentInfo
+				});
+
+			ppoFrameBuffer = new FrameBuffer(engineDevice, ppoRenderpass->getRenderPass(), { ppoColorFramebufferAttachment });
+		}
 		
 	}
 
@@ -100,6 +121,10 @@ namespace Shard3D {
 		delete mainColorFramebufferAttachment;
 		delete mainDepthFramebufferAttachment;
 		delete mainResolveFramebufferAttachment;
+
+		delete ppoFrameBuffer;
+		delete ppoColorFramebufferAttachment;
+		delete ppoRenderpass;
 	}
 
 	void EngineApplication::setupEngineFeatures() {
@@ -107,7 +132,6 @@ namespace Shard3D {
 		GraphicsSettings::init(nullptr);
 		ScriptEngine::init();
 
-		//mainOffScreen.setViewportSize({ 1920, 1080 });
 		Input::setWindow(engineWindow);
 		setWindowCallbacks();
 		
@@ -159,11 +183,8 @@ namespace Shard3D {
 
 		
 		GridSystem gridSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-#ifdef ENSET_ENABLE_COMPUTE_SHADERS
-		ComputeSystem computeSystem { engineDevice, mainOffScreen.getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-#endif
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem { engineDevice, engineRenderer.getSwapChainRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}};
+		PostProcessingSystem ppoSystem { engineDevice, ppoRenderpass->getRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}, false};
 		ShadowMappingSystem shadowSystem { engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -186,7 +207,7 @@ namespace Shard3D {
 		}
 		ImGuiLayer* imguiLayer = new ImGuiLayer();
 
-		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, ppoSystem.getFrameBufferAttachment());
+		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, ppoColorFramebufferAttachment);
 
 		layerStack.pushOverlay(imguiLayer);
 
@@ -357,20 +378,24 @@ beginWhileLoop:
 
 				SHARD3D_STAT_RECORD();
 				ppoSystem.render(frameInfo);
-				SHARD3D_STAT_RECORD_END({ "Post Processing", "Bloom" });
-
-#ifdef ENSET_ENABLE_COMPUTE_SHADERS
-				computeSystem.execute(frameInfo);
-#endif
-
+				SHARD3D_STAT_RECORD_END({ "Post Processing", "Main" });
+				SHARD3D_STAT_RECORD();
+				ppoRenderpass->beginRenderPass(frameInfo, ppoFrameBuffer);
+				ppoSystem.renderImageFlipForPresenting(frameInfo);	
+				ppoRenderpass->endRenderPass(frameInfo);
+				SHARD3D_STAT_RECORD_END({ "Post Processing", "Debanding" });
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 				// Layer overlays (use UI here)
 				for (Layer* layer : layerStack) {
 					layer->update(frameInfo);
 				}
-		
+				SHARD3D_STAT_RECORD();
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
+				SHARD3D_STAT_RECORD_END({ "Swapchain", "End" });
+				// Command buffer ends
+				SHARD3D_STAT_RECORD();
 				engineRenderer.endFrame();
+				SHARD3D_STAT_RECORD_END({ "Command Buffer", "Submit" });
 			}
 		}
 

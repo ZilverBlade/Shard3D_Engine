@@ -1,5 +1,3 @@
-#include "..\editor\application.h"
-#include "..\editor\application.h"
 #include "application.h"
 
 #include <thread>
@@ -10,7 +8,7 @@
 
 #include <Shard3D/core/misc/graphics_settings.h>
 
-#include <Shard3D/scripting/dynamic_script_engine.h>
+#include <Shard3D/scripting/script_engine.h>
 #include <Shard3D/scripting/script_handler.h>
 
 #include <Shard3D/workarounds.h>
@@ -51,8 +49,8 @@ namespace Shard3D {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				glm::ivec3(1920, 1080, 1),
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Resolve);
 
@@ -96,23 +94,19 @@ namespace Shard3D {
 		GraphicsSettings::init(nullptr);
 		ScriptEngine::init();
 
-		//mainOffScreen.setViewportSize({ 1920, 1080 });
 		Input::setWindow(engineWindow);
 		setWindowCallbacks();
-		
+
 		SharedPools::constructPools(engineDevice);
-		
+
 		AssetManager::setDevice(engineDevice);
 		ResourceHandler::init(engineDevice);
 
 		_special_assets::_editor_icons_load();
-		
+
 		GraphicsSettings::init(&engineWindow);
 
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		ini.LoadFile(ENGINE_SETTINGS_PATH);
-		ini.LoadFile(EDITOR_SETTINGS_PATH);
+		ShaderSystem::init();
 	}
 
 	void EngineApplication::setWindowCallbacks() {
@@ -146,10 +140,8 @@ namespace Shard3D {
 				.build(globalDescriptorSets[i]);
 		}
 
-		
-		
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr} };
+		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}, true };
 		ShadowMappingSystem shadowSystem{ engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -179,7 +171,7 @@ namespace Shard3D {
 		level->setPhysicsSystem(&physicsSystem);
 		level->begin();
 		auto currentTime = std::chrono::high_resolution_clock::now();
-beginWhileLoop:
+
 		while (!engineWindow.shouldClose()) {
 			glfwPollEvents();
 			auto newTime = std::chrono::high_resolution_clock::now();
@@ -241,9 +233,12 @@ beginWhileLoop:
 				billboardRenderSystem.render(frameInfo);
 				mainRenderpass->endRenderPass(frameInfo);
 
+				ppoSystem.render(frameInfo);
+
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
-				ppoSystem.render(frameInfo);		
+				ppoSystem.renderImageFlipForPresenting(frameInfo);
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
+
 				engineRenderer.endFrame();
 			}
 		}

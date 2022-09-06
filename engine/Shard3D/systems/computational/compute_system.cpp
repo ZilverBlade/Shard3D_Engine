@@ -7,26 +7,24 @@
 
 namespace Shard3D {
 
-    ComputeSystem::ComputeSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : engineDevice{ device } {
-        createPipeline(renderPass, globalSetLayout);
+    ComputeSystem::ComputeSystem(EngineDevice& device) : engineDevice{ device } {
+        createPipeline();
     }
 
     ComputeSystem::~ComputeSystem() {
         vkDestroyPipelineLayout(engineDevice.device(), pipelineLayout, nullptr);
     }
 
-    void ComputeSystem::createPipeline(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) {
-        std::shared_ptr<Texture2D> outputTargetImg = Texture2D::createEmptyTexture(engineDevice);
+    void ComputeSystem::createPipeline() {
+        //std::shared_ptr<Texture2D> outputTargetImg = Texture2D::createEmptyTexture(engineDevice);
         //pipeline layout
-        computeSystemLayout =
-            EngineDescriptorSetLayout::Builder(engineDevice)
-            .addBinding(6, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT) // input
-            .addBinding(7, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT) // output target
-            .build();
+       //computeSystemLayout =
+       //    EngineDescriptorSetLayout::Builder(engineDevice)
+       //    .addBinding(6, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT) // input
+       //    .addBinding(7, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT) // output target
+       //    .build();
 
         std::vector<VkDescriptorSetLayout> descriptorSetLayouts{
-            globalSetLayout,
-            computeSystemLayout->getDescriptorSetLayout() 
         };
         
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -49,42 +47,20 @@ namespace Shard3D {
             "assets/shaderdata/test.comp.spv"
         );
 
-        srcImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-        
-        dstImageInfo.imageView = outputTargetImg->getImageView();
-        dstImageInfo.sampler = outputTargetImg->getSampler();
-        srcImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        //srcImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        //
+        //dstImageInfo.imageView = outputTargetImg->getImageView();
+        //dstImageInfo.sampler = outputTargetImg->getSampler();
+        //srcImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
     }
 
 
-    void ComputeSystem::render(FrameInfo& frameInfo) {
+    void ComputeSystem::execute(FrameInfo& frameInfo) {
 
         computePipeline->bindCompute(frameInfo.commandBuffer);
 
-        //srcImageInfo.imageView = Singleton::mainOffScreen.getImageView();
-        //srcImageInfo.sampler = Singleton::mainOffScreen.getSampler();
-
-        VkDescriptorImageInfo computeImageInfo;
-
-       //computeImageInfo.sampler = Singleton::mainOffScreen.getSampler();
-       //computeImageInfo.imageView = Singleton::mainOffScreen.getImageView();
-       //computeImageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-
-        EngineDescriptorWriter(*computeSystemLayout, frameInfo.perDrawDescriptorPool)
-            .writeImage(6, &srcImageInfo)
-            .writeImage(7, &dstImageInfo)
-            .build(descriptorSet1);
-
-        vkCmdBindDescriptorSets(
-            frameInfo.commandBuffer,
-            VK_PIPELINE_BIND_POINT_COMPUTE,
-            pipelineLayout,
-            1,  // first set
-            1,  // set count
-            &descriptorSet1,
-            0,
-            nullptr);
+        vkCmdDispatch(frameInfo.commandBuffer, 1, 1, 1);
     }
 
 	
