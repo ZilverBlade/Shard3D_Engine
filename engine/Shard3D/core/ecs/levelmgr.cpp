@@ -91,11 +91,11 @@ namespace Shard3D {
 			}
 
 			// MODEL
-			if (actor.hasComponent<Components::MeshComponent>()) {
-				out << YAML::Key << "MeshComponent";
+			if (actor.hasComponent<Components::Mesh3DComponent>()) {
+				out << YAML::Key << "Mesh3DComponent";
 				out << YAML::BeginMap;
-					out << YAML::Key << "MeshAsset" << YAML::Value << actor.getComponent<Components::MeshComponent>().asset.getFile();
-					out << YAML::Key << "Materials" << YAML::Value << actor.getComponent<Components::MeshComponent>().materials;
+					out << YAML::Key << "MeshAsset" << YAML::Value << actor.getComponent<Components::Mesh3DComponent>().asset.getFile();
+					out << YAML::Key << "Materials" << YAML::Value << actor.getComponent<Components::Mesh3DComponent>().materials;
 				out << YAML::EndMap;
 			}
 
@@ -233,15 +233,15 @@ namespace Shard3D {
 							loadedActor.getComponent<Components::ScriptComponent>().lang = actor["ScriptComponent"]["Language"].as<std::string>() == "C#"? 0 : 1;
 						}
 
-						if (actor["MeshComponent"]) {
+						if (actor["Mesh3DComponent"]) {
 							ResourceHandler::loadMesh(
-								actor["MeshComponent"]["MeshAsset"].as<std::string>()
+								actor["Mesh3DComponent"]["MeshAsset"].as<std::string>()
 							);
-							loadedActor.addComponent<Components::MeshComponent>(
-								actor["MeshComponent"]["MeshAsset"].as<std::string>());
-							loadedActor.getComponent<Components::MeshComponent>().materials = actor["MeshComponent"]["Materials"].as<std::vector<AssetID>>();
-							loadedActor.getComponent<Components::MeshComponent>().validate();
-							for (auto& material : loadedActor.getComponent<Components::MeshComponent>().materials) {
+							loadedActor.addComponent<Components::Mesh3DComponent>(
+								actor["Mesh3DComponent"]["MeshAsset"].as<std::string>());
+							loadedActor.getComponent<Components::Mesh3DComponent>().materials = actor["Mesh3DComponent"]["Materials"].as<std::vector<AssetID>>();
+							loadedActor.getComponent<Components::Mesh3DComponent>().validate();
+							for (auto& material : loadedActor.getComponent<Components::Mesh3DComponent>().materials) {
 								ResourceHandler::loadSurfaceMaterialRecursive(material);
 							}
 						}

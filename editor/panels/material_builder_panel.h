@@ -10,5 +10,8 @@ namespace Shard3D {
 	private:
 		rPtr<SurfaceMaterial> currentItem;
 		AssetID currentAsset;
+
+		rPtr<PostProcessingMaterial> currentPPOItem;
+		AssetID currentPPOAsset;
 	};
 }

@@ -131,13 +131,18 @@ namespace Shard3D {
 			operator EngineCamera&() {
 				return camera;
 			}
-			CameraComponent() = default;
+			CameraComponent() {
+				postProcessMaterials.clear();
+				postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get());
+				postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get());
+			}																																									 
 			CameraComponent(const CameraComponent&) = default;
 			void setProjection() {
 				if (projectionType == ProjectType::Perspective)
 					camera.setPerspectiveProjection(glm::radians(fov), ar, nearClip, farClip);
 				else  camera.setOrthographicProjection(-ar, ar, -1, 1, nearClip, farClip);
 			}
+			std::vector<PostProcessingMaterialInstance> postProcessMaterials{};
 		private:
 			float fov = 70.f;
 			float nearClip = 0.05f;
@@ -147,16 +152,16 @@ namespace Shard3D {
 			friend class LevelPropertiesPanel;
 		};
 		
-		struct MeshComponent {
+		struct Mesh3DComponent {
 			AssetID asset{ "" };
 			std::vector<AssetID> materials;
 			// resets materials to be whatever mesh is loaded if the material size doesnt match the asset
 			void validate();
 			bool hideInGame = false;
 
-			MeshComponent() = default;
-			MeshComponent(const MeshComponent&) = default;
-			MeshComponent(const AssetID& mdl);
+			Mesh3DComponent() = default;
+			Mesh3DComponent(const Mesh3DComponent&) = default;
+			Mesh3DComponent(const AssetID& mdl);
 		};
 
 		struct BillboardComponent {
@@ -248,7 +253,7 @@ namespace Shard3D {
 			ParticleProperties particleTemplate;
 			uint16_t maxParticles;
 		};
-		struct RigidbodyComponent {
+		struct Rigidbody3DComponent {
 			enum class PhysicsState {
 				STATIC,
 				DYNAMIC,
@@ -262,6 +267,9 @@ namespace Shard3D {
 			JPH::BodyID physicsBody{};
 
 			PhysicsState state = PhysicsState::STATIC;
+		};
+		struct TriggerVolumeComponent {
+			
 		};
 	}
 }

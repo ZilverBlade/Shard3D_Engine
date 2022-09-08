@@ -281,7 +281,6 @@ namespace Shard3D::Resources {
 			rPtr<SurfaceMaterial_Shaded> grid_material = make_rPtr<SurfaceMaterial_Shaded>();
 			grid_material->materialTag = materialSlot;
 			grid_material->diffuseColor = { color.r, color.g, color.b };
-			grid_material->diffuseTex = AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX);
 			grid_material->specular = specular;
 			grid_material->shininess = shininess;
 			grid_material->metallic = metallic;
@@ -289,7 +288,7 @@ namespace Shard3D::Resources {
 
 			AssetManager::createMaterial(workingDir + "/" + materialSlot + ".s3dasset", grid_material);
 		}
-		AssetID m_asset = AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX);
+		AssetID m_asset = ResourceHandler::coreAssets.s_errorMaterial;
 		if (AssetManager::doesAssetExist(workingDir + "/" + materialSlot + ".s3dasset")) {
 			m_asset = AssetID(workingDir + "/" + materialSlot + ".s3dasset");
 		}

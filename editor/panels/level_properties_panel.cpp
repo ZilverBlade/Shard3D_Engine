@@ -44,12 +44,12 @@ namespace Shard3D {
 					tree.selectedActor.addComponent<Components::DirectionalLightComponent>();
 					ImGui::CloseCurrentPopup();
 				}
-				if (!tree.selectedActor.hasComponent<Components::MeshComponent>()) if (ImGui::MenuItem("Mesh")) {
-					tree.selectedActor.addComponent<Components::MeshComponent>(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
+				if (!tree.selectedActor.hasComponent<Components::Mesh3DComponent>()) if (ImGui::MenuItem("Mesh")) {
+					tree.selectedActor.addComponent<Components::Mesh3DComponent>(ResourceHandler::coreAssets.m_defaultModel);
 					ImGui::CloseCurrentPopup();
 				}
 				if (!tree.selectedActor.hasComponent<Components::BillboardComponent>()) if (ImGui::MenuItem("Billboard")) {
-					tree.selectedActor.addComponent<Components::BillboardComponent>(AssetID(ENGINE_ERRTEX));
+					tree.selectedActor.addComponent<Components::BillboardComponent>(ResourceHandler::coreAssets.t_errorTexture);
 					ImGui::CloseCurrentPopup();
 				}
 				if (!tree.selectedActor.hasComponent<Components::AudioComponent>()) if (ImGui::MenuItem("Audio")) {
@@ -59,8 +59,8 @@ namespace Shard3D {
 				if (!tree.selectedActor.hasComponent<Components::CameraComponent>()) if (ImGui::MenuItem("Camera")) {
 					tree.selectedActor.addComponent<Components::CameraComponent>();
 					ResourceHandler::loadMesh(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
-					tree.selectedActor.addComponent<Components::MeshComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
-					tree.selectedActor.getComponent<Components::MeshComponent>().hideInGame = true;
+					tree.selectedActor.addComponent<Components::Mesh3DComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+					tree.selectedActor.getComponent<Components::Mesh3DComponent>().hideInGame = true;
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -195,8 +195,8 @@ namespace Shard3D {
 			}
 			if (killComponent) actor.killComponent<Components::ScriptComponent>();
 		}
-		if (actor.hasComponent<Components::MeshComponent>()) {
-			bool open = ImGui::TreeNodeEx((void*)typeid(Components::MeshComponent).hash_code(), nodeFlags, "Mesh");
+		if (actor.hasComponent<Components::Mesh3DComponent>()) {
+			bool open = ImGui::TreeNodeEx((void*)typeid(Components::Mesh3DComponent).hash_code(), nodeFlags, "Mesh");
 			ImGui::OpenPopupOnItemClick("KillComponent", ImGuiPopupFlags_MouseButtonRight);
 			bool killComponent = false;
 			if (ImGui::BeginPopup("KillComponent")) {
@@ -207,7 +207,7 @@ namespace Shard3D {
 				ImGui::EndPopup();
 			}
 			if (open) {
-				auto& rfile = actor.getComponent<Components::MeshComponent>().asset.getFileRef();
+				auto& rfile = actor.getComponent<Components::Mesh3DComponent>().asset.getFileRef();
 				
 				char fileBuffer[256];
 				memset(fileBuffer, 0, 256);
@@ -226,14 +226,14 @@ namespace Shard3D {
 					if (ifile.good()) {
 						SHARD3D_LOG("Reloading mesh '{0}'", rfile);
 						AssetID meshAsset = AssetID(rfile);
-						actor.getComponent<Components::MeshComponent>().asset = meshAsset;
+						actor.getComponent<Components::Mesh3DComponent>().asset = meshAsset;
 						ResourceHandler::loadMesh(meshAsset);
-						actor.getComponent<Components::MeshComponent>() = Components::MeshComponent(meshAsset);
+						actor.getComponent<Components::Mesh3DComponent>() = Components::Mesh3DComponent(meshAsset);
 					} else SHARD3D_WARN("File '{0}' does not exist!", fileBuffer);
 				}
-				for (int i = 0; i < actor.getComponent<Components::MeshComponent>().materials.size(); i++) {
-					ImGui::Text("%i# %s", i, ResourceHandler::retrieveMesh(actor.getComponent<Components::MeshComponent>().asset)->materialSlots[i].c_str());
-					auto& tag = actor.getComponent<Components::MeshComponent>().materials[i].getFileRef();
+				for (int i = 0; i < actor.getComponent<Components::Mesh3DComponent>().materials.size(); i++) {
+					ImGui::Text("%i# %s", i, ResourceHandler::retrieveMesh(actor.getComponent<Components::Mesh3DComponent>().asset)->materialSlots[i].c_str());
+					auto& tag = actor.getComponent<Components::Mesh3DComponent>().materials[i].getFileRef();
 					char tagBuffer[256];
 					memset(tagBuffer, 0, 256);
 					strncpy(tagBuffer, tag.c_str(), 256);
@@ -241,12 +241,12 @@ namespace Shard3D {
 					if (ImGui::BeginDragDropTarget())
 						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.SMAT")) {
 							tag = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
-							actor.getComponent<Components::MeshComponent>().materials[i] = AssetID(actor.getComponent<Components::MeshComponent>().materials[i].getFile());
+							actor.getComponent<Components::Mesh3DComponent>().materials[i] = AssetID(actor.getComponent<Components::Mesh3DComponent>().materials[i].getFile());
 						}
 				}
 				ImGui::TreePop();
 			}
-			if (killComponent) actor.killComponent<Components::MeshComponent>();
+			if (killComponent) actor.killComponent<Components::Mesh3DComponent>();
 		}
 		if (actor.hasComponent<Components::BillboardComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::BillboardComponent).hash_code(), nodeFlags, "Billboard");
@@ -336,13 +336,35 @@ namespace Shard3D {
 				ImGui::BeginDisabled(!enableFov); ImGui::DragFloat("FOV", &actor.getComponent<Components::CameraComponent>().fov, 0.1f, 10.f, 180.f); ImGui::EndDisabled();
 				ImGui::DragFloat("Near Clip Plane", &actor.getComponent<Components::CameraComponent>().nearClip, 0.001f, 0.05f, 1.f);
 				ImGui::DragFloat("Far Clip Plane", &actor.getComponent<Components::CameraComponent>().farClip, 1.f, 16.f, 8192.f);
-#if ENSET_ALLOW_PREVIEW_CAMERA
-				if (ImGui::Button("Preview", { 150, 50 })) {
-				//	Singleton::activeLevel->setPossessedPreviewCameraActor(actor);
-					context->setPossessedPreviewCameraActor(actor);
-					showPreviewCamera = true;
+				
+				if (ImGui::TreeNode("Post Processing")) {
+					for (PostProcessingMaterialInstance& material : actor.getComponent<Components::CameraComponent>().postProcessMaterials) {
+						if (ImGui::TreeNodeEx((void*)material.master, ImGuiTreeNodeFlags_AllowItemOverlap, material.master->materialTag.c_str())) {
+							for (int i = 0; i < material.master->getParamCount(); i++) {
+								switch (material.getParameter(i).getType()) {
+								case(PPO_Types::Int32):
+									if (ImGui::DragInt(material.master->getParameterName(i).c_str(), reinterpret_cast<int*>(material.getParameter(i).get()), 0.01f))
+										material.updateBuffers();
+									break;
+								case(PPO_Types::Float):
+									if (ImGui::DragFloat(material.master->getParameterName(i).c_str(), reinterpret_cast<float*>(material.getParameter(i).get()), 0.01f))
+										material.updateBuffers();
+									break;
+								case(PPO_Types::Float2):
+									if (ImGui::DragFloat2(material.master->getParameterName(i).c_str(), glm::value_ptr(*reinterpret_cast<glm::vec2*>(material.getParameter(i).get())), 0.01f))
+										material.updateBuffers();
+									break;
+								case(PPO_Types::Float4):
+									if (ImGui::DragFloat4(material.master->getParameterName(i).c_str(), glm::value_ptr(*reinterpret_cast<glm::vec4*>(material.getParameter(i).get())), 0.01f))
+										material.updateBuffers();
+									break;
+								}
+							}
+							ImGui::TreePop();
+						}
+					}
+					ImGui::TreePop();
 				}
-#endif // !DEPLOY
 				ImGui::TreePop();
 			}
 			if (killComponent) actor.killComponent<Components::CameraComponent>();

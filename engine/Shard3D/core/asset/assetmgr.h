@@ -9,14 +9,13 @@
 
 namespace Shard3D {
 	enum class AssetType {
-		Unknown, Texture, Model3D, SurfaceMaterial, Level
+		Unknown, Texture, Model3D, SurfaceMaterial, PostProcessingMaterial, Level
 	};
 	class AssetUtils {
 	public:
 		static std::string truncatePath(const std::string& total);
 		static AssetType discoverAssetType(const std::string& assetPath);
 	};
-
 	class AssetManager {
 	public:
 		static bool doesAssetExist(const std::string& assetPath);
@@ -26,7 +25,8 @@ namespace Shard3D {
 		static void importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info);
 		static void importMesh(const std::string& sourcepath, const std::string& destpath, Model3DLoadInfo info);
 		static void createMaterial(const std::string& destpath, rPtr<SurfaceMaterial> material);
-		
+		static void createMaterial(const std::string& destpath, rPtr<PostProcessingMaterial> material);
+
 		static void purgeAsset(const std::string& assetPath);
 
 		static void setDevice(EngineDevice& dvc) { engineDevice = &dvc; }
@@ -36,7 +36,20 @@ namespace Shard3D {
 		friend class _special_assets;
 	};
 	class ResourceHandler {
-	public:
+	public:							
+		struct __CoreAssets {
+			const AssetID t_errorTexture =			AssetID("assets/_engine/tex/null_tex.png.s3dasset");		// Purple checkerboard texture
+			const AssetID t_errorMaterialTexture =	AssetID("assets/_engine/tex/null_mat.png.s3dasset");		// Blank checkerboard texture
+			const AssetID t_whiteTexture =			AssetID("assets/_engine/tex/0x000000.png.s3dasset");		// Black texture
+			const AssetID t_blackTexture =			AssetID("assets/_engine/tex/0xffffff.png.s3dasset");		// White texture
+			const AssetID t_normalTexture =			AssetID("assets/_engine/tex/0x807ffe.png.s3dasset");		// Blank normal texture;
+			 
+			const AssetID m_errorMesh =				AssetID("assets/_engine/msh/null_mdl.obj.s3dasset");		// No Mesh model
+			const AssetID m_defaultModel =			AssetID("assets/_engine/msh/cube.obj.s3dasset");			// Cube Mesh model
+			 
+			const AssetID s_errorMaterial =			AssetID("assets/_engine/mat/world_grid.s3dasset");		// Opaque surface material (world grid)
+		} static inline coreAssets;
+
 		//Clears textureAssets
 		static void clearTextureAssets();
 		//Clears meshAssets
@@ -83,7 +96,19 @@ namespace Shard3D {
 #ifndef ENSET_UNSAFE_ASSETS
 			return retrieveSurfaceMaterial_safe(asset);
 #else
-			return make_rPtr<SurfaceMaterial>();
+			return retrieveSurfaceMaterial_unsafe(asset);
+#endif
+		}
+
+		static void loadPPOMaterial(const AssetID& asset);
+		static void unloadPPOMaterial(const AssetID& asset);
+
+		static void rebuildPPOMaterial(rPtr<PostProcessingMaterial> material);
+		static inline rPtr<PostProcessingMaterial> retrievePPOMaterial(const AssetID& asset) {
+#ifndef ENSET_UNSAFE_ASSETS
+			return retrievePPOMaterial_safe(asset);
+#else
+			return retrievePPOMaterial_unsafe(asset);
 #endif
 		}
 
@@ -92,23 +117,30 @@ namespace Shard3D {
 		static auto& getSurfaceMaterialAssets() { return surfaceMaterialAssets; }
 		
 		static void runGarbageCollector();
+
 	private:
 		static inline std::vector<AssetID> destroyTexQueue;
 		static inline std::vector<AssetID> destroyMeshQueue; 
 		static inline std::vector<AssetID> destroySurfaceMatQueue;
+		static inline std::vector<AssetID> destroyPPOMatQueue;
 		static inline std::vector<rPtr<SurfaceMaterial>> rebuildSurfaceMaterialQueue;
+		static inline std::vector<rPtr<PostProcessingMaterial>> rebuildPPOMaterialQueue;
 		static void _buildSurfaceMaterial(rPtr<SurfaceMaterial> material);
+		static void _buildPPOMaterial(rPtr<PostProcessingMaterial> material);
 
 		static rPtr<Texture2D>& retrieveTexture_unsafe			(const AssetID& asset);
 		static rPtr<Texture2D>& retrieveTexture_safe			(const AssetID& asset);
 		static rPtr<Model3D>& retrieveMesh_unsafe				(const AssetID& asset);
 		static rPtr<Model3D>& retrieveMesh_safe					(const AssetID& asset);
 		static rPtr<SurfaceMaterial>& retrieveSurfaceMaterial_safe	(const AssetID& asset);
+		static rPtr<SurfaceMaterial>& retrieveSurfaceMaterial_unsafe(const AssetID& asset);
+		static rPtr<PostProcessingMaterial>& retrievePPOMaterial_safe(const AssetID& asset);
+		static rPtr<PostProcessingMaterial>& retrievePPOMaterial_unsafe(const AssetID& asset);
 
 		static inline hashMap<AssetKey, rPtr<Model3D>> meshAssets;
 		static inline hashMap<AssetKey, rPtr<Texture2D>> textureAssets;
 		static inline hashMap<AssetKey, rPtr<SurfaceMaterial>> surfaceMaterialAssets;
-
+		static inline hashMap<AssetKey, rPtr<PostProcessingMaterial>> ppoMaterialAssets;
 		static inline EngineDevice* engineDevice{};
 		friend class _special_assets;
 	};
@@ -137,7 +169,7 @@ namespace Shard3D {
 			{"editor.pref",						"assets/_engine/_editor/icon_pref.png"			},
 			{"editor.settings",					"assets/_engine/_editor/icon_gear.png"			},
 			{"editor.preview",					"assets/_engine/_editor/preview.png"			},
-			{"editor.layout",					"assets/_engine/_editor/icon_null"				},
+			{"editor.layout",					"assets/_engine/_editor/icon_layout.png"		},
 			{"editor.viewport",					"assets/_engine/_editor/icon_monitor.png"		},
 			{"editor.level",					"assets/_engine/_editor/icon_level.png"			},
 			{"editor.launch",					"assets/_engine/_editor/launch_game.png"		},			
@@ -147,6 +179,7 @@ namespace Shard3D {
 			{"editor.browser.file.msh",			"assets/_engine/_editor/icon_mesh.png"			},
 			{"editor.browser.file.lvl",			"assets/_engine/_editor/icon_level_old.png"		},
 			{"editor.browser.file.smt",			"assets/_engine/_editor/icon_material.png"		},
+			{"editor.browser.file.pmt",			"assets/_engine/_editor/icon_vfx.png"			},
 			{"editor.browser.file.cpp",			"assets/_engine/_editor/icon_file.png"			},
 			{"editor.browser.file.csh",			"assets/_engine/_editor/icon_file.png"			},
 			{"editor.browser.file.vba",			"assets/_engine/_editor/icon_file.png"			},

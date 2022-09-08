@@ -1,0 +1,7 @@
+Shard3D: 1.2.8.r0-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: bloom
+    Data:
+      Shader: assets/shaderdata/post_processing/bloom.comp.spv
+      MyParams: [[3, "Threshold", !!binary "AACAPw=="], [3, "Strength", !!binary "AACAPw=="], [2, "Passes", !!binary "DAAAAA=="]]

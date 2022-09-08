@@ -31,6 +31,8 @@ namespace Shard3D {
 				return AssetType::Model3D;
 			if (itemType == "surface_material") 
 				return AssetType::SurfaceMaterial;
+			if (itemType == "postprocessing_material")
+				return AssetType::PostProcessingMaterial;
 		}
 		return AssetType::Unknown;
 	}
@@ -44,40 +46,50 @@ namespace Shard3D {
 		textureAssets.clear(); 
 		meshAssets.clear(); 
 		surfaceMaterialAssets.clear(); 
+		ppoMaterialAssets.clear();
 	}
 
 	void ResourceHandler::init(EngineDevice& dvc) { 
 		if (engineDevice) {
-			loadTexture(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
-			loadTexture(AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX));
-			loadTexture(AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX));
-			loadTexture(AssetID(ENGINE_BLKTEX ENGINE_ASSET_SUFFIX));
-			loadTexture(AssetID(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX));
-			loadMesh(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
-			loadMesh(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
-			loadSurfaceMaterial(AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX));
+			loadTexture(coreAssets.t_errorTexture);
+			loadTexture(coreAssets.t_errorMaterialTexture);
+			loadTexture(coreAssets.t_whiteTexture);
+			loadTexture(coreAssets.t_blackTexture);
+			loadTexture(coreAssets.t_normalTexture);
+			loadMesh(coreAssets.m_defaultModel);
+			loadMesh(coreAssets.m_errorMesh);
+			loadSurfaceMaterial(coreAssets.s_errorMaterial);
+
+			loadPPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
+			loadPPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
 		}
 		engineDevice = &dvc; 
 	}
 
 	// Check if is a core texture
 	static bool isCoreAsset_T(AssetKey asset) {
-		return	asset == AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX) ||
-				asset == AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX) ||
-				asset == AssetID(ENGINE_WHTTEX ENGINE_ASSET_SUFFIX) ||
-				asset == AssetID(ENGINE_BLKTEX ENGINE_ASSET_SUFFIX) ||
-				asset == AssetID(ENGINE_NRMTEX ENGINE_ASSET_SUFFIX);
+		return	asset == AssetID("assets/_engine/tex/null_tex.png.s3dasset") ||
+				asset == AssetID("assets/_engine/tex/null_mat.png.s3dasset") ||
+				asset == AssetID("assets/_engine/tex/0x000000.png.s3dasset") ||
+				asset == AssetID("assets/_engine/tex/0xffffff.png.s3dasset") ||
+				asset == AssetID("assets/_engine/tex/0x807ffe.png.s3dasset");
 	}
 
 	// Check if is a core mesh
 	static bool isCoreAsset_M(AssetKey asset) {
-		return	asset == AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX) ||
-			asset == AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX);
+		return	asset == AssetID("assets/_engine/msh/null_mdl.obj.s3dasset") ||
+				asset == AssetID("assets/_engine/msh/cube.obj.s3dasset");
 	}
 
 	// Check if is a core surface material
 	static bool isCoreAsset_S(AssetKey asset) {
-		return asset == AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX);
+		return	asset == AssetID("assets/_engine/mat/world_grid.s3dasset");
+	}
+
+	// Check if is a core post processing material
+	static bool isCoreAsset_P(AssetKey asset) {
+		return	asset == AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset") || 
+				asset == AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset");
 	}
 
 	void ResourceHandler::clearTextureAssets() {
@@ -97,6 +109,10 @@ namespace Shard3D {
 		for (auto& asset : surfaceMaterialAssets)
 			if (!isCoreAsset_S(asset.first))
 				ResourceHandler::unloadSurfaceMaterial(asset.first);
+
+		for (auto& asset : ppoMaterialAssets)
+			if (!isCoreAsset_P(asset.first))
+				ResourceHandler::unloadPPOMaterial(asset.first);
 	}
 	void ResourceHandler::clearAllAssets() {
 		clearTextureAssets();
@@ -175,6 +191,14 @@ namespace Shard3D {
 		MaterialManager::saveMaterial(material, dest, true);
 	}
 
+	void AssetManager::createMaterial(const std::string& destpath, rPtr<PostProcessingMaterial> material) {
+		std::string& dest = const_cast<std::string&>(destpath);
+		std::replace(dest.begin(), dest.end(), '\\', '/');
+
+		MaterialManager::saveMaterial(material, dest, true);
+	}
+
+
 	void AssetManager::purgeAsset(const std::string& assetPath) {
 		if (std::filesystem::remove(assetPath))
 			std::cout << "file " << assetPath << " deleted.\n";
@@ -210,6 +234,20 @@ namespace Shard3D {
 				surfaceMaterialAssets.erase(file);
 			}
 			destroySurfaceMatQueue.clear();
+		}
+		if (rebuildPPOMaterialQueue.size() != 0) {
+			vkDeviceWaitIdle(engineDevice->device());
+			for (rPtr<PostProcessingMaterial>& material : rebuildPPOMaterialQueue) {
+				_buildPPOMaterial(material);
+			}
+			rebuildPPOMaterialQueue.clear();
+		}
+		if (destroyPPOMatQueue.size() != 0) {
+			vkDeviceWaitIdle(engineDevice->device());
+			for (AssetID& file : destroyPPOMatQueue) {
+				ppoMaterialAssets.erase(file);
+			}
+			destroyPPOMatQueue.clear();
 		}
 	}
 
@@ -247,7 +285,7 @@ namespace Shard3D {
 		SHARD3D_LOG("Loaded asset to resource map '{0}'", assetPath.getFile());
 		mesh->materials = data["Materials"].as<std::vector<AssetID>>();
 		for (auto& material : mesh->materials) ResourceHandler::loadSurfaceMaterialRecursive(material);
-		meshAssets[assetPath] = mesh;
+		meshAssets[assetPath.getID()] = mesh;
 	}
 
 	void ResourceHandler::unloadMesh(const AssetID& asset) {
@@ -255,12 +293,12 @@ namespace Shard3D {
 	}
 
 	rPtr<Model3D>& ResourceHandler::retrieveMesh_unsafe(const AssetID& asset) {
-		return meshAssets.at(asset);
+		return meshAssets.at(asset.getID());
 	}
 	rPtr<Model3D>& ResourceHandler::retrieveMesh_safe(const AssetID& asset) {
-		if (meshAssets.find(asset) != meshAssets.cend())
-			return meshAssets.at(asset);
-		return meshAssets.at(AssetID(ENGINE_ERRMSH ENGINE_ASSET_SUFFIX));
+		if (meshAssets.find(asset.getID()) != meshAssets.cend())
+			return meshAssets.at(asset.getID());
+		return meshAssets.at(coreAssets.m_errorMesh.getID());
 	}
 #pragma endregion
 
@@ -298,7 +336,7 @@ namespace Shard3D {
 		rPtr<Texture2D> texture = Texture2D::createTextureFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
 		if (!texture) return;
 		SHARD3D_LOG("Loaded texture to resource map '{0}'", textureAsset.getFile());
-		textureAssets[textureAsset] = texture;
+		textureAssets[textureAsset.getID()] = texture;
 	}
 
 	void ResourceHandler::unloadTexture(const AssetID& asset) {
@@ -311,7 +349,7 @@ namespace Shard3D {
 	rPtr<Texture2D>& ResourceHandler::retrieveTexture_safe(const AssetID& asset) {
 		if (textureAssets.find(asset) != textureAssets.cend())
 			return textureAssets.at(asset);
-		return textureAssets.at(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));
+		return textureAssets.at(coreAssets.t_errorTexture);
 	}
 
 #pragma endregion
@@ -321,14 +359,14 @@ namespace Shard3D {
 		if (surfaceMaterialAssets.find(asset) != surfaceMaterialAssets.cend()) return;
 		rPtr<SurfaceMaterial> material = MaterialManager::loadSurfaceMaterial(asset);
 		if (!material) return;
-		surfaceMaterialAssets[asset] = material;
+		surfaceMaterialAssets[asset.getID()] = material;
 		rebuildSurfaceMaterial(material);
 		SHARD3D_LOG("Loaded material to resource map '{0}'", asset.getFile());
 	}
 
 	void ResourceHandler::loadSurfaceMaterialRecursive(const AssetID& asset) {
 		loadSurfaceMaterial(asset);
-		surfaceMaterialAssets[asset]->loadAllTextures();
+		surfaceMaterialAssets[asset.getID()]->loadAllTextures();
 	}
 
 	void ResourceHandler::unloadSurfaceMaterial(const AssetID& asset) {
@@ -348,12 +386,42 @@ namespace Shard3D {
 	rPtr<SurfaceMaterial>& ResourceHandler::retrieveSurfaceMaterial_safe(const AssetID& asset) {
 		if (surfaceMaterialAssets.find(asset) != surfaceMaterialAssets.cend())
 			return surfaceMaterialAssets.at(asset);
-		return surfaceMaterialAssets.at(AssetID(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX));
+		return surfaceMaterialAssets.at(coreAssets.s_errorMaterial);
+	}
+	rPtr<SurfaceMaterial>& ResourceHandler::retrieveSurfaceMaterial_unsafe(const AssetID& asset) {
+		return surfaceMaterialAssets.at(asset);
 	}
 #pragma endregion
 
+	void ResourceHandler::loadPPOMaterial(const AssetID& asset) {
+		if (ppoMaterialAssets.find(asset) != ppoMaterialAssets.cend()) return;
+		rPtr<PostProcessingMaterial> material = MaterialManager::loadPPOMaterial(asset);
+		if (!material) return;
+		ppoMaterialAssets[asset] = material;
+		rebuildPPOMaterial(material);
+		SHARD3D_LOG("Loaded material to resource map '{0}'", asset.getFile());
+	}
 
+	void ResourceHandler::unloadPPOMaterial(const AssetID& asset) {
+		destroyPPOMatQueue.push_back(asset);
+	}
 
+	void ResourceHandler::rebuildPPOMaterial(rPtr<PostProcessingMaterial> material) {
+		if (!material->isBuilt()) _buildPPOMaterial(material);
+		rebuildPPOMaterialQueue.push_back(material);
+	}
+
+	void ResourceHandler::_buildPPOMaterial(rPtr<PostProcessingMaterial> material) {
+		material->createMaterialShader(*engineDevice, SharedPools::staticMaterialPool);
+	}
+
+	rPtr<PostProcessingMaterial>& ResourceHandler::retrievePPOMaterial_safe(const AssetID& asset) {
+		SHARD3D_ASSERT(ppoMaterialAssets.find(asset) != ppoMaterialAssets.cend() && "Fail");
+		return ppoMaterialAssets.at(asset);
+	}
+	rPtr<PostProcessingMaterial>& ResourceHandler::retrievePPOMaterial_unsafe(const AssetID& asset) {
+		return ppoMaterialAssets.at(asset);
+	}
 }
 
 #pragma region special

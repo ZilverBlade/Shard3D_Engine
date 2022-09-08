@@ -38,6 +38,10 @@ namespace Shard3D {
 				directoryEntries.types.push_back(AssetType::SurfaceMaterial);
 				directoryEntries.icons.push_back(&smatIcon);
 				continue;
+			case (AssetType::PostProcessingMaterial):
+				directoryEntries.types.push_back(AssetType::PostProcessingMaterial);
+				directoryEntries.icons.push_back(&pmatIcon);
+				continue;
 			case (AssetType::Level):
 				directoryEntries.types.push_back(AssetType::Level);
 				directoryEntries.icons.push_back(&levelIcon);
@@ -67,6 +71,9 @@ namespace Shard3D {
 		} {
 			auto& img = _special_assets::_editor_icons.at("editor.browser.file.smt");
 			smatIcon = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		} {
+			auto& img = _special_assets::_editor_icons.at("editor.browser.file.pmt");
+			pmatIcon = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		}
 		refreshIterator(std::filesystem::path(ENGINE_ASSETS_PATH));
 	}
@@ -133,6 +140,9 @@ namespace Shard3D {
 						break;
 					case(AssetType::SurfaceMaterial):
 						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.SMAT", item, strlen(item) + 1, ImGuiCond_Once);
+						break;
+					case(AssetType::PostProcessingMaterial):
+						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.PMAT", item, strlen(item) + 1, ImGuiCond_Once);
 						break;
 					case(AssetType::Unknown):
 						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.WHAT", item, strlen(item) + 1, ImGuiCond_Once);
@@ -210,18 +220,22 @@ namespace Shard3D {
 				refreshIterator(currentDir);	
 				ImGui::CloseCurrentPopup();
 			}
-			if (ImGui::BeginMenu("Create Surface Material")) {
-				if (ImGui::MenuItem("Shaded")) {
-					rPtr<SurfaceMaterial_Shaded> worldgrid = make_rPtr<SurfaceMaterial_Shaded>();
-					worldgrid->diffuseTex = AssetID(ENGINE_ERRMTX ENGINE_ASSET_SUFFIX);
-					worldgrid->shininess = 0.05f;
-					worldgrid->specular = 0.3f;
+			if (ImGui::BeginMenu("Create Material")) {
+				if (ImGui::MenuItem("Surface Shaded")) {
+					rPtr<SurfaceMaterial_Shaded> blank = make_rPtr<SurfaceMaterial_Shaded>();
 					std::string dest = std::string(currentDir.string() + "/Some kind of material");
-					AssetManager::createMaterial(dest, worldgrid);
+					AssetManager::createMaterial(dest, blank);
 					refreshIterator(currentDir);
 					ImGui::CloseCurrentPopup();
 				}
-
+				if (ImGui::MenuItem("Post Processing")) {
+					rPtr<PostProcessingMaterial> blank = make_rPtr<PostProcessingMaterial>();
+					blank->addParameter(0, "MyParam0");
+					std::string dest = std::string(currentDir.string() + "/Some kind of material");
+					AssetManager::createMaterial(dest, blank);
+					refreshIterator(currentDir);
+					ImGui::CloseCurrentPopup();
+				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndPopup();

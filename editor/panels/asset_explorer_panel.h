@@ -24,6 +24,7 @@ namespace Shard3D {
 		VkDescriptorSet textureIcon; 
 		VkDescriptorSet levelIcon;
 		VkDescriptorSet smatIcon;
+		VkDescriptorSet pmatIcon;
 
 		void refreshIterator(std::filesystem::path newPath);
 		std::filesystem::path currentDir;

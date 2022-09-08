@@ -87,10 +87,10 @@ namespace Shard3D {
 		static void AudioComponent_Update(uint64_t actorID);
 #pragma endregion
 
-#pragma region MeshComponent
-		static void MeshComponent_GetFile(uint64_t actorID, MonoString* string);
-		static void MeshComponent_SetFile(uint64_t actorID, MonoString* string);
-		static void MeshComponent_Load(uint64_t actorID);
+#pragma region Mesh3DComponent
+		static void Mesh3DComponent_GetFile(uint64_t actorID, MonoString* string);
+		static void Mesh3DComponent_SetFile(uint64_t actorID, MonoString* string);
+		static void Mesh3DComponent_Load(uint64_t actorID);
 #pragma endregion
 
 #pragma region BillboardComponent

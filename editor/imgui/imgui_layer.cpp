@@ -20,6 +20,7 @@
 #include "imgui_initializer.h"
 #include <shellapi.h>
 #include <glm/gtc/type_ptr.hpp>
+#include "../application.cpp"
 
 namespace Shard3D {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
@@ -27,6 +28,7 @@ namespace Shard3D {
 	ImGuiLayer::~ImGuiLayer() {}
 
 	static void loadLevel(sPtr<ECS::Level>& level, const std::string& path) {
+		if (level->simulationState != PlayState::Stopped) level->end();
 		level->killEverything();
 		ECS::MasterManager::loadLevel(path);
 	}
@@ -194,46 +196,7 @@ namespace Shard3D {
 		ImGui::PopStyleColor();
 		renderQuickBar(frameInfo);
 
-		// VIEWPORT
-		ImGui::Begin("Viewport");
-
-			ImVec2 vSize = ImGui::GetContentRegionAvail();
-			GraphicsSettings::getRuntimeInfo().aspectRatio = vSize.x / vSize.y;
-			ImGui::Image(viewportImage, vSize);
-			if (ImGui::BeginDragDropTarget()) {
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.LVL")) {
-					if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
-						levelTreePanel.clearSelectedActor();
-						loadLevel(frameInfo.activeLevel, std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data));
-					}
-				}
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.COMPONENTS.DROP")) {
-					size_t h_code = *reinterpret_cast<size_t*>(payload->Data);
-					if (h_code == typeid(Components::PointlightComponent).hash_code())
-						frameInfo.activeLevel->createActor("Pointlight").addComponent<Components::PointlightComponent>();
-					else if (h_code == typeid(Components::SpotlightComponent).hash_code())
-						frameInfo.activeLevel->createActor("Spotlight").addComponent<Components::SpotlightComponent>();
-					else if (h_code == 32325235)
-						frameInfo.activeLevel->createActor("Cube").addComponent<Components::MeshComponent>(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX));
-					else if (h_code == typeid(Components::CameraComponent).hash_code())
-						frameInfo.activeLevel->createActor("Camera Actor").addComponent<Components::MeshComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
-				}
-			}
-			if (frameInfo.activeLevel->simulationState == PlayState::Paused) { 
-				ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-				vMin.x += ImGui::GetWindowPos().x + 8;
-				vMin.y += ImGui::GetWindowPos().y + 16;
-				ImGui::GetWindowDrawList()->AddImage(icons.pause, vMin, ImVec2(vMin.x + 64, vMin.y + 64), ImVec2(0, 0), ImVec2(1, 1)); 
-			}
-			if (GraphicsSettings::editorPreview.ONLY_GAME) {
-			   ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-			   vMin.x += ImGui::GetWindowPos().x + 80;
-			   vMin.y += ImGui::GetWindowPos().y + 16;
-			 // ImGui::GetWindowDrawList()->AddText(io.Fonts->Fonts[0], 14.f, ImVec2(vMin.x, vMin.y), ImU32(1.f), "Test");
-			   ImGui::GetWindowDrawList()->AddImage(icons.preview, vMin, ImVec2(vMin.x + 64, vMin.y + 64), ImVec2(0, 0), ImVec2(1, 1));
-			}
-
-		ImGui::End();
+		renderViewport(frameInfo);
 
 		// start rendering stuff here
 		//ImGuizmo::BeginFrame();
@@ -299,7 +262,74 @@ namespace Shard3D {
 		hudBuilder.setContext(container);
 	}
 
-   
+	bool ImGuiLayer::handleWindowResize(FrameInfo& frameInfo)
+	{
+		//ImVec2 view = ImGui::GetContentRegionAvail();
+		//
+		//if (view.x != m_Window.width || view.y != m_Window.height)
+		//{
+		//	if (view.x == 0 || view.y == 0)
+		//	{
+		//		// The window is too small or collapsed.
+		//		return false;
+		//	}
+		//
+		//	m_Window.width = view.x;
+		//	m_Window.height = view.y;
+		//
+		//	reinterpret_cast<EditorApplication*>(frameInfo.userPointer)->			RecreateFramebuffer();
+		//
+		//	// The window state has been successfully changed.
+		//	return true;
+		//}
+
+		// The window state has not changed.
+		return true;
+	}
+
+	void ImGuiLayer::renderViewport(FrameInfo& frameInfo) {
+		ImGui::Begin("Viewport");
+
+		ImVec2 vSize = ImGui::GetContentRegionAvail();
+		GraphicsSettings::getRuntimeInfo().aspectRatio = vSize.x / vSize.y;
+		ImGui::Image(viewportImage, vSize);
+		
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.LVL")) {
+				if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
+					levelTreePanel.clearSelectedActor();
+					loadLevel(frameInfo.activeLevel, std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data));
+				}
+			}
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.COMPONENTS.DROP")) {
+				size_t h_code = *reinterpret_cast<size_t*>(payload->Data);
+				if (h_code == typeid(Components::PointlightComponent).hash_code())
+					frameInfo.activeLevel->createActor("Pointlight").addComponent<Components::PointlightComponent>();
+				else if (h_code == typeid(Components::SpotlightComponent).hash_code())
+					frameInfo.activeLevel->createActor("Spotlight").addComponent<Components::SpotlightComponent>();
+				else if (h_code == 32325235)
+					frameInfo.activeLevel->createActor("Cube").addComponent<Components::Mesh3DComponent>(ResourceHandler::coreAssets.m_defaultModel);
+				else if (h_code == typeid(Components::CameraComponent).hash_code())
+					frameInfo.activeLevel->createActor("Camera Actor").addComponent<Components::Mesh3DComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+			}
+		}
+		if (frameInfo.activeLevel->simulationState == PlayState::Paused) {
+			ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+			vMin.x += ImGui::GetWindowPos().x + 8;
+			vMin.y += ImGui::GetWindowPos().y + 16;
+			ImGui::GetWindowDrawList()->AddImage(icons.pause, vMin, ImVec2(vMin.x + 64, vMin.y + 64), ImVec2(0, 0), ImVec2(1, 1));
+		}
+		if (GraphicsSettings::editorPreview.ONLY_GAME) {
+			ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+			vMin.x += ImGui::GetWindowPos().x + 80;
+			vMin.y += ImGui::GetWindowPos().y + 16;
+			// ImGui::GetWindowDrawList()->AddText(io.Fonts->Fonts[0], 14.f, ImVec2(vMin.x, vMin.y), ImU32(1.f), "Test");
+			ImGui::GetWindowDrawList()->AddImage(icons.preview, vMin, ImVec2(vMin.x + 64, vMin.y + 64), ImVec2(0, 0), ImVec2(1, 1));
+		}
+
+		ImGui::End();
+    }
+
 	void ImGuiLayer::renderQuickBar(FrameInfo& frameInfo) {
 
 		ImGui::Begin("_editor_quickbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoTitleBar);

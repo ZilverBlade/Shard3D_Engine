@@ -2,6 +2,8 @@
 #include "material.h"
 #include "assetmgr.h"
 #include "../../systems/buffers/material_system.h"
+#include "../misc/graphics_settings.h"
+#include <any>
 
 namespace Shard3D {
 
@@ -25,9 +27,9 @@ namespace Shard3D {
 
 	void SurfaceMaterial::setBlendMode(SurfaceMaterialBlendMode_T mode) {
 		if (mode & SurfaceMaterialBlendModeMasked && !(blendMode & mode))
-			maskedInfo = new SurfaceMaterial_BlendModeMasked();
+			maskedInfo = new _SurfaceMaterial_BlendModeMasked();
 		if (mode & SurfaceMaterialBlendModeTranslucent && !(blendMode & mode))
-			translucentInfo = new SurfaceMaterial_BlendModeTranslucent();
+			translucentInfo = new _SurfaceMaterial_BlendModeTranslucent();
 		blendMode = mode;
 	}
 
@@ -150,11 +152,11 @@ namespace Shard3D {
 			textureLayout_writer.build(materialDescriptorInfo.textures);
 		}
 
-		materialPipelineConfig = make_uPtr<MaterialGraphicsPipelineConfigInfo>();
+		materialPipelineConfig = make_uPtr<_MaterialGraphicsPipelineConfigInfo>();
 		MaterialSystem::createSurfacePipelineLayout(
+			&materialPipelineConfig->shaderPipelineLayout,
 			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
-			materialDescriptorInfo.textureLayout->getDescriptorSetLayout(),
-			&materialPipelineConfig->shaderPipelineLayout
+			materialDescriptorInfo.textureLayout->getDescriptorSetLayout()
 		);
 		GraphicsPipelineConfigInfo pipelineConfigInfo{};
 		GraphicsPipeline::pipelineConfig(pipelineConfigInfo)
@@ -270,4 +272,145 @@ namespace Shard3D {
 #pragma endregion
 #pragma endregion
 
+#pragma region PostProcessing
+	PostProcessingMaterial::~PostProcessingMaterial() {
+		if (!built) {
+			SHARD3D_WARN("Attempted to destroy pipeline while material has never been built!");
+			return;
+		}
+		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
+
+		for (auto& param : myParams) {
+			param.free();
+		}
+	}
+	void PostProcessingMaterial::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
+		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
+		
+		if (!AssetManager::doesAssetExist(shaderPath)) {
+			SHARD3D_WARN("No shader found!");
+			return;
+		}
+
+		uint64_t sizeOfMyParams{};
+		std::vector<void*> myDataPure{};
+
+		for (auto& param : myParams) {
+			myDataPure.push_back(param.get());
+			sizeOfMyParams += param.getGPUSize();
+		}
+		
+		myParamsBuffer =
+			make_uPtr<EngineBuffer>(
+				device,
+				sizeOfMyParams,
+				1,
+				VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+
+		myParamsBuffer->map();
+
+		materialDescriptorInfo.paramsLayout = EngineDescriptorSetLayout::Builder(device)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT)
+			.build();
+
+		VkDescriptorBufferInfo bufferInfo = myParamsBuffer->descriptorInfo();
+		EngineDescriptorWriter(*materialDescriptorInfo.paramsLayout, *descriptorPool)
+			.writeBuffer(0, &bufferInfo)
+			.build(materialDescriptorInfo.params);
+		
+		myParamsBuffer->writeToBuffer(myDataPure.data());
+		myParamsBuffer->flush();
+		
+		materialPipelineConfig = make_uPtr<_MaterialComputePipelineConfigInfo>();
+		MaterialSystem::createPPOPipelineLayout(
+			&materialPipelineConfig->shaderPipelineLayout,
+			materialDescriptorInfo.paramsLayout->getDescriptorSetLayout()
+		);
+		
+		MaterialSystem::createPPOPipeline(
+			&materialPipelineConfig->shaderPipeline,
+			materialPipelineConfig->shaderPipelineLayout,
+			this->shaderPath);
+
+		built = true;
+	}
+
+	
+	void PostProcessingMaterial::rmvParameter(uint32_t index) {
+		SHARD3D_WARN("Removing param {0}", index);
+		std::vector<RandomPPOParam>::iterator q = myParams.begin();
+		for (int i = 0; i < myParams.size(); i++) {
+			if (i == index) break;
+			q++;
+		}
+		myParams.erase(q);
+	}
+	RandomPPOParam& PostProcessingMaterial::getParameter(uint32_t index) {
+		return myParams[index];
+	}
+
+
+	std::string& PostProcessingMaterial::getParameterName(uint32_t index) {
+		return myParamNames[index];
+	}
+
+	PostProcessingMaterialInstance::PostProcessingMaterialInstance(PostProcessingMaterial* masterMaterial) : master(masterMaterial) {
+		myParamsLocal.reserve(master->myParams.size());
+		for (auto& param : master->myParams) {
+			myParamsLocal.push_back(param.copy());
+		}
+	}
+
+	PostProcessingMaterialInstance::~PostProcessingMaterialInstance() {}
+
+	void PostProcessingMaterialInstance::updateBuffers() {
+		std::vector<uint8_t> myDataPure{};
+		myDataPure.reserve(this->master->myParamsBuffer->getBufferSize());
+		for (auto& param : myParamsLocal) {
+			for (int i = 0; i < param.getGPUSize(); i++)
+				myDataPure.push_back(reinterpret_cast<uint8_t*>(param.get())[i]);
+		}
+		this->master->myParamsBuffer->writeToBuffer(myDataPure.data());
+		this->master->myParamsBuffer->flush();
+	}
+
+	void PostProcessingMaterialInstance::dispatch(VkCommandBuffer commandBuffer, VkDescriptorSet sceneRenderedSet) {
+		SHARD3D_STAT_RECORD();
+		this->master->materialPipelineConfig->shaderPipeline->bindCompute(commandBuffer);
+		SHARD3D_STAT_RECORD_END({ "Post processing", "Pipeline binding " + this->master->materialTag });
+
+		SHARD3D_STAT_RECORD();
+		updateBuffers();
+		SHARD3D_STAT_RECORD_END({ "Post processing", "SSBO update" + this->master->materialTag });
+
+		SHARD3D_STAT_RECORD();
+		VkDescriptorSet sets[] = {
+			sceneRenderedSet,
+			this->master->materialDescriptorInfo.params
+		};
+
+		vkCmdBindDescriptorSets(
+			commandBuffer,
+			VK_PIPELINE_BIND_POINT_COMPUTE,
+			this->master->materialPipelineConfig->shaderPipelineLayout,
+			0,
+			2,
+			sets,
+			0,
+			nullptr
+		);
+		SHARD3D_STAT_RECORD_END({"Post processing", "Descriptor set binding " + this->master->materialTag});
+
+		SHARD3D_STAT_RECORD();
+		// vkCmdDispatch(commandBuffer, GraphicsSettings::get().WindowWidth / 16, GraphicsSettings::get().WindowHeight / 16, 1);
+		vkCmdDispatch(commandBuffer, 1920 / 16, 1080 / 16 + 1, 1);
+		SHARD3D_STAT_RECORD_END({ "Post processing", "Dispatch " + this->master->materialTag });
+
+	}
+	RandomPPOParam& PostProcessingMaterialInstance::getParameter(uint32_t index) {
+		return myParamsLocal[index];
+	}
+#pragma endregion
 }

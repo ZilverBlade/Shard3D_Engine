@@ -1,0 +1,7 @@
+Shard3D: 1.2.8.r0-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: hdr
+    Data:
+      Shader: assets/shaderdata/post_processing/hdr.comp.spv
+      MyParams: [[3, "Exposure", !!binary "AACAPw=="], [3, "Gain", !!binary "AAAAAA=="], [3, "Contrast", !!binary "AACAPw=="], [3, "Saturation", !!binary "AACAPw=="]]

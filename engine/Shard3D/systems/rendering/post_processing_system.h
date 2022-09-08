@@ -24,13 +24,14 @@ namespace Shard3D {
 
 	class PostProcessingSystem {
 	public:
-		PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainpresentingRenderPassRenderPass, PostProcessingGBufferInput imageInput, bool doGammaCorrection);
+		PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainpresentingRenderPassRenderPass, PostProcessingGBufferInput imageInput);
 		~PostProcessingSystem();
 
 		PostProcessingSystem(const PostProcessingSystem&) = delete;
 		PostProcessingSystem& operator=(const PostProcessingSystem&) = delete;
 
 		void render(FrameInfo& frameInfo);
+		void renderGammaCorrection(FrameInfo& frameInfo);
 		void renderImageFlipForPresenting(FrameInfo& frameInfo);
 	private:
 		void createPipelineLayout();
@@ -39,8 +40,7 @@ namespace Shard3D {
 		EngineDevice& engineDevice;
 
 		uPtr<GraphicsPipeline> debanderShaderPipeline;
-		uPtr<ComputePipeline> hdrShaderPipeline;
-		uPtr<ComputePipeline> bloomShaderPipeline;
+		uPtr<ComputePipeline> gammaCorrectionShaderPipeline;
 
 		VkDescriptorSet ppo_InputDescriptorSet{};
 
@@ -54,8 +54,6 @@ namespace Shard3D {
 		VkPipelineLayout pipelineLayout{};
 
 		std::vector<PPO_Material> postProcessMaterials{};
-
-		bool doGammaCorrectionEX;
 	};
 
 }

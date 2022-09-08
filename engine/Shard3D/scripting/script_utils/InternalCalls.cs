@@ -115,14 +115,14 @@ namespace Shard3D.Core
 
         #endregion
 
-        #region MeshComponent
+        #region Mesh3DComponent
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        internal extern static void MeshComponent_GetFile(ulong GUID, out string str);
+        internal extern static void Mesh3DComponent_GetFile(ulong GUID, out string str);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        internal extern static void MeshComponent_SetFile(ulong GUID, string str);
+        internal extern static void Mesh3DComponent_SetFile(ulong GUID, string str);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        internal extern static void MeshComponent_Load(ulong GUID);
+        internal extern static void Mesh3DComponent_Load(ulong GUID);
 
         #endregion
 

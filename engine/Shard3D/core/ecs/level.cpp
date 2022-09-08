@@ -49,14 +49,14 @@ namespace Shard3D {
 
 			copyComponent<Components::TransformComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::BillboardComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
-			copyComponent<Components::MeshComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::Mesh3DComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::AudioComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::CameraComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::DirectionalLightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::PointlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::SpotlightComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::ScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
-			copyComponent<Components::RigidbodyComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
+			copyComponent<Components::Rigidbody3DComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
 			// Secret components
 			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
@@ -124,6 +124,8 @@ namespace Shard3D {
 				SHARD3D_ERROR("Cannot possess an actor without a camera!!");
 				return;
 			}
+			for (auto& instance : actor.getComponent<Components::CameraComponent>().postProcessMaterials)
+				instance.updateBuffers();
 			possessedCameraActorGUID = actor.getUUID();
 		}
 
@@ -132,6 +134,8 @@ namespace Shard3D {
 				SHARD3D_ERROR("Cannot possess an actor without a camera!!");
 				return;
 			}
+			for (auto& instance : getActorFromUUID(guid).getComponent<Components::CameraComponent>().postProcessMaterials)
+				instance.updateBuffers();	
 			possessedCameraActorGUID = guid;
 		}
 

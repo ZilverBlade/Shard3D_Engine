@@ -16,13 +16,13 @@
 #include <Shard3D/layer/layer_stack.h>
 
 namespace Shard3D {
-	class EngineApplication {
+	class EditorApplication {
 	public:
-		EngineApplication();
-		~EngineApplication();
+		EditorApplication();
+		~EditorApplication();
 
-		EngineApplication(const EngineApplication&) = delete;
-		EngineApplication& operator=(const EngineApplication&) = delete;
+		EditorApplication(const EditorApplication&) = delete;
+		EditorApplication& operator=(const EditorApplication&) = delete;
 
 		void run();	
 	private:

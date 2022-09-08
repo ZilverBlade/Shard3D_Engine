@@ -1,0 +1,7 @@
+Shard3D: 1.2.8.r0-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: Some kind of material
+    Data:
+      Shader: assets/cutty/myshader.comp.spv
+      MyParams: [[2, MyParam0, !!binary "AwAAAA=="]]

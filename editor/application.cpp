@@ -23,18 +23,18 @@
 #include "scripting/script_link.h"
 
 namespace Shard3D {
-	EngineApplication::EngineApplication() {
+	EditorApplication::EditorApplication() {
 		createRenderPasses();
 		setupEngineFeatures();
 
 		SHARD3D_INFO("Constructing Level Pointer");
 		level = make_sPtr<ECS::Level>();
 	}
-	EngineApplication::~EngineApplication() {
+	EditorApplication::~EditorApplication() {
 	
 	}
 
-	void EngineApplication::createRenderPasses() {
+	void EditorApplication::createRenderPasses() {
 		{ // Main renderer
 			mainColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -115,7 +115,7 @@ namespace Shard3D {
 		
 	}
 
-	void EngineApplication::destroyRenderPasses() {
+	void EditorApplication::destroyRenderPasses() {
 		delete mainFrameBuffer;
 		delete mainRenderpass;
 		delete mainColorFramebufferAttachment;
@@ -127,7 +127,7 @@ namespace Shard3D {
 		delete ppoRenderpass;
 	}
 
-	void EngineApplication::setupEngineFeatures() {
+	void EditorApplication::setupEngineFeatures() {
 		EngineAudio::init();
 		GraphicsSettings::init(nullptr);
 		ScriptEngine::init();
@@ -147,18 +147,18 @@ namespace Shard3D {
 		ShaderSystem::init();
 	}
 
-	void EngineApplication::setWindowCallbacks() {
-		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, EngineApplication::eventEvent);
+	void EditorApplication::setWindowCallbacks() {
+		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, EditorApplication::eventEvent);
 	}
 
-	void EngineApplication::windowResizeEvent(Events::WindowResizeEvent& e) {
+	void EditorApplication::windowResizeEvent(Events::WindowResizeEvent& e) {
 		createRenderPasses();
 	}
 
-	void EngineApplication::eventEvent(Events::Event& e) {
+	void EditorApplication::eventEvent(Events::Event& e) {
 	}
 
-	void EngineApplication::run() {
+	void EditorApplication::run() {
 		std::vector<uPtr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
 			uboBuffers[i] = make_uPtr<EngineBuffer>(
@@ -184,7 +184,7 @@ namespace Shard3D {
 		
 		GridSystem gridSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem { engineDevice, ppoRenderpass->getRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}, false};
+		PostProcessingSystem ppoSystem { engineDevice, ppoRenderpass->getRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}};
 		ShadowMappingSystem shadowSystem { engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -272,6 +272,7 @@ namespace Shard3D {
 				.push_back(&layerList[i]->hud);
 		}
 
+		
 		for (int i = 0; i < h_l_layer->getList().size(); i++) {
 			SHARD3D_LOG("HUD Layer {0} has {1} elements", i, h_l_layer->getList().at(i)->elements.size());
 		}
@@ -324,6 +325,7 @@ beginWhileLoop:
 					frameTime,
 					commandBuffer,
 					possessedCamera,
+					this,
 					globalDescriptorSets[frameIndex],
 					*SharedPools::drawPools[frameIndex],
 					level
@@ -376,9 +378,9 @@ beginWhileLoop:
 
 				mainRenderpass->endRenderPass(frameInfo);
 
-				SHARD3D_STAT_RECORD();
+				//SHARD3D_STAT_RECORD();
 				ppoSystem.render(frameInfo);
-				SHARD3D_STAT_RECORD_END({ "Post Processing", "Main" });
+				//SHARD3D_STAT_RECORD_END({ "Post Processing", "Main" });
 				SHARD3D_STAT_RECORD();
 				ppoRenderpass->beginRenderPass(frameInfo, ppoFrameBuffer);
 				ppoSystem.renderImageFlipForPresenting(frameInfo);	
@@ -422,7 +424,7 @@ beginWhileLoop:
 		level = nullptr;
 	}
 
-	void EngineApplication::loadStaticObjects() {
+	void EditorApplication::loadStaticObjects() {
 		
 		Actor phys = level->createActor();
 		phys.addComponent<Components::RigidbodyComponent>();

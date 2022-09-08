@@ -88,7 +88,7 @@ namespace Shard3D {
 			// queues 
 			std::vector<Actor> actorKillQueue;
 
-			friend class Shard3D::EngineApplication;
+			friend class Shard3D::EditorApplication;
 			friend class Actor;
 			friend class MasterManager;
 

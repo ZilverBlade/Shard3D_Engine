@@ -141,7 +141,7 @@ namespace Shard3D {
 		}
 
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}, true };
+		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr} };
 		ShadowMappingSystem shadowSystem{ engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -234,7 +234,7 @@ namespace Shard3D {
 				mainRenderpass->endRenderPass(frameInfo);
 
 				ppoSystem.render(frameInfo);
-
+				ppoSystem.renderGammaCorrection(frameInfo);
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 				ppoSystem.renderImageFlipForPresenting(frameInfo);
 				engineRenderer.endSwapChainRenderPass(commandBuffer);

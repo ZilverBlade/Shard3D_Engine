@@ -1,28 +1,32 @@
 #version 450
 layout (local_size_x = 16, local_size_y = 16) in;
 layout (set = 0, binding = 0, rgba32f) uniform image2D postProcessImage;
-#define bloomThreshold 1.0
-#define bloomStrength 5
+
+layout (set = 1, binding = 0) readonly buffer myParams {
+    float threshold;
+    float strength;
+    int repetitions;
+} bloomInfo;
 
 const float weight[12] = float[] (0.252135, 0.227027, 0.1945946, 0.1216216, 0.074054, 0.046216, 0.026216, 0.011216, 0.008216, 0.004216, 0.002216, 0.001216);
 
 void main()	{
     vec3 pixelColor = imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.xy)).xyz;
-    vec3 bloomTerm = max(pixelColor - 1.0, 0.0);
+    vec3 bloomTerm = max(pixelColor - bloomInfo.threshold, 0.0);
     vec3 bloomHorizontal = bloomTerm * weight[0];
-    vec3 bloomVertical = bloomHorizontal;
+    vec3 bloomVertical =  bloomHorizontal;
     
-	for(int i = 1; i < 12; ++i)
+	for(int i = 1; i < bloomInfo.repetitions; ++i)
     {
-        bloomHorizontal += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x + i, gl_GlobalInvocationID.y)).xyz - 1.0, 0.0) * weight[i];
-        bloomHorizontal += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x - i, gl_GlobalInvocationID.y)).xyz - 1.0, 0.0) * weight[i];
+        bloomHorizontal += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x + i, gl_GlobalInvocationID.y)).xyz - bloomInfo.threshold, 0.0) * weight[i];
+        bloomHorizontal += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x - i, gl_GlobalInvocationID.y)).xyz - bloomInfo.threshold, 0.0) * weight[i];
     }
 
-    for(int i = 1; i < 12; ++i)
+    for(int i = 1; i < bloomInfo.repetitions; ++i)
     {
-        bloomVertical += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + i)).xyz - 1.0, 0.0) * weight[i];
-        bloomVertical += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y - i)).xyz - 1.0, 0.0) * weight[i];
+        bloomVertical += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y + i)).xyz - bloomInfo.threshold, 0.0) * weight[i];
+        bloomVertical += max(imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y - i)).xyz - bloomInfo.threshold, 0.0) * weight[i];
     }
-
-	imageStore(postProcessImage, ivec2(gl_GlobalInvocationID.xy), vec4(pixelColor + bloomHorizontal + bloomVertical, 1.0));
+    vec3 result = (bloomHorizontal+bloomVertical) * bloomInfo.strength;
+    imageStore(postProcessImage, ivec2(gl_GlobalInvocationID.xy), vec4(pixelColor + result, 1.0));
 }

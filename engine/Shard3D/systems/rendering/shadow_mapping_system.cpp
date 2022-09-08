@@ -15,7 +15,7 @@ namespace Shard3D {
 
 
 	ShadowMappingSystem::ShadowMappingSystem(EngineDevice& device) : engineDevice(device) {
-		lightCamera.setOrthographicProjection(-35.f, 35.f, 35.f, -35.f, 0.1f, 75.f);
+		lightCamera.setOrthographicProjection(-100.f, 100.f, 100.f, -100.f, 0.1f, 75.f);
 		
 		createRenderPass();
 		createPipelineLayout();
@@ -98,11 +98,11 @@ namespace Shard3D {
 			lightCamera.setViewDirection({0.f, 10.f, 0.f}, transform.getRotation(), glm::vec3(0.f, 1.f, 0.f));
 			component.lightProjection = push.projection = lightCamera.getProjection() * lightCamera.getView();
 
-			auto view = frameInfo.activeLevel->registry.view<Components::MeshComponent, Components::TransformComponent>();
+			auto view = frameInfo.activeLevel->registry.view<Components::Mesh3DComponent, Components::TransformComponent>();
 			for (auto obj : view) {
 				ECS::Actor actor = { obj, frameInfo.activeLevel.get() };
 				auto& transform = actor.getTransform();
-				auto& component = actor.getComponent<Components::MeshComponent>();
+				auto& component = actor.getComponent<Components::Mesh3DComponent>();
 
 				push.model = transform.transformMatrix;
 

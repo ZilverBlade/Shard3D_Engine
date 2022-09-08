@@ -23,10 +23,10 @@ namespace Shard3D {
 	ForwardRenderSystem::~ForwardRenderSystem() {}
 
 	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {;
-		auto view = frameInfo.activeLevel->registry.view<Components::MeshComponent, Components::TransformComponent>();
+		auto view = frameInfo.activeLevel->registry.view<Components::Mesh3DComponent, Components::TransformComponent>();
 		for (auto obj : view) { ECS::Actor actor = { obj, frameInfo.activeLevel.get() };
 			auto& transform = actor.getTransform();
-			auto& component = actor.getComponent<Components::MeshComponent>();
+			auto& component = actor.getComponent<Components::Mesh3DComponent>();
 			MeshPushConstantData push{};
 			push.modelMatrix = transform.transformMatrix;
 			push.normalMatrix = transform.normalMatrix;

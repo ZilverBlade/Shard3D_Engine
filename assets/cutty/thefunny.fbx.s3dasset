@@ -1,0 +1,6 @@
+Shard3D: 1.2.8.r0-alpha
+AssetType: mesh3d
+AssetFile: assets/cutty/thefunny.fbx
+AssetOrig: D:\Directories\Downloads\thefunny.fbx
+Materials: [assets/cutty/material_43_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_39_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_41_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_44_yakisoba_koma_test_temp12.s3dasset]
+Properties: !!binary "AAAAAA=="

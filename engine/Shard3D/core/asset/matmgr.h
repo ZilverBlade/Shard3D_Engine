@@ -20,6 +20,8 @@ namespace Shard3D {
         MaterialManager(SurfaceMaterial& material);
     
         static void saveMaterial(const rPtr<SurfaceMaterial>& material, const std::string& destPath, bool ignoreWarns = false);
+        static void saveMaterial(const rPtr<PostProcessingMaterial>& material, const std::string& destPath, bool ignoreWarns = false);
         static rPtr<SurfaceMaterial> loadSurfaceMaterial(const AssetID& asset, bool ignoreWarns = false);
+        static rPtr<PostProcessingMaterial> loadPPOMaterial(const AssetID& asset, bool ignoreWarns = false);
     };	
 }

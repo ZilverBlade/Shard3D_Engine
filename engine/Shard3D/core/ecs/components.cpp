@@ -103,13 +103,13 @@ namespace Shard3D {
 					invScale.z * (c1 * c2),
 				}, };
 		}
-		void MeshComponent::validate() {
+		void Mesh3DComponent::validate() {
 			auto& model = ResourceHandler::retrieveMesh(asset);
 			if (model->materialSlots.size() == materials.size()) return;
-			SHARD3D_WARN("MeshComponent validation failed! Resetting materials...");
+			SHARD3D_WARN("Mesh3DComponent validation failed! Resetting materials...");
 			materials = model->materials;
 		}
-		MeshComponent::MeshComponent(const AssetID& mdl) : asset(mdl.getFile()) {
+		Mesh3DComponent::Mesh3DComponent(const AssetID& mdl) : asset(mdl.getFile()) {
 			auto& model = ResourceHandler::retrieveMesh(mdl);
 			materials = model->materials;
 		}

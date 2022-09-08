@@ -93,9 +93,9 @@ namespace Shard3D {
 		_S3D_ICALL(AudioComponent_Resume);
 		_S3D_ICALL(AudioComponent_Update);
 
-		_S3D_ICALL(MeshComponent_GetFile);
-		_S3D_ICALL(MeshComponent_SetFile);
-		_S3D_ICALL(MeshComponent_Load);
+		_S3D_ICALL(Mesh3DComponent_GetFile);
+		_S3D_ICALL(Mesh3DComponent_SetFile);
+		_S3D_ICALL(Mesh3DComponent_Load);
 
 		_S3D_ICALL(BillboardComponent_GetFile);
 		_S3D_ICALL(BillboardComponent_SetFile);
@@ -136,7 +136,7 @@ namespace Shard3D {
 		//registerComponent<Components::BlueprintComponent>();
 		registerComponent<Components::TransformComponent>();
 		registerComponent<Components::BillboardComponent>();
-		registerComponent<Components::MeshComponent>();
+		registerComponent<Components::Mesh3DComponent>();
 		registerComponent<Components::AudioComponent>();
 		registerComponent<Components::CameraComponent>();
 		registerComponent<Components::DirectionalLightComponent>();
@@ -328,20 +328,20 @@ namespace Shard3D::InternalScriptCalls {
 		ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::AudioComponent>().update();
 	}
 
-	void MeshComponent_GetFile(uint64_t actorID, MonoString* string) {
-	//	string = mono_string_new(ScriptEngine::getDomain(), ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::MeshComponent>().file.c_str());
+	void Mesh3DComponent_GetFile(uint64_t actorID, MonoString* string) {
+	//	string = mono_string_new(ScriptEngine::getDomain(), ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::Mesh3DComponent>().file.c_str());
 	}
 
-	void MeshComponent_SetFile(uint64_t actorID, MonoString* string) {
+	void Mesh3DComponent_SetFile(uint64_t actorID, MonoString* string) {
 		char* t = mono_string_to_utf8(string);
 		std::string text(t);
 
-		//ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::MeshComponent>().cacheFile = text;
+		//ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::Mesh3DComponent>().cacheFile = text;
 		mono_free(t);
 	}
 
-	void MeshComponent_Load(uint64_t actorID) {
-		//auto& c = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::MeshComponent>();
+	void Mesh3DComponent_Load(uint64_t actorID) {
+		//auto& c = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::Mesh3DComponent>();
 		//c.reapplyMesh(c.cacheFile);
 	}
 

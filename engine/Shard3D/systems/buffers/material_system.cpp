@@ -5,7 +5,7 @@
 #include <fstream>
 
 namespace Shard3D {
-	void MaterialSystem::createSurfacePipelineLayout(VkDescriptorSetLayout factorLayout, VkDescriptorSetLayout textureLayout, VkPipelineLayout* pipelineLayout) {
+	void MaterialSystem::createSurfacePipelineLayout(VkPipelineLayout* pipelineLayout, VkDescriptorSetLayout factorLayout, VkDescriptorSetLayout textureLayout) {
 		SHARD3D_ASSERT(mRenderPass != VK_NULL_HANDLE && mGlobalSetLayout != VK_NULL_HANDLE && mDevice != VK_NULL_HANDLE && "Material system context not set!");
 
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "No pipeline layout provided!");
@@ -41,6 +41,37 @@ namespace Shard3D {
 			"assets/shaderdata/mesh_shader.vert.spv",
 			fragment_shader,
 			pipelineConfig
+		);
+	}
+
+	void MaterialSystem::createPPOPipelineLayout(VkPipelineLayout* pipelineLayout, VkDescriptorSetLayout dataLayout) {
+		SHARD3D_ASSERT(mPPOSceneSetLayout != VK_NULL_HANDLE && mDevice != VK_NULL_HANDLE && "Material system context not set!");
+
+		SHARD3D_ASSERT(dataLayout != VK_NULL_HANDLE && "No data layout provided!");
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "No pipeline layout provided!");
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{
+			mPPOSceneSetLayout,
+			dataLayout
+		};
+
+		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
+		pipelineLayoutInfo.pushConstantRangeCount = 0;
+		pipelineLayoutInfo.pPushConstantRanges = nullptr;
+		if (vkCreatePipelineLayout(mDevice->device(), &pipelineLayoutInfo, nullptr, pipelineLayout) != VK_SUCCESS) {
+			SHARD3D_FATAL("failed to create pipeline layout!");
+		}
+	}
+
+	void MaterialSystem::createPPOPipeline(uPtr<ComputePipeline>* pipeline, VkPipelineLayout pipelineLayout, const std::string& compute_shader) {
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+		*pipeline = make_uPtr<ComputePipeline>(
+			*mDevice,
+			pipelineLayout,
+			compute_shader
 		);
 	}
 

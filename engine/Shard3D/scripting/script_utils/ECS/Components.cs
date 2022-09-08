@@ -158,18 +158,18 @@ namespace Shard3D.Components
         }
     }
 
-    public class MeshComponent : Component
+    public class Mesh3DComponent : Component
     {
         public string File
         {
             get
             {
-                InternalCalls.MeshComponent_GetFile(_Actor.ID, out string _f);
+                InternalCalls.Mesh3DComponent_GetFile(_Actor.ID, out string _f);
                 return _f;
             }
             set
             {
-                InternalCalls.MeshComponent_SetFile(_Actor.ID, value);
+                InternalCalls.Mesh3DComponent_SetFile(_Actor.ID, value);
             }
         }
         public bool Visible
@@ -185,7 +185,7 @@ namespace Shard3D.Components
         }
         public void Apply()
         {
-            InternalCalls.MeshComponent_Load(_Actor.ID);
+            InternalCalls.Mesh3DComponent_Load(_Actor.ID);
         }
     }
 

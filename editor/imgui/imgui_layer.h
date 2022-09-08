@@ -31,6 +31,10 @@ namespace Shard3D {
 		void update(FrameInfo& frameInfo) override;
 		void attachGUIEditorInfo(sPtr<HUDContainer>& container);
 
+		bool handleWindowResize(FrameInfo& frameInfo);
+
+		void renderViewport(FrameInfo& frameInfo);
+
 		VkDescriptorSet viewportImage{};
 	private:
 		void eventEvent(Events::Event& e);

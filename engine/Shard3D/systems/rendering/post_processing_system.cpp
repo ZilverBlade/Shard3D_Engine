@@ -2,12 +2,11 @@
 
 #include "post_processing_system.h"
 #include "../computational/shader_system.h"
-#include "../../core/vulkan_api/pipeline.h"
-#include "../../core/vulkan_api/descriptors.h"
 #include "../../core/rendering/render_pass.h"
-#include "../../core/rendering/frame_buffer.h"
-#include "../../core/vulkan_api/pipeline_compute.h"
+#include "../../vulkan_abstr.h"
+#include "../../ecs.h"
 #include "../../core/misc/graphics_settings.h"
+#include "../buffers/material_system.h"
 
 namespace Shard3D {
 	static bool setVkDescriptorImageInfo(VkDescriptorImageInfo* descriptor, FrameBufferAttachment* attachment) {
@@ -18,35 +17,34 @@ namespace Shard3D {
 		return true;
 	}
 
-	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass presentingRenderPass, PostProcessingGBufferInput imageInput, bool doGammaCorrection) : engineDevice(device), doGammaCorrectionEX(doGammaCorrection) {
+	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass presentingRenderPass, PostProcessingGBufferInput imageInput) : engineDevice(device) {
 		setVkDescriptorImageInfo(&ppoDescriptor_BaseRenderedScene, imageInput.baseRenderedScene);
 		bool x1 = setVkDescriptorImageInfo(&ppoDescriptor_DepthBufferSceneInfo, imageInput.depthBufferSceneInfo);
 		bool x2 = setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
 		bool x3 = setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
 
 		EngineDescriptorSetLayout::Builder builder = EngineDescriptorSetLayout::Builder(engineDevice)
-			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
-		builder.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT); // for shader final inputs
+			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 		if (x1)
-			builder.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+			builder.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 		if (x2)
-			builder.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+			builder.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 		if (x3)
-			builder.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+			builder.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		ppo_Layout = builder.build();
 
 		EngineDescriptorWriter writer = EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
 			.writeImage(0, &ppoDescriptor_BaseRenderedScene); 
-		writer.writeImage(1, &ppoDescriptor_BaseRenderedScene);
 		if (x1)
-			writer.writeImage(2, &ppoDescriptor_DepthBufferSceneInfo);
+			writer.writeImage(1, &ppoDescriptor_DepthBufferSceneInfo);
 		if (x2)
-			writer.writeImage(3, &ppoDescriptor_PositionSceneInfo);
+			writer.writeImage(2, &ppoDescriptor_PositionSceneInfo);
 		if (x3)
-			writer.writeImage(4, &ppoDescriptor_NormalSceneInfo);
+			writer.writeImage(3, &ppoDescriptor_NormalSceneInfo);
 
 		writer.build(ppo_InputDescriptorSet);
+		MaterialSystem::setRenderedSceneImageLayout(ppo_Layout->getDescriptorSetLayout());
 
 		createPipelineLayout();
 		createPipelines(presentingRenderPass);
@@ -75,26 +73,10 @@ namespace Shard3D {
 	void PostProcessingSystem::createPipelines(VkRenderPass renderPass) {
 		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
-		if (doGammaCorrectionEX) {
-			postProcessMaterials.push_back({ make_sPtr<ComputePipeline>(
+		gammaCorrectionShaderPipeline = make_uPtr<ComputePipeline>(
 				engineDevice,
 				pipelineLayout,
-				"assets/shaderdata/post_processing/gamma_correction.comp.spv"),
-				//{GraphicsSettings::get().WindowWidth / 16, GraphicsSettings::get().WindowHeight / 16, 1} // Should be using this in the future
-				{ 1920 / 16, 1080 / 16, 1 } });
-		}
-
-		//hdrShaderPipeline = make_uPtr<ComputePipeline>(
-		//	engineDevice,
-		//	pipelineLayout,
-		//	"assets/shaderdata/post_processing/hdr.comp.spv"
-		//	);
-		postProcessMaterials.push_back({ make_sPtr<ComputePipeline>(
-				engineDevice,
-				pipelineLayout,
-				"assets/shaderdata/post_processing/bloom.comp.spv"),
-			//{GraphicsSettings::get().WindowWidth / 16, GraphicsSettings::get().WindowHeight / 16, 1} // Should be using this in the future
-			{ 1920 / 16, 1080 / 16, 1 } });
+				"assets/shaderdata/post_processing/gamma_correction.comp.spv");
 
 		GraphicsPipelineConfigInfo pipelineConfig{};
 		GraphicsPipeline::pipelineConfig(pipelineConfig)
@@ -114,23 +96,17 @@ namespace Shard3D {
 	}
 
 	void PostProcessingSystem::render(FrameInfo& frameInfo) {
-		vkCmdBindDescriptorSets(frameInfo.commandBuffer,
-			VK_PIPELINE_BIND_POINT_COMPUTE,
-			pipelineLayout,
-			0,
-			1,
-			&ppo_InputDescriptorSet,
-			0,
-			nullptr
-		);
-
-		for (auto& material : postProcessMaterials) {
-			material.dispatch(frameInfo.commandBuffer);
+		for (auto& material : frameInfo.activeLevel->getPossessedCameraActor().getComponent<Components::CameraComponent>().postProcessMaterials) {
+			material.dispatch(frameInfo.commandBuffer, ppo_InputDescriptorSet);
 		}
 	}
 
-	void PostProcessingSystem::renderImageFlipForPresenting(FrameInfo& frameInfo) {
+	void PostProcessingSystem::renderGammaCorrection(FrameInfo& frameInfo) {
+		gammaCorrectionShaderPipeline->bindCompute(frameInfo.commandBuffer);
+		vkCmdDispatch(frameInfo.commandBuffer, 1920 / 16, 1080 / 16 + 1, 1);
+	}
 
+	void PostProcessingSystem::renderImageFlipForPresenting(FrameInfo& frameInfo) {
 		debanderShaderPipeline->bind(frameInfo.commandBuffer);
 		vkCmdBindDescriptorSets(frameInfo.commandBuffer,
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -141,8 +117,7 @@ namespace Shard3D {
 			0,
 			nullptr
 		);
-		vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
-		
+		vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);	
 	}
 	void PPO_Material::dispatch(VkCommandBuffer commandBuffer) {
 		pipeline->bindCompute(commandBuffer);

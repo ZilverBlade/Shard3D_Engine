@@ -4,9 +4,10 @@
 #include <Shard3D/core/asset/assetmgr.h>
 #include <glm/gtc/type_ptr.hpp>
 namespace Shard3D {
-	MaterialBuilderPanel::MaterialBuilderPanel() : currentAsset(ENGINE_ERRMAT ENGINE_ASSET_SUFFIX) {
-        currentItem = ResourceHandler::retrieveSurfaceMaterial(currentAsset);
-    }
+	MaterialBuilderPanel::MaterialBuilderPanel() : currentAsset(ResourceHandler::coreAssets.s_errorMaterial), currentPPOAsset(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")) {
+		currentItem = ResourceHandler::retrieveSurfaceMaterial(currentAsset);
+		currentPPOItem = ResourceHandler::retrievePPOMaterial(currentPPOAsset);
+	}
 	MaterialBuilderPanel::~MaterialBuilderPanel() {}
 
 	static std::string blendModeToString(SurfaceMaterialBlendMode_T blendMode) {
@@ -181,6 +182,90 @@ namespace Shard3D {
 		}
 		if (ImGui::Button("Save")) {
 			AssetManager::createMaterial(currentAsset.getFile(), currentItem);
+		}
+		ImGui::End();
+
+		//////////////////		//////////////////		//////////////////
+		//				//		//				//		//				//
+		//				//		//				//		//				//
+		//////////////////		//////////////////		//				//
+		//						//						//				//
+		//						//						//				//
+		//						//						//////////////////
+
+		ImGui::Begin("PPO Material Builder");
+		if (ImGui::BeginCombo("##listofmaterialsppocombo", currentPPOItem->materialTag.c_str())) ImGui::EndCombo();
+
+		if (ImGui::BeginDragDropTarget())
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.PMAT")) {
+				currentPPOAsset = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
+				ResourceHandler::loadPPOMaterial(currentPPOAsset);
+				currentPPOItem = ResourceHandler::retrievePPOMaterial(currentPPOAsset);
+			}
+
+		ImGui::Text(typeid(*currentPPOItem).name());
+		auto& rfile = currentPPOItem->shaderPath;
+		char fileBuffer[256];
+		memset(fileBuffer, 0, 256);
+		strncpy(fileBuffer, rfile.c_str(), 256);
+		if (ImGui::InputText("Shader Path (SPIR-V)", fileBuffer, 256)) {
+			rfile = std::string(fileBuffer);
+		}
+
+		for (int i = 0; i < currentPPOItem->getParamCount(); i++) {
+			switch (currentPPOItem->getParameter(i).getType()) {
+			case(PPO_Types::Int32):
+				ImGui::DragInt(currentPPOItem->getParameterName(i).c_str(), reinterpret_cast<int*>(currentPPOItem->getParameter(i).get()), 0.01f);
+				break;
+			case(PPO_Types::Float):
+				ImGui::DragFloat(currentPPOItem->getParameterName(i).c_str(), reinterpret_cast<float*>(currentPPOItem->getParameter(i).get()), 0.01f);
+				break;
+			case(PPO_Types::Float2):
+				ImGui::DragFloat2(currentPPOItem->getParameterName(i).c_str(), glm::value_ptr(*reinterpret_cast<glm::vec2*>(currentPPOItem->getParameter(i).get())), 0.01f);
+				break;
+			case(PPO_Types::Float4):
+				ImGui::DragFloat4(currentPPOItem->getParameterName(i).c_str(), glm::value_ptr(*reinterpret_cast<glm::vec4*>(currentPPOItem->getParameter(i).get())), 0.01f);
+				break;
+			}
+			if (ImGui::BeginPopupContextWindow(std::string("PPOMaterialRemoveParam" + std::to_string(i + 1)).c_str(), ImGuiMouseButton_Right, true)) {
+				if (ImGui::MenuItem((std::string("Remove Parameter").c_str()))) {
+					currentPPOItem->rmvParameter(i);
+					ResourceHandler::rebuildPPOMaterial(currentPPOItem);
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+		}
+
+		if (ImGui::BeginPopupContextWindow("PPOMaterialAddParamPanel", ImGuiMouseButton_Right, false)) {
+			if (ImGui::MenuItem("Add Integer Parameter")) {
+				currentPPOItem->addParameter(int(0), "MyParam" + std::to_string(currentPPOItem->getParamCount()));
+				ResourceHandler::rebuildPPOMaterial(currentPPOItem);
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Add Float Parameter")) {
+				currentPPOItem->addParameter(float(0), "MyParam" + std::to_string(currentPPOItem->getParamCount()));
+				ResourceHandler::rebuildPPOMaterial(currentPPOItem);
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Add Vector2 Parameter")) {
+				currentPPOItem->addParameter(glm::vec2(0), "MyParam" + std::to_string(currentPPOItem->getParamCount()));
+				ResourceHandler::rebuildPPOMaterial(currentPPOItem);
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Add Vector4 Parameter")) {
+				currentPPOItem->addParameter(glm::vec4(0), "MyParam" + std::to_string(currentPPOItem->getParamCount()));
+				ResourceHandler::rebuildPPOMaterial(currentPPOItem);
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Update")) {
+			ResourceHandler::rebuildPPOMaterial(currentPPOItem);
+		}
+		if (ImGui::Button("Save")) {
+			AssetManager::createMaterial(currentPPOAsset.getFile(), currentPPOItem);
 		}
 		ImGui::End();
 	}

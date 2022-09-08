@@ -17,7 +17,7 @@ int main() {
 #ifdef _WIN32
     ShowWindow(GetConsoleWindow(), SW_SHOW);
 #endif
-    Shard3D::EngineApplication app{};
+    Shard3D::EditorApplication app{};
 #ifndef ENSET_BETA_DEBUG_TOOLS // dont hide for beta testing, as it might be useful
 #ifdef _DEPLOY  // hide for deploy, and logging would be done in a file anyway, console is only for dev purposes
 #ifdef _WIN32 // this function is exclusive to windows

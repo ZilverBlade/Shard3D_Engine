@@ -1,0 +1,36 @@
+Shard3D: 1.2.8.r0-alpha
+Level: \thecutter
+LastSavedEditorCameraPos: [-0.955592334, 2.54362917, 0.687078834]
+Actors:
+  - Actor: 16008422525636617175
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-0.529999971, 3.58999991, 2.20000005]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 15.4099998]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 14366224494989149188
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    MeshComponent:
+      MeshAsset: assets/cutty/thefunny.fbx.s3dasset
+      Materials: [assets/cutty/material_43_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_39_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_41_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_44_yakisoba_koma_test_temp12.s3dasset]
+  - Actor: 6423925944913912549
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [-0.0401425734, -0.228638142, 0.0418879017]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Emission: [1, 1, 1, 1]
+      Specularness: 1

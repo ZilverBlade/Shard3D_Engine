@@ -36,20 +36,20 @@ namespace Shard3D {
 			if (ImGui::MenuItem("New Camera Actor")) { 
 				auto actor = context->createActor("Camera Actor"); 
 				actor.addComponent<Components::CameraComponent>(); 
-				if (!actor.hasComponent<Components::MeshComponent>()) {
+				if (!actor.hasComponent<Components::Mesh3DComponent>()) {
 					ResourceHandler::loadMesh(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
-					actor.addComponent<Components::MeshComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+					actor.addComponent<Components::Mesh3DComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
 				}
 				selectedActor = actor;
 			}
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Billboard Actor")) { auto actor = context->createActor("Billboard"); actor.addComponent<Components::BillboardComponent>(AssetID(ENGINE_ERRTEX ENGINE_ASSET_SUFFIX));}
+			if (ImGui::MenuItem("New Billboard Actor")) { auto actor = context->createActor("Billboard"); actor.addComponent<Components::BillboardComponent>(ResourceHandler::coreAssets.t_errorTexture);}
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); actor.addComponent<Components::MeshComponent>(AssetID(ENGINE_DEFAULT_MODEL_FILE ENGINE_ASSET_SUFFIX)); }
+			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); actor.addComponent<Components::Mesh3DComponent>(ResourceHandler::coreAssets.m_defaultModel); }
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
