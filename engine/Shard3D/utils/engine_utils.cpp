@@ -46,4 +46,21 @@ namespace Shard3D {
 		void* result = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(bytes->data()));
 		return result;
 	}
+	void WAITUtils::preciseStandby(float seconds) {
+		__int64 timeEllapsed;
+		__int64 timeStart;
+		__int64 timeDelta;
+
+		QueryPerformanceFrequency((LARGE_INTEGER*)(&timeDelta));
+
+		__int64 timeToWait = static_cast<double>(timeDelta) * static_cast<double>(seconds);
+
+		QueryPerformanceCounter((LARGE_INTEGER*)(&timeStart));
+
+		timeEllapsed = timeStart;
+
+		while ((timeEllapsed - timeStart) < timeToWait) {
+			QueryPerformanceCounter((LARGE_INTEGER*)(&timeEllapsed));
+		};
+	}
 }

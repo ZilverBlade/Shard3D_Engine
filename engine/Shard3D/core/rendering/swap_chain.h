@@ -31,7 +31,7 @@ namespace Shard3D {
  VkFormat findDepthFormat();
 
  VkResult acquireNextImage(uint32_t *imageIndex);
- VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
+ VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex, float additionalWaitTime);
 
  bool compareSwapFormats(const EngineSwapChain& swapChain) const {
      return swapChain.swapChainDepthFormat == swapChainDepthFormat  &&

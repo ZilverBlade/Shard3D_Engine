@@ -38,6 +38,13 @@ namespace Shard3D {
 			SHARD3D_FATAL("maxAnisotropy read is invalid!!");
 	
 		graphics.FramerateCap = ini.GetLongValue("GRAPHICS", "FramerateCap");
+		if (graphics.FramerateCap > 0 && !graphics.VSync)
+			const_cast<float&>(graphics.FramerateCapInterval) = 1.f / static_cast<float>(graphics.FramerateCap);
+		else 
+			const_cast<float&>(graphics.FramerateCapInterval) = 0.f;
+		if (graphics.FramerateCap < 15 && graphics.FramerateCap > 0 && !graphics.VSync)
+			SHARD3D_WARN("Framerate is limited to an extremely low value ({0})! Experience may be worse", graphics.FramerateCap);
+
 		//graphics.MSAASamples = static_cast<VkSampleCountFlagBits>(ini.GetLongValue("GRAPHICS", "MSAASamples"));
 		//if (graphics.MSAASamples < 1)
 		//	SHARD3D_FATAL("MSAASamples read is invalid!!");

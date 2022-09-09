@@ -1,6 +1,6 @@
-Shard3D: 1.2.7.r6-alpha
-Level: \car_driving.s3dlevel
-LastSavedEditorCameraPos: [-1.79118514, 2.78961182, 1.37160623]
+Shard3D: 1.2.8.r0-alpha
+Level: \mytest.s3dlevel
+LastSavedEditorCameraPos: [-3.52424359, -1.0545851, 1.49599826]
 Actors:
   - Actor: 3482611267489539376
     TagComponent:
@@ -41,6 +41,7 @@ Actors:
       FOV: 60
       NearClipPlane: 0.0500000007
       FarClipPlane: 1024
+      PostProcessing: [[assets/_engine/mat/ppo/hdr_vfx.s3dasset, [3, !!binary "9ijcPw=="], [3, !!binary "uB4Fvg=="], [3, !!binary "7FGYPw=="], [3, !!binary "mpmZPw=="]], [assets/_engine/mat/ppo/bloom_vfx.s3dasset, [3, !!binary "4XpUPw=="], [3, !!binary "Uri+Pw=="], [2, !!binary "DAAAAA=="]]]
     Mesh3DComponent:
       MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
       Materials: [assets/materialdata/None.s3dasset]

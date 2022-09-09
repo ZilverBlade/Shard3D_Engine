@@ -12,7 +12,7 @@ Actors:
     ScriptComponent:
       Module: AutoPossessCamera
       Language: C#
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
       Materials: [assets/materialdata/None.s3dasset]
   - Actor: 3256940297627109905
@@ -26,7 +26,7 @@ Actors:
       Translation: [0.680000007, 0, 0]
       Rotation: [0, 0, -0.17453292]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/cartest/yakisobabikiniwheel.fbx.s3dasset
       Materials: [assets/cartest/RimInside.s3dasset, assets/cartest/Rim.s3dasset, assets/cartest/Tyre.s3dasset, assets/cartest/RimBolts.s3dasset]
   - Actor: 9969066776044137698
@@ -41,7 +41,7 @@ Actors:
       Translation: [0, 0, 0.289999992]
       Rotation: [0.00575958658, 0, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
       Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/ConvertibleSoft.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
   - Actor: 11949163726201048202
@@ -63,7 +63,7 @@ Actors:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [10, 10, 0.100000001]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/cube.obj.s3dasset
       Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
   - Actor: 4033656676149174111
@@ -126,7 +126,7 @@ Actors:
       Translation: [-0.680000007, 0, 0]
       Rotation: [0, 0, 2.96705961]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/cartest/yakisobabikiniwheel.fbx.s3dasset
       Materials: [assets/cartest/RimInside.s3dasset, assets/cartest/Rim.s3dasset, assets/cartest/Tyre.s3dasset, assets/cartest/RimBolts.s3dasset]
   - Actor: 9559968937425941057
@@ -164,7 +164,7 @@ Actors:
       Translation: [-0.74000001, 0, 0]
       Rotation: [0, 0, 3.14159274]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/cartest/yakisobabikiniwheel.fbx.s3dasset
       Materials: [assets/cartest/RimInside.s3dasset, assets/cartest/Rim.s3dasset, assets/cartest/Tyre.s3dasset, assets/cartest/RimBolts.s3dasset]
   - Actor: 7521268059864750746
@@ -178,6 +178,6 @@ Actors:
       Translation: [0.74000001, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/cartest/yakisobabikiniwheel.fbx.s3dasset
       Materials: [assets/cartest/RimInside.s3dasset, assets/cartest/Rim.s3dasset, assets/cartest/Tyre.s3dasset, assets/cartest/RimBolts.s3dasset]

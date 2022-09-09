@@ -427,23 +427,23 @@ beginWhileLoop:
 	void EditorApplication::loadStaticObjects() {
 		
 		Actor phys = level->createActor();
-		phys.addComponent<Components::RigidbodyComponent>();
+		phys.addComponent<Components::Rigidbody3DComponent>();
 		auto boxShape = level->physicsSystemPtr->createBoxShape(JPH::BoxShapeSettings(JPH::Vec3(100.0f, 1.0f, 100.0f)));
 		phys.getComponent<Components::TransformComponent>().setScale({ 100.f, 100.f, 1.f });
 		phys.getComponent<Components::TransformComponent>().setTranslation({ 0.0f, 100.0f, -2.0f });
-		phys.getComponent<Components::RigidbodyComponent>().physicsBody = 
+		phys.getComponent<Components::Rigidbody3DComponent>().physicsBody = 
 			level->physicsSystemPtr->createBody(JPH::BodyCreationSettings(boxShape, JPH::Vec3(0.0f, -2.0f, 100.0f), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING));
 		
 		
 		Actor sphere = level->createActor();
-		sphere.addComponent<Components::RigidbodyComponent>();
+		sphere.addComponent<Components::Rigidbody3DComponent>();
 		auto sphereShape = level->physicsSystemPtr->createSphereShape(JPH::SphereShapeSettings(0.5f));
 		sphere.getComponent<Components::TransformComponent>().setScale({ 0.5f, 0.5f, 0.5f });
-		sphere.getComponent<Components::RigidbodyComponent>().physicsBody =
+		sphere.getComponent<Components::Rigidbody3DComponent>().physicsBody =
 			level->physicsSystemPtr->createBody(JPH::BodyCreationSettings(sphereShape, JPH::Vec3(0.0f, 2.0f, 0.0f), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING));
 		sphere.getComponent<Components::TransformComponent>().setTranslation({ 0.f, 0.f, 2.f });
-		level->physicsSystemPtr->getInterface().AddLinearVelocity(sphere.getComponent<Components::RigidbodyComponent>().physicsBody, { 1.f, 0.f, 1.f });
-		level->physicsSystemPtr->getInterface().SetGravityFactor(sphere.getComponent<Components::RigidbodyComponent>().physicsBody, 1.f);
-		level->physicsSystemPtr->getInterface().SetRestitution(sphere.getComponent<Components::RigidbodyComponent>().physicsBody, 0.4f);
+		level->physicsSystemPtr->getInterface().AddLinearVelocity(sphere.getComponent<Components::Rigidbody3DComponent>().physicsBody, { 1.f, 0.f, 1.f });
+		level->physicsSystemPtr->getInterface().SetGravityFactor(sphere.getComponent<Components::Rigidbody3DComponent>().physicsBody, 1.f);
+		level->physicsSystemPtr->getInterface().SetRestitution(sphere.getComponent<Components::Rigidbody3DComponent>().physicsBody, 0.4f);
 	}
 }

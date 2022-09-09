@@ -78,7 +78,7 @@ VkResult EngineSwapChain::acquireNextImage(uint32_t *imageIndex) {
 }
 
 VkResult EngineSwapChain::submitCommandBuffers(
-    const VkCommandBuffer *buffers, uint32_t *imageIndex) {
+    const VkCommandBuffer *buffers, uint32_t *imageIndex, float additionalWaitTime) {
   if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
       vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
   }
@@ -117,8 +117,9 @@ VkResult EngineSwapChain::submitCommandBuffers(
 
   presentInfo.pImageIndices = imageIndex;
 
+  if (additionalWaitTime > 0.f) SHARD3D_WAITFOR(additionalWaitTime);
   auto result = vkQueuePresentKHR(device.presentQueue(), &presentInfo);
-
+  
   currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
   return result;
@@ -271,7 +272,7 @@ void EngineSwapChain::createRenderPass() {
 void EngineSwapChain::createFramebuffers() {
   swapChainFramebuffers.resize(imageCount());
   for (size_t i = 0; i < imageCount(); i++) {
-    std::array<VkImageView, 2> attachments = { swapChainImageViews[i], depthImageViews[i]};
+    std::array<VkImageView, 2> attachments = { swapChainImageViews[i], depthImageViews[i] };
 
     VkExtent2D swapChainExtent = getSwapChainExtent();
     VkFramebufferCreateInfo framebufferInfo = {};

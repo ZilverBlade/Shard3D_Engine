@@ -37,6 +37,11 @@ namespace Shard3D {
 		static std::vector<uint8_t> getStackBinary(void* data, size_t object_size);
 		static void* readBinary(const std::string& path);
 	};
+
+	class WAITUtils {
+	public: static void preciseStandby(float seconds);
+	};
 } 
 
 #define BIT(x) (1 << x)
+#define SHARD3D_WAITFOR(seconds) Shard3D::WAITUtils::preciseStandby(seconds)

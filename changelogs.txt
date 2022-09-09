@@ -184,5 +184,6 @@ ALPHA:
 		- Added compute shader support
 	> Shard3D Torque 1.2.8-alpha
 		- Added experimental post processing material
+		- Added FPS limiter (doesnt work with VSync)
 		:: TODO, proper events sytem, add editor layouts, use premake
 		:: Fix: change vertex and index buffers to draw offset, dont use 64 bit integers for shaders (e.g. HUD system)

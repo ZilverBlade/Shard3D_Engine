@@ -77,6 +77,7 @@ namespace Shard3D {
 		}
 
 		isFrameStarted = true;
+		timeFrameBegin = std::chrono::high_resolution_clock::now();
 
 		auto commandBuffer = getCurrentCommandBuffer();
 
@@ -99,7 +100,11 @@ namespace Shard3D {
 			SHARD3D_FATAL("failed to record command buffer!");
 		}
 
-		auto result = engineSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
+		const float frameTime = std::chrono::duration<double, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - timeFrameBegin).count();
+		const float waitTime = std::max(GraphicsSettings::get().FramerateCapInterval - frameTime, 0.f);
+
+		auto result = engineSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex, waitTime);
+
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
 			engineWindow.resetWindowResizedFlag();
 			recreateSwapchain();
@@ -144,7 +149,4 @@ namespace Shard3D {
 
 		vkCmdEndRenderPass(commandBuffer);
 	}
-
-
-
 }

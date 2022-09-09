@@ -21,7 +21,7 @@ Actors:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [0.00999999978, 0.00999999978, 0.00999999978]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/cutty/thefunny.fbx.s3dasset
       Materials: [assets/cutty/material_43_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_39_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_41_yakisoba_koma_test_temp12.s3dasset, assets/cutty/material_44_yakisoba_koma_test_temp12.s3dasset]
   - Actor: 6423925944913912549

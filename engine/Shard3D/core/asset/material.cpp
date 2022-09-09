@@ -356,7 +356,7 @@ namespace Shard3D {
 		return myParamNames[index];
 	}
 
-	PostProcessingMaterialInstance::PostProcessingMaterialInstance(PostProcessingMaterial* masterMaterial) : master(masterMaterial) {
+	PostProcessingMaterialInstance::PostProcessingMaterialInstance(PostProcessingMaterial* masterMaterial, AssetID masterMaterialAsset) : master(masterMaterial), masterAsset(masterMaterialAsset) {
 		myParamsLocal.reserve(master->myParams.size());
 		for (auto& param : master->myParams) {
 			myParamsLocal.push_back(param.copy());

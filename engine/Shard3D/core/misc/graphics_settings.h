@@ -58,11 +58,19 @@ namespace Shard3D {
 		int maxAnisotropy = 16;
 
 		//	[GRAPHICS]
-//Amount of frames per second to limit the renderer.
-// 			   @param -1: uncapped
+// Amount of frames per second to limit the renderer.
+// Requires V-Sync to be turned off
+// 			   @param 0: uncapped
 // 			   @param any other positive integer: max framerate
 			//@return (live usage)
 		int FramerateCap = 0;
+
+		//	[GRAPHICS]
+//Time to wait between frames, used by the renderer to reduce computation
+// 			   @param 0: uncapped
+// 			   @param any other positive float: time between frames
+			//@return (live usage)
+		const float FramerateCapInterval = 0.f;
 		//	[GRAPHICS]
 //Samples used by the renderer. Keep at 1, as this is deprecated and should not be used. 
 			//@return (requires restart)

@@ -131,11 +131,7 @@ namespace Shard3D {
 			operator EngineCamera&() {
 				return camera;
 			}
-			CameraComponent() {
-				postProcessMaterials.clear();
-				postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get());
-				postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get());
-			}																																									 
+			CameraComponent() = default;
 			CameraComponent(const CameraComponent&) = default;
 			void setProjection() {
 				if (projectionType == ProjectType::Perspective)

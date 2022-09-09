@@ -7,7 +7,7 @@
 #include "../rendering/camera.h"
 namespace Shard3D {
 	class PhysicsSystem;
-	class EngineApplication;
+	class EditorApplication;
 	namespace ECS {
 		class Actor;
 		class LevelTreePanel;

@@ -13,7 +13,7 @@ Actors:
       Translation: [0, 0, -3]
       Rotation: [0, 0, 0.151843637]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/cube.obj.s3dasset
       Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
   - Actor: 11461169820563454499
@@ -27,7 +27,7 @@ Actors:
       Translation: [0, 0, 3]
       Rotation: [0.382227093, 0, 0.432841629]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/cube.obj.s3dasset
       Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
   - Actor: 14111426036743595109
@@ -41,7 +41,7 @@ Actors:
       Translation: [3, 3, 3]
       Rotation: [-0.932005823, -0.00872664619, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/cube.obj.s3dasset
       Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
   - Actor: 7025414941505917041

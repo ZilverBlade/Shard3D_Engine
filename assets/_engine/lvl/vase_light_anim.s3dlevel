@@ -9,7 +9,7 @@ Actors:
       Translation: [0, 0, 1]
       Rotation: [0, 0, 0]
       Scale: [5, 5, 5]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/quad.obj.s3dasset
       Materials: [assets/materialdata/DefaultMaterial.s3dasset]
   - Actor: 8874817387433564867
@@ -19,7 +19,7 @@ Actors:
       Translation: [0, 0, 1]
       Rotation: [1.57079637, 0, 0]
       Scale: [2, 2, 2]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/smooth_vase.obj.s3dasset
       Materials: [assets/materialdata/ceramic_vase_01.s3dasset]
   - Actor: 2656111424845641502

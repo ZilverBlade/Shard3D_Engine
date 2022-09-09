@@ -56,7 +56,7 @@ namespace Shard3D {
 	
 	}
 	void PhysicsSystem::begin(ECS::Level* level) {
-		level->registry.view<Components::RigidbodyComponent, Components::TransformComponent>().each([&](Components::RigidbodyComponent& phys, Components::TransformComponent& transform) {
+		level->registry.view<Components::Rigidbody3DComponent, Components::TransformComponent>().each([&](Components::Rigidbody3DComponent& phys, Components::TransformComponent& transform) {
 			physics_system->GetBodyInterface().ActivateBody(phys.physicsBody);
 			glm::mat4 transformMat = transform.transformMatrix;
 			JPH::Mat44 matr = JPH::Mat44();
@@ -85,7 +85,7 @@ namespace Shard3D {
 		// If you want more accurate step results you can do multiple sub steps within a collision step. Usually you would set this to 1.
 		const int cIntegrationSubSteps = 1;
 		physics_system->Update(frameTime, cCollisionSteps, cIntegrationSubSteps, temp_allocator.get(), jobsystem.get());
-		level->registry.view<Components::RigidbodyComponent, Components::TransformComponent>().each([&](Components::RigidbodyComponent& phys, Components::TransformComponent& transform) {
+		level->registry.view<Components::Rigidbody3DComponent, Components::TransformComponent>().each([&](Components::Rigidbody3DComponent& phys, Components::TransformComponent& transform) {
 			
 			JPH::Vec3 translation = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform().GetTranslation();
 			JPH::Vec3 rotation = physics_system->GetBodyInterface().GetTransformedShape(phys.physicsBody).GetWorldTransform().GetRotationSafe().GetQuaternion().GetXYZ();

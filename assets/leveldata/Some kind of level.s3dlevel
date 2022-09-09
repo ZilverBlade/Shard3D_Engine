@@ -9,7 +9,7 @@ Actors:
       Translation: [-1.75999999, -0.620000005, 0.5]
       Rotation: [0, 0, 0]
       Scale: [0.400000006, 0.400000006, 0.400000006]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/cube.obj.s3dasset
       Materials: [assets/texturedata/container2.s3dasset]
   - Actor: 2085834435892676269
@@ -19,7 +19,7 @@ Actors:
       Translation: [0, 0, 0.100000001]
       Rotation: [1.57079637, 0, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/smooth_vase.obj.s3dasset
       Materials: [assets/_engine/mat/vase_material.s3dasset]
   - Actor: 3380813172334762521
@@ -41,7 +41,7 @@ Actors:
       Translation: [0, 0, 0.100000001]
       Rotation: [0, 0, 0]
       Scale: [5, 5, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/quad.obj.s3dasset
       Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
   - Actor: 18382512696233890748
@@ -51,7 +51,7 @@ Actors:
       Translation: [2.53999996, 2, 0.600000024]
       Rotation: [1.57079637, 0, 0]
       Scale: [0.5, 0.5, 0.5]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/sphere.obj.s3dasset
       Materials: [assets/_engine/mat/world_grid.s3dasset]
   - Actor: 6572799387543678022
@@ -93,6 +93,6 @@ Actors:
       FOV: 70
       NearClipPlane: 0.0500000007
       FarClipPlane: 256
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
       Materials: [assets/_engine/mat/camera_material.s3dasset]

@@ -9,6 +9,6 @@ Actors:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
+    Mesh3DComponent:
       MeshAsset: assets/_engine/msh/cube.obj.s3dasset
       Materials: [assets/leveldata/Some kind of material.s3dasset]

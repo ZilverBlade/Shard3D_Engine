@@ -124,7 +124,7 @@ namespace Shard3D {
 		strStream << stream.rdbuf();
 
 		YAML::Node data = YAML::Load(strStream.str());
-		//try 
+		try 
 		{
 			if (data["AssetType"].as<std::string>() != "postprocessing_material") { SHARD3D_ERROR("Material {0} (ID {1})) is not a post processing material!", asset.getFile(), asset.getID()); return make_rPtr<PostProcessingMaterial>(); }
 
@@ -168,9 +168,9 @@ namespace Shard3D {
 				return material;
 			}
 		}
-		//catch (YAML::Exception ex) {
-		//	SHARD3D_ERROR("Unable to load material {0} (ID {1})). Reason: {2}", asset.getFile(), asset.getID(), ex.msg);
-		//}
+		catch (YAML::Exception ex) {
+			SHARD3D_ERROR("Unable to load material {0} (ID {1})). Reason: {2}", asset.getFile(), asset.getID(), ex.msg);
+		}
 		return make_rPtr<PostProcessingMaterial>();
 	}
 

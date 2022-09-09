@@ -48,6 +48,8 @@ namespace Shard3D {
 		int currentFrameIndex;
 		bool isFrameStarted{false};
 
+		std::chrono::steady_clock::time_point timeFrameBegin;
+
 		float noEditBgColor[3] = { 0.01f, 0.01f, 0.01f };
 		std::array<VkClearValue, 2> clearValues{};
 	};

@@ -156,24 +156,18 @@ namespace Shard3D {
 	*/
 
 	enum class PPO_Types {
-		Int8 = 0,
-		Int16 = 1,
 		Int32 = 2,
 		Float = 3,
 		Float2 = 4,
-		Float3 = 5,
 		Float4 = 6
 	};
 		
 	// Helper function: 
 	// Gets the enum type from a raw typeid name
 	static PPO_Types _PPO_helper_getEnumType(const char* typeID_raw) {
-		if (typeID_raw == typeid(char).raw_name())		return PPO_Types::Int8;
-		if (typeID_raw == typeid(short).raw_name())		return PPO_Types::Int16;
 		if (typeID_raw == typeid(int).raw_name())		return PPO_Types::Int32;
 		if (typeID_raw == typeid(float).raw_name())		return PPO_Types::Float;
 		if (typeID_raw == typeid(glm::vec2).raw_name()) return PPO_Types::Float2;
-		if (typeID_raw == typeid(glm::vec3).raw_name()) return PPO_Types::Float3;
 		if (typeID_raw == typeid(glm::vec4).raw_name()) return PPO_Types::Float4;
 		SHARD3D_FATAL("Invalid type chosen: PPO_helper_getEnumType(const char* typeID_raw)");
 	}
@@ -189,7 +183,7 @@ namespace Shard3D {
 		template <typename T>
 		void swap(const T& newParam) { *this = RandomPPOParam(newParam); }
 		template <typename T>
-		void modify(const T& newData) { SHARD3D_ASSERT(sizeof(T) == dataSizeCPU); memcpy(data, &newData, dataSizeCPU); }
+		void modify(const T& newVal) { SHARD3D_ASSERT(sizeof(T) == dataSizeCPU); memcpy(data, &newVal, dataSizeCPU); }
 		template <typename T>
 		T get() { SHARD3D_ASSERT(sizeof(T) == dataSizeCPU); return *reinterpret_cast<T*>(data); }
 		void* get() { return data; }
@@ -200,7 +194,6 @@ namespace Shard3D {
 		void free() { if (data) delete data; }
 	private:
 		RandomPPOParam(const void* mydata, size_t dataSize, PPO_Types type) : dataSizeCPU(dataSize), dataSizeGPU(dataSizeCPU), type(type) {
-			SHARD3D_ASSERT(type != PPO_Types::Float3 && "pain was used");
 			data = malloc(dataSizeCPU);
 			memcpy(data, mydata, dataSizeCPU);
 		}
@@ -252,7 +245,7 @@ namespace Shard3D {
 
 	class PostProcessingMaterialInstance {
 	public:
-		PostProcessingMaterialInstance(PostProcessingMaterial* masterMaterial);
+		PostProcessingMaterialInstance(PostProcessingMaterial* masterMaterial, AssetID masterAssetID);
 		~PostProcessingMaterialInstance();
 		void dispatch(VkCommandBuffer commandBuffer, VkDescriptorSet sceneRenderedSet);
 		void updateBuffers();
@@ -260,6 +253,8 @@ namespace Shard3D {
 		RandomPPOParam& getParameter(uint32_t index);
 		// Do not modify, any modification of this is unsafe
 		PostProcessingMaterial* master;
+		// just to be able to find what the original asset is
+		AssetID masterAsset;
 	private:
 		std::vector<RandomPPOParam> myParamsLocal;
 	};

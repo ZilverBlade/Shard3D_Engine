@@ -20,8 +20,6 @@
 #include "imgui_initializer.h"
 #include <shellapi.h>
 #include <glm/gtc/type_ptr.hpp>
-#include "../application.cpp"
-
 namespace Shard3D {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
@@ -536,6 +534,7 @@ namespace Shard3D {
 
 		if (ImGui::BeginMenu("Actions")) {
 			if (ImGui::MenuItem("Dump current frame's stats", NULL /*make sure to add some sort of shardcut */)) SHARD3D_STAT_DUMP_ALL();
+			if (ImGui::MenuItem("Read graphics settings", NULL /*make sure to add some sort of shardcut */)) GraphicsSettings::read();
 			if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {
 				ShellExecuteA(nullptr, "open", "shadercompmgr.exe", "-o shaders/ shaders/", "/", false);
 			}

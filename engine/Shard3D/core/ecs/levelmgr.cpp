@@ -11,6 +11,14 @@ namespace Shard3D {
 			SHARD3D_INFO("Loading Level Manager");
 		}
 
+		static void PPOSerializeMyParamCamera(YAML::Emitter& out, RandomPPOParam param) {
+			out << YAML::Flow;
+			out << YAML::BeginSeq;
+			out << (uint32_t)param.getType();
+			out << YAML::Binary(reinterpret_cast<uint8_t*>(param.get()), param.getCPUSize());
+			out << YAML::EndSeq;
+		}
+
 		static void saveActor(YAML::Emitter& out, Actor actor, Level* level) {
 			if (actor.isInvalid()) return;
 			out << YAML::BeginMap;
@@ -67,6 +75,15 @@ namespace Shard3D {
 				out << YAML::Key << "FOV" << YAML::Value << actor.getComponent<Components::CameraComponent>().getFOV();
 				out << YAML::Key << "NearClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().getNearClip();
 				out << YAML::Key << "FarClipPlane" << YAML::Value << actor.getComponent<Components::CameraComponent>().getFarClip();
+				out << YAML::Key << "PostProcessing" << YAML::Value << YAML::Flow << YAML::BeginSeq;
+				for (int i = 0; i < actor.getComponent<Components::CameraComponent>().postProcessMaterials.size(); i++) {
+					out << YAML::Flow << YAML::BeginSeq << actor.getComponent<Components::CameraComponent>().postProcessMaterials[i].masterAsset.getFile();
+					for (int j = 0; j  < actor.getComponent<Components::CameraComponent>().postProcessMaterials[i].master->getParamCount(); j++) {
+						PPOSerializeMyParamCamera(out, actor.getComponent<Components::CameraComponent>().postProcessMaterials[i].getParameter(j));
+					}
+					out << YAML::EndSeq;
+				}
+				out << YAML::EndSeq;
 				out << YAML::EndMap;
 			}
 			// AUDIO
@@ -218,6 +235,29 @@ namespace Shard3D {
 							loadedActor.getComponent<Components::CameraComponent>().setFOV(actor["CameraComponent"]["FOV"].as<float>());
 							loadedActor.getComponent<Components::CameraComponent>().setNearClip(actor["CameraComponent"]["NearClipPlane"].as<float>());
 							loadedActor.getComponent<Components::CameraComponent>().setFarClip(actor["CameraComponent"]["FarClipPlane"].as<float>());
+
+							for (int i = 0; i < actor["CameraComponent"]["PostProcessing"].size(); i++) {
+								AssetID masterAsset = AssetID(actor["CameraComponent"]["PostProcessing"][i][0].as<std::string>());
+								ResourceHandler::loadPPOMaterial(masterAsset);
+								PostProcessingMaterialInstance instance{ ResourceHandler::retrievePPOMaterial(masterAsset).get(), masterAsset};
+								for (int j = 1; j < actor["CameraComponent"]["PostProcessing"][i].size(); j++) {
+									switch ((PPO_Types)actor["CameraComponent"]["PostProcessing"][i][j][0].as<uint32_t>()) {
+									case(PPO_Types::Int32):
+										instance.getParameter(j - 1).modify(*reinterpret_cast<const int*>(actor["CameraComponent"]["PostProcessing"][i][j][1].as<YAML::Binary>().data()));
+										break;
+									case(PPO_Types::Float):
+										instance.getParameter(j - 1).modify(*reinterpret_cast<const float*>(actor["CameraComponent"]["PostProcessing"][i][j][1].as<YAML::Binary>().data()));
+										break;
+									case(PPO_Types::Float2):
+										instance.getParameter(j - 1).modify(*reinterpret_cast<const glm::vec2*>(actor["CameraComponent"]["PostProcessing"][i][j][1].as<YAML::Binary>().data()));
+										break;
+									case(PPO_Types::Float4):
+										instance.getParameter(j - 1).modify(*reinterpret_cast<const glm::vec4*>(actor["CameraComponent"]["PostProcessing"][i][j][1].as<YAML::Binary>().data()));
+										break;
+									}
+								}
+								loadedActor.getComponent<Components::CameraComponent>().postProcessMaterials.push_back(std::move(instance));
+							}
 						}
 						if (actor["BillboardComponent"]) {
 							ResourceHandler::loadTexture(
