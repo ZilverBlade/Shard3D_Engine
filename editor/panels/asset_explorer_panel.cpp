@@ -54,6 +54,12 @@ namespace Shard3D {
 
 	AssetExplorerPanel::AssetExplorerPanel() : currentDir(ENGINE_ASSETS_PATH) { 
 		{
+			auto& img = _special_assets::_editor_icons.at("editor.browser.navback");
+			backIcon = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		} {
+			auto& img = _special_assets::_editor_icons.at("editor.browser.refresh");
+			refreshIcon = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		} {
 			auto& img = _special_assets::_editor_icons.at("editor.browser.folder");
 			folderIcon = ImGui_ImplVulkan_AddTexture(img->getSampler(), img->getImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 		} {
@@ -84,12 +90,12 @@ namespace Shard3D {
 		bool refresh_it = false;
 
 		ImGui::Begin("Asset Explorer");
-		if (ImGui::ImageButtonWithText(fileIcon, "Refresh", {16.f, 16.f})) {
+		if (ImGui::ImageButtonWithText(refreshIcon, "Refresh", {16.f, 16.f})) {
 			refresh_it = true;
 		}
 		if (currentDir != std::filesystem::path(ENGINE_ASSETS_PATH)) {
 			ImGui::SameLine();
-			if (ImGui::Button("<= Back")) {
+			if (ImGui::ImageButtonWithText(backIcon, "Back", { 16.f, 16.f })) {
 				currentDir = currentDir.parent_path();
 				refresh_it = true;
 			}
@@ -153,7 +159,7 @@ namespace Shard3D {
 
 			ImGui::PopStyleVar();
 			ImGui::PopStyleColor();		
-			ImGui::TextWrapped(fileStr.c_str());
+			ImGui::TextWrapped(dirEnt.is_directory()? fileStr.c_str() : fileStr.substr(0, fileStr.find_last_of(".")).c_str());
 
 			ImGui::NextColumn();
 			ImGui::PopID();

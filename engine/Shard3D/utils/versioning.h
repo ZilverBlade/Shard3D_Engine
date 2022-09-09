@@ -11,7 +11,7 @@ namespace Shard3D {
 		Version(Version& other) = delete;
 		Version operator=(Version& other) = delete;
 
-		bool potentiallyUnstable() { return state != VersionState::Stable; }
+		bool potentiallyUnstable() const { return state != VersionState::Stable; }
 		std::string toString() const {
 			switch (state) {
 			case VersionState::PreAlpha:

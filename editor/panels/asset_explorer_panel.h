@@ -18,6 +18,8 @@ namespace Shard3D {
 
 		void render();
 	private:
+		VkDescriptorSet refreshIcon;
+		VkDescriptorSet backIcon;
 		VkDescriptorSet folderIcon;
 		VkDescriptorSet fileIcon;
 		VkDescriptorSet mesh3dIcon;

@@ -334,6 +334,7 @@ namespace Shard3D {
 			}
 			catch (YAML::Exception ex) {
 				SHARD3D_ERROR("Unable to load level {0}. Reason: {1}", sourcePath, ex.msg);
+				return LevelMgrResults::FailedResult;
 			}
 			mLevel->name = AssetUtils::truncatePath(sourcePath);
 			mLevel->currentpath = sourcePath;

@@ -229,7 +229,9 @@ namespace Shard3D {
 		SHARD3D_INFO("Loading editor camera actor");
 		ECS::Actor editor_cameraActor = level->createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
 		editor_cameraActor.addComponent<Components::CameraComponent>();
-
+		editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
+		editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
+		
 		level->setPossessedCameraActor(editor_cameraActor);
 		editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
 		SHARD3D_INFO("Loading dummy actor");
@@ -409,6 +411,7 @@ beginWhileLoop:
 
 		if (level->simulationState != PlayState::Stopped) level->end();
 
+		ShaderSystem::destroy();
 		ScriptEngine::destroy();
 		vkDeviceWaitIdle(engineDevice.device());
 

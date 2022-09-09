@@ -177,9 +177,6 @@
     <ClInclude Include="systems\computational\physics_system.h">
       <Filter>Header Files\systems\computational</Filter>
     </ClInclude>
-    <ClInclude Include="systems\computational\compute_system.h">
-      <Filter>Header Files\systems\computational</Filter>
-    </ClInclude>
     <ClInclude Include="systems\buffers\material_system.h">
       <Filter>Header Files\systems\buffers</Filter>
     </ClInclude>
@@ -486,9 +483,6 @@
     <ClCompile Include="systems\computational\physics_system.cpp">
       <Filter>Source Files\systems\computational</Filter>
     </ClCompile>
-    <ClCompile Include="systems\computational\compute_system.cpp">
-      <Filter>Source Files\systems\computational</Filter>
-    </ClCompile>
     <ClCompile Include="systems\computational\particle_system.cpp">
       <Filter>Source Files\systems\computational</Filter>
     </ClCompile>
@@ -592,6 +586,9 @@
     </None>
     <None Include="shaders\post_processing\debander.frag">
       <Filter>Resource Files\Shaders\post_processing\final</Filter>
+    </None>
+    <None Include="shaders\post_processing\noise.comp">
+      <Filter>Resource Files\Shaders\post_processing</Filter>
     </None>
   </ItemGroup>
 </Project>

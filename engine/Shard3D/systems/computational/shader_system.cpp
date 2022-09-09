@@ -42,8 +42,10 @@ namespace Shard3D {
 		out.flush();
 		out.close();
 	}
-	void ShaderSystem::compileOnTheFly(const std::string& source, ShaderType type) {
-		SHARD3D_ASSERT(false && "Not implemented");
+	const char* ShaderSystem::compileOnTheFly(const std::string& data, ShaderType type) {
+		shaderc::SpvCompilationResult result =
+			compiler->CompileGlslToSpv(data, (shaderc_shader_kind)type, "assets/_engine/0.spv", *options);
+		return reinterpret_cast<const char*>(result.cbegin());
 	}
 	void ShaderSystem::destroy() {
 		delete compiler;

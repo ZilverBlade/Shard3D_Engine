@@ -11,7 +11,6 @@
 #include "buffers/light_system.h"
 #include "buffers/material_system.h"
 
-#include "computational/compute_system.h"
 #include "computational/particle_system.h"
 #include "computational/physics_system.h"
 #include "computational/shader_system.h"

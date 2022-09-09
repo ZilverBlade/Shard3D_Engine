@@ -150,10 +150,7 @@ namespace Shard3D {
 		void bind(VkCommandBuffer commandBuffer);
 	};
 
-	/*
-	*	Material that can be used for post processing effects.
-	*	As this is quite complex, you must write shader files for this.
-	*/
+	
 
 	enum class PPO_Types {
 		Int32 = 2,
@@ -175,7 +172,6 @@ namespace Shard3D {
 	struct RandomPPOParam {
 		template <typename T>
 		RandomPPOParam(const T& mydata) : dataSizeCPU(sizeof(T)), dataSizeGPU(dataSizeCPU), type(_PPO_helper_getEnumType(typeid(T).raw_name())) {
-			SHARD3D_ASSERT(type != PPO_Types::Float3 && "pain was used");
 			data = malloc(dataSizeCPU);
 			memcpy(data, &mydata, dataSizeCPU);
 		}
@@ -204,6 +200,10 @@ namespace Shard3D {
 		void* data;
 	};
 
+	/*
+	*	Material that can be used for post processing effects.
+	*	As this is quite complex, you must write shader files for this.
+	*/
 	class PostProcessingMaterial {
 	public:
 		PostProcessingMaterial() {}

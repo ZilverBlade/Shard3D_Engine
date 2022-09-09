@@ -142,12 +142,6 @@ namespace Shard3D {
 					auto myParam = container["MyParams"][i];
 					PPO_Types type = (PPO_Types)myParam[0].as<uint32_t>();
 					switch (type) {
-						case(PPO_Types::Int8):
-							material->addParameter(*reinterpret_cast<const char*>(myParam[2].as<YAML::Binary>().data()), myParam[1].as<std::string>());
-							break;
-						case(PPO_Types::Int16):
-							material->addParameter(*reinterpret_cast<const short*>(myParam[2].as<YAML::Binary>().data()), myParam[1].as<std::string>());
-							break;
 						case(PPO_Types::Int32):
 							material->addParameter(*reinterpret_cast<const int*>(myParam[2].as<YAML::Binary>().data()), myParam[1].as<std::string>());
 							break;
@@ -156,9 +150,6 @@ namespace Shard3D {
 							break;
 						case(PPO_Types::Float2):
 							material->addParameter(*reinterpret_cast<const glm::vec2*>(myParam[2].as<YAML::Binary>().data()), myParam[1].as<std::string>());
-							break;
-						case(PPO_Types::Float3):
-							SHARD3D_FATAL("are you trying to kill me");
 							break;
 						case(PPO_Types::Float4):
 							material->addParameter(*reinterpret_cast<const glm::vec4*>(myParam[2].as<YAML::Binary>().data()), myParam[1].as<std::string>());

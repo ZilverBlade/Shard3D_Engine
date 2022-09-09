@@ -20,7 +20,7 @@ namespace Shard3D {
 		static void init();
 		static void compileFromFile(const std::string& source, const std::string& destination, ShaderType type);
 		static void compileDirect(const char*, const std::string& destination, ShaderType type);
-		static void compileOnTheFly(const std::string& source, ShaderType type);
+		static const char* compileOnTheFly(const std::string& source, ShaderType type);
 		static void destroy();
 	private:
 		static inline shaderc::Compiler* compiler{};
