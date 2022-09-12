@@ -5,7 +5,7 @@
 
 Shard3D Engine, a 2000s styled engine running on Vulkan 1.3
 
-The goal is to get an partial editor based engine with 2000s styled graphics with modern technology, with tons of customisation.
+The goal is to make a full on editor based engine with 2000s styled graphics with modern technology, with tons of customisation.
 Read more on the website: https://www.shard3d.com
 
 ### Requirements
@@ -36,7 +36,6 @@ make sure for the first build to switch 'Use (/Yu)' to 'Create (/Yc)', and then 
 - Move Down = RIGHT CONTROL
 - Slow Down Movement = LEFT CONTROL
 - Speed Up Movement = LEFT SHIFT
-- Adjust FOV = Scroll Wheel
 
 # What Shard3D offers
 
