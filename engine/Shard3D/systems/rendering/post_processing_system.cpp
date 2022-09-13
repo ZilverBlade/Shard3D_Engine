@@ -32,9 +32,7 @@ namespace Shard3D {
 		if (x3)
 			builder.addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
 
-		ppo_Layout = builder.build();
-
-	
+		ppo_Layout = builder.build();	
 
 		EngineDescriptorWriter writer = EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
 			.writeImage(0, &ppoDescriptor_BaseRenderedScene); 
@@ -47,13 +45,6 @@ namespace Shard3D {
 
 		writer.build(ppo_InputDescriptorSet);
 		MaterialSystem::setRenderedSceneImageLayout(ppo_Layout->getDescriptorSetLayout());
-
-		ppo_LayoutFinalImage = EngineDescriptorSetLayout::Builder(engineDevice)
-			.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
-
-		EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
-			.writeImage(0, &ppoDescriptor_BaseRenderedScene).build(ppo_OutDescriptorFinalImage);
-
 
 		createPipelineLayout();
 		createPipelines(presentingRenderPass);
