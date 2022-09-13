@@ -290,12 +290,12 @@ namespace Shard3D {
 		globalData->hudContext = container;
 	}
 
-	inline bool ScriptEngine::doesClassExist(const std::string& fullClassName, int lang) {
+	bool ScriptEngine::doesClassExist(const std::string& fullClassName, int lang) {
 		return !lang ? scriptEngineData->actorClasses.find(fullClassName) != scriptEngineData->actorClasses.end() :
 			vbScriptEngineData->actorClasses.find(fullClassName) != vbScriptEngineData->actorClasses.end();
 	}
 
-	inline bool ScriptEngine::doesHUDClassExist(const std::string& fullClassName, int lang) {
+	bool ScriptEngine::doesHUDClassExist(const std::string& fullClassName, int lang) {
 		return !lang ? scriptEngineData->hudClasses.find(fullClassName) != scriptEngineData->hudClasses.end() :
 			vbScriptEngineData->hudClasses.find(fullClassName) != vbScriptEngineData->hudClasses.end();
 	}

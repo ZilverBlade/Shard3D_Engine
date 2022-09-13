@@ -18,7 +18,6 @@ namespace Shard3D {
 		void render(LevelTreePanel& tree);
 	private:
 		void drawActorProperties(Actor& actor);
-		void drawBlueprintInfo(Actor& actor);
 		void displayPreviewCamera(Actor& actor);
 		sPtr<Level> context;
 

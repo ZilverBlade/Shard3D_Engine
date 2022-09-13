@@ -182,7 +182,7 @@ namespace Shard3D {
 			{"editor.browser.file.msh",			"assets/_engine/_editor/icon_mesh.png"			},
 			{"editor.browser.file.lvl",			"assets/_engine/_editor/icon_level_old.png"		},
 			{"editor.browser.file.smt",			"assets/_engine/_editor/icon_material.png"		},
-			{"editor.browser.file.pmt",			"assets/_engine/_editor/icon_whatfile.png"			},
+			{"editor.browser.file.pmt",			"assets/_engine/_editor/icon_whatfile.png"		},
 			{"editor.browser.file.0",			"assets/_engine/_editor/icon_whatfile.png"		},
 			{"component.light.point",			"assets/_engine/_editor/icon_lightpoint.png"	},
 			{"component.light.spot",			"assets/_engine/_editor/icon_lightspot.png"		},

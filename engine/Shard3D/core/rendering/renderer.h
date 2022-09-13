@@ -45,7 +45,7 @@ namespace Shard3D {
 		std::vector<VkCommandBuffer> commandBuffers;	
 
 		uint32_t currentImageIndex;
-		int currentFrameIndex;
+		int currentFrameIndex{};
 		bool isFrameStarted{false};
 
 		float noEditBgColor[3] = { 0.01f, 0.01f, 0.01f };

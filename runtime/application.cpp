@@ -31,28 +31,50 @@ namespace Shard3D {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				glm::ivec3(1920, 1080, 1),
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				GraphicsSettings::get().MSAASamples
-				}, FrameBufferAttachmentType::Color);
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color
+			);
 
 			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				VK_FORMAT_D24_UNORM_S8_UINT,
-				VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+				engineRenderer.getSwapchain()->findDepthFormat(),
+				VK_IMAGE_ASPECT_DEPTH_BIT,
 				glm::ivec3(1920, 1080, 1),
 				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-				GraphicsSettings::get().MSAASamples
-				}, FrameBufferAttachmentType::Depth);
-
-			mainResolveFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Depth
+			);
+			mainPositionFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				glm::ivec3(1920, 1080, 1),
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
-				}, FrameBufferAttachmentType::Resolve);
+				}, FrameBufferAttachmentType::Color
+			);
+
+			mainNormalFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color
+			);
+
+			mainMaterialDataFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color
+			);
 
 			AttachmentInfo colorAttachmentInfo{};
 			colorAttachmentInfo.frameBufferAttachment = mainColorFramebufferAttachment;
@@ -64,19 +86,34 @@ namespace Shard3D {
 			depthAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
-			AttachmentInfo resolveAttachmentInfo{};
-			resolveAttachmentInfo.frameBufferAttachment = mainResolveFramebufferAttachment;
-			resolveAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			resolveAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			AttachmentInfo positionAttachmentInfo{};
+			positionAttachmentInfo.frameBufferAttachment = mainPositionFramebufferAttachment;
+			positionAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			positionAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+
+			AttachmentInfo normalAttachmentInfo{};
+			normalAttachmentInfo.frameBufferAttachment = mainNormalFramebufferAttachment;
+			normalAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			normalAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			AttachmentInfo materialAttachmentInfo{};
+			materialAttachmentInfo.frameBufferAttachment = mainMaterialDataFramebufferAttachment;
+			materialAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			materialAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
 
 			mainRenderpass = new RenderPass(
 				engineDevice, {
 				colorAttachmentInfo,
 				depthAttachmentInfo,
-				resolveAttachmentInfo
+				positionAttachmentInfo,
+				normalAttachmentInfo,
+				materialAttachmentInfo
 				});
-			
-			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainResolveFramebufferAttachment });
+
+			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment });
 		}
 	}
 
@@ -85,7 +122,8 @@ namespace Shard3D {
 		delete mainRenderpass;
 		delete mainColorFramebufferAttachment;
 		delete mainDepthFramebufferAttachment;
-		delete mainResolveFramebufferAttachment;
+		delete mainNormalFramebufferAttachment;
+		delete mainMaterialDataFramebufferAttachment;
 
 	}
 
@@ -141,7 +179,7 @@ namespace Shard3D {
 		}
 
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr} };
+		PostProcessingSystem ppoSystem{ engineDevice, engineRenderer.getSwapChainRenderPass(), {mainColorFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment} };
 		ShadowMappingSystem shadowSystem{ engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };

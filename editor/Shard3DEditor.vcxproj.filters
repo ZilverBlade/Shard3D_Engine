@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="camera">
+      <UniqueIdentifier>{EE85E6F5-DA27-11CC-C3E2-2420AF23981C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{0098A80F-6CAC-D0C0-352E-7420A101CDF1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="panels">
+      <UniqueIdentifier>{C8213A14-B4C3-64EA-9D7E-783E89BFEB3A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="camera\editor_movement_controller.h">
+      <Filter>camera</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_glfw_implementation.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_implementation.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_initializer.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_layer.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\asset_explorer_panel.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\default_component_panels.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\hud_builder_panel.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\level_peekers.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\level_properties_panel.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\level_tree_panel.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\material_builder_panel.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\settings_panel.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+    <ClInclude Include="panels\viewport_panel.h">
+      <Filter>panels</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="application.cpp" />
+    <ClCompile Include="camera\editor_movement_controller.cpp">
+      <Filter>camera</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_glfw_implementation.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_implementation.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_initializer.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_layer.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="panels\asset_explorer_panel.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\default_component_panels.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\hud_builder_panel.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\level_peekers.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\level_properties_panel.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\level_tree_panel.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\material_builder_panel.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\settings_panel.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+    <ClCompile Include="panels\viewport_panel.cpp">
+      <Filter>panels</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="applicationh" />
+  </ItemGroup>
+</Project>

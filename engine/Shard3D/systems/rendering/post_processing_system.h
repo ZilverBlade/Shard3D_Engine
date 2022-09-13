@@ -43,6 +43,7 @@ namespace Shard3D {
 		uPtr<ComputePipeline> gammaCorrectionShaderPipeline;
 
 		VkDescriptorSet ppo_InputDescriptorSet{};
+		VkDescriptorSet ppo_OutDescriptorFinalImage{};
 
 		VkDescriptorImageInfo ppoDescriptor_BaseRenderedScene;
 		VkDescriptorImageInfo ppoDescriptor_PositionSceneInfo;
@@ -50,6 +51,7 @@ namespace Shard3D {
 		VkDescriptorImageInfo ppoDescriptor_MaterialSceneInfo;
 
 		uPtr<EngineDescriptorSetLayout> ppo_Layout{};
+		uPtr<EngineDescriptorSetLayout> ppo_LayoutFinalImage{};
 
 		VkPipelineLayout pipelineLayout{};
 

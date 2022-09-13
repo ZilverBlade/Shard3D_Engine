@@ -1,10 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Deploy|x64">
-      <Configuration>Deploy</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
@@ -15,37 +11,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{AE4D95F2-1A2D-148E-2345-9F648FA37AEF}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{b68ed66f-ec3b-4689-933f-089a55d2cfaa}</ProjectGuid>
-    <RootNamespace>s3d</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <RootNamespace>Shard3D</RootNamespace>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -53,133 +39,77 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)engine\Shard3D\bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)engine\Shard3D\obj\$(Configuration)\</IntDir>
+    <OutDir>bin\Debug-windows-x86_64\</OutDir>
+    <IntDir>obj\Debug\</IntDir>
+    <TargetName>Shard3D</TargetName>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)engine\Shard3D\bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)engine\Shard3D\obj\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)engine\Shard3D\bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)engine\Shard3D\obj\$(Configuration)\</IntDir>
+    <OutDir>bin\Release-windows-x86_64\</OutDir>
+    <IntDir>obj\Release\</IntDir>
+    <TargetName>Shard3D</TargetName>
+    <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>26812;4244;4996;4005;;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\Vulkan-1.3.211.0\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\yaml\include;..\extern\entt\1include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;shadercd.lib;shaderc_combinedd.lib;shaderc_sharedd.lib;shaderc_utild.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mtd.lib;yaml-cpp_d.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\d;..\extern\joltphysics\lib\d;..\extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;Comdlg32.lib;shlwapi.lib;jolt_d.lib;shadercd.lib;shaderc_combinedd.lib;shaderc_sharedd.lib;shaderc_utild.lib;libmono-static-sgen_d.lib;assimp-vc143-mtd.lib;yaml-cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Vulkan-1.3.211.0\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib;..\extern\joltphysics\lib;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>26812;4244;4996;4005;;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\Vulkan-1.3.211.0\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\yaml\include;..\extern\entt\1include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <DebugInformationFormat>None</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;shaderc_combined.lib;shaderc_shared.lib;shaderc_util.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
-    </Lib>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_DEPLOY;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <DebugInformationFormat>None</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <SubSystem>
-      </SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-    <Lib>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib\r;..\extern\joltphysics\lib\r;..\extern\assimp\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;shaderc.lib;shaderc_combined.lib;shaderc_shared.lib;shaderc_util.lib;glfw3.lib;jolt.lib;libmono-static-sgen.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies);Comdlg32.lib;shlwapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;Ws2_32.lib;Winmm.lib;Bcrypt.lib;Version.lib;Comdlg32.lib;shlwapi.lib;jolt.lib;shaderc.lib;shaderc_combined.lib;shaderc_shared.lib;shaderc_util.lib;libmono-static-sgen.lib;assimp-vc143-mt.lib;yaml-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Vulkan-1.3.211.0\Lib;..\extern\glfw-3.3.7\lib-vc2019;..\extern\imgui\lib;..\extern\imgui-node-editor\lib;..\extern\yaml\lib;..\extern\mono\lib;..\extern\joltphysics\lib;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="core\asset\material.h" />
-    <ClInclude Include="core\asset\matmgr.h" />
-    <ClInclude Include="core\asset\serializer.h" />
-    <ClInclude Include="core\asset\assetid.h" />
-    <ClInclude Include="core\rendering\frame_buffer.h" />
-    <ClInclude Include="core\rendering\render_pass.h" />
-    <ClInclude Include="core\vulkan_api\pipeline_compute.h" />
-    <ClInclude Include="events\wnd_event.h" />
-    <ClInclude Include="systems\computational\shader_system.h" />
-    <ClInclude Include="systems\rendering\shadow_mapping_system.h" />
-    <ClInclude Include="workarounds.h" />
     <ClInclude Include="core.h" />
-    <ClInclude Include="dynamic_definitions.h" />
-    <ClInclude Include="ecs.h" />
-    <ClInclude Include="s3dstd.h" />
-    <ClInclude Include="static_definitions.h" />
-    <ClInclude Include="vulkan_abstr.h" />
+    <ClInclude Include="core\asset\assetid.h" />
     <ClInclude Include="core\asset\assetmgr.h" />
     <ClInclude Include="core\asset\cubemap.h" />
+    <ClInclude Include="core\asset\material.h" />
+    <ClInclude Include="core\asset\matmgr.h" />
     <ClInclude Include="core\asset\model.h" />
+    <ClInclude Include="core\asset\serializer.h" />
     <ClInclude Include="core\asset\texture.h" />
     <ClInclude Include="core\audio\audio.h" />
     <ClInclude Include="core\ecs\actor.h" />
@@ -187,325 +117,116 @@
     <ClInclude Include="core\ecs\level.h" />
     <ClInclude Include="core\ecs\levelmgr.h" />
     <ClInclude Include="core\ecs\sactor.h" />
+    <ClInclude Include="core\misc\UUID.h" />
     <ClInclude Include="core\misc\cheat_codes.h" />
     <ClInclude Include="core\misc\frame_info.h" />
     <ClInclude Include="core\misc\graphics_settings.h" />
-    <ClInclude Include="core\misc\UUID.h" />
     <ClInclude Include="core\rendering\camera.h" />
+    <ClInclude Include="core\rendering\frame_buffer.h" />
+    <ClInclude Include="core\rendering\render_pass.h" />
     <ClInclude Include="core\rendering\renderer.h" />
     <ClInclude Include="core\rendering\swap_chain.h" />
     <ClInclude Include="core\rendering\window.h" />
     <ClInclude Include="core\ui\hud.h" />
-    <ClInclude Include="core\ui\hudmgr.h" />
     <ClInclude Include="core\ui\hud_layer.h" />
+    <ClInclude Include="core\ui\hudmgr.h" />
     <ClInclude Include="core\vulkan_api\buffer.h" />
     <ClInclude Include="core\vulkan_api\descriptors.h" />
     <ClInclude Include="core\vulkan_api\device.h" />
     <ClInclude Include="core\vulkan_api\pipeline.h" />
+    <ClInclude Include="core\vulkan_api\pipeline_compute.h" />
+    <ClInclude Include="dynamic_definitions.h" />
+    <ClInclude Include="ecs.h" />
     <ClInclude Include="events\event.h" />
     <ClInclude Include="events\input.h" />
     <ClInclude Include="events\key_event.h" />
     <ClInclude Include="events\mouse_event.h" />
+    <ClInclude Include="events\wnd_event.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="plugins\example_component.h" />
     <ClInclude Include="plugins\plugin_link.h" />
     <ClInclude Include="plugins\script_engine_plugin_link.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="s3dpch.h" />
+    <ClInclude Include="s3dstd.h" />
     <ClInclude Include="scripting\script_engine.h" />
     <ClInclude Include="scripting\script_engine_linker.h" />
     <ClInclude Include="scripting\script_handler.h" />
-    <ClInclude Include="utils\logger.h" />
-    <ClInclude Include="utils\simple_ini.h" />
+    <ClInclude Include="static_definitions.h" />
     <ClInclude Include="systems\buffers\light_system.h" />
     <ClInclude Include="systems\buffers\material_system.h" />
     <ClInclude Include="systems\computational\particle_system.h" />
     <ClInclude Include="systems\computational\physics_system.h" />
+    <ClInclude Include="systems\computational\shader_system.h" />
     <ClInclude Include="systems\rendering\billboard_system.h" />
     <ClInclude Include="systems\rendering\editor\editor_billboard_renderer.h" />
     <ClInclude Include="systems\rendering\editor\grid_system.h" />
     <ClInclude Include="systems\rendering\forward_render_system.h" />
-    <ClInclude Include="systems\rendering\post_processing_system.h" />
     <ClInclude Include="systems\rendering\hud_system.h" />
+    <ClInclude Include="systems\rendering\post_processing_system.h" />
+    <ClInclude Include="systems\rendering\shadow_mapping_system.h" />
     <ClInclude Include="systems\systems.h" />
     <ClInclude Include="utils\def_dynamic.h" />
     <ClInclude Include="utils\dialogs.h" />
     <ClInclude Include="utils\engine_utils.h" />
+    <ClInclude Include="utils\logger.h" />
+    <ClInclude Include="utils\simple_ini.h" />
     <ClInclude Include="utils\stats_timing.h" />
     <ClInclude Include="utils\versioning.h" />
     <ClInclude Include="utils\yaml_ext.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="vulkan_abstr.h" />
+    <ClInclude Include="workarounds.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="core\asset\assetmgr.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\asset\cubemap.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\asset\material.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\asset\matmgr.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\asset\model.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\asset\serializer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="core\asset\texture.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\audio\audio.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ecs\actor.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ecs\components.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ecs\level.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ecs\levelmgr.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\asset\assetid.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="core\misc\graphics_settings.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\misc\UUID.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\rendering\camera.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\rendering\frame_buffer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\rendering\renderer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\rendering\render_pass.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\rendering\swap_chain.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\rendering\window.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ui\hudmgr.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ui\hud_layer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="core\vulkan_api\buffer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\vulkan_api\descriptors.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\vulkan_api\device.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\vulkan_api\pipeline.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\vulkan_api\pipeline_compute.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
+    <ClCompile Include="Shard3D.cpp" />
+    <ClCompile Include="core\asset\assetid.cpp" />
+    <ClCompile Include="core\asset\assetmgr.cpp" />
+    <ClCompile Include="core\asset\cubemap.cpp" />
+    <ClCompile Include="core\asset\material.cpp" />
+    <ClCompile Include="core\asset\matmgr.cpp" />
+    <ClCompile Include="core\asset\model.cpp" />
+    <ClCompile Include="core\asset\serializer.cpp" />
+    <ClCompile Include="core\asset\texture.cpp" />
+    <ClCompile Include="core\audio\audio.cpp" />
+    <ClCompile Include="core\ecs\actor.cpp" />
+    <ClCompile Include="core\ecs\components.cpp" />
+    <ClCompile Include="core\ecs\level.cpp" />
+    <ClCompile Include="core\ecs\levelmgr.cpp" />
+    <ClCompile Include="core\misc\UUID.cpp" />
+    <ClCompile Include="core\misc\graphics_settings.cpp" />
+    <ClCompile Include="core\rendering\camera.cpp" />
+    <ClCompile Include="core\rendering\frame_buffer.cpp" />
+    <ClCompile Include="core\rendering\render_pass.cpp" />
+    <ClCompile Include="core\rendering\renderer.cpp" />
+    <ClCompile Include="core\rendering\swap_chain.cpp" />
+    <ClCompile Include="core\rendering\window.cpp" />
+    <ClCompile Include="core\ui\hud_layer.cpp" />
+    <ClCompile Include="core\ui\hudmgr.cpp" />
+    <ClCompile Include="core\vulkan_api\buffer.cpp" />
+    <ClCompile Include="core\vulkan_api\descriptors.cpp" />
+    <ClCompile Include="core\vulkan_api\device.cpp" />
+    <ClCompile Include="core\vulkan_api\pipeline.cpp" />
+    <ClCompile Include="core\vulkan_api\pipeline_compute.cpp" />
     <ClCompile Include="s3dpch.cpp" />
-    <ClCompile Include="scripting\script_engine.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="scripting\script_engine_linker.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\buffers\light_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\buffers\material_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\computational\particle_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\computational\physics_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\computational\shader_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\rendering\billboard_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\rendering\editor\editor_billboard_renderer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\rendering\editor\grid_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\rendering\forward_render_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\rendering\post_processing_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\rendering\hud_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="systems\rendering\shadow_mapping_system.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="utils\engine_utils.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="utils\logger.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="utils\stats_timing.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\assets\_engine\mat\ppo\ssao.comp" />
-    <None Include="..\..\assets\_engine\shaderdata\surface_material\global_ubo.glsl" />
-    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_masked.s3dshdef" />
-    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_material.frag" />
-    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_opaque.s3dshdef" />
-    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_shaded.s3dshdef" />
-    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_translucent.s3dshdef" />
-    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_unshaded.s3dshdef" />
-    <None Include="shaders\billboard_sva.frag" />
-    <None Include="shaders\billboard_sva.vert" />
-    <None Include="shaders\fragment_blank.frag" />
-    <None Include="shaders\fullscreen_quad.vert" />
-    <None Include="shaders\hud_element.frag" />
-    <None Include="shaders\hud_element.vert" />
-    <None Include="shaders\mesh_shader.vert" />
-    <None Include="shaders\post_processing\debander.frag" />
-    <None Include="shaders\post_processing\bloom.comp" />
-    <None Include="shaders\post_processing\debander_10bit.frag" />
-    <None Include="shaders\post_processing\gamma_correction.comp" />
-    <None Include="shaders\post_processing\hdr.comp" />
-    <None Include="shaders\post_processing\lens_flare.frag" />
-    <None Include="shaders\post_processing\noise.comp" />
-    <None Include="shaders\shadow_directional.vert" />
-    <None Include="shaders\_editor\editor_svabill.frag" />
-    <None Include="shaders\_editor\editor_svabill.vert" />
-    <None Include="shaders\_editor\grid.frag" />
-    <None Include="shaders\_editor\grid.vert" />
+    <ClCompile Include="scripting\script_engine.cpp" />
+    <ClCompile Include="scripting\script_engine_linker.cpp" />
+    <ClCompile Include="systems\buffers\light_system.cpp" />
+    <ClCompile Include="systems\buffers\material_system.cpp" />
+    <ClCompile Include="systems\computational\particle_system.cpp" />
+    <ClCompile Include="systems\computational\physics_system.cpp" />
+    <ClCompile Include="systems\computational\shader_system.cpp" />
+    <ClCompile Include="systems\rendering\billboard_system.cpp" />
+    <ClCompile Include="systems\rendering\editor\editor_billboard_renderer.cpp" />
+    <ClCompile Include="systems\rendering\editor\grid_system.cpp" />
+    <ClCompile Include="systems\rendering\forward_render_system.cpp" />
+    <ClCompile Include="systems\rendering\hud_system.cpp" />
+    <ClCompile Include="systems\rendering\post_processing_system.cpp" />
+    <ClCompile Include="systems\rendering\shadow_mapping_system.cpp" />
+    <ClCompile Include="utils\engine_utils.cpp" />
+    <ClCompile Include="utils\logger.cpp" />
+    <ClCompile Include="utils\stats_timing.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

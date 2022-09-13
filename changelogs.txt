@@ -196,7 +196,7 @@ ALPHA:
 		- Added launch function
 		- Removed the MasterManager
 		- Deprecated MSAA for good (D: sad)
-
+		- Switched to premake
 
 		:: TODO, proper events sytem, fix issue with resources not being unloaded, add editor layouts, use premake
 		:: Fix: dont use 64 bit integers for shaders (e.g. HUD system)

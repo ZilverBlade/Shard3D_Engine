@@ -40,7 +40,10 @@ namespace Shard3D {
 		
 		FrameBufferAttachment* mainColorFramebufferAttachment;
 		FrameBufferAttachment* mainDepthFramebufferAttachment;
-		FrameBufferAttachment* mainResolveFramebufferAttachment;
+		FrameBufferAttachment* mainPositionFramebufferAttachment;
+		FrameBufferAttachment* mainNormalFramebufferAttachment;
+		FrameBufferAttachment* mainMaterialDataFramebufferAttachment;
+
 		FrameBuffer* mainFrameBuffer;
 		RenderPass* mainRenderpass;
 

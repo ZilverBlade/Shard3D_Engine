@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F56DF10C-612E-6D43-2A69-B6C096E8B11F}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Shard3DEditor</RootNamespace>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\export\bin\Debug-windows-x86_64\</OutDir>
+    <IntDir>obj\Debug\</IntDir>
+    <TargetName>Shard3DEditor</TargetName>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\export\bin\Release-windows-x86_64\</OutDir>
+    <IntDir>obj\Release\</IntDir>
+    <TargetName>Shard3DEditor</TargetName>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>26812;4244;4996;4005;;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\Vulkan-1.3.211.0\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\yaml\include;..\engine\extern\entt\1include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\engine\extern\assimp\include;..\engine\extern\half;..\engine;extern\imgui;extern\imguizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>imguizmo.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ImGui_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>extern\imgui\lib;extern\imguizmo\lib;..\engine\Shard3D\bin\Debug-windows-x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>26812;4244;4996;4005;;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\Vulkan-1.3.211.0\Include;..\engine\extern\glfw-3.3.7\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\yaml\include;..\engine\extern\entt\1include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\engine\extern\assimp\include;..\engine\extern\half;..\engine;extern\imgui;extern\imguizmo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>imguizmo.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ImGui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>extern\imgui\lib;extern\imguizmo\lib;..\engine\Shard3D\bin\Release-windows-x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="camera\editor_movement_controller.h" />
+    <ClInclude Include="imgui\imgui_glfw_implementation.h" />
+    <ClInclude Include="imgui\imgui_implementation.h" />
+    <ClInclude Include="imgui\imgui_initializer.h" />
+    <ClInclude Include="imgui\imgui_layer.h" />
+    <ClInclude Include="panels\asset_explorer_panel.h" />
+    <ClInclude Include="panels\default_component_panels.h" />
+    <ClInclude Include="panels\hud_builder_panel.h" />
+    <ClInclude Include="panels\level_peekers.h" />
+    <ClInclude Include="panels\level_properties_panel.h" />
+    <ClInclude Include="panels\level_tree_panel.h" />
+    <ClInclude Include="panels\material_builder_panel.h" />
+    <ClInclude Include="panels\settings_panel.h" />
+    <ClInclude Include="panels\viewport_panel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="application.cpp" />
+    <ClCompile Include="camera\editor_movement_controller.cpp" />
+    <ClCompile Include="imgui\imgui_glfw_implementation.cpp" />
+    <ClCompile Include="imgui\imgui_implementation.cpp" />
+    <ClCompile Include="imgui\imgui_initializer.cpp" />
+    <ClCompile Include="imgui\imgui_layer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="panels\asset_explorer_panel.cpp" />
+    <ClCompile Include="panels\default_component_panels.cpp" />
+    <ClCompile Include="panels\hud_builder_panel.cpp" />
+    <ClCompile Include="panels\level_peekers.cpp" />
+    <ClCompile Include="panels\level_properties_panel.cpp" />
+    <ClCompile Include="panels\level_tree_panel.cpp" />
+    <ClCompile Include="panels\material_builder_panel.cpp" />
+    <ClCompile Include="panels\settings_panel.cpp" />
+    <ClCompile Include="panels\viewport_panel.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="applicationh" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\engine\Shard3D\Shard3D.vcxproj">
+      <Project>{AE4D95F2-1A2D-148E-2345-9F648FA37AEF}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -47,7 +47,7 @@ namespace Shard3D {
 				engineRenderer.getSwapchain()->findDepthFormat(),
 				VK_IMAGE_ASPECT_DEPTH_BIT,
 				glm::ivec3(1920, 1080, 1),
-				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 				VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Depth
@@ -352,25 +352,12 @@ beginWhileLoop:
 				ubo.view = possessedCamera.getView();
 				ubo.inverseView = possessedCamera.getInverseView();
 
-				//ubo.cameraSettings = { GraphicsSettings::get().GlobalMaterialSettings,  GraphicsSettings::get().exposure };
-
+				
 				lightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
 				SHARD3D_STAT_RECORD_END({"UBO", "Update"});
-				/*
-					this section is great for adding multiple render passes such as :
-					- Begin offscreen shadow pass
-					- render shadow casting objects
-					- end offscreen shadow pass
-					- UI
 
-					Also reflections and Postfx
-
-					LAYERS MUST BE LOADED LAST!
-
-					Also order absolutely matters, post processing for example must go last
-				*/
 				//	render
 			//	SHARD3D_STAT_RECORD();
 			//	shadowSystem.render(frameInfo);

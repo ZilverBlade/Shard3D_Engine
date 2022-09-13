@@ -365,6 +365,6 @@ public:
     }
 };
 
-FLOAT16 operator "" h(long double);
+FLOAT16 operator "" _h(long double);
 
 #endif // __HALF_H__
