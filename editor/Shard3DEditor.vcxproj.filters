@@ -12,6 +12,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application.h" />
     <ClInclude Include="camera\editor_movement_controller.h">
       <Filter>camera</Filter>
     </ClInclude>
@@ -100,8 +101,5 @@
     <ClCompile Include="panels\viewport_panel.cpp">
       <Filter>panels</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="applicationh" />
   </ItemGroup>
 </Project>

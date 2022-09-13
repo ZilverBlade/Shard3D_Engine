@@ -136,7 +136,7 @@ project "Shard3DEditor"
    disablewarnings { "26812;4244;4996;4005;" }
    
    files {
-	  "editor/applicationh",
+	  "editor/application.h",
 	  "editor/application.cpp",
 	  "editor/main.cpp",
 	  "editor/camera/**.*",
@@ -208,7 +208,7 @@ project "Shard3DRuntime"
    disablewarnings { "26812;4244;4996;4005;" }
    
    files {
-	  "runtime/applicationh",
+	  "runtime/application.h",
 	  "runtime/application.cpp",
 	  "runtime/main.cpp",
    }

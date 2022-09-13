@@ -219,5 +219,4 @@ const float opacity =
 	outNormal = vec4(N, 1.0); 
 	outMaterialData = vec4(material_specular, material_shininess,material_metallic, 1.0); //RGBA
 #endif
-}						   
-						    
+}

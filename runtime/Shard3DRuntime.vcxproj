@@ -100,11 +100,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClInclude Include="application.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="applicationh" />
+    <ClCompile Include="application.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\engine\Shard3D\Shard3D.vcxproj">

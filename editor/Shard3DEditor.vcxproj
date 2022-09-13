@@ -100,6 +100,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="application.h" />
     <ClInclude Include="camera\editor_movement_controller.h" />
     <ClInclude Include="imgui\imgui_glfw_implementation.h" />
     <ClInclude Include="imgui\imgui_implementation.h" />
@@ -132,9 +133,6 @@
     <ClCompile Include="panels\material_builder_panel.cpp" />
     <ClCompile Include="panels\settings_panel.cpp" />
     <ClCompile Include="panels\viewport_panel.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="applicationh" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\engine\Shard3D\Shard3D.vcxproj">
