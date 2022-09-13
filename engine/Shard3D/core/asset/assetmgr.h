@@ -46,6 +46,7 @@ namespace Shard3D {
 			const AssetID m_defaultModel =			AssetID("assets/_engine/msh/cube.obj.s3dasset");			// Cube Mesh model
 			 
 			const AssetID s_errorMaterial =			AssetID("assets/_engine/mat/world_grid.s3dasset");		// Opaque surface material (world grid)
+			const AssetID s_blankMaterial = AssetID("assets/_engine/mat/world_grid_blank.s3dasset");		// Opaque surface material (world grid)
 		} static inline coreAssets;
 
 		//Clears textureAssets
@@ -56,6 +57,7 @@ namespace Shard3D {
 		static void clearMaterialAssets();
 		//Clears all of the asset maps
 		static void clearAllAssets();
+		static void clearAllUnusedAssets();
 		/* Loads all of the materials in use by the level into the asset maps.
 		Make sure to clear before loading, since you dont want to waste resources pointing to unused assets!
 		*/

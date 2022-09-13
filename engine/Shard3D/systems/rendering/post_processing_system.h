@@ -10,9 +10,9 @@ namespace Shard3D {
 	class FrameBufferAttachment;
 	struct PostProcessingGBufferInput {
 		FrameBufferAttachment* baseRenderedScene;
-		FrameBufferAttachment* depthBufferSceneInfo;
 		FrameBufferAttachment* positionSceneInfo;
 		FrameBufferAttachment* normalSceneInfo;
+		FrameBufferAttachment* materialSceneInfo;
 	};
 
 	struct PPO_Material {
@@ -45,9 +45,9 @@ namespace Shard3D {
 		VkDescriptorSet ppo_InputDescriptorSet{};
 
 		VkDescriptorImageInfo ppoDescriptor_BaseRenderedScene;
-		VkDescriptorImageInfo ppoDescriptor_DepthBufferSceneInfo;
 		VkDescriptorImageInfo ppoDescriptor_PositionSceneInfo;
 		VkDescriptorImageInfo ppoDescriptor_NormalSceneInfo;
+		VkDescriptorImageInfo ppoDescriptor_MaterialSceneInfo;
 
 		uPtr<EngineDescriptorSetLayout> ppo_Layout{};
 

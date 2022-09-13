@@ -12,20 +12,20 @@
 #include <Shard3D/scripting/script_handler.h>
 
 #include <Shard3D/workarounds.h>
+#include <Shard3D/core/ecs/levelmgr.cpp>
 
 namespace Shard3D {
-	EngineApplication::EngineApplication() {
+	Application::Application() {
 		createRenderPasses();
 		setupEngineFeatures();
 
 		SHARD3D_INFO("Constructing Level Pointer");
-		level = make_sPtr<ECS::Level>();
 	}
-	EngineApplication::~EngineApplication() {
+	Application::~Application() {
 	
 	}
 
-	void EngineApplication::createRenderPasses() {
+	void Application::createRenderPasses() {
 		{ // Main renderer
 			mainColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
@@ -80,7 +80,7 @@ namespace Shard3D {
 		}
 	}
 
-	void EngineApplication::destroyRenderPasses() {
+	void Application::destroyRenderPasses() {
 		delete mainFrameBuffer;
 		delete mainRenderpass;
 		delete mainColorFramebufferAttachment;
@@ -89,7 +89,7 @@ namespace Shard3D {
 
 	}
 
-	void EngineApplication::setupEngineFeatures() {
+	void Application::setupEngineFeatures() {
 		EngineAudio::init();
 		GraphicsSettings::init(nullptr);
 		ScriptEngine::init();
@@ -109,15 +109,15 @@ namespace Shard3D {
 		ShaderSystem::init();
 	}
 
-	void EngineApplication::setWindowCallbacks() {
-		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, EngineApplication::eventEvent);
+	void Application::setWindowCallbacks() {
+		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, Application::eventEvent);
 	}
 
-	void EngineApplication::eventEvent(Events::Event& e) {
+	void Application::eventEvent(Events::Event& e) {
 		//SHARD3D_LOG("{0}", e.toString());
 	}
 
-	void EngineApplication::run(char* levelpath) {
+	void Application::run(char* levelpath) {
 		std::vector<uPtr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
 			uboBuffers[i] = make_uPtr<EngineBuffer>(
@@ -150,41 +150,31 @@ namespace Shard3D {
 		LightSystem lightSystem{};
 
 		ResourceHandler::init(engineDevice);
-
-		SHARD3D_INFO("Loading editor camera actor");
-		ECS::Actor editor_cameraActor = level->createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
-		editor_cameraActor.addComponent<Components::CameraComponent>();
-
-		level->setPossessedCameraActor(editor_cameraActor);
-		editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
-		SHARD3D_INFO("Loading dummy actor");
-		ECS::Actor dummy = level->createActorWithUUID(1, "Dummy Actor (SYSTEM RESERVED)");
+		level = make_sPtr<ECS::Level>();
 
 		loadStaticObjects();
 
-		SHARD3D_ASSERT(AssetManager::doesAssetExist(levelpath) && "Level does not exist!");
+		SHARD3D_ASSERT(IOUtils::doesFileExist(levelpath) && "Level does not exist!");
 		SHARD3D_ASSERT(AssetUtils::discoverAssetType(levelpath) == AssetType::Level && "Item provided is not a level!");
 
-		ECS::MasterManager::loadLevel(levelpath);	
-		ECS::MasterManager::executeQueue(level, engineDevice);
-
+		ECS::LevelManager levelMan(level);
+		ECS::LevelMgrResults result = levelMan.load(levelpath, true);
+		
 		level->setPhysicsSystem(&physicsSystem);
 		level->begin();
 		auto currentTime = std::chrono::high_resolution_clock::now();
-
 		while (!engineWindow.shouldClose()) {
-			glfwPollEvents();
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
-
+			glfwPollEvents();
+			
 			auto possessedCameraActor = level->getPossessedCameraActor();
 			auto& possessedCamera = level->getPossessedCamera();
 			
 			level->tick(frameTime);
 			level->runGarbageCollector(engineDevice);
 			ResourceHandler::runGarbageCollector();
-			ECS::MasterManager::executeQueue(level, engineDevice);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().getTranslation(), 
 				possessedCameraActor.getTransform().getRotation());
 			possessedCameraActor.getComponent<Components::CameraComponent>().ar = GraphicsSettings::getRuntimeInfo().aspectRatio;
@@ -209,24 +199,10 @@ namespace Shard3D {
 				ubo.view = possessedCamera.getView();
 				ubo.inverseView = possessedCamera.getInverseView();
 
-				//ubo.cameraSettings = { GraphicsSettings::get().GlobalMaterialSettings,  GraphicsSettings::get().exposure };
-
 				lightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
-				/*
-					this section is great for adding multiple render passes such as :
-					- Begin offscreen shadow pass
-					- render shadow casting objects
-					- end offscreen shadow pass
-					- UI
-
-					Also reflections and Postfx
-
-					LAYERS MUST BE LOADED LAST!
-
-					Also order absolutely matters, post processing for example must go last
-				*/
+				
 				//	render
 				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
 				forwardRenderSystem.renderForward(frameInfo);
@@ -239,12 +215,13 @@ namespace Shard3D {
 				ppoSystem.renderImageFlipForPresenting(frameInfo);
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 
-				engineRenderer.endFrame();
+				engineRenderer.endFrame(newTime);
 			}
 		}
 
 		level->end();
 
+		ShaderSystem::destroy();
 		ScriptEngine::destroy();
 		vkDeviceWaitIdle(engineDevice.device());
 
@@ -257,7 +234,7 @@ namespace Shard3D {
 		level = nullptr;
 	}
 
-	void EngineApplication::loadStaticObjects() {
+	void Application::loadStaticObjects() {
 		
 	}
 }

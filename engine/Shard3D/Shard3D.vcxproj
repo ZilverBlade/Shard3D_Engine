@@ -186,7 +186,6 @@
     <ClInclude Include="core\ecs\components.h" />
     <ClInclude Include="core\ecs\level.h" />
     <ClInclude Include="core\ecs\levelmgr.h" />
-    <ClInclude Include="core\ecs\mmgr.h" />
     <ClInclude Include="core\ecs\sactor.h" />
     <ClInclude Include="core\misc\cheat_codes.h" />
     <ClInclude Include="core\misc\frame_info.h" />
@@ -296,11 +295,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="core\ecs\levelmgr.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="core\ecs\mmgr.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
@@ -485,15 +479,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\assets\_engine\mat\ppo\ssao.comp" />
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\global_ubo.glsl" />
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_masked.s3dshdef" />
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_material.frag" />
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_opaque.s3dshdef" />
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_shaded.s3dshdef" />
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_translucent.s3dshdef" />
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_unshaded.s3dshdef" />
     <None Include="shaders\billboard_sva.frag" />
     <None Include="shaders\billboard_sva.vert" />
     <None Include="shaders\fragment_blank.frag" />
     <None Include="shaders\fullscreen_quad.vert" />
     <None Include="shaders\hud_element.frag" />
     <None Include="shaders\hud_element.vert" />
-    <None Include="shaders\materials\surface_shaded_masked.frag" />
-    <None Include="shaders\materials\surface_shaded_opaque.frag" />
-    <None Include="shaders\materials\surface_shaded_translucent.frag" />
     <None Include="shaders\mesh_shader.vert" />
     <None Include="shaders\post_processing\debander.frag" />
     <None Include="shaders\post_processing\bloom.comp" />

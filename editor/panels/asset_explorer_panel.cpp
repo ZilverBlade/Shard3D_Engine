@@ -106,6 +106,7 @@ namespace Shard3D {
 		float panelWidth = ImGui::GetContentRegionAvail().x;
 		int columnCount = std::max((int)(panelWidth / (96.f + 16.f))// <--- thumbnail size (96px) + padding (16px)
 																, 1);
+		std::string currentSelection = "";
 
 		ImGui::Columns(columnCount, 0, false);
 		for (int i = 0; i < directoryEntries.entries.size(); i++) {
@@ -127,13 +128,11 @@ namespace Shard3D {
 						refresh_it = true;
 					}
 				}
-				if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-					currentContextMenu = dirEntPath;
-				}
+				currentSelection = fileStr;
 			}
 			if (!dirEnt.is_directory())
 				if (ImGui::BeginDragDropSource()) {
-					// likely memory leak. if any issues in the future, check this
+					// memory leak. if any issues in the future, check this
 					char* item = (char*)malloc(relativePath.u8string().length() + 1);
 					strncpy(item, const_cast<char*>(relativePath.u8string().c_str()), relativePath.u8string().length() + 1);
 					switch (directoryEntries.types[i]) {
@@ -170,28 +169,29 @@ namespace Shard3D {
 		}
 		ImGui::Columns(1);
 
-		if (ImGui::BeginPopupContextWindow("AssetMenu", ImGuiMouseButton_Right, true)) {
-			if (ImGui::MenuItem("Rename")) {
-				SHARD3D_NOIMPL;
+		if (currentSelection != "")
+			if (ImGui::BeginPopupContextWindow("AssetMenu", ImGuiMouseButton_Right, true)) {
+				if (ImGui::MenuItem("Rename")) {
+					SHARD3D_NOIMPL;
 
-				currentContextMenu = std::filesystem::path();
-				ImGui::CloseCurrentPopup();
-			}
-			if (ImGui::MenuItem("Replace")) {
-				SHARD3D_NOIMPL;
+					currentSelection = "";
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Replace")) {
+					SHARD3D_NOIMPL;
 
-				currentContextMenu = std::filesystem::path();
-				ImGui::CloseCurrentPopup();
-			}
-			if (ImGui::MenuItem("Delete")) {
-				AssetManager::purgeAsset(currentContextMenu.string());
-				refresh_it = true;
+					currentSelection = "";
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Delete")) {
+					AssetManager::purgeAsset(currentSelection);
+					refresh_it = true;
 
-				currentContextMenu = std::filesystem::path();
-				ImGui::CloseCurrentPopup();
+					currentSelection = "";
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
 		if (ImGui::BeginPopupContextWindow("AssetExplorerContext", ImGuiMouseButton_Right, false)) {
 			if (ImGui::MenuItem("Import Texture")) {
 				std::string file = FileDialogs::openFile();
@@ -223,7 +223,8 @@ namespace Shard3D {
 			}
 			ImGui::Separator();
 			if (ImGui::MenuItem("New level")) {
-				LevelManager lman(make_sPtr<Level>("Some kind of level"));
+				auto trash = make_sPtr<Level>("Some kind of level");
+				LevelManager lman(trash);
 				lman.save(std::string(currentDir.string() + "/Some kind of level"));
 				refreshIterator(currentDir);	
 				ImGui::CloseCurrentPopup();

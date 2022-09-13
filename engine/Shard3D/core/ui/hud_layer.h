@@ -22,6 +22,6 @@ namespace Shard3D {
 		bool contextRefresh;
 		HUDRenderSystem hudRenderSystem;
 		HUD hud;
-		friend class EditorApplication;
+		friend class Application;
 	};
 }

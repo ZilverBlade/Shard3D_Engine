@@ -1,6 +1,6 @@
-Shard3D: 1.2.8.r2-alpha
+Shard3D: 1.2.8.r3-alpha
 Level: \car_showroom.s3dlevel
-LastSavedEditorCameraPos: [2.1134212, 5.52807665, 1.86857808]
+LastSavedEditorCameraPos: [5.15448856, 2.70665956, 1.36302638]
 Actors:
   - Actor: 7521268059864750746
     TagComponent:
@@ -183,7 +183,7 @@ Actors:
       FOV: 45.5
       NearClipPlane: 0.0500000007
       FarClipPlane: 1024
-      PostProcessing: [[assets/_engine/mat/ppo/hdr_vfx.s3dasset, [3, !!binary "FK5HPw=="], [3, !!binary "KVwPPg=="], [3, !!binary "UriePw=="], [3, !!binary "SOGaPw=="]], [assets/_engine/mat/ppo/bloom_vfx.s3dasset, [3, !!binary "ZmZmPw=="], [3, !!binary "zcyMPw=="], [2, !!binary "DAAAAA=="]], [assets/_engine/mat/ppo/noise_vfx.s3dasset, [3, !!binary "exQuPg=="], [3, !!binary "USiePQ=="]]]
+      PostProcessing: [[assets/_engine/mat/ppo/hdr_vfx.s3dasset, [3, !!binary "FK5HPw=="], [3, !!binary "KVwPPg=="], [3, !!binary "UriePw=="], [3, !!binary "SOGaPw=="]], [assets/_engine/mat/ppo/bloom_vfx.s3dasset, [3, !!binary "ZmZmPw=="], [3, !!binary "zcyMPw=="], [2, !!binary "DAAAAA=="]], [assets/_engine/mat/ppo/noise_vfx.s3dasset, [3, !!binary "AAAAAA=="], [3, !!binary "v3b5PQ=="]], [assets/_engine/mat/ppo/ssao_vfx.s3dasset, [3, !!binary "4XoAQQ=="], [2, !!binary "PgAAAA=="], [3, !!binary "SOGCQQ=="]]]
     Mesh3DComponent:
       MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
       Materials: [assets/materialdata/None.s3dasset]

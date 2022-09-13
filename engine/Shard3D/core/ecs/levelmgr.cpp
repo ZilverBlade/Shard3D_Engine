@@ -7,7 +7,7 @@
 #include <fstream>
 namespace Shard3D {
 	namespace ECS {
-		LevelManager::LevelManager(const sPtr<Level>& level) : mLevel(level) { 
+		LevelManager::LevelManager(sPtr<Level>& level) : mLevel(level) { 
 			SHARD3D_INFO("Loading Level Manager");
 		}
 
@@ -198,7 +198,7 @@ namespace Shard3D {
 					}// change this to check if the version is less or more
 				}
 
-				ResourceHandler::clearAllAssets(); // remove since new stuff will be loaded into memory
+				//ResourceHandler::clearAllAssets(); // remove since new stuff will be loaded into memory
 				
 				std::string levelName = data["Level"].as<std::string>();
 				mLevel->getActorFromUUID(0).getTransform().setTranslation(data["LastSavedEditorCameraPos"].as<glm::vec3>());
@@ -338,6 +338,8 @@ namespace Shard3D {
 			}
 			mLevel->name = AssetUtils::truncatePath(sourcePath);
 			mLevel->currentpath = sourcePath;
+		    //ResourceHandler::clearAllUnusedAssets();
+			// find a fix for this
 			return LevelMgrResults::SuccessResult;
 		}
 

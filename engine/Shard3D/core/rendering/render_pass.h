@@ -17,10 +17,8 @@ namespace Shard3D {
 		RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments);
 		~RenderPass();
 
-		RenderPass(const RenderPass&) = delete;
-		RenderPass& operator=(const RenderPass&) = delete;
-		RenderPass(RenderPass&&) = delete;
-		RenderPass& operator=(RenderPass&&) = delete;
+		DELETE_COPY(RenderPass);
+		DELETE_MOVE(RenderPass);
 
 		void beginRenderPass(FrameInfo& frameInfo, FrameBuffer* frameBuffer);
 		void endRenderPass(FrameInfo& frameInfo);

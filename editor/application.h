@@ -14,13 +14,13 @@
 #include <Shard3D/core/rendering/renderer.h>
 
 namespace Shard3D {
-	class EditorApplication {
+	class Application {
 	public:
-		EditorApplication();
-		~EditorApplication();
+		Application();
+		~Application();
 
-		EditorApplication(const EditorApplication&) = delete;
-		EditorApplication& operator=(const EditorApplication&) = delete;
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
 
 		void run();	
 	private:
@@ -41,9 +41,11 @@ namespace Shard3D {
 		
 		FrameBufferAttachment* mainColorFramebufferAttachment;
 		FrameBufferAttachment* mainDepthFramebufferAttachment;
+		FrameBufferAttachment* mainPositionFramebufferAttachment;
+		FrameBufferAttachment* mainNormalFramebufferAttachment;
+		FrameBufferAttachment* mainMaterialDataFramebufferAttachment;
 
-		FrameBufferAttachment* mainResolveFramebufferAttachment;
-		FrameBufferAttachment* mainDepthResolveFramebufferAttachment;
+
 		FrameBuffer* mainFrameBuffer;
 		RenderPass* mainRenderpass;
 

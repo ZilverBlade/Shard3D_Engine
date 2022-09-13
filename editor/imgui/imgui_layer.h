@@ -15,6 +15,7 @@
 #include "../panels/settings_panel.h"
 #include "../panels/default_component_panels.h"
 
+#include "../camera/editor_movement_controller.h"
 namespace Shard3D {
 	class HUDLayer;
 	class HUD;
@@ -49,8 +50,12 @@ namespace Shard3D {
 		int width;
 		int height;
 
+
+		sPtr<ECS::Level> capturedLevel{};
+
 		EngineWindow& engineWindow;
 		EngineDevice& engineDevice;
+		controller::EditorMovementController editorCameraController{};
 
 		float timeSinceLastSecond;
 		float deltaTimeFromLastSecond;

@@ -30,7 +30,7 @@ namespace Shard3D {
 
 		void refreshIterator(std::filesystem::path newPath);
 		std::filesystem::path currentDir;
-		std::filesystem::path currentContextMenu;
+		
 		AssetIteratorCombo directoryEntries;
 	};
 }

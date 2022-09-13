@@ -23,6 +23,8 @@
 
 #include <ImGuizmo.h>
 #include <Shard3D/systems/buffers/material_system.h>
+#include <Shard3D/core/ecs/levelmgr.h>
+
 
 namespace Shard3D {
 	ImGuiLayer::ImGuiLayer(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass) : engineDevice(dvc), engineWindow(wnd){
@@ -58,9 +60,59 @@ namespace Shard3D {
 
 	static void loadLevel(sPtr<ECS::Level>& level, const std::string& path) {
 		if (level->simulationState != PlayState::Stopped) level->end();
-		level->killEverything();
-		ECS::MasterManager::loadLevel(path);
+		sPtr<ECS::Level> newlevel = make_sPtr<ECS::Level>();
+		newlevel->setPhysicsSystem(level->physicsSystemPtr);
+		LevelManager levelMan(newlevel);
+		LevelMgrResults result = levelMan.load(path, false);
+		if (result == LevelMgrResults::OldEngineVersionResult) {
+			if (MessageDialogs::show("This level was created in an different version of Shard3D, results may be unexpected.\nWould you like to try and load the level anyway?", "WARNING!", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDYES) {
+				levelMan.load(path, true);
+			}
+			else {
+				levelMan.load(level->currentpath, true);
+			}
+		}
+		level.swap(newlevel);
 	}
+	static void saveLevel(sPtr<ECS::Level>& level, const std::string& path) {
+		if (level->simulationState != PlayState::Stopped) { SHARD3D_ERROR("Cannot save level that is running!"); return; }
+		std::string filepath = FileDialogs::saveFile(ENGINE_SHARD3D_LEVELFILE_OPTIONS);
+		if (!filepath.empty()) {
+			ECS::LevelManager levelMan(level);
+			levelMan.save(filepath, false);
+		}
+	}
+
+	static void playLevel(sPtr<ECS::Level>& level, sPtr<ECS::Level>& capturedLevel, GLFWwindow* window) {
+		SHARD3D_INFO("Capturing level");
+		capturedLevel = Level::copy(level);
+		level->begin();
+
+		std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + level->name;
+		glfwSetWindowTitle(window, title.c_str());
+	}
+	static void pauseLevel(sPtr<ECS::Level>& level, GLFWwindow* window) {
+		level->simulationState = PlayState::Paused;
+		level->simulationStateCallback();
+		std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Paused) | " + level->name;
+		glfwSetWindowTitle(window, title.c_str());
+	}
+	static void resumeLevel(sPtr<ECS::Level>& level, GLFWwindow* window) {
+		level->simulationState = PlayState::Playing;
+		level->simulationStateCallback();
+		std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + level->name;
+		glfwSetWindowTitle(window, title.c_str());
+	}
+	static void stopLevel(sPtr<ECS::Level>& level, sPtr<ECS::Level>& capturedLevel, GLFWwindow* window) {	
+		level->end();
+		SHARD3D_INFO("Loading back Captured level");
+		level.swap(capturedLevel);
+		capturedLevel = make_sPtr<Level>("__WB3D:NOEDITcapturelvl");
+
+		std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped) | " + level->name;
+		glfwSetWindowTitle(window, title.c_str());
+	}
+
 
 	void ImGuiLayer::createIcons() {
 		{
@@ -274,7 +326,7 @@ namespace Shard3D {
 		//	m_Window.width = view.x;
 		//	m_Window.height = view.y;
 		//
-		//	reinterpret_cast<EditorApplication*>(frameInfo.userPointer)->			RecreateFramebuffer();
+		//	reinterpret_cast<Application*>(frameInfo.userPointer)->			RecreateFramebuffer();
 		//
 		//	// The window state has been successfully changed.
 		//	return true;
@@ -289,7 +341,7 @@ namespace Shard3D {
 
 		ImVec2 vSize = ImGui::GetContentRegionAvail();
 		GraphicsSettings::getRuntimeInfo().aspectRatio = vSize.x / vSize.y;
-		GraphicsSettings::getRuntimeInfo().localScreen = { ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight() };
+		GraphicsSettings::getRuntimeInfo().localScreen = { ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowSize().x ,ImGui::GetWindowSize().y};
 
 		ImGui::Image(viewportImage, vSize);
 
@@ -298,6 +350,7 @@ namespace Shard3D {
 				if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
 					levelTreePanel.clearSelectedActor();
 					loadLevel(frameInfo.activeLevel, std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data));
+					refreshContext = true;
 				}
 			}
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.COMPONENTS.DROP")) {
@@ -313,10 +366,22 @@ namespace Shard3D {
 					actor.addComponent<Components::CameraComponent>();
 					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
 					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
-
 				}
 			}
 		}
+		
+		if (frameInfo.activeLevel->simulationState != PlayState::Playing) {	
+			if (ImGui::IsWindowHovered()) {
+				Actor cameraActor = frameInfo.activeLevel->getActorFromUUID(0);
+				editorCameraController.tryPollOrientation(engineWindow, frameInfo.frameTime, cameraActor);
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::FocusWindow(ImGui::GetCurrentWindow());
+			}
+			if (ImGui::IsWindowFocused()) {
+				Actor cameraActor = frameInfo.activeLevel->getActorFromUUID(0);
+				editorCameraController.tryPollTranslation(engineWindow, frameInfo.frameTime, cameraActor);
+			}
+		} 
+		
 
 		{
 			Actor actor = levelTreePanel.getSelectedActor();
@@ -380,7 +445,7 @@ namespace Shard3D {
 		}
 
 		ImGui::End();
-    }
+	}
 
 	void ImGuiLayer::renderQuickBar(FrameInfo& frameInfo) {
 
@@ -396,12 +461,19 @@ namespace Shard3D {
 
 		// Save/Load
 		if (ImGui::ImageButton(icons.save, btnSize)) {
-			SHARD3D_NOIMPL;
+			saveLevel(frameInfo.activeLevel, frameInfo.activeLevel->currentpath);
 		}
 		ImGui::TextWrapped("Save");
 		ImGui::NextColumn();
 		if (ImGui::ImageButton(icons.load, btnSize)) {
-			SHARD3D_NOIMPL;
+			if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
+				std::string filepath = FileDialogs::openFile(ENGINE_SHARD3D_LEVELFILE_OPTIONS);
+				if (!filepath.empty()) {
+					levelTreePanel.clearSelectedActor();
+					loadLevel(frameInfo.activeLevel, filepath);
+					refreshContext = true;
+				}
+			}
 		}
 		ImGui::TextWrapped("Load");
 		ImGui::NextColumn();
@@ -412,21 +484,11 @@ namespace Shard3D {
 			(frameInfo.activeLevel->simulationState == PlayState::Stopped) ? icons.play : 
 				((frameInfo.activeLevel->simulationState == PlayState::Paused) ? icons.play : icons.pause), btnSize))
 			if (frameInfo.activeLevel->simulationState == PlayState::Stopped) { // Play
-				ECS::MasterManager::captureLevel(frameInfo.activeLevel);
-				frameInfo.activeLevel->begin();
-				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-				glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
+				playLevel(frameInfo.activeLevel, capturedLevel, engineWindow.getGLFWwindow());
 			} else if (frameInfo.activeLevel->simulationState == PlayState::Paused) {  // Resume
-				frameInfo.activeLevel->simulationState = PlayState::Playing;
-				frameInfo.activeLevel->simulationStateCallback();
-				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-				glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
-
+				resumeLevel(frameInfo.activeLevel, engineWindow.getGLFWwindow());
 			} else if (frameInfo.activeLevel->simulationState == PlayState::Playing) {  // Pause
-				frameInfo.activeLevel->simulationState = PlayState::Paused;
-				frameInfo.activeLevel->simulationStateCallback();
-				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Paused) | " + frameInfo.activeLevel->name;
-				glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
+				pauseLevel(frameInfo.activeLevel, engineWindow.getGLFWwindow());
 			}
 		ImGui::TextWrapped((frameInfo.activeLevel->simulationState == PlayState::Stopped) ? "Play" :
 			((frameInfo.activeLevel->simulationState == PlayState::Paused) ? "Resume" : "Pause"));
@@ -434,9 +496,7 @@ namespace Shard3D {
 		ImGui::BeginDisabled(frameInfo.activeLevel->simulationState == PlayState::Stopped);
 		if (ImGui::ImageButton(icons.stop, btnSize)) {        // Stop
 			levelTreePanel.clearSelectedActor();
-			frameInfo.activeLevel->end();
-			std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped) | " + frameInfo.activeLevel->name;
-			glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
+			stopLevel(frameInfo.activeLevel, capturedLevel, engineWindow.getGLFWwindow());
 			refreshContext = true;
 		}
 		ImGui::TextWrapped("Stop");
@@ -462,7 +522,7 @@ namespace Shard3D {
 		ImGui::TextWrapped("Layout");
 		ImGui::NextColumn();
 		if (ImGui::ImageButton(icons.launchgame, btnSize)) {
-			SHARD3D_NOIMPL;
+			ShellExecuteA(nullptr, "open", "Shard3DRuntime.exe", frameInfo.activeLevel->currentpath.c_str(), "", true);
 		}
 		ImGui::TextWrapped("Launch");
 		ImGui::NextColumn();
@@ -489,7 +549,6 @@ namespace Shard3D {
 					levelTreePanel.clearSelectedActor();
 					frameInfo.activeLevel->killEverything();
 				}
-
 			}
 			if (ImGui::MenuItem("Load Level...", "Ctrl+O")) {
 				if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
@@ -497,22 +556,17 @@ namespace Shard3D {
 					if (!filepath.empty()) {
 						levelTreePanel.clearSelectedActor();
 						loadLevel(frameInfo.activeLevel, filepath);
+						refreshContext = true;	
 					}
 				}
 			}
 			if (ImGui::MenuItem("Save Level...", "Ctrl+S")) {
-				ECS::LevelManager levelMan(frameInfo.activeLevel);
-				levelMan.save(frameInfo.activeLevel->currentpath, false);
-			}
-			if (ImGui::MenuItem("Save Level... (Encrypted)", NULL)) {
-				ECS::LevelManager levelMan(frameInfo.activeLevel);
-				levelMan.save(frameInfo.activeLevel->currentpath, true);
+				saveLevel(frameInfo.activeLevel, frameInfo.activeLevel->currentpath);
 			}
 			if (ImGui::MenuItem("Save Level As...", "Ctrl+Shift+S")) {
 				std::string filepath = FileDialogs::saveFile(ENGINE_SHARD3D_LEVELFILE_OPTIONS);
 				if (!filepath.empty()) {
-					ECS::LevelManager levelMan(frameInfo.activeLevel);
-					levelMan.save(filepath, false);
+					saveLevel(frameInfo.activeLevel, filepath);
 				}
 			}
 			ImGui::Separator();
@@ -526,34 +580,23 @@ namespace Shard3D {
 			if (ImGui::BeginMenu("Level Simulation")) {
 				ImGui::BeginDisabled(frameInfo.activeLevel->simulationState != PlayState::Stopped || frameInfo.activeLevel->simulationState == PlayState::Paused);
 				if (ImGui::MenuItem("Begin")) {
-					ECS::MasterManager::captureLevel(frameInfo.activeLevel);
-					frameInfo.activeLevel->begin();
-					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-					glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
+					playLevel(frameInfo.activeLevel, capturedLevel, engineWindow.getGLFWwindow());		
 				} ImGui::EndDisabled();
 				if (frameInfo.activeLevel->simulationState != PlayState::Paused) {
 					ImGui::BeginDisabled(frameInfo.activeLevel->simulationState != PlayState::Playing); if (ImGui::MenuItem("Pause")) {
-						frameInfo.activeLevel->simulationState = PlayState::Paused;
-						frameInfo.activeLevel->simulationStateCallback();
-						std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Paused) | " + frameInfo.activeLevel->name;
-						glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
+						pauseLevel(frameInfo.activeLevel, engineWindow.getGLFWwindow());
 					} ImGui::EndDisabled();
 				}
 				else {
 					ImGui::BeginDisabled(frameInfo.activeLevel->simulationState == PlayState::Playing); if (ImGui::MenuItem("Resume")) {
-						frameInfo.activeLevel->simulationState = PlayState::Playing;
-						frameInfo.activeLevel->simulationStateCallback();
-						std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-						glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
+						resumeLevel(frameInfo.activeLevel, engineWindow.getGLFWwindow());
 					} ImGui::EndDisabled();
 				}
 
 				ImGui::BeginDisabled(frameInfo.activeLevel->simulationState == PlayState::Stopped);
 				if (ImGui::MenuItem("End")) {
 					levelTreePanel.clearSelectedActor();
-					frameInfo.activeLevel->end();
-					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped) | " + frameInfo.activeLevel->name;
-					glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
+					stopLevel(frameInfo.activeLevel, capturedLevel, engineWindow.getGLFWwindow());
 					refreshContext = true;
 				} ImGui::EndDisabled();
 				ImGui::EndMenu();

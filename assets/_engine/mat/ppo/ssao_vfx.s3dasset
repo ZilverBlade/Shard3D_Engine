@@ -1,0 +1,7 @@
+Shard3D: 1.2.8.r3-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: SSAO
+    Data:
+      Shader: assets/_engine/mat/ppo/ssao.comp
+      MyParams: [[3, Strength, !!binary "AAAAQA=="], [2, Samples, !!binary "QAAAAA=="], [3, Radius, !!binary "AACgQA=="]]

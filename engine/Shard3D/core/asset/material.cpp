@@ -27,6 +27,7 @@ namespace Shard3D {
 		if (translucentInfo)
 			delete translucentInfo;
 
+		SHARD3D_LOG("Destroying Material {0}", this->materialTag);
 		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
 	}
 
@@ -169,9 +170,15 @@ namespace Shard3D {
 			.setCullMode(drawData.culling)
 			.enableVertexDescriptions();
 
+		
 		if (this->blendMode == SurfaceMaterialBlendModeTranslucent)
 			GraphicsPipeline::pipelineConfig(pipelineConfigInfo).enableAlphaBlending(VK_BLEND_OP_ADD);
 	
+		pipelineConfigInfo.colorBlendInfo.attachmentCount = 4;
+		VkPipelineColorBlendAttachmentState attachments[4]{ pipelineConfigInfo.colorBlendAttachment, pipelineConfigInfo.colorBlendAttachment,pipelineConfigInfo.colorBlendAttachment ,pipelineConfigInfo.colorBlendAttachment };
+		pipelineConfigInfo.colorBlendInfo.pAttachments = attachments;
+
+
 		MaterialSystem::createSurfacePipeline(
 			&materialPipelineConfig->shaderPipeline,
 			materialPipelineConfig->shaderPipelineLayout, 
@@ -275,6 +282,7 @@ namespace Shard3D {
 			SHARD3D_WARN("Attempted to destroy pipeline while material has never been built!");
 			return;
 		}
+		SHARD3D_LOG("Destroying Material {0}", this->materialTag);
 		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
 
 		for (auto& param : myParams) {

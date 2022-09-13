@@ -64,9 +64,8 @@ namespace Shard3D {
 		float frameTime;
 		VkCommandBuffer commandBuffer;
 		EngineCamera& camera;
-		void* userPointer;
 		VkDescriptorSet globalDescriptorSet;
 		EngineDescriptorPool& perDrawDescriptorPool;  // pool of descriptors that is cleared each frame
-		sPtr<ECS::Level> activeLevel;
+		sPtr<ECS::Level>& activeLevel;
 	};
 }

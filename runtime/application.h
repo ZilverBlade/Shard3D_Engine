@@ -14,13 +14,13 @@
 
 
 namespace Shard3D {
-	class EngineApplication {
+	class Application {
 	public:
-		EngineApplication();
-		~EngineApplication();
+		Application();
+		~Application();
 
-		EngineApplication(const EngineApplication&) = delete;
-		EngineApplication& operator=(const EngineApplication&) = delete;
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
 
 		void run(char* levelpath);	
 	private:

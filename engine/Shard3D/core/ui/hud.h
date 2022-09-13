@@ -68,6 +68,6 @@ namespace Shard3D {
 
 	private:
 		std::vector<HUD*> hudLayerList;
-		friend class EditorApplication;
+		friend class Application;
 	};
 }

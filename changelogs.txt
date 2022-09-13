@@ -192,6 +192,11 @@ ALPHA:
 		- Added ability to modify post process material in script engine
 		- Added ability to recompile all shaders (surface materials) at demand
 		- Added experimental low precision vertex buffers
-		
-		:: TODO, proper events sytem, add editor layouts, use premake
+		- Fixed input conflict between editor gui and editor camera
+		- Added launch function
+		- Removed the MasterManager
+		- Deprecated MSAA for good (D: sad)
+
+
+		:: TODO, proper events sytem, fix issue with resources not being unloaded, add editor layouts, use premake
 		:: Fix: dont use 64 bit integers for shaders (e.g. HUD system)

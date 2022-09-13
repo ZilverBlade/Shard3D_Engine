@@ -19,29 +19,29 @@ namespace Shard3D {
 
 	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass presentingRenderPass, PostProcessingGBufferInput imageInput) : engineDevice(device) {
 		setVkDescriptorImageInfo(&ppoDescriptor_BaseRenderedScene, imageInput.baseRenderedScene);
-		bool x1 = setVkDescriptorImageInfo(&ppoDescriptor_DepthBufferSceneInfo, imageInput.depthBufferSceneInfo);
-		bool x2 = setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
-		bool x3 = setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
+		bool x1 = setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
+		bool x2 = setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
+		bool x3 = setVkDescriptorImageInfo(&ppoDescriptor_MaterialSceneInfo, imageInput.materialSceneInfo);
 
 		EngineDescriptorSetLayout::Builder builder = EngineDescriptorSetLayout::Builder(engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 		if (x1)
-			builder.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+			builder.addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
 		if (x2)
-			builder.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+			builder.addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
 		if (x3)
-			builder.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+			builder.addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
 
 		ppo_Layout = builder.build();
 
 		EngineDescriptorWriter writer = EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
 			.writeImage(0, &ppoDescriptor_BaseRenderedScene); 
 		if (x1)
-			writer.writeImage(1, &ppoDescriptor_DepthBufferSceneInfo);
+			writer.writeImage(1, &ppoDescriptor_PositionSceneInfo);
 		if (x2)
-			writer.writeImage(2, &ppoDescriptor_PositionSceneInfo);
+			writer.writeImage(2, &ppoDescriptor_NormalSceneInfo);
 		if (x3)
-			writer.writeImage(3, &ppoDescriptor_NormalSceneInfo);
+			writer.writeImage(3, &ppoDescriptor_MaterialSceneInfo);
 
 		writer.build(ppo_InputDescriptorSet);
 		MaterialSystem::setRenderedSceneImageLayout(ppo_Layout->getDescriptorSetLayout());
@@ -102,6 +102,15 @@ namespace Shard3D {
 	}
 
 	void PostProcessingSystem::renderGammaCorrection(FrameInfo& frameInfo) {
+		vkCmdBindDescriptorSets(frameInfo.commandBuffer,
+			VK_PIPELINE_BIND_POINT_COMPUTE,
+			pipelineLayout,
+			0,
+			1,
+			&ppo_InputDescriptorSet,
+			0,
+			nullptr
+		);
 		gammaCorrectionShaderPipeline->bindCompute(frameInfo.commandBuffer);
 		vkCmdDispatch(frameInfo.commandBuffer, 1920 / 16, 1080 / 16 + 1, 1);
 	}

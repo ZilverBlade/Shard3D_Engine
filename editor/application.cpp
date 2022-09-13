@@ -8,7 +8,6 @@
 #include <Shard3D/core/asset/assetmgr.h>
 #include <Shard3D/core/ui/hud_layer.h>
 
-#include "camera/editor_movement_controller.h"
 #include "imgui/imgui_layer.h"
 #include "imgui/imgui_initializer.h"
 
@@ -23,46 +22,65 @@
 #include "scripting/script_link.h"
 
 namespace Shard3D {
-	EditorApplication::EditorApplication() {
+	Application::Application() {
 		createRenderPasses();
 		setupEngineFeatures();
 
-		SHARD3D_INFO("Constructing Level Pointer");
-		level = make_sPtr<ECS::Level>();
 	}
-	EditorApplication::~EditorApplication() {
+	Application::~Application() {
 	
 	}
 
-	void EditorApplication::createRenderPasses() {
+	void Application::createRenderPasses() {
 		{ // Main renderer
 			mainColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				VK_FORMAT_R32G32B32A32_SFLOAT,
-				VK_IMAGE_ASPECT_COLOR_BIT,
-				glm::ivec3(1920, 1080, 1),
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				GraphicsSettings::get().MSAASamples
-				}, FrameBufferAttachmentType::Color);
-
-			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				engineRenderer.getSwapchain()->findDepthFormat(),
-				VK_IMAGE_ASPECT_DEPTH_BIT,
-				glm::ivec3(1920, 1080, 1),
-				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
-				GraphicsSettings::get().MSAASamples
-				}, FrameBufferAttachmentType::Depth);
-
-
-			mainResolveFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				glm::ivec3(1920, 1080, 1),
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
-				}, FrameBufferAttachmentType::Resolve);
+				}, FrameBufferAttachmentType::Color
+			);
+
+			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				engineRenderer.getSwapchain()->findDepthFormat(),
+				VK_IMAGE_ASPECT_DEPTH_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Depth
+			);
+			mainPositionFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color
+			);
+
+			mainNormalFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color
+			);
+
+			mainMaterialDataFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				glm::ivec3(1920, 1080, 1),
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
+				VK_IMAGE_LAYOUT_GENERAL,
+				VK_SAMPLE_COUNT_1_BIT
+				}, FrameBufferAttachmentType::Color
+			);
 
 			AttachmentInfo colorAttachmentInfo{};
 			colorAttachmentInfo.frameBufferAttachment = mainColorFramebufferAttachment;
@@ -74,21 +92,34 @@ namespace Shard3D {
 			depthAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
-			AttachmentInfo resolveAttachmentInfo{};
-			resolveAttachmentInfo.frameBufferAttachment = mainResolveFramebufferAttachment;
-			resolveAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			resolveAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			AttachmentInfo positionAttachmentInfo{};
+			positionAttachmentInfo.frameBufferAttachment = mainPositionFramebufferAttachment;
+			positionAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			positionAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+
+			AttachmentInfo normalAttachmentInfo{};
+			normalAttachmentInfo.frameBufferAttachment = mainNormalFramebufferAttachment;
+			normalAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			normalAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+			AttachmentInfo materialAttachmentInfo{};
+			materialAttachmentInfo.frameBufferAttachment = mainMaterialDataFramebufferAttachment;
+			materialAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			materialAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
 			
 			mainRenderpass = new RenderPass(
 				engineDevice, {
 				colorAttachmentInfo,
 				depthAttachmentInfo,
-				resolveAttachmentInfo
-				//depthresolveAttachmentInfo
+				positionAttachmentInfo,
+				normalAttachmentInfo,
+				materialAttachmentInfo
 				});
 
-			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainResolveFramebufferAttachment });
+			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment });
 		}
 		{ // Post processing
 			ppoColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
@@ -115,19 +146,20 @@ namespace Shard3D {
 		
 	}
 
-	void EditorApplication::destroyRenderPasses() {
+	void Application::destroyRenderPasses() {
 		delete mainFrameBuffer;
 		delete mainRenderpass;
 		delete mainColorFramebufferAttachment;
 		delete mainDepthFramebufferAttachment;
-		delete mainResolveFramebufferAttachment;
-
+		delete mainNormalFramebufferAttachment;
+		delete mainMaterialDataFramebufferAttachment;
+	
 		delete ppoFrameBuffer;
 		delete ppoColorFramebufferAttachment;
 		delete ppoRenderpass;
 	}
 
-	void EditorApplication::setupEngineFeatures() {
+	void Application::setupEngineFeatures() {
 		EngineAudio::init();
 		GraphicsSettings::init(nullptr);
 		ScriptEngine::init();
@@ -147,18 +179,18 @@ namespace Shard3D {
 		ShaderSystem::init();
 	}
 
-	void EditorApplication::setWindowCallbacks() {
-		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, EditorApplication::eventEvent);
+	void Application::setWindowCallbacks() {
+		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, Application::eventEvent);
 	}
 
-	void EditorApplication::windowResizeEvent(Events::WindowResizeEvent& e) {
+	void Application::windowResizeEvent(Events::WindowResizeEvent& e) {
 		createRenderPasses();
 	}
 
-	void EditorApplication::eventEvent(Events::Event& e) {
+	void Application::eventEvent(Events::Event& e) {
 	}
 
-	void EditorApplication::run() {
+	void Application::run() {
 		std::vector<uPtr<EngineBuffer>> uboBuffers(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); i++) {
 			uboBuffers[i] = make_uPtr<EngineBuffer>(
@@ -184,7 +216,7 @@ namespace Shard3D {
 		
 		GridSystem gridSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem { engineDevice, ppoRenderpass->getRenderPass(), {mainResolveFramebufferAttachment, nullptr, nullptr, nullptr}};
+		PostProcessingSystem ppoSystem { engineDevice, ppoRenderpass->getRenderPass(), {mainColorFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment}};
 		ShadowMappingSystem shadowSystem { engineDevice };
 
 		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
@@ -194,9 +226,11 @@ namespace Shard3D {
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
 
-		level->setPhysicsSystem(&physicsSystem);
-
 		ResourceHandler::init(engineDevice);
+		// level must be created after resource handler has been initialised due to the fact that the editor camera is created with post processing materials
+		SHARD3D_INFO("Constructing Level Pointer");
+		level = make_sPtr<ECS::Level>();
+		level->setPhysicsSystem(&physicsSystem);
 
 		{
 			CSimpleIniA ini;
@@ -220,18 +254,8 @@ namespace Shard3D {
 		hudLayer2.layer = 2;
 		hudLayer3.layer = 3;
 
-		SHARD3D_INFO("Loading editor camera actor");
-		ECS::Actor editor_cameraActor = level->createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
-		editor_cameraActor.addComponent<Components::CameraComponent>();
-		editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
-		editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
-		
-		level->setPossessedCameraActor(editor_cameraActor);
-		editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
-		SHARD3D_INFO("Loading dummy actor");
-		ECS::Actor dummy = level->createActorWithUUID(1, "Dummy Actor (SYSTEM RESERVED)");
+		auto editor_cameraActor = level->getActorFromUUID(0);
 
-		controller::EditorMovementController editorCameraController{};
 		{
 			CSimpleIniA ini;
 			ini.SetUnicode();
@@ -302,13 +326,9 @@ beginWhileLoop:
 			SHARD3D_STAT_RECORD();
 			level->runGarbageCollector(engineDevice);
 			ResourceHandler::runGarbageCollector();
-			ECS::MasterManager::executeQueue(level, engineDevice);
 			EngineAudio::globalUpdate(possessedCameraActor.getTransform().getTranslation(), 
 				possessedCameraActor.getTransform().getRotation());
 			SHARD3D_STAT_RECORD_END({ "Engine", "Garbage Collection" });
-			if (level->simulationState != PlayState::Playing) {
-				editorCameraController.tryPoll(engineWindow, frameTime, editor_cameraActor);
-			}
 			possessedCameraActor.getComponent<Components::CameraComponent>().ar = GraphicsSettings::getRuntimeInfo().aspectRatio;
 			possessedCamera.setViewYXZ(possessedCameraActor.getTransform().transformMatrix);
 			possessedCameraActor.getComponent<Components::CameraComponent>().setProjection();
@@ -321,7 +341,6 @@ beginWhileLoop:
 					frameTime,
 					commandBuffer,
 					possessedCamera,
-					this,
 					globalDescriptorSets[frameIndex],
 					*SharedPools::drawPools[frameIndex],
 					level
@@ -353,9 +372,9 @@ beginWhileLoop:
 					Also order absolutely matters, post processing for example must go last
 				*/
 				//	render
-				SHARD3D_STAT_RECORD();
-				shadowSystem.render(frameInfo);
-				SHARD3D_STAT_RECORD_END({ "Rendering", "Shadow Mapping" });
+			//	SHARD3D_STAT_RECORD();
+			//	shadowSystem.render(frameInfo);
+			//	SHARD3D_STAT_RECORD_END({ "Rendering", "Shadow Mapping" });
 
 				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
 
@@ -429,7 +448,7 @@ beginWhileLoop:
 		level = nullptr;
 	}
 
-	void EditorApplication::loadStaticObjects() {
+	void Application::loadStaticObjects() {
 		
 		Actor phys = level->createActor();
 		phys.addComponent<Components::Rigidbody3DComponent>();

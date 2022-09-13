@@ -12,7 +12,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shard3DEditor", "editor\Sha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shard3D Core", "engine\Shard3D\scripting\script_utils\Shard3D Core.csproj", "{CA0E9FD8-3A7D-46A3-A138-1A937CD9D584}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shard3D Runtime", "runtime\Shard3D Runtime.vcxproj", "{B4836232-E14E-4786-95E0-2879B5B8D68C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shard3DRuntime", "runtime\Shard3D Runtime.vcxproj", "{B4836232-E14E-4786-95E0-2879B5B8D68C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B68ED66F-EC3B-4689-933F-089A55D2CFAA} = {B68ED66F-EC3B-4689-933F-089A55D2CFAA}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

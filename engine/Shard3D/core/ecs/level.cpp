@@ -2,7 +2,7 @@
 #include "level.h"
 #include "sactor.h" // also includes "actor.h"
 
-#include "mmgr.h"
+#include "levelmgr.h"
 
 #include "../asset/assetmgr.h"
 #include "../../scripting/script_engine.h"
@@ -12,9 +12,22 @@
 
 namespace Shard3D {
 	namespace ECS {
-		Level::Level(const std::string &lvlName) : name(lvlName) {}
+		Level::Level(const std::string &lvlName, bool makeSystem) : name(lvlName) {
+			if (!makeSystem) return;
+			SHARD3D_ERROR("Loading editor camera actor");
+			ECS::Actor editor_cameraActor = createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
+			editor_cameraActor.addComponent<Components::CameraComponent>();
+			editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
+			editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
+
+		    setPossessedCameraActor(editor_cameraActor);
+			editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
+			SHARD3D_ERROR("Loading dummy actor");
+			ECS::Actor dummy = createActorWithUUID(1, "Dummy Actor (SYSTEM RESERVED)");
+
+		}
 		Level::~Level() {
-			SHARD3D_INFO("Destroying level");
+			SHARD3D_ERROR("Destroying level");
 			registry.clear();
 		}
 
@@ -23,6 +36,7 @@ namespace Shard3D {
 			auto view = src.view<Component>();
 			for (auto e : view) {
 				UUID guid = src.get<Components::UUIDComponent>(e).id;
+				
 				if (map.find(guid) == map.end()) SHARD3D_FATAL("enttMap.find(guid) == enttMap.end()");
 
 				entt::entity dstEnttID = map.at(guid);
@@ -34,7 +48,7 @@ namespace Shard3D {
 		}
 
 		sPtr<Level> Level::copy(sPtr<Level> other) {
-			sPtr<Level> newLvl = make_sPtr<Level>(other->name);
+			sPtr<Level> newLvl = make_sPtr<Level>(other->name, false);
 			hashMap<UUID, entt::entity> enttMap;
 
 			auto& srcLvlRegistry = other->registry;
@@ -239,7 +253,6 @@ namespace Shard3D {
 			ScriptEngine::runtimeStop();
 			setPossessedCameraActor(0);
 			SHARD3D_LOG("Reloading level");
-			loadRegistryCapture = true;
 		}
 
 		void Level::killActor(Actor actor) {

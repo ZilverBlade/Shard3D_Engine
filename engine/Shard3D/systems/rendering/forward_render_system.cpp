@@ -32,7 +32,8 @@ namespace Shard3D {
 			push.normalMatrix = transform.normalMatrix;
 
 			auto& model = ResourceHandler::retrieveMesh(component.asset);
-			SHARD3D_ASSERT(model->materialSlots.size() == component.materials.size() && "Mesh Component and 3D model do not match!");
+			SHARD3D_SILENT_ASSERT(model->materialSlots.size() == component.materials.size() && "Mesh Component and 3D model do not match!");
+			SHARD3D_ASSERT(model->materialSlots.size() <= component.materials.size() && "Mesh Component has less slots than 3D model!");
 			for (int i = 0; i < model->bind(frameInfo.commandBuffer); i++) {
 				rPtr<SurfaceMaterial> material = ResourceHandler::retrieveSurfaceMaterial(component.materials[i]);	
 				material->bind(frameInfo.commandBuffer, frameInfo.globalDescriptorSet);

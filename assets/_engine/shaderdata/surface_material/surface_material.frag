@@ -1,9 +1,12 @@
+//#version 450
 layout(location = 0) in vec3 fragPosWorld;
 layout(location = 1) in vec3 fragNormalWorld;
 layout(location = 2) in vec2 fragUV;
 
 layout (location = 0) out vec4 outColor;
-
+layout (location = 1) out vec4 outPosition;
+layout (location = 2) out vec4 outNormal;
+layout (location = 3) out vec4 outMaterialData;
 
 struct Pointlight {
 	vec4 position;
@@ -211,4 +214,10 @@ const float opacity =
 #endif
 ;
 	outColor = vec4(calculatedLight, opacity); //RGBA
-}
+	outPosition = vec4(fragPosWorld, 1.0);
+#ifdef S3DSDEF_SHADER_PERMUTATION_SURFACE_SHADED
+	outNormal = vec4(N, 1.0); 
+	outMaterialData = vec4(material_specular, material_shininess,material_metallic, 1.0); //RGBA
+#endif
+}						   
+						    

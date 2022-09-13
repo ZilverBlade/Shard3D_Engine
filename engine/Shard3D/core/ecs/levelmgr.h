@@ -19,7 +19,7 @@ namespace Shard3D {
 
 		class LevelManager {
 		public:
-			LevelManager(const sPtr<Level>& level);
+			LevelManager(sPtr<Level>& level);
 
 			void save(const std::string& destinationPath, bool encryptLevel = false);
 			void saveRuntime(const std::string& destinationPath);
@@ -28,7 +28,7 @@ namespace Shard3D {
 			LevelMgrResults loadRuntime(const std::string& sourcePath);
 
 		private:
-			sPtr<Level> mLevel;
+			sPtr<Level>& mLevel;
 		};
 	}
 }

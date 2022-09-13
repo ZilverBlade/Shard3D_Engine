@@ -6,11 +6,10 @@
 
 namespace Shard3D {
 	namespace controller {
-		void EditorMovementController::tryPoll(EngineWindow& _window, float _dt, ECS::Actor& _actor) {
-			window = _window.getGLFWwindow();
+		void EditorMovementController::tryPollTranslation(EngineWindow& _window, float _dt, const ECS::Actor& _actor) {
+		
 			actor = _actor;
 			dt = _dt;
-			SHARD3D_EVENT_BIND_HANDLER_RFC(_window, EditorMovementController::eventEvent);
 
 			float yaw = actor.getComponent<Components::TransformComponent>().getRotation().z;
 			float pitch = actor.getComponent<Components::TransformComponent>().getRotation().x;
@@ -33,6 +32,12 @@ namespace Shard3D {
 				actor.getComponent<Components::TransformComponent>().setTranslation(
 					actor.getComponent<Components::TransformComponent>().getTranslation() += moveSpeed * dt * glm::normalize(moveDir) * speedModifier);
 			}
+		}
+		void EditorMovementController::tryPollOrientation(EngineWindow& _window, float _dt, const ECS::Actor& _actor) {
+			window = _window.getGLFWwindow();
+			actor = _actor;
+			dt = _dt;
+			
 
 			if (Input::isMouseButtonDown(buttons.canRotate)) {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

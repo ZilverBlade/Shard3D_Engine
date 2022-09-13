@@ -49,3 +49,9 @@ namespace Shard3D {
 
 #define BIT(x) (1 << x)
 #define SHARD3D_WAITFOR(seconds) Shard3D::WAITUtils::preciseStandby(seconds)
+
+#define DELETE_COPY(myClass)	myClass(const myClass&) = delete; \
+								myClass& operator=(const myClass&) = delete;
+#define DELETE_MOVE(myClass)	myClass(myClass&&) = delete; \
+								myClass& operator=(myClass&&) = delete;
+

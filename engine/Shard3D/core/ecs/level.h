@@ -7,7 +7,7 @@
 #include "../rendering/camera.h"
 namespace Shard3D {
 	class PhysicsSystem;
-	class EditorApplication;
+	class Application;
 	namespace ECS {
 		class Actor;
 		class LevelTreePanel;
@@ -21,7 +21,9 @@ namespace Shard3D {
 
 		class Level {
 		public:
-			Level(const std::string& lvlName = "Some kind of level");
+			DELETE_COPY(Level);
+
+			Level(const std::string& lvlName = "Some kind of level", bool makeSystem = true);
 			~Level();
 
 			static sPtr<Level> copy(sPtr<Level> other);
@@ -59,6 +61,7 @@ namespace Shard3D {
 			void end();
 
 			void setPhysicsSystem(PhysicsSystem* _physicsSystemPtr) { physicsSystemPtr = _physicsSystemPtr; }
+			PhysicsSystem* physicsSystemPtr;
 
 			void simulationStateCallback();
 
@@ -75,12 +78,9 @@ namespace Shard3D {
 		private:
 			//should only be called by system processes
 			Actor createActorWithUUID(UUID guid, const std::string& name = "Some kind of actor");
-			PhysicsSystem* physicsSystemPtr;
-
+			
 			void rebuildTransforms();
 			void rebuildRelations(Actor child);
-
-			bool loadRegistryCapture = false;
 
 			// map
 			hashMap<UUID, entt::entity> actorMap;
@@ -88,7 +88,7 @@ namespace Shard3D {
 			// queues 
 			std::vector<Actor> actorKillQueue;
 
-			friend class Shard3D::EditorApplication;
+			friend class Shard3D::Application;
 			friend class Actor;
 			friend class MasterManager;
 

@@ -225,9 +225,6 @@
     <ClInclude Include="core\ecs\levelmgr.h">
       <Filter>Header Files\core\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="core\ecs\mmgr.h">
-      <Filter>Header Files\core\ecs</Filter>
-    </ClInclude>
     <ClInclude Include="core\ecs\sactor.h">
       <Filter>Header Files\core\ecs</Filter>
     </ClInclude>
@@ -381,9 +378,6 @@
     <ClCompile Include="core\ecs\levelmgr.cpp">
       <Filter>Source Files\core\ecs</Filter>
     </ClCompile>
-    <ClCompile Include="core\ecs\mmgr.cpp">
-      <Filter>Source Files\core\ecs</Filter>
-    </ClCompile>
     <ClCompile Include="core\ecs\actor.cpp">
       <Filter>Source Files\core\ecs</Filter>
     </ClCompile>
@@ -524,17 +518,8 @@
     <None Include="shaders\hud_element.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
     </None>
-    <None Include="shaders\materials\surface_shaded_opaque.frag">
-      <Filter>Resource Files\Shaders\material</Filter>
-    </None>
     <None Include="shaders\mesh_shader.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
-    </None>
-    <None Include="shaders\materials\surface_shaded_masked.frag">
-      <Filter>Resource Files\Shaders\material</Filter>
-    </None>
-    <None Include="shaders\materials\surface_shaded_translucent.frag">
-      <Filter>Resource Files\Shaders\material</Filter>
     </None>
     <None Include="shaders\fullscreen_quad.vert">
       <Filter>Resource Files\Shaders\vertex</Filter>
@@ -564,6 +549,30 @@
       <Filter>Resource Files\Shaders\post_processing\final</Filter>
     </None>
     <None Include="shaders\post_processing\noise.comp">
+      <Filter>Resource Files\Shaders\post_processing</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_masked.s3dshdef">
+      <Filter>Resource Files\Shaders\material</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_material.frag">
+      <Filter>Resource Files\Shaders\material</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_opaque.s3dshdef">
+      <Filter>Resource Files\Shaders\material</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_shaded.s3dshdef">
+      <Filter>Resource Files\Shaders\material</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_translucent.s3dshdef">
+      <Filter>Resource Files\Shaders\material</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\surface_unshaded.s3dshdef">
+      <Filter>Resource Files\Shaders\material</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\shaderdata\surface_material\global_ubo.glsl">
+      <Filter>Resource Files\Shaders\material</Filter>
+    </None>
+    <None Include="..\..\assets\_engine\mat\ppo\ssao.comp">
       <Filter>Resource Files\Shaders\post_processing</Filter>
     </None>
   </ItemGroup>

@@ -54,6 +54,7 @@ namespace Shard3D {
 			loadMesh(coreAssets.m_defaultModel);
 			loadMesh(coreAssets.m_errorMesh);
 			loadSurfaceMaterial(coreAssets.s_errorMaterial);
+			loadSurfaceMaterial(coreAssets.s_blankMaterial);
 
 			loadPPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
 			loadPPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
@@ -78,7 +79,8 @@ namespace Shard3D {
 
 	// Check if is a core surface material
 	static bool isCoreAsset_S(AssetKey asset) {
-		return	asset == AssetID("assets/_engine/mat/world_grid.s3dasset");
+		return	asset == AssetID("assets/_engine/mat/world_grid.s3dasset") ||
+				asset == AssetID("assets/_engine/mat/world_grid_blank.s3dasset");
 	}
 
 	// Check if is a core post processing material
@@ -115,7 +117,23 @@ namespace Shard3D {
 		clearMaterialAssets();
 		runGarbageCollector();
 	}
-
+	void ResourceHandler::clearAllUnusedAssets() {
+		// doesnt work because the AssetKey is the real pointer to the asset map
+#ifdef _______________
+		for (auto& [key, data] : textureAssets)
+			if (!isCoreAsset_T(key))
+				if (data.unique())
+					ResourceHandler::unloadTexture(key);
+		for (auto& [key, data] : meshAssets)
+			if (!isCoreAsset_M(key))
+				if (data.unique())
+					ResourceHandler::unloadMesh(key);
+		for (auto& [key, data] : surfaceMaterialAssets)
+			if (!isCoreAsset_S(key))
+				if (data.unique())
+					ResourceHandler::unloadSurfaceMaterial(key);
+#endif
+	}
 //========================================================================================================================
 
 	void AssetManager::importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info) {

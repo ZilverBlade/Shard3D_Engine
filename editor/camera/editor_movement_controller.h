@@ -9,7 +9,8 @@ namespace Shard3D {
     namespace controller {
 	    class EditorMovementController {
 	    public:
-            void tryPoll(EngineWindow& _window, float _dt, ECS::Actor& _actor);
+            void tryPollTranslation(EngineWindow& _window, float _dt, const ECS::Actor& _actor);
+            void tryPollOrientation(EngineWindow& _window, float _dt, const ECS::Actor& _actor);
 
             void eventEvent(Events::Event& e);
 

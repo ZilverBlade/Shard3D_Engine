@@ -37,9 +37,6 @@
     <Filter Include="Source Files\panels">
       <UniqueIdentifier>{4d382f5b-4fd5-4c47-92c4-e7cc3d6417aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\gtk">
-      <UniqueIdentifier>{b2642689-703f-4bda-9688-99bd51e9fa2d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

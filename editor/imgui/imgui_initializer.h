@@ -12,7 +12,7 @@ namespace Shard3D {
 		static inline VkDescriptorPool imGuiDescriptorPool;
 		static inline ImGui_ImplVulkan_InitInfo imgui_init_info{};
 		friend class ImGuiLayer;
-		friend class EditorApplication;
+		friend class Application;
 		static void init(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass, bool lightTheme);
 		static void setViewportImage(VkDescriptorSet* image, FrameBufferAttachment* frameBufferAttachment);
 	};
