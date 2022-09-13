@@ -13,9 +13,17 @@ namespace Shard3D {
 		const GraphicsPipelineConfigInfo& configInfo
 	)
 		: engineDevice{device} {
-		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
+		createGraphicsPipeline(readFile(vertFilePath), readFile(fragFilePath), configInfo);
 	}
-
+	GraphicsPipeline::GraphicsPipeline(
+		EngineDevice& device,
+		const std::string& vertFilePath,
+		const std::vector<char>& fragData,
+		const GraphicsPipelineConfigInfo& configInfo
+	)
+		: engineDevice{ device } {
+		createGraphicsPipeline(readFile(vertFilePath), fragData, configInfo);
+	}
 	GraphicsPipeline::~GraphicsPipeline() {
 		vkDestroyShaderModule(engineDevice.device(), vertShaderModule, nullptr);
 		vkDestroyShaderModule(engineDevice.device(), fragShaderModule, nullptr);
@@ -40,8 +48,8 @@ namespace Shard3D {
 	}
 
 	void GraphicsPipeline::createGraphicsPipeline(
-		const std::string& vertFilePath,
-		const std::string& fragFilePath,
+		const std::vector<char>& vertCode,
+		const std::vector<char>& fragCode,
 		const GraphicsPipelineConfigInfo& configInfo
 	) {
 		SHARD3D_ASSERT(
@@ -50,8 +58,6 @@ namespace Shard3D {
 		SHARD3D_ASSERT(
 			configInfo.renderPass != VK_NULL_HANDLE &&
 			"Cannot create graphics pipeline:: no renderPass provided in configInfo");
-		auto vertCode = readFile(vertFilePath);
-		auto fragCode = readFile(fragFilePath);
 
 		createShaderModule(vertCode, &vertShaderModule);
 		createShaderModule(fragCode, &fragShaderModule);

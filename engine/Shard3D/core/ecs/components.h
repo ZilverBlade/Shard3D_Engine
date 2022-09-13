@@ -41,6 +41,7 @@ namespace Shard3D {
 		};
 
 		struct TransformComponent {
+			void dasd(glm::vec3 _t);
 			void setTranslation(glm::vec3 _t) { dirty = true; translation = glm::vec3(_t.x, _t.z, _t.y); }
 			void setRotation(glm::vec3 _r) { dirty = true; rotation = glm::vec3(_r.x, _r.z, _r.y); }
 			void setScale(glm::vec3 _s) { dirty = true; scale = glm::vec3(_s.x, _s.z, _s.y); }
@@ -58,6 +59,8 @@ namespace Shard3D {
 			glm::vec3 getTranslation() { return glm::vec3(translation.x, translation.z, translation.y); }
 			glm::vec3 getRotation() { return glm::vec3(rotation.x, rotation.z, rotation.y); }
 			glm::vec3 getScale() { return glm::vec3(scale.x, scale.z, scale.y); }
+
+			static void decompose(const glm::mat4& transform, glm::vec3* outTranslation, glm::vec3* outRotationEulerXYZ, glm::vec3* outScale);
 
 			TransformComponent() = default;
 			TransformComponent(const TransformComponent&) = default;
@@ -266,6 +269,22 @@ namespace Shard3D {
 		};
 		struct TriggerVolumeComponent {
 			
+		};
+
+		struct ExponentialFogComponent {
+			//https://iquilezles.org/articles/fog/
+		};
+		struct AreaFogComponent {
+			// allows for foggy lights
+		};
+		struct DistanceMistComponent {
+			//https://developer.download.nvidia.com/CgTutorial/cg_tutorial_chapter09.html chaper 9.1.5 and https://vicrucann.github.io/tutorials/osg-shader-fog/
+		};
+		struct DecalComponent {
+
+		};
+		struct ReflectionCubeComponent {
+
 		};
 	}
 }

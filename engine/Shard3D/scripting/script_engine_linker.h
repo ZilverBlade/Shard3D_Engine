@@ -69,6 +69,19 @@ namespace Shard3D {
 
 		static void CameraComponent_GetFarClip(uint64_t actorID, float* v);
 		static void CameraComponent_SetFarClip(uint64_t actorID, float* v);
+
+		static void CameraComponent_GetPostProcessingEffectsCount(uint64_t actorID, uint32_t* _count);
+		static void CameraComponent_GetPostProcessingParametersCount(uint64_t actorID, uint32_t _index, uint32_t* _count);
+		static void CameraComponent_GetPostProcessingParameterValue_int(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, int* v);
+		static void CameraComponent_SetPostProcessingParameterValue_int(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, int* v);
+		static void CameraComponent_GetPostProcessingParameterValue_float(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, float* v);
+		static void CameraComponent_SetPostProcessingParameterValue_float(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, float* v);
+		static void CameraComponent_GetPostProcessingParameterValue_float2(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec2* v);
+		static void CameraComponent_SetPostProcessingParameterValue_float2(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec2* v);
+		static void CameraComponent_GetPostProcessingParameterValue_float4(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec4* v);
+		static void CameraComponent_SetPostProcessingParameterValue_float4(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec4* v);
+		static void CameraComponent_GetPostProcessingParameterValueType(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, MonoType* type);
+
 #pragma endregion
 
 #pragma region Audio

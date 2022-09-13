@@ -42,7 +42,10 @@ namespace Shard3D {
 
 	void DefaultComponentPanels::render() {
 		ImGui::Begin("Basic Actors");
-		ImGui::BeginListBox("##actorlistboxpanel", ImGui::GetContentRegionAvail());
+		if (!ImGui::BeginListBox("##actorlistboxpanel", ImGui::GetContentRegionAvail())) {
+			ImGui::End();
+			return;
+		}
 		drawImageButtonWithText(icons.pointlight, "Pointlight Actor", { 32.f, 32.f }, typeid(Components::PointlightComponent).hash_code());
 		drawImageButtonWithText(icons.spotlight, "Spotlight Actor", { 32.f, 32.f }, typeid(Components::SpotlightComponent).hash_code());
 		drawImageButtonWithText(icons.camera, "Camera Actor", { 32.f, 32.f }, typeid(Components::CameraComponent).hash_code());

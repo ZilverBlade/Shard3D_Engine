@@ -3,5 +3,5 @@ AssetType: postprocessing_material
 PPOMaterial:
   - Material: hdr
     Data:
-      Shader: assets/shaderdata/post_processing/hdr.comp.spv
+      Shader: assets/_engine/mat/ppo/hdr.comp
       MyParams: [[3, "Exposure", !!binary "AACAPw=="], [3, "Gain", !!binary "AAAAAA=="], [3, "Contrast", !!binary "AACAPw=="], [3, "Saturation", !!binary "AACAPw=="]]

@@ -1,4 +1,5 @@
-#version 450
+// #version 450
+#include "global_ubo.glsl"
 
 layout(location = 0) in vec3 fragPosWorld;
 layout(location = 1) in vec3 fragNormalWorld;
@@ -6,45 +7,6 @@ layout(location = 2) in vec2 fragUV;
 
 layout (location = 0) out vec4 outColor;
 
-struct Pointlight {
-	vec4 position;
-	vec4 color;
-	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
-	float specularMod;
-	float radius;
-};
-struct Spotlight {
-	vec4 position;
-	vec4 color;
-	vec4 direction; // (ignore w)
-	vec2 angle; //outer, inner
-	vec4 attenuationMod; //	const + linear * x + quadratic * x^2
-	float specularMod;
-	float radius;
-};
-struct DirectionalLight {
-	vec4 position;
-	vec4 color;
-	vec4 direction; //	directional (ignore w)
-	float specularMod;	
-};
-
-layout(set = 0, binding = 0) uniform GlobalUbo{
-	mat4 projection;
-	mat4 view;
-	mat4 invView;
-
-	vec4 ambientLightColor;			//	sky/ambient
-	
-	#ifdef ShadedMaterial
-	Pointlight pointlights[128];
-	Spotlight spotlights[128];
-	DirectionalLight directionalLights[6];
-	int numPointlights;
-	int numSpotlights;
-	int numDirectionalLights;
-	#endif
-} ubo;
 
 layout(set = 1, binding = 1) uniform MaterialFactor{
 	vec4 diffuse;
@@ -63,9 +25,12 @@ layout(set = 2, binding = 3) uniform sampler2D tex_shininess;
 layout(set = 2, binding = 4) uniform sampler2D tex_metallic;
 layout(set = 2, binding = 5) uniform sampler2D tex_normal;
 #endif
-S3DSDEF_SURFACE_MASKED_UNIFORMSAMPLER2D_EXT
-S3DSDEF_SURFACE_TRANSLUCENT_UNIFORMSAMPLER2D_EXT
-
+#ifdef S3DSDEF_SURFACE_MASKED_UNIFORMSAMPLER2D_EXT
+layout(set = 2, binding = 6) uniform sampler2D tex_mask;
+#endif
+#ifdef S3DSDEF_SURFACE_TRANSLUCENT_UNIFORMSAMPLER2D_EXT
+layout(set = 2, binding = 7) uniform sampler2D tex_opacity;
+#endif
 layout(push_constant) uniform Push {
 	mat4 modelMatrix; 
 	mat4 normalMatrix;
@@ -120,8 +85,9 @@ vec3 calculateLight(vec3 incolor, vec3 baseSpecular, vec3 normal, vec3 viewpoint
 	
 // shader code
 void main(){
-	S3DSDEF_SURFACE_MASKEDFUNC
-	
+#ifdef S3DSDEF_SURFACE_MASKEDFUNC
+	if (texture(tex_mask, fragUV).x < 0.5) discard;
+#endif
 	const vec3 fragColor = 
 #ifdef S3DSDEF_SHADER_PERMUTATION_SURFACE_SHADED
 	texture(tex_diffuse, fragUV).xyz * factor.diffuse.xyz;
@@ -201,7 +167,7 @@ void main(){
 	+ lightOutput, 
 #endif
 #ifdef S3DSDEF_SHADER_PERMUTATION_SURFACE_TRANSLUCENT
-	S3DSDEF_SURFACE_ALPHAFUNC
+	texture(tex_opacity, fragUV).x * factor.diffuse.w
 #else
 	1.0
 #endif

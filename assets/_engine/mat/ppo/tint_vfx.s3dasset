@@ -1,0 +1,7 @@
+Shard3D: 1.2.8.r2-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: tint
+    Data:
+      Shader: assets\_engine\mat\ppo\tint.comp
+      MyParams: [[6, Color, !!binary "AAAAAAAAAAAAAAAAAACAPw=="]]

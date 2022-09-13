@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CameraComponentPostProcessingManipulator.cs" />
     <Compile Include="developer fuckery.cs" />
     <Compile Include="ECS\Actor.cs" />
     <Compile Include="ECS\Components.cs" />

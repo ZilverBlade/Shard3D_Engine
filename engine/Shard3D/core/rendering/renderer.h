@@ -30,7 +30,7 @@ namespace Shard3D {
 		}
 
 		VkCommandBuffer beginFrame();
-		void endFrame();
+		void endFrame(std::chrono::time_point<std::chrono::steady_clock>& beginTimePoint);
 		void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
 		void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 		uPtr<EngineSwapChain>& getSwapchain() { return engineSwapChain; }
@@ -47,8 +47,6 @@ namespace Shard3D {
 		uint32_t currentImageIndex;
 		int currentFrameIndex;
 		bool isFrameStarted{false};
-
-		std::chrono::steady_clock::time_point timeFrameBegin;
 
 		float noEditBgColor[3] = { 0.01f, 0.01f, 0.01f };
 		std::array<VkClearValue, 2> clearValues{};

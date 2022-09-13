@@ -82,7 +82,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
@@ -111,7 +111,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -141,7 +141,7 @@
       <PrecompiledHeaderFile>s3dpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\entt\1include;..\extern\yaml\include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>26812;4244;4996;4005;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -199,7 +199,6 @@
     <ClInclude Include="core\ui\hud.h" />
     <ClInclude Include="core\ui\hudmgr.h" />
     <ClInclude Include="core\ui\hud_layer.h" />
-    <ClInclude Include="core\ui\screen_layer.h" />
     <ClInclude Include="core\vulkan_api\buffer.h" />
     <ClInclude Include="core\vulkan_api\descriptors.h" />
     <ClInclude Include="core\vulkan_api\device.h" />
@@ -209,8 +208,6 @@
     <ClInclude Include="events\key_event.h" />
     <ClInclude Include="events\mouse_event.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="layer\layer.h" />
-    <ClInclude Include="layer\layer_stack.h" />
     <ClInclude Include="plugins\example_component.h" />
     <ClInclude Include="plugins\plugin_link.h" />
     <ClInclude Include="plugins\script_engine_plugin_link.h" />
@@ -372,14 +369,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="core\ui\screen_layer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="core\vulkan_api\buffer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
@@ -404,16 +393,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../../s3dpch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="layer\layer.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="layer\layer_stack.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../s3dpch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../s3dpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="s3dpch.cpp" />
     <ClCompile Include="scripting\script_engine.cpp">

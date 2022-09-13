@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Shard3D/layer/layer.h>
-#include <Shard3D/layer/layer_stack.h>
-	
 #include <Shard3D/core/vulkan_api/pipeline.h>
 
 // panels
@@ -21,14 +18,13 @@
 namespace Shard3D {
 	class HUDLayer;
 	class HUD;
-	class ImGuiLayer : public Shard3D::Layer {
+	class ImGuiLayer {
 	public:
-		ImGuiLayer();
+		ImGuiLayer(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass);
 		~ImGuiLayer();
 
-		void attach(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass, LayerStack* layerStack) override;
-		void detach() override;
-		void update(FrameInfo& frameInfo) override;
+		void detach();
+		void render(FrameInfo& frameInfo);
 		void attachGUIEditorInfo(sPtr<HUDContainer>& container);
 
 		bool handleWindowResize(FrameInfo& frameInfo);
@@ -53,12 +49,9 @@ namespace Shard3D {
 		int width;
 		int height;
 
-		LayerStack* currentStack;
+		EngineWindow& engineWindow;
+		EngineDevice& engineDevice;
 
-		EngineWindow* engineWindow;
-		EngineDevice* engineDevice;
-
-		bool hasBeenDetached = false;
 		float timeSinceLastSecond;
 		float deltaTimeFromLastSecond;
 
@@ -101,6 +94,8 @@ namespace Shard3D {
 		SettingsPanel settingsPanel;
 		HUDBuilderPanel hudBuilder;
 		MaterialBuilderPanel materialBuilder;
+
+		int gizmoType = -1;
 
 		bool refreshContext;
 //Gizmo levelGizmo;

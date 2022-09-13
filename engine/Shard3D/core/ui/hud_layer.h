@@ -1,18 +1,14 @@
 #pragma once
 
-#include "../../layer/layer.h"
-
 #include "../../systems/rendering/hud_system.h"
 #include "../../events/mouse_event.h"
 namespace Shard3D {
-	class HUDLayer : public Shard3D::Layer {
+	class HUDLayer {
 	public:
-		HUDLayer();
+		HUDLayer(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass);
 		~HUDLayer();
 
-		void attach(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass, LayerStack* layerStack) override;
-		void detach() override;
-		void update(FrameInfo& frameInfo) override;
+		void render(FrameInfo& frameInfo);
 
 		void addElement(sPtr<HUDElement> element);
 		sPtr<HUDElement> getSelectedElement();

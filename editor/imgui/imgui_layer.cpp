@@ -20,24 +20,14 @@
 #include "imgui_initializer.h"
 #include <shellapi.h>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <ImGuizmo.h>
+#include <Shard3D/systems/buffers/material_system.h>
+
 namespace Shard3D {
-	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
-
-	ImGuiLayer::~ImGuiLayer() {}
-
-	static void loadLevel(sPtr<ECS::Level>& level, const std::string& path) {
-		if (level->simulationState != PlayState::Stopped) level->end();
-		level->killEverything();
-		ECS::MasterManager::loadLevel(path);
-	}
-
-	void ImGuiLayer::attach(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass, LayerStack* layerStack) {
-		engineDevice = &dvc;
-		engineWindow = &wnd;
-		currentStack = layerStack;
+	ImGuiLayer::ImGuiLayer(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass) : engineDevice(dvc), engineWindow(wnd){
 		std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped)";
-		glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
-		hasBeenDetached = false;
+		glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 
 		refreshContext = true;
 
@@ -62,6 +52,14 @@ namespace Shard3D {
 		enset.pbr = ini.GetBoolValue("RENDERING", "PBR");
 
 		createIcons();
+	}
+
+	ImGuiLayer::~ImGuiLayer() {}
+
+	static void loadLevel(sPtr<ECS::Level>& level, const std::string& path) {
+		if (level->simulationState != PlayState::Stopped) level->end();
+		level->killEverything();
+		ECS::MasterManager::loadLevel(path);
 	}
 
 	void ImGuiLayer::createIcons() {
@@ -106,24 +104,17 @@ namespace Shard3D {
 	}
 
 	void ImGuiLayer::detach() {
-		// check if has been detatched already, otherwise when program closes, otherwise imgui will try to destroy a context that doesnt exist
-		if (hasBeenDetached) return;
-		vkDeviceWaitIdle(engineDevice->device());
-		vkDestroyDescriptorPool(engineDevice->device(), ImGuiInitializer::imGuiDescriptorPool, nullptr);
+		vkDeviceWaitIdle(engineDevice.device());
+		vkDestroyDescriptorPool(engineDevice.device(), ImGuiInitializer::imGuiDescriptorPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 		levelTreePanel.destroyContext();
 		levelPropertiesPanel.destroyContext();
 		levelPeekPanel.destroyContext();
-		hasBeenDetached = true;
-		SHARD3D_LOG("Detached ImGui");
 	}
 
-	void ImGuiLayer::update(FrameInfo& frameInfo) {
-		if (hasBeenDetached) return;
-		if (hasBeenDetached) SHARD3D_ERROR("FAILED TO DETACH IMGUI");
-		SHARD3D_STAT_RECORD();
+	void ImGuiLayer::render(FrameInfo& frameInfo) {
 		if (refreshContext) {
 			levelTreePanel.setContext(frameInfo.activeLevel);
 			levelPropertiesPanel.setContext(frameInfo.activeLevel);
@@ -131,7 +122,7 @@ namespace Shard3D {
 			refreshContext = false;
 		}
 		
-		SHARD3D_EVENT_BIND_HANDLER_PTR(engineWindow, ImGuiLayer::eventEvent);
+		SHARD3D_EVENT_BIND_HANDLER_RFC(engineWindow, ImGuiLayer::eventEvent);
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
@@ -140,7 +131,7 @@ namespace Shard3D {
 		ImGuiIO& io = ImGui::GetIO();
 		io.DeltaTime = frameInfo.frameTime;
 
-		glfwGetWindowSize(engineWindow->getGLFWwindow(), &width, &height);
+		glfwGetWindowSize(engineWindow.getGLFWwindow(), &width, &height);
 		io.DisplaySize = ImVec2(width, height);
 
 		ImGui_ImplVulkan_NewFrame();
@@ -248,13 +239,21 @@ namespace Shard3D {
 		}
 		if (showDemoWindow) ImGui::ShowDemoWindow();
 		ImGui::End();
-		ImGui::Render();
 
+		SHARD3D_STAT_RECORD();
+
+		ImGui::Render();
+		SHARD3D_STAT_RECORD_END({ "ImGui", "Render" });
+
+		SHARD3D_STAT_RECORD();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), frameInfo.commandBuffer);
+		SHARD3D_STAT_RECORD_END({ "ImGui", "ImGui_ImplVulkan_RenderDrawData" });
+		SHARD3D_STAT_RECORD();
 		ImGui::UpdatePlatformWindows();
 		ImGui::RenderPlatformWindowsDefault();
-		SHARD3D_STAT_RECORD_END({ "ImGui", "Rendering" });
-	}
+		SHARD3D_STAT_RECORD_END({ "ImGui", "UpdatePlatformWindowsRenderPlatformWindowsDefault" });
+
+}
 
 	void ImGuiLayer::attachGUIEditorInfo(sPtr<HUDContainer>& container) {
 		hudBuilder.setContext(container);
@@ -290,8 +289,10 @@ namespace Shard3D {
 
 		ImVec2 vSize = ImGui::GetContentRegionAvail();
 		GraphicsSettings::getRuntimeInfo().aspectRatio = vSize.x / vSize.y;
+		GraphicsSettings::getRuntimeInfo().localScreen = { ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight() };
+
 		ImGui::Image(viewportImage, vSize);
-		
+
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.LVL")) {
 				if (MessageDialogs::show("This will overwrite the current level, and unsaved changes will be lost! Are you sure you want to continue?", "WARNING!", MessageDialogs::OPTYESNO | MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTDEFBUTTON2) == MessageDialogs::RESYES) {
@@ -307,8 +308,61 @@ namespace Shard3D {
 					frameInfo.activeLevel->createActor("Spotlight").addComponent<Components::SpotlightComponent>();
 				else if (h_code == 32325235)
 					frameInfo.activeLevel->createActor("Cube").addComponent<Components::Mesh3DComponent>(ResourceHandler::coreAssets.m_defaultModel);
-				else if (h_code == typeid(Components::CameraComponent).hash_code())
-					frameInfo.activeLevel->createActor("Camera Actor").addComponent<Components::Mesh3DComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+				else if (h_code == typeid(Components::CameraComponent).hash_code()) {
+					Actor actor = frameInfo.activeLevel->createActor("Camera Actor"); actor.addComponent<Components::Mesh3DComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+					actor.addComponent<Components::CameraComponent>();
+					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
+					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
+
+				}
+			}
+		}
+
+		{
+			Actor actor = levelTreePanel.getSelectedActor();
+			if (actor) {
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+				Actor cameraActor = frameInfo.activeLevel->getPossessedCameraActor();
+				EngineCamera& camera = cameraActor.getComponent<Components::CameraComponent>().camera;
+				glm::mat4 proj = camera.getProjection();
+				glm::mat4 invView = camera.getView();
+
+				auto& tc = actor.getComponent<Components::TransformComponent>();
+				glm::mat4 actorTransform = tc.transformMatrix;
+
+				gizmoType = ImGuizmo::TRANSLATE;
+				ImGuizmo::Manipulate(glm::value_ptr(invView), glm::value_ptr(proj), (ImGuizmo::OPERATION)gizmoType, ImGuizmo::LOCAL, glm::value_ptr(actorTransform));
+				if (ImGuizmo::IsUsing() && gizmoType != -1) {
+					glm::vec3 transl{};
+					glm::vec3 rotat{};
+					glm::vec3 scal{};
+
+					Components::TransformComponent::decompose(actorTransform, &transl, &rotat, &scal);
+					glm::vec4 realTranslation = glm::vec4(transl.x, transl.z, transl.y, 1.f);
+					glm::vec4 realRotation = glm::vec4(rotat.x, rotat.z, rotat.y, 1.f);
+					glm::vec4 realScale = glm::vec4(scal.x, scal.z, scal.y, 1.f);
+
+					glm::vec3 original_rotation = tc.getRotation();
+
+					if (!actor.hasRelationship()) {
+						glm::vec3 deltaRotation = glm::vec3(realRotation) - original_rotation; 
+						tc.setTranslation(glm::vec3(realTranslation));
+						tc.setScale(glm::vec3(realScale));
+						//tc.setRotation(deltaRotation + original_rotation);
+					}
+					else if (actor.getComponent<Components::RelationshipComponent>().parentActor == entt::null) {
+						glm::vec3 deltaRotation = glm::vec3(realRotation) - original_rotation;
+						tc.setTranslation(glm::vec3(realTranslation));
+						tc.setScale(glm::vec3(realScale));
+						tc.setRotation(deltaRotation + original_rotation);
+					}
+					else {
+						auto& parentTransform = Actor(actor.getComponent<Components::RelationshipComponent>().parentActor, frameInfo.activeLevel.get()).getTransform().transformMatrix;
+						glm::vec4 adjustedTransform = actorTransform[3] / parentTransform;
+					}
+				}
 			}
 		}
 		if (frameInfo.activeLevel->simulationState == PlayState::Paused) {
@@ -361,18 +415,18 @@ namespace Shard3D {
 				ECS::MasterManager::captureLevel(frameInfo.activeLevel);
 				frameInfo.activeLevel->begin();
 				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-				glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+				glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 			} else if (frameInfo.activeLevel->simulationState == PlayState::Paused) {  // Resume
 				frameInfo.activeLevel->simulationState = PlayState::Playing;
 				frameInfo.activeLevel->simulationStateCallback();
 				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-				glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+				glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 
 			} else if (frameInfo.activeLevel->simulationState == PlayState::Playing) {  // Pause
 				frameInfo.activeLevel->simulationState = PlayState::Paused;
 				frameInfo.activeLevel->simulationStateCallback();
 				std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Paused) | " + frameInfo.activeLevel->name;
-				glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+				glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 			}
 		ImGui::TextWrapped((frameInfo.activeLevel->simulationState == PlayState::Stopped) ? "Play" :
 			((frameInfo.activeLevel->simulationState == PlayState::Paused) ? "Resume" : "Pause"));
@@ -382,7 +436,7 @@ namespace Shard3D {
 			levelTreePanel.clearSelectedActor();
 			frameInfo.activeLevel->end();
 			std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped) | " + frameInfo.activeLevel->name;
-			glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+			glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 			refreshContext = true;
 		}
 		ImGui::TextWrapped("Stop");
@@ -475,14 +529,14 @@ namespace Shard3D {
 					ECS::MasterManager::captureLevel(frameInfo.activeLevel);
 					frameInfo.activeLevel->begin();
 					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-					glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+					glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 				} ImGui::EndDisabled();
 				if (frameInfo.activeLevel->simulationState != PlayState::Paused) {
 					ImGui::BeginDisabled(frameInfo.activeLevel->simulationState != PlayState::Playing); if (ImGui::MenuItem("Pause")) {
 						frameInfo.activeLevel->simulationState = PlayState::Paused;
 						frameInfo.activeLevel->simulationStateCallback();
 						std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Paused) | " + frameInfo.activeLevel->name;
-						glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+						glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 					} ImGui::EndDisabled();
 				}
 				else {
@@ -490,7 +544,7 @@ namespace Shard3D {
 						frameInfo.activeLevel->simulationState = PlayState::Playing;
 						frameInfo.activeLevel->simulationStateCallback();
 						std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: PLAYING) | " + frameInfo.activeLevel->name;
-						glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+						glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 					} ImGui::EndDisabled();
 				}
 
@@ -499,7 +553,7 @@ namespace Shard3D {
 					levelTreePanel.clearSelectedActor();
 					frameInfo.activeLevel->end();
 					std::string title = "Shard3D Engine " + ENGINE_VERSION.toString() + " (Playstate: Stopped) | " + frameInfo.activeLevel->name;
-					glfwSetWindowTitle(engineWindow->getGLFWwindow(), title.c_str());
+					glfwSetWindowTitle(engineWindow.getGLFWwindow(), title.c_str());
 					refreshContext = true;
 				} ImGui::EndDisabled();
 				ImGui::EndMenu();
@@ -535,10 +589,12 @@ namespace Shard3D {
 		if (ImGui::BeginMenu("Actions")) {
 			if (ImGui::MenuItem("Dump current frame's stats", NULL /*make sure to add some sort of shardcut */)) SHARD3D_STAT_DUMP_ALL();
 			if (ImGui::MenuItem("Read graphics settings", NULL /*make sure to add some sort of shardcut */)) GraphicsSettings::read();
-			if (ImGui::MenuItem("Compile Shaders", NULL /*make sure to add some sort of shardcut */)) {
-				ShellExecuteA(nullptr, "open", "shadercompmgr.exe", "-o shaders/ shaders/", "/", false);
+			if (ImGui::MenuItem("Recompile Surface Materials", NULL /*make sure to add some sort of shardcut */)) {
+				MaterialSystem::recompileSurface();
 			}
-			if (ImGui::MenuItem("Compile Shaders & Reupload Pipeline", NULL /*make sure to add some sort of shardcut */)) {}
+			if (ImGui::MenuItem("Recompile Post Processing Materials", NULL /*make sure to add some sort of shardcut */)) {
+				MaterialSystem::recompilePPO();
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Window")) {

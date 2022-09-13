@@ -11,7 +11,7 @@ namespace Shard3D {
 			SHARD3D_INFO("Loading Level Manager");
 		}
 
-		static void PPOSerializeMyParamCamera(YAML::Emitter& out, RandomPPOParam param) {
+		static void PPOSerializeMyParamCamera(YAML::Emitter& out, RandomShaderParam param) {
 			out << YAML::Flow;
 			out << YAML::BeginSeq;
 			out << (uint32_t)param.getType();
@@ -202,7 +202,6 @@ namespace Shard3D {
 				
 				std::string levelName = data["Level"].as<std::string>();
 				mLevel->getActorFromUUID(0).getTransform().setTranslation(data["LastSavedEditorCameraPos"].as<glm::vec3>());
-
 				if (data["Actors"]) {
 					for (auto actor : data["Actors"]) {
 						Actor loadedActor{};
@@ -210,6 +209,7 @@ namespace Shard3D {
 						SHARD3D_INFO("Loading actor with ID {0}", actor["Actor"].as<uint64_t>());
 						if (actor["TagComponent"]) {
 							loadedActor = mLevel->createActorWithUUID(actor["Actor"].as<uint64_t>(), actor["TagComponent"]["Tag"].as<std::string>());
+							SHARD3D_LOG("Creating actor {0}, UUID {1}, handle {2}", loadedActor.getTag(), loadedActor.getUUID(), (uint32_t)loadedActor.actorHandle);
 						} // Dont load actor if no TagComponent, every actor should have a TagComponent, so if an actor has no TagComponent, it must be some kind of core thing
 
 						if (actor["TransformComponent"]) {

@@ -109,7 +109,19 @@ namespace Shard3D {
 		{	
 			double x, y;
 			glfwGetCursorPos(window->getGLFWwindow(), &x, &y);
-			mousePos = { x,y };
+
+			float mX = GraphicsSettings::getRuntimeInfo().localScreen.x;
+			float mY = GraphicsSettings::getRuntimeInfo().localScreen.y;
+			
+			float mWidth = GraphicsSettings::getRuntimeInfo().localScreen.z;
+			float mHeight = GraphicsSettings::getRuntimeInfo().localScreen.w;
+			
+			
+			float xClipped = (x - mX) / (mWidth);
+			
+			float yClipped = (y - mY) / (mHeight);
+
+			mousePos = { xClipped * 1920, yClipped * 1080 };
 		}
 		float ar = GraphicsSettings::getRuntimeInfo().aspectRatio;
 		graphicsPipeline->bind(frameInfo.commandBuffer);

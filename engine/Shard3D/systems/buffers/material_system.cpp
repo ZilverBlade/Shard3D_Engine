@@ -3,8 +3,21 @@
 #include "material_system.h"
 #include "../../core/asset/assetmgr.h"
 #include <fstream>
+#include "../computational/shader_system.h"
 
 namespace Shard3D {
+	void MaterialSystem::recompileSurface() {
+		compiledShaders.clear();
+		for (auto& [key, material] : ResourceHandler::getSurfaceMaterialAssets()) {
+			ResourceHandler::rebuildSurfaceMaterial(material);
+		}
+	}
+	void MaterialSystem::recompilePPO() {
+		for (auto& [key, material] : ResourceHandler::getPPOMaterialAssets()) {
+			ResourceHandler::rebuildPPOMaterial(material);
+		}
+	}
+
 	void MaterialSystem::createSurfacePipelineLayout(VkPipelineLayout* pipelineLayout, VkDescriptorSetLayout factorLayout, VkDescriptorSetLayout textureLayout) {
 		SHARD3D_ASSERT(mRenderPass != VK_NULL_HANDLE && mGlobalSetLayout != VK_NULL_HANDLE && mDevice != VK_NULL_HANDLE && "Material system context not set!");
 
@@ -43,6 +56,53 @@ namespace Shard3D {
 			pipelineConfig
 		);
 	}
+	void MaterialSystem::createSurfacePipeline(uPtr<GraphicsPipeline>* pipeline, VkPipelineLayout pipelineLayout, GraphicsPipelineConfigInfo& pipelineConfig, SurfaceMaterial* self) {
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+		pipelineConfig.renderPass = mRenderPass;
+		pipelineConfig.pipelineLayout = pipelineLayout;
+
+		std::stringstream stream;
+		std::stringstream cacheDir;
+		cacheDir << "assets/shaderdata/materials/surface_";
+		stream << "#version 450\n";
+		if (dynamic_cast<SurfaceMaterial_Shaded*>(self)) {
+			stream << "#define S3DSDEF_SHADER_PERMUTATION_SURFACE_SHADED\n";
+			cacheDir << "shaded_";
+		} if (self->getBlendMode() & SurfaceMaterialBlendModeMasked) {
+			stream << "#define S3DSDEF_SHADER_PERMUTATION_SURFACE_MASKED\n";
+			cacheDir << "masked_";
+		} if (self->getBlendMode() & SurfaceMaterialBlendModeTranslucent) {
+			stream << "#define S3DSDEF_SHADER_PERMUTATION_SURFACE_TRANSLUCENT\n";
+			cacheDir << "translucent_";
+		} if (self->getBlendMode() == 0)
+			cacheDir << "opaque_";
+		cacheDir << ".spv";
+
+		if (std::find(compiledShaders.begin(), compiledShaders.end(), cacheDir.str()) != compiledShaders.end()) {
+			SHARD3D_LOG("Reading cached shader '{0}'", cacheDir.str());
+			goto pipelinecreate;
+		}
+		
+		{
+			stream << IOUtils::readText("assets/_engine/shaderdata/surface_material/surface_material.frag");
+			std::string finalString = stream.rdbuf()->str();
+			finalString = finalString.substr(0, finalString.length() - 2);
+
+			std::vector<char> myBytes = ShaderSystem::compileOnTheFlyDirect(finalString, "assets/_engine/shaderdata/surface_material/surface_material.frag", ShaderType::Pixel);
+			IOUtils::writeStackBinary(myBytes.data(), myBytes.size(), cacheDir.str());
+			compiledShaders.push_back(cacheDir.str());
+		}
+	pipelinecreate:
+		*pipeline = make_uPtr<GraphicsPipeline>(
+			*mDevice,
+			"assets/shaderdata/mesh_shader.vert.spv",
+			cacheDir.str(),
+			pipelineConfig
+			);
+
+	}
+
 
 	void MaterialSystem::createPPOPipelineLayout(VkPipelineLayout* pipelineLayout, VkDescriptorSetLayout dataLayout) {
 		SHARD3D_ASSERT(mPPOSceneSetLayout != VK_NULL_HANDLE && mDevice != VK_NULL_HANDLE && "Material system context not set!");
@@ -74,7 +134,15 @@ namespace Shard3D {
 			compute_shader
 		);
 	}
+	void MaterialSystem::createPPOPipeline(uPtr<ComputePipeline>* pipeline, VkPipelineLayout pipelineLayout, const std::vector<char>& compute_code) {
+		SHARD3D_ASSERT(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
+		*pipeline = make_uPtr<ComputePipeline>(
+			*mDevice,
+			pipelineLayout,
+			compute_code
+		);
+	}
 	void MaterialSystem::destroyPipelineLayout(VkPipelineLayout pipelineLayout) {
 		vkDestroyPipelineLayout(mDevice->device(), pipelineLayout, nullptr);	
 	}

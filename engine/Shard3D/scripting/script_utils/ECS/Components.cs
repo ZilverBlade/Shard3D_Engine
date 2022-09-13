@@ -102,6 +102,12 @@ namespace Shard3D.Components
             }
         }
 
+        public uint GetPostProcessingEffectsCount()
+        {
+            InternalCalls.CameraComponent_GetPostProcessingEffectsCount(_Actor.ID, out uint _va);
+               return _va;
+        }
+
         public void Possess()
         {
             InternalCalls.SceneManager_PossessCameraActor(_Actor.ID);

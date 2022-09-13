@@ -37,11 +37,6 @@ namespace Shard3D {
 		return AssetType::Unknown;
 	}
 
-	bool AssetManager::doesAssetExist(const std::string& assetPath) {
-		std::ifstream ifile(assetPath);
-		return ifile.good();
-	}
-
 	void ResourceHandler::destroy() {
 		textureAssets.clear(); 
 		meshAssets.clear(); 
@@ -268,10 +263,16 @@ namespace Shard3D {
 		YAML::Node data = YAML::Load(strStream.str());
 
 		stream.close();
-		if (data["AssetType"].as<std::string>() != "mesh3d") {
-			SHARD3D_ERROR("Trying to load non texture asset!");
+		try {
+			if (data["AssetType"].as<std::string>() != "mesh3d") {
+				SHARD3D_ERROR("Trying to load non texture asset!");
+				return;
+			}
+		}
+		catch (YAML::Exception ex) {
+			SHARD3D_ERROR("Error, loading invalid asset file: {0}", ex.msg);
 			return;
-		} 
+		}
 		
 		// Hacky binary read
 		Model3DLoadInfo loadInfo = *reinterpret_cast<Model3DLoadInfo*>(reinterpret_cast<uintptr_t>(data["Properties"].as<YAML::Binary>().data()));
@@ -317,13 +318,17 @@ namespace Shard3D {
 		strStream << stream.rdbuf();
 
 		YAML::Node data = YAML::Load(strStream.str());
-
 		stream.close();
-		if (data["AssetType"].as<std::string>() != "texture") {
-			SHARD3D_ERROR("Trying to load non texture asset!");
+		try {
+			if (data["AssetType"].as<std::string>() != "texture") {
+				SHARD3D_ERROR("Trying to load non texture asset!");
+				return;
+			}
+		}
+		catch (YAML::Exception ex) {
+			SHARD3D_ERROR("Error, loading invalid asset file: {0}", ex.msg);
 			return;
 		}
-
 		// Hacky binary read
 		TextureLoadInfo loadInfo = *reinterpret_cast<TextureLoadInfo*>(reinterpret_cast<uintptr_t>(data["Properties"].as<YAML::Binary>().data()));
 

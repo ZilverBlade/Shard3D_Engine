@@ -1,5 +1,6 @@
 #pragma once
 #include <Shard3D/core/asset/material.h>
+class TextEditor;
 namespace Shard3D {
 	class MaterialBuilderPanel {
 	public:
@@ -10,6 +11,7 @@ namespace Shard3D {
 	private:
 		rPtr<SurfaceMaterial> currentItem;
 		AssetID currentAsset;
+		TextEditor* editor;
 
 		rPtr<PostProcessingMaterial> currentPPOItem;
 		AssetID currentPPOAsset;

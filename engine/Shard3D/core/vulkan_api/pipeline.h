@@ -46,6 +46,13 @@ namespace Shard3D {
 			const std::string& fragFilePath, 
 			const GraphicsPipelineConfigInfo& configInfo
 		);
+
+		GraphicsPipeline(
+			EngineDevice& device, 
+			const std::string& vertFilePath,
+			const std::vector<char>& fragData, 
+			const GraphicsPipelineConfigInfo& configInfo
+		);
 		
 		~GraphicsPipeline();
 
@@ -62,8 +69,8 @@ namespace Shard3D {
 		static std::vector<char> readFile(const std::string& filePath);
 
 		void createGraphicsPipeline(
-			const std::string& vertFilePath,
-			const std::string& fragFilePath,
+			const std::vector<char>& vertCode,
+			const std::vector<char>& fragCode,
 			const GraphicsPipelineConfigInfo& configInfo
 		);
 

@@ -2,5 +2,5 @@ Shard3D: 1.2.7.r5-alpha
 AssetType: mesh3d
 AssetFile: assets/cartest/yakisobabikini.fbx
 AssetOrig: D:\Directories\Documents\yakisobabikini.fbx
-Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/ConvertibleSoft.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightTop.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
 Properties: !!binary "AAAAAA=="

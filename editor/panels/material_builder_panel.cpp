@@ -1,14 +1,18 @@
 #include "material_builder_panel.h"
 
 #include <imgui.h>
+#include <TextEditor.h>
+#include <fstream>
 #include <Shard3D/core/asset/assetmgr.h>
 #include <glm/gtc/type_ptr.hpp>
 namespace Shard3D {
 	MaterialBuilderPanel::MaterialBuilderPanel() : currentAsset(ResourceHandler::coreAssets.s_errorMaterial), currentPPOAsset(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")) {
 		currentItem = ResourceHandler::retrieveSurfaceMaterial(currentAsset);
 		currentPPOItem = ResourceHandler::retrievePPOMaterial(currentPPOAsset);
+		editor = new TextEditor;
+		editor->SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
 	}
-	MaterialBuilderPanel::~MaterialBuilderPanel() {}
+	MaterialBuilderPanel::~MaterialBuilderPanel() { delete editor; }
 
 	static std::string blendModeToString(SurfaceMaterialBlendMode_T blendMode) {
 		std::string blendMode_str;
@@ -41,7 +45,6 @@ namespace Shard3D {
 				currentItem = ResourceHandler::retrieveSurfaceMaterial(currentAsset);
 			}
 
-
 		const char* items[] = { "Opaque", "Masked", "Translucent", "TranslucentMasked" };
 		const char* current_item = items[currentItem->getBlendMode()];
 		
@@ -58,10 +61,9 @@ namespace Shard3D {
 			}
 			ImGui::EndCombo();
 		}
-
 	
 		ImGui::Text(typeid(*currentItem).name());
-		if (typeid(*currentItem).raw_name() == typeid(SurfaceMaterial_Shaded).raw_name()) {
+		if (dynamic_cast<SurfaceMaterial_Shaded*>(currentItem.get())) {
 			auto* surfaceMaterial = reinterpret_cast<SurfaceMaterial_Shaded*>(currentItem.get());
 			ImGui::ColorEdit3("Diffuse", glm::value_ptr(surfaceMaterial->diffuseColor));
 			{
@@ -201,6 +203,7 @@ namespace Shard3D {
 				currentPPOAsset = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
 				ResourceHandler::loadPPOMaterial(currentPPOAsset);
 				currentPPOItem = ResourceHandler::retrievePPOMaterial(currentPPOAsset);
+				editor->SetText(IOUtils::readText(currentPPOItem->shaderPath));
 			}
 
 		ImGui::Text(typeid(*currentPPOItem).name());
@@ -208,12 +211,30 @@ namespace Shard3D {
 		char fileBuffer[256];
 		memset(fileBuffer, 0, 256);
 		strncpy(fileBuffer, rfile.c_str(), 256);
-		if (ImGui::InputText("Shader Path (SPIR-V)", fileBuffer, 256)) {
+		if (ImGui::InputText("Shader File", fileBuffer, 256)) {
 			rfile = std::string(fileBuffer);
 		}
+		if (ImGui::Button("Load")) {
+			editor->SetText(IOUtils::readText(currentPPOItem->shaderPath));
+		}
+		if (ImGui::Button("Save & Compile")) {
+			IOUtils::writeText(editor->GetText(),currentPPOItem->shaderPath);
+			ResourceHandler::rebuildPPOMaterial(currentPPOItem);
+		}
+		editor->Render("MyTextEditor", ImVec2(ImGui::GetContentRegionAvail().x, 200.f), true);
 
 		for (int i = 0; i < currentPPOItem->getParamCount(); i++) {
-			switch (currentPPOItem->getParameter(i).getType()) {
+			//const char* myStr = std::string("##xbx" + std::to_string(i) + currentPPOItem->getParameterName(i)).c_str();
+			//
+			//auto& tag = currentPPOItem->getParameterName(i);
+			//char tagBuffer[256];
+			//memset(tagBuffer, 0, 256);
+			//strncpy(tagBuffer, tag.c_str(), 256);
+			//if (ImGui::InputText(std::string("##fucker" + std::string(myStr)).c_str(), tagBuffer, 256)) {
+			//	tag = std::string(tagBuffer);
+			//} ImGui::SameLine();
+
+			switch (currentPPOItem->getParameter(i).getType()) {			
 			case(PPO_Types::Int32):
 				ImGui::DragInt(currentPPOItem->getParameterName(i).c_str(), reinterpret_cast<int*>(currentPPOItem->getParameter(i).get()), 0.01f);
 				break;

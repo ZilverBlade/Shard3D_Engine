@@ -4,11 +4,16 @@
 #include "../../systems/buffers/material_system.h"
 #include "../misc/graphics_settings.h"
 #include <any>
+#include "../../systems/computational/shader_system.h"
 
 namespace Shard3D {
 
-#pragma region Surface
 
+	void RandomShaderTextureSampler2D::reload() {
+		ResourceHandler::loadTexture(mySampler);
+	}
+
+#pragma region Surface
 	SurfaceMaterial::SurfaceMaterial() { }
 
 	SurfaceMaterial::~SurfaceMaterial() {
@@ -166,20 +171,12 @@ namespace Shard3D {
 
 		if (this->blendMode == SurfaceMaterialBlendModeTranslucent)
 			GraphicsPipeline::pipelineConfig(pipelineConfigInfo).enableAlphaBlending(VK_BLEND_OP_ADD);
-
-		std::string shader = "assets/shaderdata/materials/surface_shaded_opaque.frag.spv";
-		
-		if (blendMode & SurfaceMaterialBlendModeMasked) 
-			shader = "assets/shaderdata/materials/surface_shaded_masked.frag.spv";		
-		if (blendMode & SurfaceMaterialBlendModeTranslucent) 
-			shader = "assets/shaderdata/materials/surface_shaded_translucent.frag.spv";	
-
+	
 		MaterialSystem::createSurfacePipeline(
 			&materialPipelineConfig->shaderPipeline,
 			materialPipelineConfig->shaderPipelineLayout, 
 			pipelineConfigInfo, 
-			shader);
-
+			this);
 		built = true;
 	}
 
@@ -287,7 +284,7 @@ namespace Shard3D {
 	void PostProcessingMaterial::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
 		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
 		
-		if (!AssetManager::doesAssetExist(shaderPath)) {
+		if (!IOUtils::doesFileExist(shaderPath)) {
 			SHARD3D_WARN("No shader found!");
 			return;
 		}
@@ -303,7 +300,7 @@ namespace Shard3D {
 		myParamsBuffer =
 			make_uPtr<EngineBuffer>(
 				device,
-				sizeOfMyParams,
+				(sizeOfMyParams > 0) ? sizeOfMyParams : 4,
 				1,
 				VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
@@ -319,8 +316,8 @@ namespace Shard3D {
 		EngineDescriptorWriter(*materialDescriptorInfo.paramsLayout, *descriptorPool)
 			.writeBuffer(0, &bufferInfo)
 			.build(materialDescriptorInfo.params);
-		
-		myParamsBuffer->writeToBuffer(myDataPure.data());
+		int fake = 42352;
+		myParamsBuffer->writeToBuffer((sizeOfMyParams > 0) ? myDataPure.data() : (void*)&fake);
 		myParamsBuffer->flush();
 		
 		materialPipelineConfig = make_uPtr<_MaterialComputePipelineConfigInfo>();
@@ -329,10 +326,16 @@ namespace Shard3D {
 			materialDescriptorInfo.paramsLayout->getDescriptorSetLayout()
 		);
 		
-		MaterialSystem::createPPOPipeline(
-			&materialPipelineConfig->shaderPipeline,
-			materialPipelineConfig->shaderPipelineLayout,
-			this->shaderPath);
+		if (strUtils::hasEnding(this->shaderPath, ".spv"))
+			MaterialSystem::createPPOPipeline(
+				&materialPipelineConfig->shaderPipeline,
+				materialPipelineConfig->shaderPipelineLayout,
+				this->shaderPath);
+		else
+			MaterialSystem::createPPOPipeline(
+				&materialPipelineConfig->shaderPipeline,
+				materialPipelineConfig->shaderPipelineLayout,
+				ShaderSystem::compileOnTheFly(this->shaderPath, ShaderType::Compute));
 
 		built = true;
 	}
@@ -340,14 +343,14 @@ namespace Shard3D {
 	
 	void PostProcessingMaterial::rmvParameter(uint32_t index) {
 		SHARD3D_WARN("Removing param {0}", index);
-		std::vector<RandomPPOParam>::iterator q = myParams.begin();
+		std::vector<RandomShaderParam>::iterator q = myParams.begin();
 		for (int i = 0; i < myParams.size(); i++) {
 			if (i == index) break;
 			q++;
 		}
 		myParams.erase(q);
 	}
-	RandomPPOParam& PostProcessingMaterial::getParameter(uint32_t index) {
+	RandomShaderParam& PostProcessingMaterial::getParameter(uint32_t index) {
 		return myParams[index];
 	}
 
@@ -409,7 +412,7 @@ namespace Shard3D {
 		SHARD3D_STAT_RECORD_END({ "Post processing", "Dispatch " + this->master->materialTag });
 
 	}
-	RandomPPOParam& PostProcessingMaterialInstance::getParameter(uint32_t index) {
+	RandomShaderParam& PostProcessingMaterialInstance::getParameter(uint32_t index) {
 		return myParamsLocal[index];
 	}
 #pragma endregion

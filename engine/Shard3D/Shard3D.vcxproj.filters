@@ -88,12 +88,6 @@
     <Filter Include="Header Files\events">
       <UniqueIdentifier>{3a8ce00a-fad5-4bdf-b4be-5b6845f4037d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\layer">
-      <UniqueIdentifier>{be3e841d-f72d-4c86-9ea8-afcaa843dacb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\layer">
-      <UniqueIdentifier>{412a0e58-d54f-4f41-8ecf-8a576ccd9b71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\plugins">
       <UniqueIdentifier>{4d44cb1a-672a-41ed-8112-33a548517f90}</UniqueIdentifier>
     </Filter>
@@ -264,9 +258,6 @@
     <ClInclude Include="core\ui\hudmgr.h">
       <Filter>Header Files\core\ui</Filter>
     </ClInclude>
-    <ClInclude Include="core\ui\screen_layer.h">
-      <Filter>Header Files\core\ui</Filter>
-    </ClInclude>
     <ClInclude Include="core\vulkan_api\buffer.h">
       <Filter>Header Files\core\vkapi</Filter>
     </ClInclude>
@@ -290,12 +281,6 @@
     </ClInclude>
     <ClInclude Include="events\mouse_event.h">
       <Filter>Header Files\events</Filter>
-    </ClInclude>
-    <ClInclude Include="layer\layer_stack.h">
-      <Filter>Header Files\layer</Filter>
-    </ClInclude>
-    <ClInclude Include="layer\layer.h">
-      <Filter>Header Files\layer</Filter>
     </ClInclude>
     <ClInclude Include="plugins\example_component.h">
       <Filter>Header Files\plugins</Filter>
@@ -426,9 +411,6 @@
     <ClCompile Include="core\ui\hudmgr.cpp">
       <Filter>Source Files\core\ui</Filter>
     </ClCompile>
-    <ClCompile Include="core\ui\screen_layer.cpp">
-      <Filter>Source Files\core\ui</Filter>
-    </ClCompile>
     <ClCompile Include="core\vulkan_api\pipeline.cpp">
       <Filter>Source Files\core\vkapi</Filter>
     </ClCompile>
@@ -440,12 +422,6 @@
     </ClCompile>
     <ClCompile Include="core\vulkan_api\device.cpp">
       <Filter>Source Files\core\vkapi</Filter>
-    </ClCompile>
-    <ClCompile Include="layer\layer.cpp">
-      <Filter>Source Files\layer</Filter>
-    </ClCompile>
-    <ClCompile Include="layer\layer_stack.cpp">
-      <Filter>Source Files\layer</Filter>
     </ClCompile>
     <ClCompile Include="scripting\script_engine_linker.cpp">
       <Filter>Source Files\scripting</Filter>

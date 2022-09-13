@@ -2,6 +2,8 @@
 #include "../../vulkan_abstr.h"
 #include "material.h"
 #include "../asset/assetid.h"
+#include <half.h>
+using half = FLOAT16;
 extern "C" {
 	struct aiNode;
 	struct aiScene;
@@ -25,6 +27,13 @@ namespace Shard3D {
 				bool operator==(const Vertex& other) const {
 					return position == other.position && normal == other.normal && uv == other.uv;
 				}
+			};
+			// low precision vertex
+			struct LPVertex {
+				LPVertex(const Vertex& highp);
+				half myposX{}, myposY{}, myposZ{};
+				half mynormX{}, mynormY{}, mynormZ{};
+				half myuvX{}, myuvY{};
 			};
 
 			struct SubmeshData {

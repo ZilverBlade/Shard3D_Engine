@@ -1,0 +1,7 @@
+Shard3D: 1.2.8.r1-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: Noise
+    Data:
+      Shader: assets\_engine\mat\ppo\noise.comp
+      MyParams: [[3, Intensity, !!binary "AAAAAA=="], [3, NoiseDelta, !!binary "AAAAAA=="]]

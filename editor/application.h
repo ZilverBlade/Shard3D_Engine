@@ -13,8 +13,6 @@
 #include <Shard3D/core/rendering/render_pass.h>
 #include <Shard3D/core/rendering/renderer.h>
 
-#include <Shard3D/layer/layer_stack.h>
-
 namespace Shard3D {
 	class EditorApplication {
 	public:
@@ -55,8 +53,5 @@ namespace Shard3D {
 
 		// ECS
 		sPtr<ECS::Level> level;
-
-		// Layers
-		LayerStack layerStack{ engineDevice, engineWindow, engineRenderer };
 	};
 }

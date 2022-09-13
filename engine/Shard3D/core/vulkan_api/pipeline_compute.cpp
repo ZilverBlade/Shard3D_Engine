@@ -12,9 +12,16 @@ namespace Shard3D {
 		const std::string& shaderFilePath
 	)
 		: engineDevice{ device } {
-		createComputePipeline(pipelineLayout, shaderFilePath);
+		createComputePipeline(pipelineLayout, readFile(shaderFilePath));
 	}
-
+	ComputePipeline::ComputePipeline(
+		EngineDevice& device,
+		VkPipelineLayout& pipelineLayout,
+		const std::vector<char>& shaderData
+	)
+		: engineDevice{ device } {
+		createComputePipeline(pipelineLayout, shaderData);
+	}
 	ComputePipeline::~ComputePipeline() {
 		vkDestroyShaderModule(engineDevice.device(), computeShaderModule, nullptr);
 		vkDestroyPipeline(engineDevice.device(), computePipeline, nullptr);
@@ -39,9 +46,8 @@ namespace Shard3D {
 
 	void ComputePipeline::createComputePipeline(
 		VkPipelineLayout& pipelineLayout,
-		const std::string& shaderFilePath
+		std::vector<char> shaderCode
 	) {
-		auto shaderCode = readFile(shaderFilePath);
 
 		VkPipelineShaderStageCreateInfo shaderStage{};
 		createShaderModule(shaderCode, &computeShaderModule);

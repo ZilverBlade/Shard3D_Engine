@@ -81,6 +81,18 @@ namespace Shard3D {
 		_S3D_ICALL(CameraComponent_GetFarClip);
 		_S3D_ICALL(CameraComponent_SetFarClip);
 
+		_S3D_ICALL(CameraComponent_GetPostProcessingEffectsCount);
+		_S3D_ICALL(CameraComponent_GetPostProcessingParametersCount);
+		_S3D_ICALL(CameraComponent_GetPostProcessingParameterValue_int);
+		_S3D_ICALL(CameraComponent_SetPostProcessingParameterValue_int);
+		_S3D_ICALL(CameraComponent_GetPostProcessingParameterValue_float);
+		_S3D_ICALL(CameraComponent_SetPostProcessingParameterValue_float);
+		_S3D_ICALL(CameraComponent_GetPostProcessingParameterValue_float2);
+		_S3D_ICALL(CameraComponent_SetPostProcessingParameterValue_float2);
+		_S3D_ICALL(CameraComponent_GetPostProcessingParameterValue_float4);
+		_S3D_ICALL(CameraComponent_SetPostProcessingParameterValue_float4);
+		_S3D_ICALL(CameraComponent_GetPostProcessingParameterValueType);
+
 		_S3D_ICALL(AudioComponent_GetFile);
 		_S3D_ICALL(AudioComponent_SetFile);
 		_S3D_ICALL(AudioComponent_GetPropertiesPitch);
@@ -278,6 +290,45 @@ namespace Shard3D::InternalScriptCalls {
 
 	void CameraComponent_SetFarClip(uint64_t actorID, float* v) {
 		ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().setFarClip(*v);
+	}
+
+	void CameraComponent_GetPostProcessingEffectsCount(uint64_t actorID, uint32_t* _count) {
+		*_count = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials.size();
+	}
+
+	void CameraComponent_GetPostProcessingParametersCount(uint64_t actorID, uint32_t _index, uint32_t* _count) {
+		*_count = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_index].master->getParamCount();
+	}
+
+	void CameraComponent_GetPostProcessingParameterValue_int(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, int* v) {
+		*v = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).get<int>();
+	}
+	void CameraComponent_SetPostProcessingParameterValue_int(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, int* v) {
+		ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).modify(*v);
+	}
+
+	void CameraComponent_GetPostProcessingParameterValue_float(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, float* v) {
+		*v = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).get<float>();
+	}
+	void CameraComponent_SetPostProcessingParameterValue_float(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, float* v) {
+		ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).modify(*v);
+	}
+
+	void CameraComponent_GetPostProcessingParameterValue_float2(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec2* v) {
+		*v = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).get<glm::vec2>();
+	}
+	void CameraComponent_SetPostProcessingParameterValue_float2(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec2* v) {
+		ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).modify(*v);
+	}
+
+	void CameraComponent_GetPostProcessingParameterValue_float4(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec4* v) {
+		*v = ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).get<glm::vec4>();
+	}
+	void CameraComponent_SetPostProcessingParameterValue_float4(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, glm::vec4* v) {
+		ScriptEngine::getContext()->getActorFromUUID(actorID).getComponent<Components::CameraComponent>().postProcessMaterials[_effect_index].getParameter(_param_index).modify(*v);
+	}
+
+	void CameraComponent_GetPostProcessingParameterValueType(uint64_t actorID, uint32_t _effect_index, uint32_t _param_index, MonoType* type) {
 	}
 
 	void AudioComponent_GetFile(uint64_t actorID, MonoString* string) {

@@ -24,7 +24,7 @@ namespace Shard3D {
 		float aspectRatio = 1.f;
 		glm::vec4 ambientLightColor = { 1.0f, 1.0f, 1.0f, 0.01f };;
 		bool is10BitColor = false;
-
+		glm::vec4 localScreen{1280,720, 0, 0}; // posX, posY, width, height, 
 	};
 
 	struct NonModifyableStaticInfo {

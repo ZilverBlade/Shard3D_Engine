@@ -94,7 +94,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;extern\imguizmo;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\engine;%(AdditionalIncludeDirectories);..\engine\extern\half</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
@@ -105,8 +105,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>extern\imgui\lib;..\engine\Shard3D\bin\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Shard3D.lib;ImGui.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>extern\imgui\lib;extern\imguizmo\lib;..\engine\Shard3D\bin\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Shard3D.lib;ImGui_d.lib;imguizmo.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -117,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;extern\imguizmo;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories);..\engine\extern\half</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <DisableSpecificWarnings>4996;</DisableSpecificWarnings>
@@ -130,8 +130,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>extern\imgui\lib;..\engine\Shard3D\bin\Release;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Shard3D.lib;ImGui.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>extern\imgui\lib;extern\imguizmo\lib;..\engine\Shard3D\bin\Release;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Shard3D.lib;ImGui.lib;imguizmo.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
@@ -142,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;extern\imgui;extern\imguizmo;..\engine\extern\glfw-3.3.7\include;..\engine\extern\object_loaders\tinyobjloader\include;..\engine\extern\object_loaders\tinygltf\include;..\engine\extern\spdlog;..\engine\extern\joltphysics\include;..\engine\extern\imgui-node-editor;..\engine\extern\entt\1include;..\engine\extern\jsonhpp\1include;..\engine\extern\yaml\include;..\engine\extern\stb\include;..\engine\extern\miniaudio\1include;..\engine\extern\mono\include;..\extern\assimp\include;..\engine;%(AdditionalIncludeDirectories);..\engine\extern\half</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <DisableSpecificWarnings>4996;</DisableSpecificWarnings>
@@ -155,8 +155,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>extern\imgui\lib;..\engine\Shard3D\bin\Release;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Shard3D.lib;ImGui.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>extern\imgui\lib;extern\imguizmo\lib;..\engine\Shard3D\bin\Release;..\extern\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Shard3D.lib;ImGui.lib;imguizmo.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -175,6 +175,7 @@
     <ClCompile Include="panels\level_tree_panel.cpp" />
     <ClCompile Include="panels\material_builder_panel.cpp" />
     <ClCompile Include="panels\settings_panel.cpp" />
+    <ClCompile Include="panels\viewport_panel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="panels\level_tree_panel.h" />
     <ClInclude Include="panels\material_builder_panel.h" />
     <ClInclude Include="panels\settings_panel.h" />
+    <ClInclude Include="panels\viewport_panel.h" />
     <ClInclude Include="scripting\cpp\carcontroller.h" />
     <ClInclude Include="scripting\cpp\example_script.h" />
     <ClInclude Include="scripting\script_link.h" />

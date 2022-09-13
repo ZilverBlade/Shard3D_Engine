@@ -91,7 +91,7 @@ namespace Shard3D {
 				for (auto& actor : actorKillQueue) {
 					SHARD3D_LOG("Destroying actor '{0}'", actor.getTag());
 					actorMap.erase(actor.getUUID());
-					registry.destroy(actor);
+					uint16_t killed = registry.destroy(actor);
 				}
 				actorKillQueue.clear();
 				return;

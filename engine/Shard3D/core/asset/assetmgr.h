@@ -18,8 +18,6 @@ namespace Shard3D {
 	};
 	class AssetManager {
 	public:
-		static bool doesAssetExist(const std::string& assetPath);
-
 		static void loadLevelAssets();
 
 		static void importTexture(const std::string& sourcepath, const std::string& destpath, TextureLoadInfo info);
@@ -115,7 +113,7 @@ namespace Shard3D {
 		static auto& getMeshAssets() { return meshAssets; }
 		static auto& getTextureAssets() { return textureAssets; }
 		static auto& getSurfaceMaterialAssets() { return surfaceMaterialAssets; }
-		
+		static auto& getPPOMaterialAssets() { return ppoMaterialAssets; }
 		static void runGarbageCollector();
 
 	private:

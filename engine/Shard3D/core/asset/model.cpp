@@ -10,7 +10,9 @@
 #include <assimp/scene.h>           
 #include <assimp/postprocess.h>     
 #include <fstream>
+
 #include "matmgr.h"
+
 
 namespace std {
 	template <>
@@ -24,6 +26,18 @@ namespace std {
 }
 
 namespace Shard3D::Resources {
+
+	static bool useHighPVBuffer(){
+		static bool hasChecked = false;
+		static bool highpAttributes = false;
+		if (hasChecked) return highpAttributes;
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+		highpAttributes = ini.GetBoolValue("RENDERING", "HighPrecisionVBuffer");
+		hasChecked = true;
+		return highpAttributes;
+	}
 
 	Model3D::Model3D(EngineDevice& dvc, const Model3D::Builder &builder) : device(&dvc) {
 		createVertexBuffers(builder.submeshPtrs);
@@ -40,7 +54,6 @@ namespace Shard3D::Resources {
 	uPtr<Model3D> Model3D::createMeshFromFile(EngineDevice& dvc, const std::string& filepath, Model3DLoadInfo loadInfo) {
 		Builder builder{};	
 		CSimpleIniA ini;
-
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 		
@@ -75,25 +88,38 @@ namespace Shard3D::Resources {
 
 	void Model3D::createVertexBuffers(std::vector<SubmeshData*> mapdata) {
 		std::vector<Vertex> vertexData;
-		for (int i = 0; i < mapdata.size(); i++) {
-			uint32_t vertexcount = static_cast<uint32_t>(mapdata[i]->vertices.size());
-			SHARD3D_ASSERT(vertexcount >= 3 && "Vertex count must be at least 3");
-			buffers.vertexCounts.emplace_back(vertexcount);
-			vertexData.reserve(vertexcount);
-			for (Vertex vertex : mapdata[i]->vertices)
-				vertexData.emplace_back(vertex);
-			if (buffers.vertexOffsets.size() == 0) { buffers.vertexOffsets.push_back(0); continue; }
-			buffers.vertexOffsets.push_back(buffers.vertexOffsets[i - 1] + buffers.vertexCounts[i - 1]);
-		}
+		std::vector<LPVertex> lp_vertexData;
 
+		if (useHighPVBuffer())
+			for (int i = 0; i < mapdata.size(); i++) {
+				uint32_t vertexcount = static_cast<uint32_t>(mapdata[i]->vertices.size());
+				SHARD3D_ASSERT(vertexcount >= 3 && "Vertex count must be at least 3");
+				buffers.vertexCounts.emplace_back(vertexcount);
+				vertexData.reserve(vertexcount);
+				for (Vertex vertex : mapdata[i]->vertices)
+					vertexData.emplace_back(vertex);
+				if (buffers.vertexOffsets.size() == 0) { buffers.vertexOffsets.push_back(0); continue; }
+				buffers.vertexOffsets.push_back(buffers.vertexOffsets[i - 1] + buffers.vertexCounts[i - 1]);
+			}
+		else
+			for (int i = 0; i < mapdata.size(); i++) {
+				uint32_t vertexcount = static_cast<uint32_t>(mapdata[i]->vertices.size());
+				SHARD3D_ASSERT(vertexcount >= 3 && "Vertex count must be at least 3");
+				buffers.vertexCounts.emplace_back(vertexcount);
+				lp_vertexData.reserve(vertexcount);
+				for (Vertex vertex : mapdata[i]->vertices)
+					lp_vertexData.emplace_back(vertex);
+				if (buffers.vertexOffsets.size() == 0) { buffers.vertexOffsets.push_back(0); continue; }
+				buffers.vertexOffsets.push_back(buffers.vertexOffsets[i - 1] + buffers.vertexCounts[i - 1]);
+			}
 		uint32_t fullVertexCount{};
 		for (uint32_t count : buffers.vertexCounts) {
 			fullVertexCount += count;
 		}
 	
-		VkDeviceSize bufferSize = sizeof(Vertex) * fullVertexCount;
-		uint32_t vertexSize = sizeof(Vertex);
-
+		uint32_t vertexSize = useHighPVBuffer() ? sizeof(Vertex) : sizeof(LPVertex);
+		VkDeviceSize bufferSize = static_cast<size_t>(vertexSize) * fullVertexCount;
+		
 		EngineBuffer stagingBuffer{
 			*device,
 			vertexSize,
@@ -103,7 +129,7 @@ namespace Shard3D::Resources {
 		};
 
 		stagingBuffer.map();
-		stagingBuffer.writeToBuffer((void*)vertexData.data());
+		stagingBuffer.writeToBuffer(useHighPVBuffer() ? (void*)vertexData.data() : (void*)lp_vertexData.data());
 		buffers.vertexBuffer = make_sPtr<EngineBuffer>(
 			*device,
 			vertexSize,
@@ -177,15 +203,17 @@ namespace Shard3D::Resources {
 	}
 
 	std::vector<VkVertexInputBindingDescription> Model3D::Vertex::getBindingDescriptions() {
-		return { {0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX} };
+		uint32_t size = useHighPVBuffer() ? sizeof(Vertex) : sizeof(LPVertex);
+		return { {0, size, VK_VERTEX_INPUT_RATE_VERTEX} };
 	}
 	
 	std::vector<VkVertexInputAttributeDescription> Model3D::Vertex::getAttributeDescriptions() {
+		if (useHighPVBuffer()) SHARD3D_LOG("Using High Precision Vertex Buffer");
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 		attributeDescriptions.reserve(3); 
-		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)	});
-		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)	});
-		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32_SFLOAT,	offsetof(Vertex, uv)		});
+		attributeDescriptions.push_back({ 0, 0, useHighPVBuffer() ? VK_FORMAT_R32G32B32_SFLOAT : VK_FORMAT_R16G16B16_SFLOAT, offsetof(Vertex, position)	});
+		attributeDescriptions.push_back({ 1, 0, useHighPVBuffer() ? VK_FORMAT_R32G32B32_SFLOAT : VK_FORMAT_R16G16B16_SFLOAT, offsetof(Vertex, normal)	});
+		attributeDescriptions.push_back({ 2, 0, useHighPVBuffer() ? VK_FORMAT_R32G32_SFLOAT : VK_FORMAT_R16G16_SFLOAT,	offsetof(Vertex, uv)		});
 		return attributeDescriptions;
 	}
 	
@@ -289,10 +317,22 @@ namespace Shard3D::Resources {
 			AssetManager::createMaterial(workingDir + "/" + materialSlot + ".s3dasset", grid_material);
 		}
 		AssetID m_asset = ResourceHandler::coreAssets.s_errorMaterial;
-		if (AssetManager::doesAssetExist(workingDir + "/" + materialSlot + ".s3dasset")) {
+		if (IOUtils::doesFileExist(workingDir + "/" + materialSlot + ".s3dasset")) {
 			m_asset = AssetID(workingDir + "/" + materialSlot + ".s3dasset");
 		}
 
 		submeshes[materialSlot].materialAsset = m_asset;
+	}
+	Model3D::LPVertex::LPVertex(const Vertex& highp)
+	{
+		
+		myposX	 = half::ToFloat16(highp.position.x);
+		myposY	 = half::ToFloat16(highp.position.y);
+		myposZ	 = half::ToFloat16(highp.position.z);
+		mynormX	 = half::ToFloat16(highp.normal.x);
+		mynormY	 = half::ToFloat16(highp.normal.y);
+		mynormZ	 = half::ToFloat16(highp.normal.z);
+		myuvX	 = half::ToFloat16(highp.uv.x);
+		myuvY	 = half::ToFloat16(highp.uv.y);
 	}
 }

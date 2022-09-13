@@ -4,11 +4,44 @@
 #include <fstream>
 
 namespace Shard3D {
+	class ShaderIncluder : public shaderc::CompileOptions::IncluderInterface {
+		shaderc_include_result* GetInclude(const char* requested_source, shaderc_include_type type, const char* requesting_source, size_t include_depth) override {
+			//BS
+			std::string msg = std::string(requesting_source);
+			msg += std::to_string(type);
+			msg += static_cast<char>(include_depth);
+
+			const std::string name = std::string(requested_source);
+			const std::string contents = IOUtils::readText(name, true);
+
+			auto container = new std::array<std::string, 2>;
+			(*container)[0] = name;
+			(*container)[1] = contents;
+
+			auto data = new shaderc_include_result;
+
+			data->user_data = container;
+
+			data->source_name = (*container)[0].data();
+			data->source_name_length = (*container)[0].size();
+
+			data->content = (*container)[1].data();
+			data->content_length = (*container)[1].size();
+
+			return data;
+		};
+
+		void ReleaseInclude(shaderc_include_result* data) override {
+			delete static_cast<std::array<std::string, 2>*>(data->user_data);
+			delete data;
+		};
+	};
+
+
 	void ShaderSystem::init() {
 		compiler = new shaderc::Compiler();
 		options = new shaderc::CompileOptions();
 		options->AddMacroDefinition("SHARD3D_VERSION", ENGINE_VERSION.toString());
-		options->AddMacroDefinition("SHARD3D_SHADER_TEMPLATE");
 		options->SetOptimizationLevel(shaderc_optimization_level_performance); // always max performance
 	}
 	void ShaderSystem::compileFromFile(const std::string& source, const std::string& destination, ShaderType type) {
@@ -42,10 +75,43 @@ namespace Shard3D {
 		out.flush();
 		out.close();
 	}
-	const char* ShaderSystem::compileOnTheFly(const std::string& data, ShaderType type) {
-		shaderc::SpvCompilationResult result =
-			compiler->CompileGlslToSpv(data, (shaderc_shader_kind)type, "assets/_engine/0.spv", *options);
-		return reinterpret_cast<const char*>(result.cbegin());
+	std::vector<char> ShaderSystem::compileOnTheFly(const std::string& data, ShaderType type) {
+		SHARD3D_WARN("Compiling Shader '{0}'", data);
+		std::string shaderCode = IOUtils::readText(data, true);
+		shaderc::PreprocessedSourceCompilationResult pre_result =
+			compiler->PreprocessGlsl(shaderCode, (shaderc_shader_kind)type, data.c_str(), *options);
+		auto rtype = (shaderc_shader_kind)type;
+		shaderc::SpvCompilationResult result = compiler->CompileGlslToSpv(pre_result.begin(), (shaderc_shader_kind)type, data.c_str(), *options);
+	
+		if (pre_result.GetNumErrors() > 0) {
+			SHARD3D_ERROR(pre_result.GetErrorMessage());
+		}
+
+		if (result.GetNumErrors() > 0) {
+			SHARD3D_ERROR(result.GetErrorMessage());
+		}
+
+		std::vector<uint32_t> sresult = std::vector<uint32_t>(result.cbegin(), result.cend());
+		return *reinterpret_cast<std::vector<char>*>(&sresult);
+	}
+	std::vector<char> ShaderSystem::compileOnTheFlyDirect(const std::string& shaderCode, const char* sourceFile, ShaderType type) {
+		SHARD3D_WARN("Compiling Shader '{0}'", sourceFile);
+		shaderc::PreprocessedSourceCompilationResult pre_result =
+			compiler->PreprocessGlsl(shaderCode, (shaderc_shader_kind)type, sourceFile, *options);
+		std::string xresult = std::string(pre_result.cbegin(), pre_result.cend());
+		std::string fixed = xresult.substr(0, xresult.find_last_of("}") + 1);
+		shaderc::SpvCompilationResult result = compiler->CompileGlslToSpv(fixed.data(), fixed.size(), (shaderc_shader_kind)type, sourceFile, *options);
+
+		if (pre_result.GetNumErrors() > 0) {
+			SHARD3D_ERROR(pre_result.GetErrorMessage());
+		}
+		
+		if (result.GetNumErrors() > 0) {
+			SHARD3D_ERROR(result.GetErrorMessage());
+		}
+
+		std::vector<uint32_t> sresult = std::vector<uint32_t>(result.cbegin(), result.cend());
+		return *reinterpret_cast<std::vector<char>*>(&sresult);
 	}
 	void ShaderSystem::destroy() {
 		delete compiler;

@@ -77,10 +77,8 @@ namespace Shard3D {
 		}
 
 		isFrameStarted = true;
-		timeFrameBegin = std::chrono::high_resolution_clock::now();
-
+		
 		auto commandBuffer = getCurrentCommandBuffer();
-
 
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -91,7 +89,7 @@ namespace Shard3D {
 
 		return commandBuffer;
 	}
-	void EngineRenderer::endFrame() {
+	void EngineRenderer::endFrame(std::chrono::time_point<std::chrono::steady_clock>& beginTimePoint) {
 		SHARD3D_ASSERT(isFrameStarted && "Can't call endFrame while frame is not in progress");
 
 		auto commandBuffer = getCurrentCommandBuffer();
@@ -100,7 +98,7 @@ namespace Shard3D {
 			SHARD3D_FATAL("failed to record command buffer!");
 		}
 
-		const float frameTime = std::chrono::duration<double, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - timeFrameBegin).count();
+		const float frameTime = std::chrono::duration<double, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - beginTimePoint).count();
 		const float waitTime = std::max(GraphicsSettings::get().FramerateCapInterval - frameTime, 0.f);
 
 		auto result = engineSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex, waitTime);

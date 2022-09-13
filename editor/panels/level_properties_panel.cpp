@@ -19,7 +19,7 @@ namespace Shard3D {
 
 	void LevelPropertiesPanel::render(LevelTreePanel& tree) {
 		SHARD3D_ASSERT(context != nullptr && "Context not provided!");
-		ImGui::Begin("Properties"); ImGui::BeginDisabled(context->simulationState == PlayState::Playing/*&& ini.canEditDuringSimulation*/);
+		ImGui::Begin("Properties"); //ImGui::BeginDisabled(context->simulationState == PlayState::Playing/*&& ini.canEditDuringSimulation*/);
 		if (tree.selectedActor) { 
 			drawActorProperties(tree.selectedActor);
 			if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
@@ -61,6 +61,8 @@ namespace Shard3D {
 					ResourceHandler::loadMesh(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
 					tree.selectedActor.addComponent<Components::Mesh3DComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
 					tree.selectedActor.getComponent<Components::Mesh3DComponent>().hideInGame = true;
+					tree.selectedActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
+					tree.selectedActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -68,7 +70,8 @@ namespace Shard3D {
 			}
 		}
 		if (showPreviewCamera) displayPreviewCamera(tree.selectedActor);
-		ImGui::EndDisabled(); ImGui::End();
+		//ImGui::EndDisabled(); 
+		ImGui::End();
 	}
 
 
@@ -339,6 +342,8 @@ namespace Shard3D {
 				
 				if (ImGui::TreeNode("Post Processing")) {
 					for (PostProcessingMaterialInstance& material : actor.getComponent<Components::CameraComponent>().postProcessMaterials) {
+						if (material.master != ResourceHandler::retrievePPOMaterial(material.masterAsset).get())
+							material = PostProcessingMaterialInstance(ResourceHandler::retrievePPOMaterial(material.masterAsset).get(), material.masterAsset);
 						if (ImGui::TreeNodeEx((void*)material.master, ImGuiTreeNodeFlags_AllowItemOverlap, material.master->materialTag.c_str())) {
 							for (int i = 0; i < material.master->getParamCount(); i++) {
 								switch (material.getParameter(i).getType()) {
@@ -362,8 +367,15 @@ namespace Shard3D {
 							}
 							ImGui::TreePop();
 						}
+						
 					}
 					ImGui::TreePop();
+					if (ImGui::BeginDragDropTarget())
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.PMAT")) {
+							AssetID loadedMaterial = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
+							ResourceHandler::loadPPOMaterial(loadedMaterial);
+							actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(loadedMaterial).get(), loadedMaterial);
+						}
 				}
 				ImGui::TreePop();
 			}

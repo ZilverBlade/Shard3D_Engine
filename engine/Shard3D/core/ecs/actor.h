@@ -54,6 +54,10 @@ namespace Shard3D {
 				level->registry.remove<T>(actorHandle);
 			}
 
+			inline bool hasRelationship() {
+				return hasComponent<Components::RelationshipComponent>();
+			}
+
 			bool isInvalid() {
 				return actorHandle == entt::null 
 					|| (getUUID() == 0 || getUUID() == 1 || getUUID() == UINT64_MAX)

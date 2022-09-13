@@ -36,6 +36,10 @@ namespace Shard3D {
 		static void writeStackBinary(void* data, size_t object_size, const std::string& path);
 		static std::vector<uint8_t> getStackBinary(void* data, size_t object_size);
 		static void* readBinary(const std::string& path);
+
+		static std::string readText(const std::string& path, bool binary = false);
+		static void writeText(const std::string& text, const std::string& path);
+		static bool doesFileExist(const std::string& assetPath);
 	};
 
 	class WAITUtils {

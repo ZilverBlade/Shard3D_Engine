@@ -7,21 +7,17 @@
 #include "../../core.h"
 
 namespace Shard3D {
-    HUDLayer::HUDLayer() : Layer("HUDLayer"){}
-
-    HUDLayer::~HUDLayer() {}
-
-    void HUDLayer::attach(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass, LayerStack* layerStack) {
+    HUDLayer::HUDLayer(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass) {
         TEMPORARY::hudList.push_back(&hud);
         hudRenderSystem.create(dvc, wnd, renderPass);
     }
 
-    void HUDLayer::detach() {
+    HUDLayer::~HUDLayer() {
         hud.elements.clear();
         hudRenderSystem.destroy();
     }
 
-     void HUDLayer::update(FrameInfo& frameInfo) {
+     void HUDLayer::render(FrameInfo& frameInfo) {
         if (!GraphicsSettings::editorPreview.V_GUI) return;
         SHARD3D_STAT_RECORD();
         hudRenderSystem.render(frameInfo, hud);

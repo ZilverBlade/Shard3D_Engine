@@ -70,6 +70,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="VB\Scripts\PPOManipulator.vb" />
     <Compile Include="VB\Scripts\Camera.vb" />
     <Compile Include="VB\Scripts\Example.vb" />
     <Compile Include="VB\Scripts\Template.vb" />

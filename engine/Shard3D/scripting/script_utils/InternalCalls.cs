@@ -85,6 +85,28 @@ namespace Shard3D.Core
         internal extern static void CameraComponent_GetFarClip(ulong GUID, out float _fc);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static void CameraComponent_SetFarClip(ulong GUID, ref float _fc);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_GetPostProcessingEffectsCount(ulong GUID, out uint _count);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_GetPostProcessingParametersCount(ulong GUID, uint _index, out uint _count);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_GetPostProcessingParameterValue_int(ulong GUID, uint _effect_index, uint _param_index, out int _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_SetPostProcessingParameterValue_int(ulong GUID, uint _effect_index, uint _param_index, ref int _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_GetPostProcessingParameterValue_float(ulong GUID, uint _effect_index, uint _param_index, out float _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_SetPostProcessingParameterValue_float(ulong GUID, uint _effect_index, uint _param_index, ref float _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_GetPostProcessingParameterValue_float2(ulong GUID, uint _effect_index, uint _param_index, out Vector2 _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_SetPostProcessingParameterValue_float2(ulong GUID, uint _effect_index, uint _param_index, ref Vector2 _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_GetPostProcessingParameterValue_float4(ulong GUID, uint _effect_index, uint _param_index, out Vector4 _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_SetPostProcessingParameterValue_float4(ulong GUID, uint _effect_index, uint _param_index, ref Vector4 _value);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void CameraComponent_GetPostProcessingParameterValueType(ulong GUID, uint _effect_index, uint _param_index, out System.Type _value);
 
         #endregion
 

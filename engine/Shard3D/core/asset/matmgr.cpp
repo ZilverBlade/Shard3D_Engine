@@ -20,7 +20,7 @@ namespace Shard3D {
 		out << YAML::Key << "Class" << YAML::Value << typeid(*material.get()).name();
 		out << YAML::Key << "BlendMode" << YAML::Value << material->getBlendMode();
 		out << YAML::EndMap;
-			
+		
 		out << YAML::Key << "Draw";
 		out << YAML::BeginMap;
 		out << YAML::Key << "VkCullModeFlags" << YAML::Value << material->drawData.culling;
@@ -42,7 +42,7 @@ namespace Shard3D {
 		fout.close();
 	}
 
-	static void PPOSerializeMyParam(YAML::Emitter& out, RandomPPOParam param, std::string name) {
+	static void PPOSerializeMyParam(YAML::Emitter& out, RandomShaderParam param, std::string name) {
 		out << YAML::Flow;
 		out << YAML::BeginSeq;
 		out << (uint32_t)param.getType();

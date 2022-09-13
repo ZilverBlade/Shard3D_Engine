@@ -172,7 +172,7 @@ namespace Shard3D {
 		}
 		auto globalSetLayout = EngineDescriptorSetLayout::Builder(engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-			.build();	
+			.build();
 		std::vector<VkDescriptorSet> globalDescriptorSets(EngineSwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < globalDescriptorSets.size(); i++) {
 			auto bufferInfo = uboBuffers[i]->descriptorInfo();
@@ -205,26 +205,20 @@ namespace Shard3D {
 
 			ImGuiInitializer::init(engineDevice, engineWindow, engineRenderer.getSwapChainRenderPass(), ini.GetBoolValue("THEME", "useLightMode"));
 		}
-		ImGuiLayer* imguiLayer = new ImGuiLayer();
+		ImGuiLayer imguiLayer = { engineDevice, engineWindow, engineRenderer.getSwapChainRenderPass() };
 
-		ImGuiInitializer::setViewportImage(&imguiLayer->viewportImage, ppoColorFramebufferAttachment);
-
-		layerStack.pushOverlay(imguiLayer);
+		ImGuiInitializer::setViewportImage(&imguiLayer.viewportImage, ppoColorFramebufferAttachment);
 
 		// TODO: render the HUDLayer to a seperate renderpass, then render that over the mainoffscreen in the editor viewport, 
 		// but render the HUD seperately from everything in the GUIEditor window.
-		HUDLayer* hudLayer0 = new HUDLayer();
-		HUDLayer* hudLayer1 = new HUDLayer();
-		HUDLayer* hudLayer2 = new HUDLayer();
-		HUDLayer* hudLayer3 = new HUDLayer();
-		hudLayer0->layer = 0;
-		hudLayer1->layer = 1;
-		hudLayer2->layer = 2;
-		hudLayer3->layer = 3;
-		layerStack.pushOverlay(hudLayer3);
-		layerStack.pushOverlay(hudLayer2);
-		layerStack.pushOverlay(hudLayer1);
-		layerStack.pushOverlay(hudLayer0);
+		HUDLayer hudLayer0{engineDevice, engineWindow, ppoRenderpass->getRenderPass()};
+		HUDLayer hudLayer1{engineDevice, engineWindow, ppoRenderpass->getRenderPass()};
+		HUDLayer hudLayer2{engineDevice, engineWindow, ppoRenderpass->getRenderPass()};
+		HUDLayer hudLayer3{engineDevice, engineWindow, ppoRenderpass->getRenderPass()};
+		hudLayer0.layer = 0;
+		hudLayer1.layer = 1;
+		hudLayer2.layer = 2;
+		hudLayer3.layer = 3;
 
 		SHARD3D_INFO("Loading editor camera actor");
 		ECS::Actor editor_cameraActor = level->createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
@@ -258,13 +252,13 @@ namespace Shard3D {
 				editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic);  //Ortho perspective (not needed 99.99% of the time)
 			}
 		}
-		loadStaticObjects();
+		//loadStaticObjects();
 
 		HUDLayer* layerList[4]{
-			hudLayer0,
-			hudLayer1,
-			hudLayer2,
-			hudLayer3
+			&hudLayer0,
+			&hudLayer1,
+			&hudLayer2,
+			&hudLayer3
 		};
 
 		sPtr<HUDContainer> h_l_layer = make_sPtr<HUDContainer>();
@@ -279,20 +273,20 @@ namespace Shard3D {
 			SHARD3D_LOG("HUD Layer {0} has {1} elements", i, h_l_layer->getList().at(i)->elements.size());
 		}
 		ScriptEngine::setHUDContext(h_l_layer.get());
-		imguiLayer->attachGUIEditorInfo(h_l_layer);
+		imguiLayer.attachGUIEditorInfo(h_l_layer);
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 beginWhileLoop:
 		while (!engineWindow.shouldClose()) {
 			StatsTimer::dumpIf();
 			StatsTimer::clear();
-			SHARD3D_STAT_RECORD();
-			glfwPollEvents();
-			SHARD3D_STAT_RECORD_END({"Window", "Polling"});
 			auto newTime = std::chrono::high_resolution_clock::now();
 			float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
 			currentTime = newTime;
-
+			SHARD3D_STAT_RECORD();
+			glfwPollEvents();
+			SHARD3D_STAT_RECORD_END({"Window", "Polling"});
+		
 			auto possessedCameraActor = level->getPossessedCameraActor();
 			auto& possessedCamera = level->getPossessedCamera();
 			editor_cameraActor = level->getActorFromUUID(0);
@@ -364,9 +358,11 @@ beginWhileLoop:
 				SHARD3D_STAT_RECORD_END({ "Rendering", "Shadow Mapping" });
 
 				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
+
 				SHARD3D_STAT_RECORD();
 				forwardRenderSystem.renderForward(frameInfo);
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Lighting" });
+
 				SHARD3D_STAT_RECORD();
 				billboardRenderSystem.render(frameInfo);
 
@@ -383,22 +379,30 @@ beginWhileLoop:
 				//SHARD3D_STAT_RECORD();
 				ppoSystem.render(frameInfo);
 				//SHARD3D_STAT_RECORD_END({ "Post Processing", "Main" });
+
 				SHARD3D_STAT_RECORD();
 				ppoRenderpass->beginRenderPass(frameInfo, ppoFrameBuffer);
-				ppoSystem.renderImageFlipForPresenting(frameInfo);	
+
+				ppoSystem.renderImageFlipForPresenting(frameInfo);
+
+				hudLayer0.render(frameInfo);
+				hudLayer1.render(frameInfo);
+				hudLayer2.render(frameInfo);
+				hudLayer3.render(frameInfo);
+
 				ppoRenderpass->endRenderPass(frameInfo);
 				SHARD3D_STAT_RECORD_END({ "Post Processing", "Debanding" });
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
-				// Layer overlays (use UI here)
-				for (Layer* layer : layerStack) {
-					layer->update(frameInfo);
-				}
+
+				imguiLayer.render(frameInfo);
+
 				SHARD3D_STAT_RECORD();
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 				SHARD3D_STAT_RECORD_END({ "Swapchain", "End" });
+
 				// Command buffer ends
 				SHARD3D_STAT_RECORD();
-				engineRenderer.endFrame();
+				engineRenderer.endFrame(newTime);
 				SHARD3D_STAT_RECORD_END({ "Command Buffer", "Submit" });
 			}
 		}
@@ -418,9 +422,7 @@ beginWhileLoop:
 		ResourceHandler::destroy();
 		_special_assets::_editor_icons_destroy();
 		
-		for (Layer* layer : layerStack) {
-			layer->detach();
-		}
+		imguiLayer.detach();
 		destroyRenderPasses();
 		SharedPools::destructPools();
 

@@ -1,0 +1,20 @@
+
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;
+layout (set = 0, binding = 0, rgba32f) uniform image2D postProcessImage;
+
+layout (set = 1, binding = 0) readonly buffer myParams {
+    float intensity;
+    float noiseCoef;
+} noiseData;
+
+
+highp float random(vec2 coef) {
+    return fract(sin(dot(coef, vec2(12.9898,78.233))) * 43758.5453);
+}
+
+void main()	{
+    vec3 pixelColor = imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.xy)).rgb + noiseData.intensity * random(gl_GlobalInvocationID.xy * noiseData.noiseCoef);
+    imageStore(postProcessImage, ivec2(gl_GlobalInvocationID.xy), vec4(pixelColor, 1.0));
+}
