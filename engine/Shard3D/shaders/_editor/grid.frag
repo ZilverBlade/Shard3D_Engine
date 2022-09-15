@@ -10,7 +10,7 @@ layout(location = 0) out vec4 outColor;
 
 vec4 grid(vec3 fragPos3D, float scale, bool drawAxis) {
     vec2 coord = fragPos3D.xz * scale;
-    vec2 derivative = fwidth(coord);
+    vec2 derivative = fwidth(coord * vec2(2.5));
     vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative;
     float line = min(grid.x, grid.y);
     float minimumz = min(derivative.y, 1);
@@ -46,5 +46,5 @@ void main() {
 
     outColor = (grid(fragPos3D, 2, true) + grid(fragPos3D, 2, true))* float(t > 0) * fading; // adding multiple resolution for the grid
 
-    //if (outColor.a == 0.0) discard;
+    if (outColor.a == 0.0) discard;
 }

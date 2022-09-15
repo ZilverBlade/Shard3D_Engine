@@ -1,7 +1,7 @@
 #include "../../s3dpch.h"  
 #include "window.h"
 #include "../../utils/simple_ini.h"
-
+#include "../misc/graphics_settings.h"
 #include "../misc/cheat_codes.h"
 #include "../asset/texture.h"
 #include "../../events/input.h"
@@ -160,6 +160,19 @@ namespace Shard3D {
 		engineWindow->framebufferResized = true;
 		engineWindow->width = width;
 		engineWindow->height = height;
+
+		GraphicsSettings::get().WindowHeight = height;
+		GraphicsSettings::get().WindowWidth = width;
+
+		uint32_t icountX = width / 16;
+		uint32_t icountY = height / 16;
+		// round by excess due to post processing dispatch ID's needing to cover the whole screen
+		if (icountX * 16 < width)
+			icountX += 1;
+		if (icountY * 16 < height)
+			icountY += 1;		
+
+		GraphicsSettings::getRuntimeInfo().PostProcessingInvocationIDCounts = glm::ivec3(icountX, icountY, 1);
 
 		Events::WindowResizeEvent _event(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 		engineWindow->_wndData.eventCallback(_event);

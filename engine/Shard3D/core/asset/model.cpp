@@ -192,6 +192,7 @@ namespace Shard3D::Resources {
 			vkCmdBindIndexBuffer(commandBuffer, buffers.indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		}
 		return buffers.vertexOffsets.size();
+		half mynum = 45.h;
 	}
 
 	void Model3D::draw(VkCommandBuffer commandBuffer, uint32_t index) {

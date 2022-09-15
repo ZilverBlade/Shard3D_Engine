@@ -174,6 +174,7 @@ namespace Shard3D {
 		_SurfaceMaterialShaderDescriptorInfo materialDescriptorInfo{};
 		uPtr<EngineBuffer> factorsBuffer;
 		SurfaceMaterialBlendMode_T blendMode = SurfaceMaterialBlendModeOpaque;
+		void free();
 	};	
 
 	// SSMR (Specular/Shininess/Metallic Rendering)
@@ -321,6 +322,7 @@ namespace Shard3D {
 		uPtr<_MaterialComputePipelineConfigInfo> materialPipelineConfig;
 		friend class MaterialManager;
 		friend class PostProcessingMaterialInstance;
+		void free();
 	};
 
 	class PostProcessingMaterialInstance {

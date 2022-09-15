@@ -4,6 +4,41 @@
 #include "../../vulkan_abstr.h"
 #include "../../core/vulkan_api/pipeline_compute.h"
 namespace Shard3D {
+	enum SurfaceMaterialClassOptions {
+		SurfaceMaterialClassOptions_Shaded = BIT(0),
+		SurfaceMaterialClassOptions_Unshaded = BIT(1),
+		SurfaceMaterialClassOptions_Masked = BIT(2),
+		SurfaceMaterialClassOptions_Translucent = BIT(3),
+		SurfaceMaterialClassOptions_VirtualUber = BIT(4),
+		SurfaceMaterialClassOptions_FrontfaceCulling = BIT(5),
+		SurfaceMaterialClassOptions_NoCulling = BIT(6),
+	};
+
+	/*
+		**current system:**
+			GOOD | bind mesh once
+			GOOD | iterate over all meshes once per frame
+			BAD  | bind pipeline multiple times
+		
+		**material class draw vectors:**
+			GOOD | no iterations
+			GOOD | bind pipeline for each material class once per frame
+			BAD  | bind mesh multiple times per frame
+		
+		**material category vectors per submesh slot per mesh:**
+			GOOD | bind mesh once
+			GOOD | bind pipeline for each material class once per frame
+			BAD  | iterate over meshes X amount of times, of which X is the amount of material class combinations
+	*/
+
+	struct SurfaceMaterialRenderInfo {
+		glm::mat4 modelMatrix, normalMatrix;
+		AssetID material;
+		AssetID mesh;
+	};
+
+typedef uint32_t SurfaceMaterialClassOptionsFlags;
+
 	class SurfaceMaterial;
 	class MaterialSystem {
 	public:
@@ -50,5 +85,7 @@ namespace Shard3D {
 		static inline VkDescriptorSetLayout mGlobalSetLayout{};
 		static inline VkDescriptorSetLayout mPPOSceneSetLayout{};
 		static inline std::vector<std::string> compiledShaders{};
+
+		static inline hashMap<SurfaceMaterialClassOptionsFlags, std::vector<AssetID>> materialRendering;
 	};
 }

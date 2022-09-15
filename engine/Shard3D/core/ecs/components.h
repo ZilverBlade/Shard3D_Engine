@@ -18,10 +18,11 @@ namespace Shard3D {
 	class LevelPropertiesPanel;
 	namespace Components {
 		struct UUIDComponent {
-			UUID id;
-
-			UUIDComponent() = default;
+			inline UUID getID() { return id; }
+			UUIDComponent(UUID id_) { id = id_; }
 			UUIDComponent(const UUIDComponent&) = default;
+		private:
+			UUID id;
 		};
 
 		struct TagComponent {
@@ -41,7 +42,6 @@ namespace Shard3D {
 		};
 
 		struct TransformComponent {
-			void dasd(glm::vec3 _t);
 			void setTranslation(glm::vec3 _t) { dirty = true; translation = glm::vec3(_t.x, _t.z, _t.y); }
 			void setRotation(glm::vec3 _r) { dirty = true; rotation = glm::vec3(_r.x, _r.z, _r.y); }
 			void setScale(glm::vec3 _s) { dirty = true; scale = glm::vec3(_s.x, _s.z, _s.y); }

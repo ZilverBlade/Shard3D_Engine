@@ -290,4 +290,9 @@ namespace Shard3D {
 		}
 		ImGui::End();
 	}
+	void MaterialBuilderPanel::destroy()
+	{
+		this->currentItem = nullptr;
+		this->currentPPOItem = nullptr;
+	}
 }

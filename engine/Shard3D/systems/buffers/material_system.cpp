@@ -84,8 +84,8 @@ namespace Shard3D {
 			goto pipelinecreate;
 		}
 		
-		{
-			stream << IOUtils::readText("assets/_engine/shaderdata/surface_material/surface_material.frag");
+		{		// comment out the version 
+			stream << "//" << IOUtils::readText("assets/_engine/shaderdata/surface_material/surface_material.frag");
 			std::string finalString = stream.rdbuf()->str();
 			finalString = finalString.substr(0, finalString.length() - 2);
 

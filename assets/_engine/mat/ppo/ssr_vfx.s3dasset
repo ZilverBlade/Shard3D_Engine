@@ -1,0 +1,7 @@
+Shard3D: 1.2.8.r5-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: SSR
+    Data:
+      Shader: assets/_engine/mat/ppo/ssr.comp
+      MyParams: [[3, maxDistance, !!binary "AADwQQ=="], [3, resolution, !!binary "mpmZPg=="], [3, thickness, !!binary "AAAAPw=="], [2, steps, !!binary "CgAAAA=="]]

@@ -104,7 +104,6 @@ namespace Shard3D {
 		auto result = engineSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex, waitTime);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-			engineWindow.resetWindowResizedFlag();
 			recreateSwapchain();
 		} else if (result != VK_SUCCESS) {
 			SHARD3D_FATAL("failed to present swap chain image!");

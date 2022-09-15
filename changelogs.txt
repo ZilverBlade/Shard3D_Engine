@@ -197,6 +197,13 @@ ALPHA:
 		- Removed the MasterManager
 		- Deprecated MSAA for good (D: sad)
 		- Switched to premake
+		- Fixed descriptor set leak issue with material system
+		- Shader improvements (fresnel!)
+		- Re-added proper framebuffer resizing
+		- Increased grid thickness
+		- Fixed asset explorer bug where entering an empty directory made it impossible to exit
+		- Switched to C++20
+		- Asset and resource system QOL improvements
 
 		:: TODO, proper events sytem, fix issue with resources not being unloaded, add editor layouts, use premake
 		:: Fix: dont use 64 bit integers for shaders (e.g. HUD system)

@@ -64,7 +64,7 @@ namespace Shard3D {
 					|| !hasComponent<Components::TagComponent>()
 					|| !hasComponent<Components::UUIDComponent>();
 			}
-			inline UUID getUUID() { return getComponent<Components::UUIDComponent>().id; }
+			inline UUID getUUID() { return getComponent<Components::UUIDComponent>().getID(); }
 			inline std::string getTag() { return getComponent<Components::TagComponent>().tag; }
 			inline void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
 			inline Components::TransformComponent& getTransform() { return getComponent<Components::TransformComponent>(); }

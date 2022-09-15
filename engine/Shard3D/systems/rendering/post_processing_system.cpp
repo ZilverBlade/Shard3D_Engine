@@ -9,41 +9,46 @@
 #include "../buffers/material_system.h"
 
 namespace Shard3D {
-	static bool setVkDescriptorImageInfo(VkDescriptorImageInfo* descriptor, FrameBufferAttachment* attachment) {
-		if (attachment == nullptr) return false;
+	static void setVkDescriptorImageInfo(VkDescriptorImageInfo* descriptor, FrameBufferAttachment* attachment) {
 		descriptor->imageLayout = attachment->getDescription().finalLayout;
 		descriptor->imageView = attachment->getImageView();
 		descriptor->sampler = attachment->getSampler();
-		return true;
+	}
+
+	void PostProcessingSystem::updateDescriptors(PostProcessingGBufferInput imageInput) {
+		setVkDescriptorImageInfo(&ppoDescriptor_BaseRenderedScene, imageInput.baseRenderedScene);
+		setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
+		setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
+		setVkDescriptorImageInfo(&ppoDescriptor_MaterialSceneInfo, imageInput.materialSceneInfo);
+		EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
+			.writeImage(0, &ppoDescriptor_BaseRenderedScene)
+			.writeImage(1, &ppoDescriptor_PositionSceneInfo)
+			.writeImage(2, &ppoDescriptor_NormalSceneInfo)
+			.writeImage(3, &ppoDescriptor_MaterialSceneInfo)
+			.build(ppo_InputDescriptorSet);
 	}
 
 	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass presentingRenderPass, PostProcessingGBufferInput imageInput) : engineDevice(device) {
 		setVkDescriptorImageInfo(&ppoDescriptor_BaseRenderedScene, imageInput.baseRenderedScene);
-		bool x1 = setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
-		bool x2 = setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
-		bool x3 = setVkDescriptorImageInfo(&ppoDescriptor_MaterialSceneInfo, imageInput.materialSceneInfo);
+		setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
+		setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
+		setVkDescriptorImageInfo(&ppoDescriptor_MaterialSceneInfo, imageInput.materialSceneInfo);
 
-		EngineDescriptorSetLayout::Builder builder = EngineDescriptorSetLayout::Builder(engineDevice)
-			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
-		if (x1)
-			builder.addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
-		if (x2)
-			builder.addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
-		if (x3)
-			builder.addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
+		ppo_Layout = EngineDescriptorSetLayout::Builder(engineDevice)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+			.addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
+			.addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
+			.addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
+			.build();
 
-		ppo_Layout = builder.build();	
+		EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
+			.writeImage(0, &ppoDescriptor_BaseRenderedScene)
+			.writeImage(1, &ppoDescriptor_PositionSceneInfo)
+			.writeImage(2, &ppoDescriptor_NormalSceneInfo)
+			.writeImage(3, &ppoDescriptor_MaterialSceneInfo)
+			.build(ppo_InputDescriptorSet);
 
-		EngineDescriptorWriter writer = EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
-			.writeImage(0, &ppoDescriptor_BaseRenderedScene); 
-		if (x1)
-			writer.writeImage(1, &ppoDescriptor_PositionSceneInfo);
-		if (x2)
-			writer.writeImage(2, &ppoDescriptor_NormalSceneInfo);
-		if (x3)
-			writer.writeImage(3, &ppoDescriptor_MaterialSceneInfo);
 
-		writer.build(ppo_InputDescriptorSet);
 		MaterialSystem::setRenderedSceneImageLayout(ppo_Layout->getDescriptorSetLayout());
 
 		createPipelineLayout();
@@ -112,7 +117,7 @@ namespace Shard3D {
 			nullptr
 		);
 		gammaCorrectionShaderPipeline->bindCompute(frameInfo.commandBuffer);
-		vkCmdDispatch(frameInfo.commandBuffer, 1920 / 16, 1080 / 16 + 1, 1);
+		vkCmdDispatch(frameInfo.commandBuffer, GraphicsSettings::getRuntimeInfo().PostProcessingInvocationIDCounts.x, GraphicsSettings::getRuntimeInfo().PostProcessingInvocationIDCounts.y, 1);
 	}
 
 	void PostProcessingSystem::renderImageFlipForPresenting(FrameInfo& frameInfo) {
@@ -127,9 +132,5 @@ namespace Shard3D {
 			nullptr
 		);
 		vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);	
-	}
-	void PPO_Material::dispatch(VkCommandBuffer commandBuffer) {
-		pipeline->bindCompute(commandBuffer);
-		vkCmdDispatch(commandBuffer, workgroups.x, workgroups.y, workgroups.z);
 	}
 }

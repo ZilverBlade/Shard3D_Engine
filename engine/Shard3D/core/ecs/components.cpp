@@ -75,10 +75,6 @@ namespace Shard3D {
 			}
 		};
 
-		void TransformComponent::dasd(glm::vec3 _t)
-		{
-		}
-
 		void TransformComponent::decompose(const glm::mat4& transform, glm::vec3* outTranslation, glm::vec3* outRotationEulerXYZ, glm::vec3* outScale) {
 			// From glm::decompose in matrix_decompose.inl
 

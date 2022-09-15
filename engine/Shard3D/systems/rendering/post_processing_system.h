@@ -14,14 +14,6 @@ namespace Shard3D {
 		FrameBufferAttachment* normalSceneInfo;
 		FrameBufferAttachment* materialSceneInfo;
 	};
-
-	struct PPO_Material {
-		PPO_Material(sPtr<ComputePipeline>&& _pipeline, glm::ivec3 _workgroups) : pipeline(_pipeline), workgroups(_workgroups) {}
-		void dispatch(VkCommandBuffer commandBuffer);
-		sPtr<ComputePipeline> pipeline;
-		glm::ivec3 workgroups;
-	};
-
 	class PostProcessingSystem {
 	public:
 		PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainpresentingRenderPassRenderPass, PostProcessingGBufferInput imageInput);
@@ -33,6 +25,7 @@ namespace Shard3D {
 		void render(FrameInfo& frameInfo);
 		void renderGammaCorrection(FrameInfo& frameInfo);
 		void renderImageFlipForPresenting(FrameInfo& frameInfo);
+		void updateDescriptors(PostProcessingGBufferInput imageInput);
 	private:
 		void createPipelineLayout();
 		void createPipelines(VkRenderPass renderPass);
@@ -52,8 +45,6 @@ namespace Shard3D {
 		uPtr<EngineDescriptorSetLayout> ppo_Layout{};
 
 		VkPipelineLayout pipelineLayout{};
-
-		std::vector<PPO_Material> postProcessMaterials{};
 	};
 
 }

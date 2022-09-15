@@ -7,6 +7,15 @@
 
 #include "assetid.h"
 
+namespace std {
+	template<>
+	struct hash<Shard3D::AssetID> {
+		size_t operator()(const Shard3D::AssetID& id) const {
+			return id.getID();
+		}
+	};
+}
+
 namespace Shard3D {
 	enum class AssetType {
 		Unknown, Texture, Model3D, SurfaceMaterial, PostProcessingMaterial, Level
@@ -137,10 +146,10 @@ namespace Shard3D {
 		static rPtr<PostProcessingMaterial>& retrievePPOMaterial_safe(const AssetID& asset);
 		static rPtr<PostProcessingMaterial>& retrievePPOMaterial_unsafe(const AssetID& asset);
 
-		static inline hashMap<AssetKey, rPtr<Model3D>> meshAssets;
-		static inline hashMap<AssetKey, rPtr<Texture2D>> textureAssets;
-		static inline hashMap<AssetKey, rPtr<SurfaceMaterial>> surfaceMaterialAssets;
-		static inline hashMap<AssetKey, rPtr<PostProcessingMaterial>> ppoMaterialAssets;
+		static inline hashMap<AssetID, rPtr<Model3D>> meshAssets;
+		static inline hashMap<AssetID, rPtr<Texture2D>> textureAssets;
+		static inline hashMap<AssetID, rPtr<SurfaceMaterial>> surfaceMaterialAssets;
+		static inline hashMap<AssetID, rPtr<PostProcessingMaterial>> ppoMaterialAssets;
 		static inline EngineDevice* engineDevice{};
 		friend class _special_assets;
 	};

@@ -1,0 +1,344 @@
+#version 450
+layout (local_size_x = 16, local_size_y = 16) in;
+layout (set = 0, binding = 0, rgba32f) uniform image2D postProcessImage;
+layout (set = 0, binding = 1, rgba32f) uniform image2D positionImage;
+layout (set = 0, binding = 2, rgba32f) uniform image2D normalImage;
+layout (set = 0, binding = 3, rgba32f) uniform image2D materialImage;
+
+layout (set = 1, binding = 0) readonly buffer myParams {
+  float maxDistance;// = 30;
+  float resolution; // = 0.3;
+  float thickness; // = 0.5;
+  int   steps; //      = 10;
+} ssrData;
+
+struct Pixel {
+  vec4 color;
+  float specular;
+  bool isValid;
+  vec3 normal;
+  float reciprocalZ;
+  vec3 viewPos;
+};
+
+//float random(vec2 coef) {
+//    return fract(sin(dot(coef, vec2(12.9898,78.233))) * 43758.5453);
+//}
+
+//https://github.com/agostbiro/screen-space-reflections
+Pixel getPixel(in vec2 coord)
+{
+  bool isValid;
+  float  specular
+    ;
+
+  Pixel invalidFragment;
+
+  vec3
+    normal,
+    viewPos;
+
+  vec4
+    color,
+    pos;
+
+  // returned to indicate an error.
+  invalidFragment = Pixel(vec4(0.0), 0.0, false,
+                             vec3(0.0), 0.0, vec3(0.0));
+
+   const vec2 sceneArea = imageSize(postProcessImage);
+   if (any(lessThan(coord, vec2(0.0))) || any(greaterThan(coord, sceneArea)))
+  {
+    invalidFragment.color = vec4(0.0, 1.0, 0.0, 1.0);
+
+    return invalidFragment;
+  }
+
+  color = imageLoad(postProcessImage, ivec2(coord));
+  specular = imageLoad(materialImage, ivec2(coord)).x;
+  normal = normalize(imageLoad(normalImage, ivec2(coord)).xyz);
+  pos = imageLoad(positionImage, ivec2(coord));
+
+  viewPos = pos.xyz;
+  isValid = pos.w == 1.0 ? true : false;
+
+  if (!isValid)
+  {
+    invalidFragment.color = vec4(0.0, 1.0, 1.0, 1.0);
+    return invalidFragment;
+  }
+
+  return Pixel(color, specular, isValid, normal, 1.0 / pos.z, viewPos);
+}
+
+Pixel marchRay(Pixel fragment,
+                  vec3 prevViewPosition)
+{
+  // TODO (abiro) Make it configurable.
+  const float 
+    MAX_ITERATIONS = 20.0,
+    MAX_STRIDE = 16.0,
+    SEARCH_STEPS = 3.0;
+
+  //const vec3 
+  //  CAMERA_DIR = vec3(0.0, 0.0, 1.0),
+  //  DOWN_DIR = vec3(0.0, -1.0, 0.0);
+
+  bool
+    canReflect,
+    coarseHit,
+    isDownFacing,
+    sameDir;
+
+  float
+    dotProductNormalReflRay,
+    dotProductNormalNextReflRay,
+    nextPosReciprocalZ,
+    targetPosReciprocalZ,
+    startingPosReciprocalZ,
+    steps,
+    stepRatio,
+    stepsBack;
+
+  Pixel 
+    invalidFragment, 
+    nextFragment,
+    prevFragment;
+
+  vec2
+    nextPos,
+    searchDirection,
+    searchDirUnitLen,
+    startingPos,
+    targetPos;
+
+  vec3
+    incidentRay,
+    reflectedRay;
+
+  vec4 
+    fragmentClipCoord,
+    targetClipCoord;
+
+  // Returned to indicate no hit.
+  invalidFragment = Pixel(vec4(0.0), 0.0, false, vec3(0.0), 
+                             0.0, vec3(0.0));
+
+  incidentRay = normalize(fragment.viewPos - prevViewPosition);
+  reflectedRay = reflect(incidentRay, fragment.normal);
+
+  // Reflections toward the camera would fail on the depth test and cause other
+  // complications (hit out of frame objects or encounter occluders).
+ //if (dot(reflectedRay, CAMERA_DIR) > 0.0)
+ //{
+ //  invalidFragment.color = vec4(1.0, 0.0, 1.0, 1.0);
+ //  return invalidFragment;
+ //}
+
+  targetClipCoord = vec4(fragment.viewPos + reflectedRay, 1.0);
+  fragmentClipCoord = vec4(fragment.viewPos, 1.0);
+  
+  dotProductNormalReflRay = dot(fragment.normal, reflectedRay);
+  
+ // isDownFacing = dot(fragment.normal, DOWN_DIR) > 0.0;
+
+  // Screen space is a space here where integer coordinates correspond to pixels
+  // with origin in the middle.
+  // TODO (abiro) to which part of a pixel does the integer coordinate 
+  // correspond to?
+  startingPos = fragmentClipCoord.xy;
+
+  // Using reciprocals allows linear interpolation in screen space.
+  // Making depth comparisons in clip space to avoid having to convert to
+  // view space from clip.
+  startingPosReciprocalZ = 1.0 / fragmentClipCoord.z;
+
+  targetPos = targetClipCoord.xy;
+
+  targetPosReciprocalZ = 1.0 / targetClipCoord.z;
+
+  searchDirection = targetPos - startingPos;
+
+  // TODO (abiro) This doesn't guarantee that all pixels are visited along the
+  // path. Use DDA.
+  searchDirUnitLen = normalize(searchDirection);
+
+  stepRatio = 1.0 / length(searchDirection);
+
+  nextPos = vec2(0.0);
+
+  for (float i = 1.0; i <= MAX_ITERATIONS; i += 1.0)
+  {
+    steps = i * MAX_STRIDE;
+
+    // Find the next position in screen space to test for a hit along the 
+    // reflected ray.
+    nextPos = startingPos + steps * searchDirUnitLen;
+
+    // Find the z value at the next position to test in view space. 
+    nextPosReciprocalZ = mix(startingPosReciprocalZ, 
+                             targetPosReciprocalZ, 
+                             steps * stepRatio);
+
+    // Get the fragment from the framebuffer that could be reflected to the 
+    // current fragment and see if it is actually reflected there.
+    nextFragment = getPixel(nextPos);
+
+    // TODO (abiro) rethink this
+    if (!nextFragment.isValid)
+    {
+      return nextFragment;
+    }
+
+    // If the dot product of two vectors is negative, they are facing entirely
+    // different directions.
+    canReflect = dot(reflectedRay, nextFragment.normal) < 0.0;
+
+    // See if the point is along the ray.
+    // See commit message d2897ae on down-facing objects.
+    sameDir = (isDownFacing ? 0.5 : 0.99) <
+              dot(reflectedRay,
+                  normalize(nextFragment.viewPos - fragment.viewPos));
+
+    // TODO (abiro) Rethink this. 'nextPosReciprocalZ' is in clip space, while
+    // 'nextFragment.reciprocalZ' is in view space. This should have not matter,
+    // as long as ray is within the image.
+
+    // Test if the ray is behind the object.
+    // Z values are negative in clip space, but the reciprocal switches 
+    // relations.
+    if (nextPosReciprocalZ >= nextFragment.reciprocalZ && sameDir && canReflect)
+    {
+      coarseHit = true;
+      break;
+    }
+    // In this case, a closer object is blocking a possible hit from view.
+    else if (sameDir && canReflect)
+    {
+      invalidFragment.color = vec4(0.0, 0.0, 1.0, 1.0);
+      return invalidFragment;
+    }
+  }
+
+  if (!coarseHit)
+  {
+    invalidFragment.color = vec4(1.0, 0.0, 0.0, 1.0);
+    return invalidFragment;
+  }
+
+  if (!nextFragment.isValid)
+  {
+    invalidFragment.color = vec4(1.0, 1.0, 0.0, 1.0);
+    return invalidFragment;
+  }
+
+  // Refine the match by binary search. If the ray is behind the current
+  // fragment's position, take a half-stride long step back and reexamine
+  // the depth buffer. Then, taking smaller and smaller steps recursively
+  // find the closest hit for the ray.
+  for (float j = SEARCH_STEPS; j >= 0.0; j -= 1.0)
+  {
+    dotProductNormalNextReflRay = dot(
+      fragment.normal,
+      normalize(nextFragment.viewPos - fragment.viewPos)
+    );
+
+    if (dotProductNormalReflRay < dotProductNormalNextReflRay)
+    {
+      // Step back
+      stepsBack = -pow(2.0, j);
+    }
+    else if (dotProductNormalReflRay > dotProductNormalNextReflRay)
+    {
+      // Step forward
+      stepsBack = pow(2.0, j);
+    }
+    else
+    {
+      break;
+    }
+
+    steps = steps + stepsBack;
+
+    nextPos = startingPos + steps * searchDirUnitLen;
+    prevFragment = nextFragment;
+    nextFragment = getPixel(nextPos);
+
+    // TODO (abiro) rethink this
+    if (!nextFragment.isValid)
+    {
+      nextFragment = prevFragment;
+      break;
+    }
+  }
+
+  return nextFragment;
+}
+
+
+
+void main()	{
+   
+   
+    const vec3 pixelColor = imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.xy)).rgb;
+    const vec4 pixelPos = imageLoad(positionImage, ivec2(gl_GlobalInvocationID.xy));
+    const vec3 pixelNormal = imageLoad(normalImage, ivec2(gl_GlobalInvocationID.xy)).xyz;
+    const vec3 pixelMaterial = imageLoad(materialImage, ivec2(gl_GlobalInvocationID.xy)).xyz;
+    const float p_specular = pixelMaterial.x;
+    const float p_shininess = pixelMaterial.y;
+
+    float 
+  cumulativeDistance,
+  weight;
+
+Pixel fragment,
+  nextFragment;
+
+vec3
+  prevViewPosition,
+  reflectionsColor; 
+
+    fragment = getPixel(ivec2(gl_GlobalInvocationID.xy));
+
+  // All code is exectued regardless whether it's in a branch or not, so the
+  // rest of the code will still execute.
+  if (!fragment.isValid)
+    return;
+
+  vec4 resultColor = fragment.color;
+
+  // The source of the incident ray is the origin at first.
+  prevViewPosition = vec3(0.0);
+  reflectionsColor = vec3(0.0);
+  cumulativeDistance = 0.0;
+  
+  int MAX_BOUNCES = 3;
+
+  for (int i = 0; i < MAX_BOUNCES; i++)
+  {
+
+    nextFragment = marchRay(fragment, prevViewPosition);
+
+    if (!nextFragment.isValid)
+    {
+      break;
+    }
+
+    cumulativeDistance += distance(fragment.viewPos, nextFragment.viewPos);
+
+    // The intensity of light is inversely proportional to the square of the
+    // of the distance from its source.
+    // TODO (abiro) Need more realistic model for the reflection of different 
+    // materials.
+    weight = (cumulativeDistance == 0.0) ? 0.0 : 1.0 / cumulativeDistance;
+
+    // TODO (abiro) alpha?
+    resultColor.xyz =  pixelColor + nextFragment.color.rgb * weight;
+
+    prevViewPosition = fragment.viewPos;
+    fragment = nextFragment;
+  }
+
+
+  imageStore(postProcessImage, ivec2(gl_GlobalInvocationID.xy), vec4(resultColor.xyz, 1.0) );
+}

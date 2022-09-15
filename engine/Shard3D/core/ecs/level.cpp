@@ -14,7 +14,7 @@ namespace Shard3D {
 	namespace ECS {
 		Level::Level(const std::string &lvlName, bool makeSystem) : name(lvlName) {
 			if (!makeSystem) return;
-			SHARD3D_ERROR("Loading editor camera actor");
+			SHARD3D_INFO("Loading editor camera actor");
 			ECS::Actor editor_cameraActor = createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
 			editor_cameraActor.addComponent<Components::CameraComponent>();
 			editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
@@ -22,12 +22,12 @@ namespace Shard3D {
 
 		    setPossessedCameraActor(editor_cameraActor);
 			editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
-			SHARD3D_ERROR("Loading dummy actor");
+			SHARD3D_INFO("Loading dummy actor");
 			ECS::Actor dummy = createActorWithUUID(1, "Dummy Actor (SYSTEM RESERVED)");
 
 		}
 		Level::~Level() {
-			SHARD3D_ERROR("Destroying level");
+			SHARD3D_INFO("Destroying level");
 			registry.clear();
 		}
 
@@ -35,7 +35,7 @@ namespace Shard3D {
 		static void copyComponent(entt::registry& dst, entt::registry& src, hashMap<UUID, entt::entity>& map) {
 			auto view = src.view<Component>();
 			for (auto e : view) {
-				UUID guid = src.get<Components::UUIDComponent>(e).id;
+				UUID guid = src.get<Components::UUIDComponent>(e).getID();
 				
 				if (map.find(guid) == map.end()) SHARD3D_FATAL("enttMap.find(guid) == enttMap.end()");
 
@@ -47,6 +47,13 @@ namespace Shard3D {
 			}
 		}
 
+		void Level::shallowCopy(sPtr<Level>& this_, sPtr<Level>& other) {
+			this_->possessedCameraActorGUID = other->getPossessedCameraActor().getUUID();
+			this_->currentpath = other->currentpath;
+			this_->name = other->name;
+			this_->physicsSystemPtr = other->physicsSystemPtr;
+		}
+
 		sPtr<Level> Level::copy(sPtr<Level> other) {
 			sPtr<Level> newLvl = make_sPtr<Level>(other->name, false);
 			hashMap<UUID, entt::entity> enttMap;
@@ -56,7 +63,7 @@ namespace Shard3D {
 
 			auto idView = srcLvlRegistry.view<Components::UUIDComponent>();
 			for (auto it = idView.begin(); it != idView.end(); ++it) {
-				UUID guid = srcLvlRegistry.get<Components::UUIDComponent>(idView[it.index()]).id;
+				UUID guid = srcLvlRegistry.get<Components::UUIDComponent>(idView[it.index()]).getID();
 				Actor newActor = newLvl->createActorWithUUID(guid, srcLvlRegistry.get<Components::TagComponent>(idView[it.index()]).tag);
 				enttMap[guid] = newActor.actorHandle;
 			}
@@ -76,11 +83,8 @@ namespace Shard3D {
 			copyComponent<Components::CppScriptComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 			copyComponent<Components::RelationshipComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
-			newLvl->possessedCameraActorGUID = other->getPossessedCameraActor().getUUID();
-			newLvl->currentpath = other->currentpath;
-			newLvl->name = other->name;
-			newLvl->physicsSystemPtr = other->physicsSystemPtr;
-
+			shallowCopy(newLvl, other);
+			
 			return newLvl;
 		}
 

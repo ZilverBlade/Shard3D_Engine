@@ -7,8 +7,7 @@ namespace Shard3D {
 	class AssetID {
 	public:
 		AssetID(const std::string& asset);
-		AssetID(uint64_t _assetID) : assetID(_assetID){}
-		
+	
 		// Returned hashed value
 		inline uint64_t getID() const { return assetID; }
 		// Returns asset file (.s3dasset)

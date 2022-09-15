@@ -61,7 +61,7 @@ namespace Shard3D {
 	static void loadLevel(sPtr<ECS::Level>& level, const std::string& path) {
 		if (level->simulationState != PlayState::Stopped) level->end();
 		sPtr<ECS::Level> newlevel = make_sPtr<ECS::Level>();
-		newlevel->setPhysicsSystem(level->physicsSystemPtr);
+		Level::shallowCopy(newlevel,level);
 		LevelManager levelMan(newlevel);
 		LevelMgrResults result = levelMan.load(path, false);
 		if (result == LevelMgrResults::OldEngineVersionResult) {
@@ -76,11 +76,8 @@ namespace Shard3D {
 	}
 	static void saveLevel(sPtr<ECS::Level>& level, const std::string& path) {
 		if (level->simulationState != PlayState::Stopped) { SHARD3D_ERROR("Cannot save level that is running!"); return; }
-		std::string filepath = FileDialogs::saveFile(ENGINE_SHARD3D_LEVELFILE_OPTIONS);
-		if (!filepath.empty()) {
-			ECS::LevelManager levelMan(level);
-			levelMan.save(filepath, false);
-		}
+		ECS::LevelManager levelMan(level);
+		levelMan.save(path, false);
 	}
 
 	static void playLevel(sPtr<ECS::Level>& level, sPtr<ECS::Level>& capturedLevel, GLFWwindow* window) {
@@ -164,6 +161,8 @@ namespace Shard3D {
 		levelTreePanel.destroyContext();
 		levelPropertiesPanel.destroyContext();
 		levelPeekPanel.destroyContext();
+
+		materialBuilder.destroy();
 	}
 
 	void ImGuiLayer::render(FrameInfo& frameInfo) {
@@ -311,31 +310,6 @@ namespace Shard3D {
 		hudBuilder.setContext(container);
 	}
 
-	bool ImGuiLayer::handleWindowResize(FrameInfo& frameInfo)
-	{
-		//ImVec2 view = ImGui::GetContentRegionAvail();
-		//
-		//if (view.x != m_Window.width || view.y != m_Window.height)
-		//{
-		//	if (view.x == 0 || view.y == 0)
-		//	{
-		//		// The window is too small or collapsed.
-		//		return false;
-		//	}
-		//
-		//	m_Window.width = view.x;
-		//	m_Window.height = view.y;
-		//
-		//	reinterpret_cast<Application*>(frameInfo.userPointer)->			RecreateFramebuffer();
-		//
-		//	// The window state has been successfully changed.
-		//	return true;
-		//}
-
-		// The window state has not changed.
-		return true;
-	}
-
 	void ImGuiLayer::renderViewport(FrameInfo& frameInfo) {
 		ImGui::Begin("Viewport");
 
@@ -380,8 +354,7 @@ namespace Shard3D {
 				Actor cameraActor = frameInfo.activeLevel->getActorFromUUID(0);
 				editorCameraController.tryPollTranslation(engineWindow, frameInfo.frameTime, cameraActor);
 			}
-		} 
-		
+		}
 
 		{
 			Actor actor = levelTreePanel.getSelectedActor();

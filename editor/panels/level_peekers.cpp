@@ -103,7 +103,7 @@ namespace Shard3D {
 		ImGui::Begin("Texture Inspector");
 		ImGui::Text((std::string("Texture count: " + std::to_string(ResourceHandler::getTextureAssets().size())).c_str()));
 		for (auto& asset : ResourceHandler::getTextureAssets()) {
-			ImGui::Text(std::to_string(asset.first).c_str());
+			ImGui::Text(asset.first.getFile().c_str());
 		}
 		if (ImGui::Button("Force delete all textures (dangerous)")) {
 			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous if assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
@@ -118,7 +118,7 @@ namespace Shard3D {
 		ImGui::Begin("Mesh & LOD Inspector");
 		ImGui::Text((std::string("Mesh count: " + std::to_string(ResourceHandler::getMeshAssets().size())).c_str()));
 		for (auto& asset : ResourceHandler::getMeshAssets()) {
-			ImGui::Text(std::to_string(asset.first).c_str());
+			ImGui::Text(asset.first.getFile().c_str());
 		}
 		if (ImGui::Button("Force delete all models (dangerous)")) {
 			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous if assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {
@@ -135,7 +135,7 @@ namespace Shard3D {
 		ImGui::Begin("Material Inspector");
 		ImGui::Text((std::string("Material count: " + std::to_string(ResourceHandler::getSurfaceMaterialAssets().size())).c_str()));
 		for (auto& asset : ResourceHandler::getSurfaceMaterialAssets()) {
-			ImGui::Text(std::to_string(asset.first).c_str());
+			ImGui::Text(asset.first.getFile().c_str());
 		}
 		if (ImGui::Button("Force delete all materials (dangerous)")) {
 			if (MessageDialogs::show(std::string("Deletion of all assets can be dangerous if assets are in use.\nUnexpected crashes may happen if one of these assets is in use.\nAre you sure you want to proceed ?").c_str(), "Caution!", MessageDialogs::OPTICONEXCLAMATION | MessageDialogs::OPTYESNO) == MessageDialogs::RESYES) {

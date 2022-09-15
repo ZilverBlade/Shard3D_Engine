@@ -27,11 +27,11 @@ project "Shard3D"
 
    kind "StaticLib"
    language "C++"
-   cppdialect "C++17"
+   cppdialect "C++20"
    targetdir (bin)
 
    flags { "MultiProcessorCompile" }
-   disablewarnings { "26812;4244;4996;4005;" }
+   disablewarnings { "26812;4244;4996;4005" }
    
    files {
       "engine/Shard3D/**.cpp",
@@ -129,11 +129,11 @@ project "Shard3DEditor"
   
    kind "ConsoleApp"
    language "C++"
-   cppdialect "C++17"
+   cppdialect "C++20"
    targetdir (bin)
 
    flags { "MultiProcessorCompile" }
-   disablewarnings { "26812;4244;4996;4005;" }
+   disablewarnings { "26812;4244;4996;4005" }
    
    files {
 	  "editor/application.h",
@@ -201,11 +201,11 @@ project "Shard3DRuntime"
   
    kind "ConsoleApp"
    language "C++"
-   cppdialect "C++17"
+   cppdialect "C++20"
    targetdir (bin)
 
    flags { "MultiProcessorCompile" }
-   disablewarnings { "26812;4244;4996;4005;" }
+   disablewarnings { "26812;4244;4996;4005" }
    
    files {
 	  "runtime/application.h",

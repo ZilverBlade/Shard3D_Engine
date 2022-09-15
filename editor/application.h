@@ -15,6 +15,8 @@
 
 namespace Shard3D {
 	class Application {
+		static inline constexpr int wndWidth = 1280;
+		static inline constexpr int wndHeight = 720;
 	public:
 		Application();
 		~Application();
@@ -34,8 +36,10 @@ namespace Shard3D {
 		void windowResizeEvent(Events::WindowResizeEvent& e);
 		void eventEvent(Events::Event& e);
 
+		void resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem);
+
 		// Engine components
-		EngineWindow engineWindow{ 1280, 720, "Shard3D Engine" };
+		EngineWindow engineWindow{ wndWidth, wndHeight, "Shard3D Engine" };
 		EngineDevice engineDevice{ engineWindow };
 		EngineRenderer engineRenderer{ engineWindow, engineDevice };
 		

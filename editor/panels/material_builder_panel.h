@@ -8,6 +8,7 @@ namespace Shard3D {
 		~MaterialBuilderPanel();
 
 		void render();
+		void destroy();
 	private:
 		rPtr<SurfaceMaterial> currentItem;
 		AssetID currentAsset;

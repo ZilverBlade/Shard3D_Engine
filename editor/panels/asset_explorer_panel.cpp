@@ -93,13 +93,17 @@ namespace Shard3D {
 		SHARD3D_STAT_RECORD();
 		SHARD3D_STAT_RECORD_END({ "ImGui", "Widgets" });
 		if (ImGui::ImageButtonWithText(refreshIcon, "Refresh", {16.f, 16.f})) {
-			refresh_it = true;
+			refreshIterator(currentDir);
+			ImGui::End();
+			return;
 		}
 		if (currentDir != std::filesystem::path(ENGINE_ASSETS_PATH)) {
 			ImGui::SameLine();
 			if (ImGui::ImageButtonWithText(backIcon, "Back", { 16.f, 16.f })) {
 				currentDir = currentDir.parent_path();
-				refresh_it = true;
+				refreshIterator(currentDir);
+				ImGui::End();
+				return;
 			}
 		}
 
@@ -134,7 +138,7 @@ namespace Shard3D {
 				if (ImGui::BeginDragDropSource()) {
 					// memory leak. if any issues in the future, check this
 					char* item = (char*)malloc(relativePath.u8string().length() + 1);
-					strncpy(item, const_cast<char*>(relativePath.u8string().c_str()), relativePath.u8string().length() + 1);
+					strncpy(item, const_cast<char*>(relativePath.string().c_str()), relativePath.u8string().length() + 1);
 					switch (directoryEntries.types[i]) {
 					case(AssetType::Texture):
 						ImGui::SetDragDropPayload("SHARD3D.ASSEXP.TEX", item, strlen(item) + 1, ImGuiCond_Once);

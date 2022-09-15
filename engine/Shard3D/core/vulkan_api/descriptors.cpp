@@ -117,7 +117,7 @@ namespace Shard3D {
         return true;
     }
 
-    void EngineDescriptorPool::freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const {
+    void EngineDescriptorPool::freeDescriptors(const std::vector<VkDescriptorSet>& descriptors) const {
         vkFreeDescriptorSets(
             engineDevice.device(),
             descriptorPool,

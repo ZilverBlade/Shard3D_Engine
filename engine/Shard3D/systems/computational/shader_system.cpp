@@ -43,6 +43,7 @@ namespace Shard3D {
 		options = new shaderc::CompileOptions();
 		options->AddMacroDefinition("SHARD3D_VERSION", ENGINE_VERSION.toString());
 		options->SetOptimizationLevel(shaderc_optimization_level_performance); // always max performance
+		options->SetIncluder(std::make_unique<ShaderIncluder>());
 	}
 	void ShaderSystem::compileFromFile(const std::string& source, const std::string& destination, ShaderType type) {
 		SHARD3D_ASSERT(options && compiler && "Shader System has not been initialized!");		
@@ -76,7 +77,9 @@ namespace Shard3D {
 		out.close();
 	}
 	std::vector<char> ShaderSystem::compileOnTheFly(const std::string& data, ShaderType type) {
-		SHARD3D_WARN("Compiling Shader '{0}'", data);
+		SHARD3D_ASSERT(options && compiler && "Shader System has not been initialized!");
+		
+		SHARD3D_INFO("Compiling Shader '{0}'", data);
 		std::string shaderCode = IOUtils::readText(data, true);
 		shaderc::PreprocessedSourceCompilationResult pre_result =
 			compiler->PreprocessGlsl(shaderCode, (shaderc_shader_kind)type, data.c_str(), *options);
@@ -95,7 +98,9 @@ namespace Shard3D {
 		return *reinterpret_cast<std::vector<char>*>(&sresult);
 	}
 	std::vector<char> ShaderSystem::compileOnTheFlyDirect(const std::string& shaderCode, const char* sourceFile, ShaderType type) {
-		SHARD3D_WARN("Compiling Shader '{0}'", sourceFile);
+		SHARD3D_ASSERT(options && compiler && "Shader System has not been initialized!");
+		
+		SHARD3D_INFO("Compiling Shader '{0}'", sourceFile);
 		shaderc::PreprocessedSourceCompilationResult pre_result =
 			compiler->PreprocessGlsl(shaderCode, (shaderc_shader_kind)type, sourceFile, *options);
 		std::string xresult = std::string(pre_result.cbegin(), pre_result.cend());

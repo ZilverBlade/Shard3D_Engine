@@ -366,10 +366,18 @@ namespace Shard3D {
 								}
 							}
 							ImGui::TreePop();
-						}
-						
+							
+						}						
 					}
 					ImGui::TreePop();
+					ImGui::OpenPopupOnItemClick("RemovePPOEffect", ImGuiPopupFlags_MouseButtonRight);
+					if (ImGui::BeginPopup("RemovePPOEffect")) {
+						if (ImGui::MenuItem("Remove (last) Effect")) {
+							actor.getComponent<Components::CameraComponent>().postProcessMaterials.pop_back();
+							ImGui::CloseCurrentPopup();
+						}
+						ImGui::EndPopup();
+					}
 					if (ImGui::BeginDragDropTarget())
 						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.PMAT")) {
 							AssetID loadedMaterial = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);

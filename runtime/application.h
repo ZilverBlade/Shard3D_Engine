@@ -15,6 +15,8 @@
 
 namespace Shard3D {
 	class Application {
+		static inline constexpr int wndWidth = 1280;
+		static inline constexpr int wndHeight = 720;
 	public:
 		Application();
 		~Application();
@@ -29,6 +31,7 @@ namespace Shard3D {
 		void setWindowCallbacks();
 		void createRenderPasses();
 		void destroyRenderPasses();
+		void resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem);
 		void loadStaticObjects();
 
 		void eventEvent(Events::Event& e);

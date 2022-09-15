@@ -36,7 +36,7 @@ namespace Shard3D {
 			mainColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
-				glm::ivec3(1920, 1080, 1),
+				{ wndWidth, wndHeight, 1 },
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
@@ -46,7 +46,7 @@ namespace Shard3D {
 			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				engineRenderer.getSwapchain()->findDepthFormat(),
 				VK_IMAGE_ASPECT_DEPTH_BIT,
-				glm::ivec3(1920, 1080, 1),
+				{ wndWidth, wndHeight, 1 },
 				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 				VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
 				VK_SAMPLE_COUNT_1_BIT
@@ -55,7 +55,7 @@ namespace Shard3D {
 			mainPositionFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
-				glm::ivec3(1920, 1080, 1),
+				{ wndWidth, wndHeight, 1 },
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
@@ -65,7 +65,7 @@ namespace Shard3D {
 			mainNormalFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
-				glm::ivec3(1920, 1080, 1),
+				{ wndWidth, wndHeight, 1 },
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
@@ -75,7 +75,7 @@ namespace Shard3D {
 			mainMaterialDataFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
-				glm::ivec3(1920, 1080, 1),
+				{ wndWidth, wndHeight, 1 },
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_SAMPLE_COUNT_1_BIT
@@ -125,7 +125,7 @@ namespace Shard3D {
 			ppoColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 			VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
-				glm::ivec3(1920, 1080, 1),
+				{ wndWidth, wndHeight, 1 },
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 				VK_SAMPLE_COUNT_1_BIT
@@ -188,6 +188,15 @@ namespace Shard3D {
 	}
 
 	void Application::eventEvent(Events::Event& e) {
+	}
+
+
+	void Application::resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem) {
+		mainFrameBuffer->resize(glm::ivec3(newWidth, newHeight, 1), mainRenderpass->getRenderPass());
+		ppoFrameBuffer->resize(glm::ivec3(newWidth, newHeight, 1), ppoRenderpass->getRenderPass());
+
+		ImGuiInitializer::setViewportImage(&reinterpret_cast<ImGuiLayer*>(editor)->viewportImage, ppoColorFramebufferAttachment);
+		reinterpret_cast<PostProcessingSystem*>(ppoSystem)->updateDescriptors({mainColorFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment});
 	}
 
 	void Application::run() {
@@ -410,6 +419,14 @@ beginWhileLoop:
 				SHARD3D_STAT_RECORD();
 				engineRenderer.endFrame(newTime);
 				SHARD3D_STAT_RECORD_END({ "Command Buffer", "Submit" });
+
+				SHARD3D_STAT_RECORD();
+				if (engineWindow.wasWindowResized()) {
+					resizeFrameBuffers(engineWindow.getExtent().width, engineWindow.getExtent().height, &imguiLayer, &ppoSystem);
+					engineWindow.resetWindowResizedFlag();
+				}
+				SHARD3D_STAT_RECORD_END({ "Window", "Resize check & FBuffer" });
+
 			}
 		}
 
@@ -420,15 +437,20 @@ beginWhileLoop:
 		}
 
 		if (level->simulationState != PlayState::Stopped) level->end();
+		vkDeviceWaitIdle(engineDevice.device());
+
+		imguiLayer.detach();
+
+		for (HUD* my : h_l_layer->getList()) {
+			my->elements.clear();
+		}
 
 		ShaderSystem::destroy();
 		ScriptEngine::destroy();
-		vkDeviceWaitIdle(engineDevice.device());
-
+		
 		ResourceHandler::destroy();
 		_special_assets::_editor_icons_destroy();
 		
-		imguiLayer.detach();
 		destroyRenderPasses();
 		SharedPools::destructPools();
 

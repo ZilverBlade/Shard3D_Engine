@@ -27,6 +27,7 @@ namespace Shard3D {
 			~Level();
 
 			static sPtr<Level> copy(sPtr<Level> other);
+			static void shallowCopy(sPtr<Level>& this_, sPtr<Level>& other);
 
 			Actor createActor(const std::string& name= "Some kind of actor");
 			

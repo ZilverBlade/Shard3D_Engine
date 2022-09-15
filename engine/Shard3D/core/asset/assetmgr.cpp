@@ -304,7 +304,7 @@ namespace Shard3D {
 		SHARD3D_LOG("Loaded asset to resource map '{0}'", assetPath.getFile());
 		mesh->materials = data["Materials"].as<std::vector<AssetID>>();
 		for (auto& material : mesh->materials) ResourceHandler::loadSurfaceMaterialRecursive(material);
-		meshAssets[assetPath.getID()] = mesh;
+		meshAssets[assetPath] = mesh;
 	}
 
 	void ResourceHandler::unloadMesh(const AssetID& asset) {
@@ -312,12 +312,12 @@ namespace Shard3D {
 	}
 
 	rPtr<Model3D>& ResourceHandler::retrieveMesh_unsafe(const AssetID& asset) {
-		return meshAssets.at(asset.getID());
+		return meshAssets.at(asset);
 	}
 	rPtr<Model3D>& ResourceHandler::retrieveMesh_safe(const AssetID& asset) {
-		if (meshAssets.find(asset.getID()) != meshAssets.cend())
-			return meshAssets.at(asset.getID());
-		return meshAssets.at(coreAssets.m_errorMesh.getID());
+		if (meshAssets.contains(asset))
+			return meshAssets.at(asset);
+		return meshAssets.at(coreAssets.m_errorMesh);
 	}
 #pragma endregion
 
@@ -359,7 +359,7 @@ namespace Shard3D {
 		rPtr<Texture2D> texture = Texture2D::createTextureFromFile(*engineDevice, data["AssetFile"].as<std::string>(), loadInfo);
 		if (!texture) return;
 		SHARD3D_LOG("Loaded texture to resource map '{0}'", textureAsset.getFile());
-		textureAssets[textureAsset.getID()] = texture;
+		textureAssets[textureAsset] = texture;
 	}
 
 	void ResourceHandler::unloadTexture(const AssetID& asset) {
@@ -370,7 +370,7 @@ namespace Shard3D {
 		return textureAssets.at(asset);
 	}
 	rPtr<Texture2D>& ResourceHandler::retrieveTexture_safe(const AssetID& asset) {
-		if (textureAssets.find(asset) != textureAssets.cend())
+		if (textureAssets.contains(asset))
 			return textureAssets.at(asset);
 		return textureAssets.at(coreAssets.t_errorTexture);
 	}
@@ -379,17 +379,17 @@ namespace Shard3D {
 
 #pragma region Material
 	void ResourceHandler::loadSurfaceMaterial(const AssetID& asset) {
-		if (surfaceMaterialAssets.find(asset) != surfaceMaterialAssets.cend()) return;
+		if (surfaceMaterialAssets.contains(asset)) return;
 		rPtr<SurfaceMaterial> material = MaterialManager::loadSurfaceMaterial(asset);
 		if (!material) return;
-		surfaceMaterialAssets[asset.getID()] = material;
+		surfaceMaterialAssets[asset] = material;
 		rebuildSurfaceMaterial(material);
 		SHARD3D_LOG("Loaded material to resource map '{0}'", asset.getFile());
 	}
 
 	void ResourceHandler::loadSurfaceMaterialRecursive(const AssetID& asset) {
 		loadSurfaceMaterial(asset);
-		surfaceMaterialAssets[asset.getID()]->loadAllTextures();
+		surfaceMaterialAssets[asset]->loadAllTextures();
 	}
 
 	void ResourceHandler::unloadSurfaceMaterial(const AssetID& asset) {
@@ -407,7 +407,7 @@ namespace Shard3D {
 	}
 
 	rPtr<SurfaceMaterial>& ResourceHandler::retrieveSurfaceMaterial_safe(const AssetID& asset) {
-		if (surfaceMaterialAssets.find(asset) != surfaceMaterialAssets.cend())
+		if (surfaceMaterialAssets.contains(asset))
 			return surfaceMaterialAssets.at(asset);
 		return surfaceMaterialAssets.at(coreAssets.s_errorMaterial);
 	}
@@ -417,7 +417,7 @@ namespace Shard3D {
 #pragma endregion
 
 	void ResourceHandler::loadPPOMaterial(const AssetID& asset) {
-		if (ppoMaterialAssets.find(asset) != ppoMaterialAssets.cend()) return;
+		if (ppoMaterialAssets.contains(asset)) return;
 		rPtr<PostProcessingMaterial> material = MaterialManager::loadPPOMaterial(asset);
 		if (!material) return;
 		ppoMaterialAssets[asset] = material;

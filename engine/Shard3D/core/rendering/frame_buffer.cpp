@@ -1,8 +1,27 @@
 #include "../../s3dpch.h"
 #include "frame_buffer.h"
-
+#include <Shlwapi.h>
 namespace Shard3D {
 	FrameBufferAttachment::FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler) : engineDevice(device), description(attachmentDescription), _attachmentType(attachmentType) {
+		create(engineDevice, attachmentDescription, this->_attachmentType, hasSampler);
+	}
+	void FrameBufferAttachment::destroy() {
+		vkDestroyImageView(engineDevice.device(), imageView, nullptr);
+		vkDestroyImage(engineDevice.device(), image, nullptr);
+		vkDestroySampler(engineDevice.device(), sampler, nullptr);
+		vkFreeMemory(engineDevice.device(), imageMemory, nullptr);
+	}
+	FrameBufferAttachment::~FrameBufferAttachment() {
+		destroy();
+	}
+
+	void FrameBufferAttachment::resize(glm::ivec3 newDimensions) {
+		destroy();
+		description.dimensions = newDimensions;
+		create(engineDevice, description, this->_attachmentType, this->sampler);
+	}	
+
+	void FrameBufferAttachment::create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler) {
 		VkImageCreateInfo imageCreateInfo{};
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -44,11 +63,11 @@ namespace Shard3D {
 		imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 		imageViewCreateInfo.subresourceRange.layerCount = 1;
 		imageViewCreateInfo.image = image;
-		
+
 		if (vkCreateImageView(device.device(), &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS) {
 			SHARD3D_ERROR("Failed to create image view!");
 		}
-		
+
 		if (hasSampler) {
 			// Create sampler to sample from the attachment in the fragment shader
 			VkSamplerCreateInfo samplerInfo = {};
@@ -67,31 +86,29 @@ namespace Shard3D {
 			if (vkCreateSampler(device.device(), &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
 				SHARD3D_ERROR("Failed to create sampler");
 			}
-		
-		// Fill a descriptor for later use in a descriptor set
-		descriptor.imageLayout = attachmentDescription.finalLayout;
-		descriptor.imageView = imageView;
-		descriptor.sampler = sampler;
+
+			// Fill a descriptor for later use in a descriptor set
+			descriptor.imageLayout = attachmentDescription.finalLayout;
+			descriptor.imageView = imageView;
+			descriptor.sampler = sampler;
 		}
 		dimensions = { attachmentDescription.dimensions.x, attachmentDescription.dimensions.y, attachmentDescription.dimensions.z };
 	}
 
-	FrameBufferAttachment::~FrameBufferAttachment() {
-		vkDestroyImageView(engineDevice.device(), imageView, nullptr);
-		vkDestroyImage(engineDevice.device(), image, nullptr);
-		vkDestroySampler(engineDevice.device(), sampler, nullptr);
-		vkFreeMemory(engineDevice.device(), imageMemory, nullptr);
+	
+	void FrameBuffer::destroy()
+	{
+		vkDestroyFramebuffer(engineDevice.device(), frameBuffer, nullptr);
 	}
-
-	FrameBuffer::FrameBuffer(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& attachments) : engineDevice(device) {
+	void FrameBuffer::create(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& _attachments) {
 		std::vector<VkImageView> imageViews;
-		for (auto& attachment : attachments) {
+		for (auto& attachment : _attachments) {
 			imageViews.push_back(attachment->getImageView());
 		}
 
-		width = static_cast<uint32_t>(attachments[0]->getDimensions().x);
-		height = static_cast<uint32_t>(attachments[0]->getDimensions().y);
-		depth = static_cast<uint32_t>(attachments[0]->getDimensions().z);
+		width = static_cast<uint32_t>(_attachments[0]->getDimensions().x);
+		height = static_cast<uint32_t>(_attachments[0]->getDimensions().y);
+		depth = static_cast<uint32_t>(_attachments[0]->getDimensions().z);
 
 		VkFramebufferCreateInfo fbufferCreateInfo{};
 		fbufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -109,12 +126,25 @@ namespace Shard3D {
 		}
 	}
 
-	FrameBuffer::~FrameBuffer() {
-		vkDestroyFramebuffer(engineDevice.device(), frameBuffer, nullptr);
+	FrameBuffer::FrameBuffer(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& _attachments) : engineDevice(device) {
+		create(device, renderPass, _attachments);
+		this->attachments.reserve(_attachments.size());
+		for (FrameBufferAttachment* attachment : _attachments) {
+			this->attachments.push_back(attachment);
+		}
 	}
 
-	void FrameBuffer::resize(glm::ivec3 newDimensions) {
+	FrameBuffer::~FrameBuffer() {
+		destroy();
+		
+	}
 
+	void FrameBuffer::resize(glm::ivec3 newDimensions, VkRenderPass renderpass) {
+		for (FrameBufferAttachment* attachment : attachments) {
+			attachment->resize(newDimensions);
+		}
+		destroy();
+		create(this->engineDevice, renderpass, attachments);
 	}
 
 }

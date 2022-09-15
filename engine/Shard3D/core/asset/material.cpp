@@ -27,8 +27,15 @@ namespace Shard3D {
 		if (translucentInfo)
 			delete translucentInfo;
 
-		SHARD3D_LOG("Destroying Material {0}", this->materialTag);
+		SHARD3D_LOG("Destroying Material {0}", this->materialTag);	
+
+		free();
+	}
+
+	void SurfaceMaterial::free() {
 		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
+		//if (SharedPools::staticMaterialPool)
+			SharedPools::staticMaterialPool->freeDescriptors({ this->materialDescriptorInfo.factors, this->materialDescriptorInfo.textures });
 	}
 
 	void SurfaceMaterial::setBlendMode(SurfaceMaterialBlendMode_T mode) {
@@ -81,7 +88,7 @@ namespace Shard3D {
 	};
 
 	void SurfaceMaterial_Shaded::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
-		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
+		if (built) this->free();
 
 		if (blendMode & SurfaceMaterialBlendModeMasked)
 			SHARD3D_ASSERT(this->maskedInfo && "Masked info for surface material not set, while material has Masked as a blend mode set!");
@@ -283,14 +290,21 @@ namespace Shard3D {
 			return;
 		}
 		SHARD3D_LOG("Destroying Material {0}", this->materialTag);
-		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
-
+		
 		for (auto& param : myParams) {
 			param.free();
 		}
+		free();
+	}	
+	
+	void PostProcessingMaterial::free() {
+		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
+		//if (SharedPools::staticMaterialPool)
+			SharedPools::staticMaterialPool->freeDescriptors({ this->materialDescriptorInfo.params });
 	}
+
 	void PostProcessingMaterial::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
-		if (built) MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
+		if (built) this->free();
 		
 		if (!IOUtils::doesFileExist(shaderPath)) {
 			SHARD3D_WARN("No shader found!");
@@ -367,6 +381,7 @@ namespace Shard3D {
 		return myParamNames[index];
 	}
 
+
 	PostProcessingMaterialInstance::PostProcessingMaterialInstance(PostProcessingMaterial* masterMaterial, AssetID masterMaterialAsset) : master(masterMaterial), masterAsset(masterMaterialAsset) {
 		myParamsLocal.reserve(master->myParams.size());
 		for (auto& param : master->myParams) {
@@ -415,8 +430,7 @@ namespace Shard3D {
 		SHARD3D_STAT_RECORD_END({"Post processing", "Descriptor set binding " + this->master->materialTag});
 
 		SHARD3D_STAT_RECORD();
-		// vkCmdDispatch(commandBuffer, GraphicsSettings::get().WindowWidth / 16, GraphicsSettings::get().WindowHeight / 16, 1);
-		vkCmdDispatch(commandBuffer, 1920 / 16, 1080 / 16 + 1, 1);
+		vkCmdDispatch(commandBuffer, GraphicsSettings::getRuntimeInfo().PostProcessingInvocationIDCounts.x, GraphicsSettings::getRuntimeInfo().PostProcessingInvocationIDCounts.y, 1);
 		SHARD3D_STAT_RECORD_END({ "Post processing", "Dispatch " + this->master->materialTag });
 
 	}

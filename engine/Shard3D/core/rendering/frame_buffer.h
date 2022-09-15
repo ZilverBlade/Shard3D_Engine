@@ -26,10 +26,8 @@ namespace Shard3D {
 		FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
 		~FrameBufferAttachment();
 
-		FrameBufferAttachment(const FrameBufferAttachment&) = delete;
-		FrameBufferAttachment& operator=(const FrameBufferAttachment&) = delete;
-		FrameBufferAttachment(FrameBufferAttachment&&) = delete;
-		FrameBufferAttachment& operator=(FrameBufferAttachment&&) = delete;
+		DELETE_COPY(FrameBufferAttachment);
+		DELETE_MOVE(FrameBufferAttachment);
 
 		inline VkImage getImage() { return image; }
 		inline VkImageView getImageView() { return imageView; }
@@ -41,7 +39,11 @@ namespace Shard3D {
 		inline FrameBufferAttachmentType getType() { return _attachmentType; }
 		inline VkDescriptorImageInfo getDescriptor() { return descriptor; }
 		
+		void resize(glm::ivec3 newDimensions);
 	private:
+		void destroy();
+		void create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
+
 		VkImage image{};
 		VkImageView imageView{};
 		VkSampler sampler{};
@@ -61,21 +63,24 @@ namespace Shard3D {
 		FrameBuffer(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& attachments);
 		~FrameBuffer();
 
-		FrameBuffer(const FrameBuffer&) = delete;
-		FrameBuffer& operator=(const FrameBuffer&) = delete;
-		FrameBuffer(FrameBuffer&&) = delete;
-		FrameBuffer& operator=(FrameBuffer&&) = delete;
+		
+		DELETE_COPY(FrameBuffer);
+		DELETE_MOVE(FrameBuffer);
 
 		inline glm::ivec3 getDimensions() { return {width, height, depth}; }
 		inline VkFramebuffer getFrameBuffer() { return frameBuffer; }
-		void resize(glm::ivec3 newDimensions);
+		void resize(glm::ivec3 newDimensions, VkRenderPass renderpass);
 	private:
+		void create(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& _attachments);
+		void destroy();
+		
 		uint32_t width{};
 		uint32_t height{};
 		uint32_t depth{};
 
 		VkFramebuffer frameBuffer{};
 
+		std::vector<FrameBufferAttachment*> attachments;
 		EngineDevice& engineDevice;
 	};
 
@@ -84,10 +89,8 @@ namespace Shard3D {
 		FrameBufferAdvanced(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& attachments);
 		~FrameBufferAdvanced();
 
-		FrameBufferAdvanced(const FrameBufferAdvanced&) = delete;
-		FrameBufferAdvanced& operator=(const FrameBufferAdvanced&) = delete;
-		FrameBufferAdvanced(FrameBufferAdvanced&&) = delete;
-		FrameBufferAdvanced& operator=(FrameBufferAdvanced&&) = delete;
+		DELETE_COPY(FrameBufferAdvanced);
+		DELETE_MOVE(FrameBufferAdvanced);
 
 		inline glm::ivec3 getDimensions() { return { width, height, depth }; }
 		inline VkFramebuffer getFrameBuffer() { return frameBuffer; }

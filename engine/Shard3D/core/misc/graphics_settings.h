@@ -25,6 +25,8 @@ namespace Shard3D {
 		glm::vec4 ambientLightColor = { 1.0f, 1.0f, 1.0f, 0.01f };;
 		bool is10BitColor = false;
 		glm::vec4 localScreen{1280,720, 0, 0}; // posX, posY, width, height, 
+
+		glm::uvec3 PostProcessingInvocationIDCounts{1920 / 16, 1080 / 16, 1};
 	};
 
 	struct NonModifyableStaticInfo {
