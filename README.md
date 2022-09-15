@@ -13,11 +13,7 @@ Read more on the website: https://www.shard3d.com
 Requires version **1.3.211.0** of Vulkan SDK: https://vulkan.lunarg.com/sdk/home#windows
 Make sure to install GLM and SDL2, and that the vulkan environment variable states VULKAN_SDK.
 
-**Make sure to compile with MSVC (VS2019) as other build systems are not supported at the moment** 
-
-**Extra details about building:** 
-Since this project now uses precompiled headers, and has multi-processor compiling enabled, 
-make sure for the first build to switch 'Use (/Yu)' to 'Create (/Yc)', and then switch it back to 'Use (/Yu)' when it's done, to be able to use multi-processor compilation.
+**Use premake_build.bat to generate your project files** 
 
 ### Contributors
 
