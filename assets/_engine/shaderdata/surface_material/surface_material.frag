@@ -38,10 +38,6 @@ layout(set = 2, binding = 7) uniform sampler2D tex_opacity;
 #ifdef S3DSDEF_SHADER_PERMUTATION_SURFACE_CLEARCOAT
 layout(set = 2, binding = 8) uniform sampler2D tex_clearcoat;
 #endif
-layout(push_constant) uniform Push {
-	mat4 modelMatrix; 
-	mat4 normalMatrix;
-} push;
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {

@@ -50,6 +50,9 @@
     <Compile Include="HUD\HUD.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="InternalCalls.cs" />
+    <Compile Include="Math\Comparison.cs" />
+    <Compile Include="Math\Lerp.cs" />
+    <Compile Include="Animation\Tween.cs" />
     <Compile Include="SceneMgr.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Math\Vector.cs" />

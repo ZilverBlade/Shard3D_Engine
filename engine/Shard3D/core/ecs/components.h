@@ -248,6 +248,10 @@ namespace Shard3D {
 			ScriptComponent() = default;
 			ScriptComponent(const ScriptComponent&) = default;
 		};
+
+
+
+
 		struct ParticleComponent {
 			ParticleProperties particleTemplate;
 			uint16_t maxParticles;
@@ -283,7 +287,10 @@ namespace Shard3D {
 		struct DecalComponent {
 
 		};
-		struct ReflectionCubeComponent {
+		struct ReflectionCubeStaticComponent {
+
+		};
+		struct ReflectionCubeDynamicComponent {
 
 		};
 	}

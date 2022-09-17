@@ -1,0 +1,14 @@
+Shard3D: 1.2.7.r4-alpha
+Level: \My Level.s3dlevel
+LastSavedEditorCameraPos: [-18.0073643, -7.92002916, 1.50880349]
+Actors:
+  - Actor: 15057446755060096712
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/leveldata/Some kind of material.s3dasset]

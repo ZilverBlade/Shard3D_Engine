@@ -22,7 +22,7 @@ namespace Shard3D {
 	}
 	ForwardRenderSystem::~ForwardRenderSystem() {}
 
-	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {;
+	void ForwardRenderSystem::renderForward(FrameInfo& frameInfo) {
 		auto view = frameInfo.activeLevel->registry.view<Components::Mesh3DComponent, Components::TransformComponent>();
 		for (auto obj : view) { ECS::Actor actor = { obj, frameInfo.activeLevel.get() };
 			auto& transform = actor.getTransform();
@@ -40,12 +40,48 @@ namespace Shard3D {
 				vkCmdPushConstants(
 					frameInfo.commandBuffer,
 					material->getPipelineLayout(),
-					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+					VK_SHADER_STAGE_VERTEX_BIT,
 					0,
 					sizeof(MeshPushConstantData),
 					&push
 				);
 				model->draw(frameInfo.commandBuffer, i);
+			}
+		}
+	}
+
+	void ForwardRenderSystem::renderForwardNew(FrameInfo& frameInfo) {
+		VkCommandBuffer& commandBuffer = frameInfo.commandBuffer;
+		VkDescriptorSet& globalDescriptorSet = frameInfo.globalDescriptorSet;
+		renderClass(commandBuffer, globalDescriptorSet, SurfaceMaterialClassOptions_FrontfaceCulling | SurfaceMaterialClassOptions_Shaded | SurfaceMaterialClassOptions_Opaque);
+		renderClass(commandBuffer, globalDescriptorSet, SurfaceMaterialClassOptions_FrontfaceCulling | SurfaceMaterialClassOptions_Shaded | SurfaceMaterialClassOptions_Masked);
+		renderClass(commandBuffer, globalDescriptorSet, SurfaceMaterialClassOptions_NoCulling | SurfaceMaterialClassOptions_Shaded | SurfaceMaterialClassOptions_Opaque);
+		renderClass(commandBuffer, globalDescriptorSet, SurfaceMaterialClassOptions_NoCulling | SurfaceMaterialClassOptions_Shaded | SurfaceMaterialClassOptions_Masked);
+		
+		// transparency
+		renderClass(commandBuffer, globalDescriptorSet, SurfaceMaterialClassOptions_FrontfaceCulling | SurfaceMaterialClassOptions_Shaded | SurfaceMaterialClassOptions_Translucent);
+		renderClass(commandBuffer, globalDescriptorSet, SurfaceMaterialClassOptions_NoCulling | SurfaceMaterialClassOptions_Shaded | SurfaceMaterialClassOptions_Translucent);
+	}
+
+	void ForwardRenderSystem::renderClass(VkCommandBuffer commandBuffer, VkDescriptorSet globalDescriptorSet, uint32_t flags) {
+		MaterialSystem::bindMaterialClass(flags, commandBuffer);
+		for (auto& [asset, object] : MaterialSystem::getMaterialRenderingList()[flags]) {
+			rPtr<Model3D>& model = ResourceHandler::retrieveMesh(object.mesh->asset);
+			model->bind(commandBuffer);
+			MeshPushConstantData push{};
+			push.modelMatrix = object.transform->transformMatrix;
+			push.normalMatrix = object.transform->normalMatrix;
+			vkCmdPushConstants(
+				commandBuffer,
+				MaterialSystem::getMaterialClass(flags)->getPipelineLayout(),
+				VK_SHADER_STAGE_VERTEX_BIT,
+				0,
+				sizeof(MeshPushConstantData),
+				&push
+			);
+			for (uint32_t index : object.material_indices) {
+				ResourceHandler::retrieveSurfaceMaterial(object.mesh->materials[index])->bind(commandBuffer, globalDescriptorSet);
+				model->draw(commandBuffer, index);
 			}
 		}
 	}

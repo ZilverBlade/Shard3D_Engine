@@ -1,21 +1,26 @@
 ﻿using Shard3D.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Shard3D.Scripts
 {
 	public class CarDriver : Actor
 	{
+		public string onFile = "assets/audiodata/race_engine_3_on.wav";
+		public string offFile = "assets/audiodata/race_engine_3_off.wav";
+
+		public float max_steering_velocity_rad_per_sec = 0.8f;
+
+		private Animation.TweenFloat steeringTween;
+
 		private const float basePitch = 0.1f;
 		private Components.TransformComponent transform;
-		private Components.AudioComponent audio;
+
+		private Components.AudioComponent audioOn;
+		private Components.AudioComponent audioOff;
+		
 		private float exponent;
 		private Vector3 moveVector;
 
-		private ulong exhaustActorID = 2106594163601404339;
+		private ulong exhaustOnActorID = 11921769603700759874;
+		private ulong exhaustOffActorID = 12116567100235884741;
 
 		private ulong rearwheelhubID = 8660709294248625364;
 		private ulong frontleftwheelID = 13339742369598458913;
@@ -27,39 +32,52 @@ namespace Shard3D.Scripts
 		protected void BeginEvent()
 		{
 			transform = this.GetComponent<Components.TransformComponent>();
-			audio = ECS.GetActor(exhaustActorID).GetComponent<Components.AudioComponent>();
-			audio.Play();
+			audioOn = ECS.GetActor(exhaustOnActorID).GetComponent<Components.AudioComponent>();
+			audioOn.Play();
+			audioOff = ECS.GetActor(exhaustOffActorID).GetComponent<Components.AudioComponent>();
+			audioOff.Play();
 
 			frontleftwheelIDtransform = ECS.GetActor(frontleftwheelID).GetComponent<Components.TransformComponent>();
 			frontrightwheelIDtransform = ECS.GetActor(frontrightwheelID).GetComponent<Components.TransformComponent>();
 			rearwheelhubIDtransform = ECS.GetActor(rearwheelhubID).GetComponent<Components.TransformComponent>();
+
+			steeringTween = new Animation.TweenEaseFloat(0.7f, -0.5f, 0.5f);
+			steeringTween.Jump(0.35f);
 		}
 
 		protected void EndEvent()
 		{
-			audio.Stop();
+			audioOn.Stop();
+			audioOff.Stop();
 		}
 
 		protected void TickEvent(float dt)
 		{
 			var rotation = transform.Rotation;
 			var translation = transform.Translation;
-			var audioProperties = audio.Properties;
+			var audioOnProperties = audioOn.Properties;
+			var audioOffProperties = audioOff.Properties;
 
 			var rotationWFR = frontrightwheelIDtransform.Rotation;
-			
+
 			float yaw = rotation.z;
-			Vector3 forwardDir = new Vector3((float)Math.Sin(yaw), (float)Math.Cos(yaw), 0.0f);
+			Vector3 forwardDir = new Vector3((float)System.Math.Sin(yaw), (float)System.Math.Cos(yaw), 0.0f);
 			
 			if (Input.IsKeyDown(KeyInput.KEY_D))
-			{
-				rotationWFR.z += 0.4f * dt;
-				rotationWFR.z = Math.Min(rotationWFR.z, 0.5f);
+			{			
+				steeringTween.Update(dt);
+			}
+			else if(steeringTween.GetAlpha() >= 0.5)
+            {
+				steeringTween.UpdateReverse(dt);
 			}
 			if (Input.IsKeyDown(KeyInput.KEY_A))
 			{
-				rotationWFR.z -= 0.4f * dt;
-				rotationWFR.z = Math.Max(rotationWFR.z, -0.5f);
+				steeringTween.UpdateReverse(dt);
+			}
+			else if (steeringTween.GetAlpha() < 0.5)
+			{
+				steeringTween.Update(dt);
 			}
 			if (Input.IsKeyDown(KeyInput.KEY_S))
 				moveVector -= dt;
@@ -67,34 +85,41 @@ namespace Shard3D.Scripts
 			{
 				exponent += dt * 0.05f; 
 				moveVector += exponent * dt * 0.05f;
-				rotation.z += rotationWFR.z * dt;
-				audioProperties.volume = 0.5f;
+				audioOnProperties.volume = 0.7f;
+				audioOffProperties.volume = 0.0f;
 			}
 			else
 			{
-				moveVector.x -= dt * 0.0098f;
-				moveVector.y -= dt * 0.0098f;
+				moveVector.x -= dt * 0.0178f;
+				moveVector.y -= dt * 0.0178f;
 				exponent -= 0.05f * dt;
 				if (exponent < 0) exponent = 0.0001f;
 				if (moveVector.x < 0) moveVector.x = 0.0f;
 				if (moveVector.y < 0) moveVector.y = 0.0f;
-				audioProperties.volume = 0.2f;
+				audioOnProperties.volume = 0.0f;
+				audioOffProperties.volume = 0.5f;
 			}
-
+			float c = 90 * moveVector.y;
+			rotation.z += rotationWFR.z * dt * Math.Clamp(c * c, 0.0f, max_steering_velocity_rad_per_sec);
 			rotationWFR.x += moveVector.y;
 
+			rotationWFR.z = steeringTween.GetValue();
 			frontrightwheelIDtransform.Rotation = rotationWFR;
 			frontleftwheelIDtransform.Rotation = rotationWFR;
 			rearwheelhubIDtransform.Rotation = new Vector3(rotationWFR.x, 0.0f, 0.0f);
 
 			translation += moveVector * forwardDir;
 
-			audioProperties.relativePos = translation;
-			audioProperties.pitch = basePitch + moveVector.y * 3.0f;
+			audioOnProperties.relativePos = translation;
+			audioOnProperties.pitch = basePitch + moveVector.y * 3.0f;
 
+			audioOffProperties.relativePos = translation;
+			audioOffProperties.pitch = basePitch + moveVector.y * 3.0f;
 
-			audio.Properties = audioProperties;
-			audio.Update();
+			audioOn.Properties = audioOnProperties;
+			audioOff.Properties = audioOffProperties;
+			audioOn.Update();
+			audioOff.Update();
 			transform.Rotation = rotation;
 			transform.Translation = translation;
 		}

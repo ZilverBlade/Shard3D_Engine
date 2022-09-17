@@ -18,6 +18,10 @@ namespace Shard3D {
 
 		void render();
 	private:
+		std::string currentSelection{};
+		std::string renamingAsset{};
+		std::string renamingAssetOriginal{};
+
 		VkDescriptorSet refreshIcon;
 		VkDescriptorSet backIcon;
 		VkDescriptorSet folderIcon;

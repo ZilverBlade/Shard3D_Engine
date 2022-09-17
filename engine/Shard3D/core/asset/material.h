@@ -4,6 +4,7 @@
 #include "../../vulkan_abstr.h"
 #include "../asset/assetid.h"
 #include "../vulkan_api/pipeline_compute.h"
+#include "../../systems/buffers/material_system.h"
 /*
 * Shard 3D Material system
 * 
@@ -33,18 +34,6 @@ namespace YAML {
 }
 
 namespace Shard3D {
-	struct _MaterialGraphicsPipelineConfigInfo {
-		VkPipelineLayout shaderPipelineLayout{};
-		uPtr<GraphicsPipeline> shaderPipeline{};
-	};
-	struct _MaterialComputePipelineConfigInfo {
-		VkPipelineLayout shaderPipelineLayout{};
-		uPtr<ComputePipeline> shaderPipeline{};
-	};
-	struct _DrawData {
-		VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
-		VkCullModeFlags culling = VK_CULL_MODE_NONE;
-	};
 
 	enum class PPO_Types {
 		Int32 = 2,

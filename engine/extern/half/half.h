@@ -365,6 +365,8 @@ public:
     }
 };
 
-FLOAT16 operator "" h(long double);
+static FLOAT16 operator "" h(long double val) {
+    return FLOAT16::ToFloat16(static_cast<float>(val));
+}
 
 #endif // __HALF_H__

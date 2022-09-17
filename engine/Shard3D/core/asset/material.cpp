@@ -138,7 +138,7 @@ namespace Shard3D {
 
 			materialDescriptorInfo.textureLayout = textureLayout_builder.build();
 		}
-
+			
 		{
 			VkDescriptorImageInfo diffuseTex_imageInfo = ResourceHandler::retrieveTexture(this->diffuseTex)->getImageInfo();
 			VkDescriptorImageInfo specularTex_imageInfo = ResourceHandler::retrieveTexture(this->specularTex)->getImageInfo();

@@ -110,8 +110,6 @@ namespace Shard3D {
 		float panelWidth = ImGui::GetContentRegionAvail().x;
 		int columnCount = std::max((int)(panelWidth / (96.f + 16.f))// <--- thumbnail size (96px) + padding (16px)
 																, 1);
-		std::string currentSelection = "";
-
 		ImGui::Columns(columnCount, 0, false);
 		for (int i = 0; i < directoryEntries.entries.size(); i++) {
 			auto& dirEnt = directoryEntries.entries[i];
@@ -132,7 +130,8 @@ namespace Shard3D {
 						refresh_it = true;
 					}
 				}
-				currentSelection = fileStr;
+				if (!fileStr.empty())
+					currentSelection = fileStr;
 			}
 			if (!dirEnt.is_directory())
 				if (ImGui::BeginDragDropSource()) {
@@ -163,39 +162,60 @@ namespace Shard3D {
 				}
 
 			ImGui::PopStyleVar();
-			ImGui::PopStyleColor();		
-			ImGui::TextWrapped(dirEnt.is_directory()? fileStr.c_str() : fileStr.substr(0, fileStr.find_last_of(".")).c_str());
+			ImGui::PopStyleColor();	
+			if (!currentSelection.empty() && renamingAssetOriginal == fileStr.substr(0, fileStr.find_last_of(".")).c_str() && renamingAssetOriginal == currentSelection.substr(0, currentSelection.find_last_of("."))) {
+				auto& rfile = renamingAsset;
+				char fileBuffer[256];
+				memset(fileBuffer, 0, 256);
+				strncpy(fileBuffer, rfile.c_str(), 256);
 
+				if (ImGui::InputText("##assetrenamingpayload", fileBuffer, 256)) {
+					rfile = std::string(fileBuffer);
+				}
+				if (ImGui::IsKeyPressed(ImGuiKey_Enter)) {
+					if (dirEnt.is_directory()) {
+						std::filesystem::rename(currentDir.string() + "/" + currentSelection, currentDir.string() + "/" + renamingAsset);
+						currentSelection = renamingAsset;
+					} else {
+						std::string literal_extension = currentSelection.substr(currentSelection.find_last_of("."), currentSelection.length() - currentSelection.find_last_of(".")).c_str();
+						std::filesystem::rename(currentDir.string() + "/" + currentSelection, currentDir.string() + "/" + renamingAsset + literal_extension);
+						currentSelection = renamingAsset + literal_extension;
+					}
+					refresh_it = true;
+					renamingAssetOriginal = {};
+					renamingAsset = {};
+					currentSelection = {};
+				}
+			} else {
+				ImGui::TextWrapped(dirEnt.is_directory() ? fileStr.c_str() : fileStr.substr(0, fileStr.find_last_of(".")).c_str());
+			}
 			ImGui::NextColumn();
 			ImGui::PopID();
 
 			if (refresh_it) { refreshIterator(currentDir); break; }
 		}
 		ImGui::Columns(1);
-
-		if (currentSelection != "")
-			if (ImGui::BeginPopupContextWindow("AssetMenu", ImGuiMouseButton_Right, true)) {
-				if (ImGui::MenuItem("Rename")) {
-					SHARD3D_NOIMPL;
-
-					currentSelection = "";
-					ImGui::CloseCurrentPopup();
-				}
-				if (ImGui::MenuItem("Replace")) {
-					SHARD3D_NOIMPL;
-
-					currentSelection = "";
-					ImGui::CloseCurrentPopup();
-				}
-				if (ImGui::MenuItem("Delete")) {
-					AssetManager::purgeAsset(currentSelection);
-					refresh_it = true;
-
-					currentSelection = "";
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
+		if (!currentSelection.empty()) if (ImGui::BeginPopupContextWindow("AssetMenu", ImGuiMouseButton_Right, true)) {
+			if (ImGui::MenuItem("Rename")) {
+				renamingAssetOriginal = renamingAsset = currentSelection.substr(0, currentSelection.find_last_of("."));
+				ImGui::CloseCurrentPopup();
 			}
+			if (ImGui::MenuItem("Replace")) {
+				SHARD3D_NOIMPL;
+
+				currentSelection = "";
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Delete")) {
+				if (MessageDialogs::show("This asset may be used in other contexts, removing this asset may cause issues.\nAre you sure you want to delete this?", "Asset Explorer", MessageDialogs::DialogOptions::OPTYESNO | MessageDialogs::DialogOptions::OPTICONQUESTION) == MessageDialogs::DialogResult::RESYES) {
+					AssetManager::purgeAsset(currentDir.string() + "/" + currentSelection);
+					currentSelection = {};
+					refreshIterator(currentDir);
+				}
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
 		if (ImGui::BeginPopupContextWindow("AssetExplorerContext", ImGuiMouseButton_Right, false)) {
 			if (ImGui::MenuItem("Import Texture")) {
 				std::string file = FileDialogs::openFile();

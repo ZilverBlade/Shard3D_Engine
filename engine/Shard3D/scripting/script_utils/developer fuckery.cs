@@ -14,7 +14,8 @@ namespace Shard3D
             Vector4 lmao2 = (Vector4)vecthing;
             Vector3 xd = new Vector2(4); // implicit casts go brrr
 
-            
+            Animation.TweenFloat tween;
+            tween = new Animation.TweenLinearFloat(23, 4, 16);
         }
     }
 }

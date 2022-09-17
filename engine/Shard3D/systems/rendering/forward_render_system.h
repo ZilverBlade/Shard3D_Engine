@@ -15,7 +15,10 @@ namespace Shard3D {
 		ForwardRenderSystem& operator=(const ForwardRenderSystem&) = delete;
 
 		void renderForward(FrameInfo &frameInfo);
+		void renderForwardNew(FrameInfo& frameInfo);
 	private:
+		void renderClass(VkCommandBuffer commandBuffer, VkDescriptorSet globalDescriptorSet, uint32_t flags);
+
 		EngineDevice& engineDevice;
 	};
 

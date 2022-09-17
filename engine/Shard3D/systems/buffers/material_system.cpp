@@ -6,6 +6,22 @@
 #include "../computational/shader_system.h"
 
 namespace Shard3D {
+	void MaterialSystem::setAllAvailableMaterialShaderPermutations(std::vector<SurfaceMaterialClassOptionsFlags>&& shaders) {
+		materialRendering.reserve(shaders.size());
+		for (uint32_t permutation : shaders) {
+			materialRendering[permutation] = hashMap<AssetID, SurfaceMaterialRenderInfo>();
+			materialClasses[permutation] = new SurfaceMaterialClass(permutation);
+		}
+	}
+	void MaterialSystem::destroy() {
+		for (auto& [flags, mas_materials] : materialRendering) {
+			mas_materials.clear();
+		}
+		materialRendering.clear();
+		for (auto& [_, item] : materialClasses) {
+			delete item;
+		}
+	}
 	void MaterialSystem::recompileSurface() {
 		compiledShaders.clear();
 		for (auto& [key, material] : ResourceHandler::getSurfaceMaterialAssets()) {
@@ -29,7 +45,7 @@ namespace Shard3D {
 		};
 
 		VkPushConstantRange pushConstantRange{};
-		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = 128; // sizeof(MeshPushConstantData)
 
@@ -145,5 +161,52 @@ namespace Shard3D {
 	}
 	void MaterialSystem::destroyPipelineLayout(VkPipelineLayout pipelineLayout) {
 		vkDestroyPipelineLayout(mDevice->device(), pipelineLayout, nullptr);	
+	}
+	void MaterialSystem::bindMaterialClass(SurfaceMaterialClassOptionsFlags flags, VkCommandBuffer commandBuffer) {
+		materialClasses[flags]->bind(commandBuffer);
+	}
+	SurfaceMaterialClass* MaterialSystem::getMaterialClass(SurfaceMaterialClassOptionsFlags flags) {
+		return materialClasses[flags];
+	}
+	void MaterialSystem::addToMaterialRenderingList(const AssetID& asset, SurfaceMaterialClassOptionsFlags flags, const SurfaceMaterialRenderInfo& renderInfo) {
+		materialRendering[flags][asset] = renderInfo;
+	}
+	void MaterialSystem::rmvFromMaterialRenderingList(const AssetID& asset, SurfaceMaterialClassOptionsFlags flags) {
+		materialRendering[flags].erase(asset);
+	}
+	void MaterialSystem::switchMaterialRenderingList(const AssetID& asset, SurfaceMaterialClassOptionsFlags old_flags, SurfaceMaterialClassOptionsFlags new_flags, const SurfaceMaterialRenderInfo& new_renderInfo) {
+		auto renderInfo = materialRendering[old_flags].extract(asset);
+		materialRendering[new_flags].insert(std::move(renderInfo));
+	}
+	SurfaceMaterialClass::SurfaceMaterialClass(SurfaceMaterialClassOptionsFlags flags) : options_flags(flags) {
+		materialPipelineConfig = make_uPtr<_MaterialGraphicsPipelineConfigInfo>();
+	//	MaterialSystem::createSurfacePipelineLayout(
+	//		&materialPipelineConfig->shaderPipelineLayout,
+	//		materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
+	//		materialDescriptorInfo.textureLayout->getDescriptorSetLayout()
+	//	);
+		GraphicsPipelineConfigInfo pipelineConfigInfo{};
+		GraphicsPipeline::pipelineConfig(pipelineConfigInfo)
+			.defaultGraphicsPipelineConfigInfo()
+			.setCullMode(drawData.culling)
+			.enableVertexDescriptions();
+
+
+		if (flags & SurfaceMaterialClassOptions_Translucent)
+			GraphicsPipeline::pipelineConfig(pipelineConfigInfo).enableAlphaBlending(VK_BLEND_OP_ADD);
+
+		pipelineConfigInfo.colorBlendInfo.attachmentCount = 4;
+		VkPipelineColorBlendAttachmentState attachments[4]{ pipelineConfigInfo.colorBlendAttachment, pipelineConfigInfo.colorBlendAttachment,pipelineConfigInfo.colorBlendAttachment ,pipelineConfigInfo.colorBlendAttachment };
+		pipelineConfigInfo.colorBlendInfo.pAttachments = attachments;
+
+
+	//	MaterialSystem::createSurfacePipeline(
+	//		&materialPipelineConfig->shaderPipeline,
+	//		materialPipelineConfig->shaderPipelineLayout,
+	//		pipelineConfigInfo,
+	//		this);
+	}
+	void SurfaceMaterialClass::bind(VkCommandBuffer commandBuffer) {
+		materialPipelineConfig->shaderPipeline->bind(commandBuffer);
 	}
 }
