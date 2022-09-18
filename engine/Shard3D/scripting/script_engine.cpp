@@ -107,8 +107,8 @@ namespace Shard3D {
 			const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
 			int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 
-			if (numTypes > 1) if (lang == 0)	 SHARD3D_LOG("Loaded C# Assembly modules: ");
-			else SHARD3D_LOG("Loaded VB Assembly modules: ");
+			if (numTypes > 1) if (lang == 0)	 SHARD3D_INFO("Loaded C# Assembly modules: ");
+			else SHARD3D_INFO("Loaded VB Assembly modules: ");
 			for (int32_t i = 0; i < numTypes; i++) {
 				if (i == 0) continue;
 				uint32_t cols[MONO_TYPEDEF_SIZE];
@@ -151,7 +151,6 @@ namespace Shard3D {
 			if (isActor) {
 				data->actorClasses[fullname] = ptr;
 			}
-			SHARD3D_LOG("is {0} actor? {1} (lang {2})", fullname, isActor, data->lang == ScriptLanguage_CSharp? "C#" : "VB");
 		}
 
 		MonoClass* hudClass = mono_class_from_name(globalData->coreAssemblyImage, "Shard3D.Core", "HUD");
@@ -249,7 +248,7 @@ namespace Shard3D {
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 
-		SHARD3D_LOG("Loaded Core Assembly modules: ");
+		SHARD3D_INFO("Loaded Core Assembly modules: ");
 		for (int32_t i = 0; i < numTypes; i++) {
 			if (i == 0) continue;
 			uint32_t cols[MONO_TYPEDEF_SIZE];

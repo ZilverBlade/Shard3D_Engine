@@ -71,6 +71,20 @@ namespace Shard3D {
 		return ifile.good();
 	}
 
+	std::string strUtils::removeIllegalPathChars(const std::string& string) {
+		std::string result_text;
+		for (int i = 0; i < string.length(); ++i)
+		{
+			if ((string[i] >= 'a' && string[i] <= 'z') ||
+				(string[i] >= 'A' && string[i] <= 'Z') ||
+				(string[i] == ' ') || (string[i] == '-') ||
+				(string[i] == '_') ||
+				(string[i] >= '0' && string[i] <= '9'))
+				result_text.push_back(string[i]);
+		}
+		return result_text;
+	}
+
 	void WAITUtils::preciseStandby(float seconds) {
 		// why is this so broken
 		//std::this_thread::sleep_for(std::chrono::duration<float, std::chrono::seconds::period>(seconds));

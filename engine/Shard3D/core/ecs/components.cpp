@@ -3,6 +3,7 @@
 
 #include "../asset/assetmgr.h"
 #include <glm/gtx/matrix_decompose.hpp>
+#include "../asset/matmgr.h"
 
 namespace Shard3D {
 	namespace Components {
@@ -192,9 +193,10 @@ namespace Shard3D {
 		}
 		void Mesh3DComponent::validate() {
 			auto& model = ResourceHandler::retrieveMesh(asset);
-			if (model->materialSlots.size() == materials.size()) return;
-			SHARD3D_WARN("Mesh3DComponent validation failed! Resetting materials...");
-			materials = model->materials;
+			if (model->materialSlots.size() != materials.size()) {
+				SHARD3D_WARN("Mesh3DComponent validation failed! Resetting materials...");
+				materials = model->materials;
+			}
 		}
 		Mesh3DComponent::Mesh3DComponent(const AssetID& mdl) : asset(mdl.getFile()) {
 			auto& model = ResourceHandler::retrieveMesh(mdl);
@@ -202,5 +204,5 @@ namespace Shard3D {
 		}
 		BillboardComponent::BillboardComponent(const AssetID& tex) : asset(tex.getFile()) {}
 
-}
+	}
 }

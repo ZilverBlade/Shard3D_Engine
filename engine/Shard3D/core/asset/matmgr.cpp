@@ -23,8 +23,8 @@ namespace Shard3D {
 		
 		out << YAML::Key << "Draw";
 		out << YAML::BeginMap;
-		out << YAML::Key << "VkCullModeFlags" << YAML::Value << material->drawData.culling;
-		out << YAML::Key << "VkPolygonMode" << YAML::Value << material->drawData.polygonMode;
+		out << YAML::Key << "VkCullModeFlags" << YAML::Value << material->getCullMode();
+		out << YAML::Key << "VkPolygonMode" << YAML::Value << material->getPolygonMode();
 		out << YAML::EndMap;
 		
 		out << YAML::Key << "Data";
@@ -101,10 +101,10 @@ namespace Shard3D {
 				drawData.polygonMode = static_cast<VkPolygonMode>(container["Draw"]["VkPolygonMode"].as<uint32_t>());
 
 				if (container["Physics"]["Class"].as<std::string>() == typeid(SurfaceMaterial_Shaded).name()) {
-					rPtr<SurfaceMaterial_Shaded> material = make_rPtr<SurfaceMaterial_Shaded>();
+ 					rPtr<SurfaceMaterial_Shaded> material = make_rPtr<SurfaceMaterial_Shaded>();
 					material->setBlendMode(container["Physics"]["BlendMode"].as<uint32_t>());
 					material->materialTag = container["Material"].as<std::string>();
-					material->drawData = drawData;
+					material->setCullMode(drawData.culling);
 					material->deserialize(&container);
 					return material;
 				}

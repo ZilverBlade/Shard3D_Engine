@@ -9,10 +9,11 @@
 #include "../ui/hud.h"
 #include "../../workarounds.h"
 #include "../../systems/computational/physics_system.h"
+#include "../../systems/handlers/render_handler.h"
 
 namespace Shard3D {
 	namespace ECS {
-		Level::Level(const std::string &lvlName, bool makeSystem) : name(lvlName) {
+		Level::Level(const std::string& lvlName, bool makeSystem) : name(lvlName) {
 			if (!makeSystem) return;
 			SHARD3D_INFO("Loading editor camera actor");
 			ECS::Actor editor_cameraActor = createActorWithUUID(0, "Editor Camera Actor (SYSTEM RESERVED)");
@@ -20,7 +21,7 @@ namespace Shard3D {
 			editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
 			editor_cameraActor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
 
-		    setPossessedCameraActor(editor_cameraActor);
+			setPossessedCameraActor(editor_cameraActor);
 			editor_cameraActor.getComponent<Components::TransformComponent>().setTranslation(glm::vec3(0.f, -1.f, 1.f));
 			SHARD3D_INFO("Loading dummy actor");
 			ECS::Actor dummy = createActorWithUUID(1, "Dummy Actor (SYSTEM RESERVED)");
@@ -36,11 +37,11 @@ namespace Shard3D {
 			auto view = src.view<Component>();
 			for (auto e : view) {
 				UUID guid = src.get<Components::UUIDComponent>(e).getID();
-				
+
 				if (map.find(guid) == map.end()) SHARD3D_FATAL("enttMap.find(guid) == enttMap.end()");
 
 				entt::entity dstEnttID = map.at(guid);
-				
+
 				auto& component = src.get<Component>(e);
 
 				dst.emplace_or_replace<Component>(dstEnttID, component);
@@ -84,7 +85,11 @@ namespace Shard3D {
 			copyComponent<Components::RelationshipComponent>(dstLvlRegistry, srcLvlRegistry, enttMap);
 
 			shallowCopy(newLvl, other);
-			
+
+			for (auto& actor : enttMap) {
+				RenderHandler::refreshActor(Actor(actor.second, newLvl.get()));
+			}
+
 			return newLvl;
 		}
 
@@ -108,8 +113,12 @@ namespace Shard3D {
 			if (actorKillQueue.size() != 0) {
 				for (auto& actor : actorKillQueue) {
 					SHARD3D_LOG("Destroying actor '{0}'", actor.getTag());
-					actorMap.erase(actor.getUUID());
-					uint16_t killed = registry.destroy(actor);
+					UUID uuid = actor.getUUID();
+					actorMap.erase(uuid);
+					for (SurfaceMaterialClassOptionsFlags class_ : RenderHandler::getRenderUsingClasses(uuid)) {
+						RenderHandler::rmvFromSurfaceMaterialRenderingList(uuid, class_);
+					}
+					registry.destroy(actor.actorHandle);
 				}
 				actorKillQueue.clear();
 				return;
@@ -200,7 +209,7 @@ namespace Shard3D {
 				for (HUD* hud : TEMPORARY::hudList) for (auto& element : hud->elements)
 						ScriptEngine::hudScript().begin(element.second.get());
 			}
-			physicsSystemPtr->begin(this);
+		//	physicsSystemPtr->begin(this);
 			SHARD3D_INFO("Beginning simulation");
 		}
 
@@ -253,7 +262,7 @@ namespace Shard3D {
 				for (HUD* hud : TEMPORARY::hudList) for (auto& element : hud->elements)
 					ScriptEngine::hudScript().end(element.second.get());
 			}
-			physicsSystemPtr->end(this);
+			//physicsSystemPtr->end(this);
 			ScriptEngine::runtimeStop();
 			setPossessedCameraActor(0);
 			SHARD3D_LOG("Reloading level");

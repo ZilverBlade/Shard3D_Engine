@@ -52,6 +52,8 @@ namespace Shard3D {
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Depth
 			);
+
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 			mainPositionFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
@@ -81,7 +83,7 @@ namespace Shard3D {
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Color
 			);
-
+#endif
 			AttachmentInfo colorAttachmentInfo{};
 			colorAttachmentInfo.frameBufferAttachment = mainColorFramebufferAttachment;
 			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -93,6 +95,7 @@ namespace Shard3D {
 			depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
 
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 			AttachmentInfo positionAttachmentInfo{};
 			positionAttachmentInfo.frameBufferAttachment = mainPositionFramebufferAttachment;
 			positionAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -109,17 +112,24 @@ namespace Shard3D {
 			materialAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			materialAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
-			
+#endif
 			mainRenderpass = new RenderPass(
 				engineDevice, {
 				colorAttachmentInfo,
-				depthAttachmentInfo,
+				depthAttachmentInfo
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
+			,
 				positionAttachmentInfo,
 				normalAttachmentInfo,
 				materialAttachmentInfo
+#endif
 				});
 
-			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment });
+			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
+				, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment 
+#endif	
+				});
 		}
 		{ // Post processing
 			ppoColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
@@ -151,9 +161,13 @@ namespace Shard3D {
 		delete mainRenderpass;
 		delete mainColorFramebufferAttachment;
 		delete mainDepthFramebufferAttachment;
+
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
+		delete mainPositionFramebufferAttachment;
 		delete mainNormalFramebufferAttachment;
 		delete mainMaterialDataFramebufferAttachment;
-	
+#endif
+
 		delete ppoFrameBuffer;
 		delete ppoColorFramebufferAttachment;
 		delete ppoRenderpass;
@@ -285,7 +299,7 @@ namespace Shard3D {
 				editor_cameraActor.getComponent<Components::CameraComponent>().setProjectionType(editor_cameraActor.getComponent<Components::CameraComponent>().Orthographic);  //Ortho perspective (not needed 99.99% of the time)
 			}
 		}
-		loadStaticObjects();
+		//loadStaticObjects();
 
 		HUDLayer* layerList[4]{
 			&hudLayer0,
@@ -325,9 +339,9 @@ beginWhileLoop:
 			editor_cameraActor = level->getActorFromUUID(0);
 
 			if (level->simulationState == PlayState::Playing) {
-				SHARD3D_STAT_RECORD(); 
-				physicsSystem.simulate(level.get(), frameTime);
-				SHARD3D_STAT_RECORD_END({ "Level", "Physics" });
+			//	SHARD3D_STAT_RECORD(); 
+			//	physicsSystem.simulate(level.get(), frameTime);
+			//	SHARD3D_STAT_RECORD_END({ "Level", "Physics" });
 				SHARD3D_STAT_RECORD();
 				level->tick(frameTime);
 				SHARD3D_STAT_RECORD_END({ "Level", "Tick" });
@@ -375,7 +389,7 @@ beginWhileLoop:
 				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
 
 				SHARD3D_STAT_RECORD();
-				forwardRenderSystem.renderForward(frameInfo);
+				forwardRenderSystem.renderForwardOld(frameInfo);
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Lighting" });
 
 				SHARD3D_STAT_RECORD();
@@ -407,10 +421,10 @@ beginWhileLoop:
 
 				ppoRenderpass->endRenderPass(frameInfo);
 				SHARD3D_STAT_RECORD_END({ "Post Processing", "Debanding" });
-				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 
 				imguiLayer.render(frameInfo);
-
+				engineRenderer.beginSwapChainRenderPass(commandBuffer);
+				imguiLayer.draw(frameInfo);
 				SHARD3D_STAT_RECORD();
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
 				SHARD3D_STAT_RECORD_END({ "Swapchain", "End" });

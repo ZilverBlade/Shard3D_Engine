@@ -43,6 +43,9 @@
     <Filter Include="systems\computational">
       <UniqueIdentifier>{ECDB96FB-5848-52F6-213C-EA538D67745E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="systems\handlers">
+      <UniqueIdentifier>{DD07E374-C900-02C7-F232-E74BDE8AE1D2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="systems\rendering">
       <UniqueIdentifier>{EA0FB04E-5626-AEE4-9F9D-39060BF37E6C}</UniqueIdentifier>
     </Filter>
@@ -195,9 +198,6 @@
     <ClInclude Include="systems\buffers\light_system.h">
       <Filter>systems\buffers</Filter>
     </ClInclude>
-    <ClInclude Include="systems\buffers\material_system.h">
-      <Filter>systems\buffers</Filter>
-    </ClInclude>
     <ClInclude Include="systems\computational\particle_system.h">
       <Filter>systems\computational</Filter>
     </ClInclude>
@@ -206,6 +206,12 @@
     </ClInclude>
     <ClInclude Include="systems\computational\shader_system.h">
       <Filter>systems\computational</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\handlers\material_handler.h">
+      <Filter>systems\handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="systems\handlers\render_handler.h">
+      <Filter>systems\handlers</Filter>
     </ClInclude>
     <ClInclude Include="systems\rendering\billboard_system.h">
       <Filter>systems\rendering</Filter>
@@ -355,9 +361,6 @@
     <ClCompile Include="systems\buffers\light_system.cpp">
       <Filter>systems\buffers</Filter>
     </ClCompile>
-    <ClCompile Include="systems\buffers\material_system.cpp">
-      <Filter>systems\buffers</Filter>
-    </ClCompile>
     <ClCompile Include="systems\computational\particle_system.cpp">
       <Filter>systems\computational</Filter>
     </ClCompile>
@@ -366,6 +369,12 @@
     </ClCompile>
     <ClCompile Include="systems\computational\shader_system.cpp">
       <Filter>systems\computational</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\handlers\material_handler.cpp">
+      <Filter>systems\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\handlers\render_handler.cpp">
+      <Filter>systems\handlers</Filter>
     </ClCompile>
     <ClCompile Include="systems\rendering\billboard_system.cpp">
       <Filter>systems\rendering</Filter>

@@ -4,7 +4,7 @@
 #include "../../vulkan_abstr.h"
 #include "../asset/assetid.h"
 #include "../vulkan_api/pipeline_compute.h"
-#include "../../systems/buffers/material_system.h"
+#include "../../systems/handlers/material_handler.h"
 /*
 * Shard 3D Material system
 * 
@@ -95,11 +95,8 @@ namespace Shard3D {
 	struct _SurfaceMaterialShaderDescriptorInfo {
 		VkDescriptorSet factors{};
 		VkDescriptorSet textures{};
-
-		uPtr<EngineDescriptorSetLayout> factorLayout{};
-		uPtr<EngineDescriptorSetLayout> textureLayout{};
 	};
-
+	
 	struct _PPOMaterialShaderDescriptorInfo {
 		VkDescriptorSet params{};
 
@@ -112,13 +109,13 @@ namespace Shard3D {
 		uPtr<EngineDescriptorSetLayout> dataLayout{};
 	};
 
-	enum SurfaceMaterialBlendMode {
-		SurfaceMaterialBlendModeOpaque = 0,
-		SurfaceMaterialBlendModeMasked = BIT(0),
-		SurfaceMaterialBlendModeTranslucent = BIT(1)
+	enum _SurfaceMaterialBlendMode {
+		_SurfaceMaterialBlendModeOpaque = 0,
+		_SurfaceMaterialBlendModeMasked = BIT(0),
+		_SurfaceMaterialBlendModeTranslucent = BIT(1)
 	};
 
-#define SurfaceMaterialBlendMode_T uint32_t
+	typedef uint32_t SurfaceMaterialBlendMode_T;
 
 	struct _SurfaceMaterial_BlendModeMasked {
 		AssetID maskTex = AssetID("assets/_engine/tex/0xffffff.png" ENGINE_ASSET_SUFFIX);
@@ -142,12 +139,16 @@ namespace Shard3D {
 		_SurfaceMaterial_BlendModeMasked* maskedInfo{};
 		_SurfaceMaterial_BlendModeTranslucent* translucentInfo{};
 
-		uint32_t getBlendMode() { return blendMode; }
 		void setBlendMode(SurfaceMaterialBlendMode_T mode);
-
+		SurfaceMaterialBlendMode_T getBlendMode();
+		
+		void setCullMode(VkCullModeFlags cullmode);
+		VkCullModeFlagBits getCullMode();
+		void setPolygonMode(VkPolygonMode polygonmode);
+		VkPolygonMode getPolygonMode();
+	
+		SurfaceMaterialClassOptionsFlags getClass() { return classFlags; }
 		std::string materialTag = "Some kind of material";
-
-		_DrawData drawData{};
 
 		virtual void createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) = 0;
 		virtual void serialize(YAML::Emitter* out) = 0;
@@ -156,19 +157,21 @@ namespace Shard3D {
 
 		void bind(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet);
 		inline bool isBuilt() { return built; }
-		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig->shaderPipelineLayout; }
 	protected:
+		_DrawData drawData{};
 		bool built = false;
-		uPtr<_MaterialGraphicsPipelineConfigInfo> materialPipelineConfig{};
-		_SurfaceMaterialShaderDescriptorInfo materialDescriptorInfo{};
 		uPtr<EngineBuffer> factorsBuffer;
-		SurfaceMaterialBlendMode_T blendMode = SurfaceMaterialBlendModeOpaque;
+		_SurfaceMaterialShaderDescriptorInfo materialDescriptors;
+		SurfaceMaterialClassOptionsFlags classFlags = SurfaceMaterialClassOptions_Opaque | SurfaceMaterialClassOptions_FrontfaceCulling;
 		void free();
+	private:
 	};	
 
 	// SSMR (Specular/Shininess/Metallic Rendering)
 	class SurfaceMaterial_Shaded : public SurfaceMaterial {
 	public:
+		SurfaceMaterial_Shaded() { classFlags |= SurfaceMaterialClassOptions_Shaded; }
+
 		AssetID normalTex = AssetID("assets/_engine/tex/0x807ffe.png" ENGINE_ASSET_SUFFIX);
 
 		glm::vec3 emissiveColor{ 0.f };

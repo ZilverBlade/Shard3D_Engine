@@ -1,0 +1,159 @@
+Shard3D: 1.2.8.r7-alpha
+Level: \shitt.s3dlevel
+LastSavedEditorCameraPos: [6.77411461, -8.52429771, 3.8802979]
+Actors:
+  - Actor: 4089328527215886138
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [2.28294992, -0.539908111, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/3.s3dasset]
+  - Actor: 17937059835716850670
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 2.55075383]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/1 - Copy (2).s3dasset]
+  - Actor: 10147328385272069844
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, -3.79544234, 2.41623592]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/1 - Copy - Copy.s3dasset]
+  - Actor: 5729959409267264548
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [5.53852224, 0, 2.11067295]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/1 - Copy.s3dasset]
+  - Actor: 4937776330226119385
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [3.0805912, 0, 2.07835293]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/1.s3dasset]
+  - Actor: 17352746145591185299
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0.630235553, -3.47522879, -0.437352955]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/1.s3dasset]
+  - Actor: 6595711585566160549
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-0.914256811, -0.139427543, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/2.s3dasset]
+  - Actor: 12474413144498393538
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [6.52781466e-07, 3.8764019, -4.67567635]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/2 - Copy - Copy.s3dasset]
+  - Actor: 12171115963052648251
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-10.2076244, 0, -1.20772791]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/3 - Copy (2).s3dasset]
+  - Actor: 11110064117495861708
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [4.9331708, 0, -0.0681477189]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/tonsofmeshes/3 - Copy (2).s3dasset]
+  - Actor: 17653206599555557895
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [2.94194031, -3.43299294, -2.68220901e-07]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 10926728206149163279
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [4.63446999, 0, 3.6122613]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 5540790783217379941
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-1.36424994, -2.26905441, 1.08538043]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 14897907176272481101
+    TagComponent:
+      Tag: Camera Actor
+    TransformComponent:
+      Translation: [4.75521564, -6.07954216, 2.31325555]
+      Rotation: [0.172787592, -0.143116996, -0.884881914]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      Module: AutoPossessCamera
+      Language: C#
+    CameraComponent:
+      ProjectionType: 1
+      FOV: 70
+      NearClipPlane: 0.0500000007
+      FarClipPlane: 1024
+      PostProcessing: [[assets/_engine/mat/ppo/hdr_vfx.s3dasset, [3, !!binary "heuxPw=="], [3, !!binary "AAAAAA=="], [3, !!binary "AACAPw=="], [3, !!binary "AACAPw=="]], [assets/_engine/mat/ppo/bloom_vfx.s3dasset, [3, !!binary "AACAPw=="], [3, !!binary "AACAPw=="], [2, !!binary "DAAAAA=="]]]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
+      Materials: [assets/materialdata/None.s3dasset]

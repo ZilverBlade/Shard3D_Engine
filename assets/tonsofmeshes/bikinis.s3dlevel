@@ -1,0 +1,202 @@
+Shard3D: 1.2.8.r7-alpha
+Level: \bikinis.s3dlevel
+LastSavedEditorCameraPos: [9.18155193, -9.5102253, 1.9639281]
+Actors:
+  - Actor: 14475933500945145491
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-8.72325325, 0, 2.76696968]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 4429549262427187858
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-3.04143476, 0, 2.34099627]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 3402921725431768826
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [2.44473362, 0, 1.55922782]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 4.34000015]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 4934946653845604781
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [8.83385468, 0, 1.93778884]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 4.03999996]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 14817117496196121603
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-11.2419262, 0.0404062308, 0.531624794]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 10261101540770002548
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-7.69403934, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 14181117089730787572
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-4.03400707, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 12502714266191806914
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-0.214409471, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 3080985666566151206
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [2.62402415, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 7188861479731019503
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [5.48565102, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 4718121889135585830
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [9.09269428, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 4442785725517874110
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [12.8217697, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikini.fbx.s3dasset
+      Materials: [assets/cartest/BodyPaintBase.s3dasset, assets/cartest/WindowGlass.s3dasset, assets/cartest/UnderbodyPlastic.s3dasset, assets/cartest/PlasticTrim.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/BodyPaint.s3dasset, assets/cartest/Chrome.s3dasset, assets/cartest/HeadlightGlass.s3dasset, assets/cartest/Indicator.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/TaillightBtm.s3dasset, assets/cartest/ExhaustPipe.s3dasset, assets/cartest/void.s3dasset]
+  - Actor: 4059564158776134574
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-31.0623016, 0, 3.82050204]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/sponzaniouschange/Sponza.fbx.s3dasset
+      Materials: [assets/sponzaniouschange/sponzaleaf1.s3dasset, assets/sponzaniouschange/sponzaMaterial__58.s3dasset, assets/sponzaniouschange/sponzavase_round1.s3dasset, assets/sponzaniouschange/sponzaMaterial__299.s3dasset, assets/sponzaniouschange/sponzabricks1.s3dasset, assets/sponzaniouschange/sponzaarch1.s3dasset, assets/sponzaniouschange/sponzaceiling1.s3dasset, assets/sponzaniouschange/sponzacolumn_a1.s3dasset, assets/sponzaniouschange/sponzafloor1.s3dasset, assets/sponzaniouschange/sponzacolumn_c1.s3dasset, assets/sponzaniouschange/sponzadetails1.s3dasset, assets/sponzaniouschange/sponzacolumn_b1.s3dasset, assets/sponzaniouschange/sponzaMaterial__300.s3dasset, assets/sponzaniouschange/sponzaflagpole1.s3dasset, assets/sponzaniouschange/sponzafabric_e1.s3dasset, assets/sponzaniouschange/sponzafabric_d1.s3dasset, assets/sponzaniouschange/sponzafabric_a1.s3dasset, assets/sponzaniouschange/sponzafabric_g1.s3dasset, assets/sponzaniouschange/sponzafabric_c1.s3dasset, assets/sponzaniouschange/sponzafabric_f1.s3dasset, assets/sponzaniouschange/sponzachain1.s3dasset, assets/sponzaniouschange/sponzavase_hanging1.s3dasset, assets/sponzaniouschange/sponzavase1.s3dasset, assets/sponzaniouschange/sponzaMaterial__301.s3dasset, assets/sponzaniouschange/sponzaroof1.s3dasset]
+  - Actor: 18219448813284859724
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [-0.127409041, -0.0209439509, 0.0331612565]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Emission: [1, 1, 1, 1]
+      Specularness: 1
+  - Actor: 17764659900452900642
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [9.14364624, 0, 0]
+      Rotation: [-0.677187741, -0.342084527, -0.37000981]
+      Scale: [0.49000001, 0.460000008, 0.319999993]
+    Mesh3DComponent:
+      MeshAsset: assets/sponzaniouschange/Sponza.fbx.s3dasset
+      Materials: [assets/sponzaniouschange/sponzaleaf1.s3dasset, assets/sponzaniouschange/sponzaMaterial__58.s3dasset, assets/sponzaniouschange/sponzavase_round1.s3dasset, assets/sponzaniouschange/sponzaMaterial__299.s3dasset, assets/sponzaniouschange/sponzabricks1.s3dasset, assets/sponzaniouschange/sponzaarch1.s3dasset, assets/sponzaniouschange/sponzaceiling1.s3dasset, assets/sponzaniouschange/sponzacolumn_a1.s3dasset, assets/sponzaniouschange/sponzafloor1.s3dasset, assets/sponzaniouschange/sponzacolumn_c1.s3dasset, assets/sponzaniouschange/sponzadetails1.s3dasset, assets/sponzaniouschange/sponzacolumn_b1.s3dasset, assets/sponzaniouschange/sponzaMaterial__300.s3dasset, assets/sponzaniouschange/sponzaflagpole1.s3dasset, assets/sponzaniouschange/sponzafabric_e1.s3dasset, assets/sponzaniouschange/sponzafabric_d1.s3dasset, assets/sponzaniouschange/sponzafabric_a1.s3dasset, assets/sponzaniouschange/sponzafabric_g1.s3dasset, assets/sponzaniouschange/sponzafabric_c1.s3dasset, assets/sponzaniouschange/sponzafabric_f1.s3dasset, assets/sponzaniouschange/sponzachain1.s3dasset, assets/sponzaniouschange/sponzavase_hanging1.s3dasset, assets/sponzaniouschange/sponzavase1.s3dasset, assets/sponzaniouschange/sponzaMaterial__301.s3dasset, assets/sponzaniouschange/sponzaroof1.s3dasset]
+  - Actor: 6303911563948297048
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-4.32315397, 0, 6.57735729]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 15761725229778121830
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [1.00363624, 0, 4.06855631]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 6699859439241829413
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [-3.43395376, 0, -2.85942602]
+      Rotation: [-2.03156328, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/sponzaniouschange/Sponza.fbx.s3dasset
+      Materials: [assets/sponzaniouschange/sponzaleaf1.s3dasset, assets/sponzaniouschange/sponzaMaterial__58.s3dasset, assets/sponzaniouschange/sponzavase_round1.s3dasset, assets/sponzaniouschange/sponzaMaterial__299.s3dasset, assets/sponzaniouschange/sponzabricks1.s3dasset, assets/sponzaniouschange/sponzaarch1.s3dasset, assets/sponzaniouschange/sponzaceiling1.s3dasset, assets/sponzaniouschange/sponzacolumn_a1.s3dasset, assets/sponzaniouschange/sponzafloor1.s3dasset, assets/sponzaniouschange/sponzacolumn_c1.s3dasset, assets/sponzaniouschange/sponzadetails1.s3dasset, assets/sponzaniouschange/sponzacolumn_b1.s3dasset, assets/sponzaniouschange/sponzaMaterial__300.s3dasset, assets/sponzaniouschange/sponzaflagpole1.s3dasset, assets/sponzaniouschange/sponzafabric_e1.s3dasset, assets/sponzaniouschange/sponzafabric_d1.s3dasset, assets/sponzaniouschange/sponzafabric_a1.s3dasset, assets/sponzaniouschange/sponzafabric_g1.s3dasset, assets/sponzaniouschange/sponzafabric_c1.s3dasset, assets/sponzaniouschange/sponzafabric_f1.s3dasset, assets/sponzaniouschange/sponzachain1.s3dasset, assets/sponzaniouschange/sponzavase_hanging1.s3dasset, assets/sponzaniouschange/sponzavase1.s3dasset, assets/sponzaniouschange/sponzaMaterial__301.s3dasset, assets/sponzaniouschange/sponzaroof1.s3dasset]
+  - Actor: 13050288155934048228
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 1.32380319, 1.14409792]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Mesh3DComponent:
+      MeshAsset: assets/cartest/yakisobabikiniwheel.fbx.s3dasset
+      Materials: [assets/cartest/Tyre.s3dasset, assets/cartest/Rim.s3dasset, assets/cartest/RimInside.s3dasset, assets/cartest/RimBolts.s3dasset]

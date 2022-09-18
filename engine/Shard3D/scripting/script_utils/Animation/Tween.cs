@@ -4,7 +4,7 @@
     {
         public abstract class Tween
         {
-            protected float elapsedAlpha = 0.0f;
+            protected float alpha = 0.0f;
             protected float duration;
 
             public abstract bool Update(float deltaTime);
@@ -14,7 +14,7 @@
             }
             public virtual void Reset()
             {
-                elapsedAlpha = 0.0f;
+                alpha = 0.0f;
             }
             public void Jump(float newTimePos)
             {
@@ -22,11 +22,11 @@
             }
             public float GetAlpha()
             {
-                return elapsedAlpha;
+                return alpha;
             }
             public float GetElapsed()
             {
-                return elapsedAlpha * duration;
+                return alpha * duration;
             }
         }
 
@@ -139,14 +139,14 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
                
-                value = (1 - elapsedAlpha) * origin + elapsedAlpha * dest;
+                value = (1 - alpha) * origin + alpha * dest;
 
                 return false;
             }
@@ -160,16 +160,16 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
                    
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
 
-                value.x = (1 - elapsedAlpha) * origin.x + elapsedAlpha * dest.x;
-                value.y = (1 - elapsedAlpha) * origin.y + elapsedAlpha * dest.y;
+                value.x = (1 - alpha) * origin.x + alpha * dest.x;
+                value.y = (1 - alpha) * origin.y + alpha * dest.y;
 
                 return false;
             }
@@ -183,17 +183,17 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
                    
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
 
-                value.x = (1 - elapsedAlpha) * origin.x + elapsedAlpha * dest.x;
-                value.y = (1 - elapsedAlpha) * origin.y + elapsedAlpha * dest.y;
-                value.z = (1 - elapsedAlpha) * origin.z + elapsedAlpha * dest.z;
+                value.x = (1 - alpha) * origin.x + alpha * dest.x;
+                value.y = (1 - alpha) * origin.y + alpha * dest.y;
+                value.z = (1 - alpha) * origin.z + alpha * dest.z;
 
                 return false;
             }
@@ -207,18 +207,18 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
                    
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
 
-                value.x = (1 - elapsedAlpha) * origin.x + elapsedAlpha * dest.x;
-                value.y = (1 - elapsedAlpha) * origin.y + elapsedAlpha * dest.y;
-                value.z = (1 - elapsedAlpha) * origin.z + elapsedAlpha * dest.z;
-                value.w = (1 - elapsedAlpha) * origin.w + elapsedAlpha * dest.w;
+                value.x = (1 - alpha) * origin.x + alpha * dest.x;
+                value.y = (1 - alpha) * origin.y + alpha * dest.y;
+                value.z = (1 - alpha) * origin.z + alpha * dest.z;
+                value.w = (1 - alpha) * origin.w + alpha * dest.w;
 
                 return false;
             }
@@ -238,16 +238,16 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
                    
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
 
-                float sqt = elapsedAlpha * elapsedAlpha;
-                value = origin + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin;
+                float sqt = alpha * alpha;
+                value = origin + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin;
 
                 return false;
             }
@@ -266,17 +266,17 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
 
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
 
-                float sqt = elapsedAlpha * elapsedAlpha;
-                value.x = origin.x + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.x;
-                value.y = origin.y + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.y;
+                float sqt = alpha * alpha;
+                value.x = origin.x + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.x;
+                value.y = origin.y + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.y;
                 
                 return false;
             }
@@ -299,18 +299,18 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
                    
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
 
-                float sqt = elapsedAlpha * elapsedAlpha;
-                value.x = origin.x + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.x;
-                value.y = origin.y + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.y;
-                value.z = origin.z + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.z;
+                float sqt = alpha * alpha;
+                value.x = origin.x + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.x;
+                value.y = origin.y + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.y;
+                value.z = origin.z + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.z;
 
                 return false;
             }
@@ -330,19 +330,65 @@
             // Updates the interpolation, returns true when the tween has ended
             public override bool Update(float deltaTime)
             {
-                elapsedAlpha += deltaTime / duration;
-                if (!Math.IsBetween(elapsedAlpha, 0f, 1f))
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
                 {
 
-                    elapsedAlpha = Math.Clamp(elapsedAlpha, 0, 1f);
+                    alpha = Math.Clamp(alpha, 0, 1f);
                     return true;
                 }
 
-                float sqt = elapsedAlpha * elapsedAlpha;
-                value.x = origin.x + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.x;
-                value.y = origin.y + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.y;
-                value.z = origin.z + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.z;
-                value.w = origin.w + sqt / (2.0F * (sqt - elapsedAlpha) + 1.0f) * destMinOrigin.w;
+                float sqt = alpha * alpha;
+                value.x = origin.x + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.x;
+                value.y = origin.y + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.y;
+                value.z = origin.z + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.z;
+                value.w = origin.w + sqt / (2.0F * (sqt - alpha) + 1.0f) * destMinOrigin.w;
+
+                return false;
+            }
+        }
+
+        public class TweenBezierFloat : TweenFloat
+        {
+            private float destMinOrigin;
+            private Math.Bezier curve;
+
+            public float p1x = 0;
+            public float p1y = 0;
+             
+            public float p2x = 0;
+            public float p2y = 1;
+             
+            public float p3x = 1;
+            public float p3y = 0;
+             
+            public float p4x = 1;
+            public float p4y = 1;
+
+            public TweenBezierFloat(float durationSeconds, float begin, float final, Math.Bezier curve_) : base(durationSeconds, begin, final)
+            {
+                destMinOrigin = final - begin;
+                curve = curve_;
+            }
+
+            public override bool Update(float deltaTime)
+            {
+
+                alpha += deltaTime / duration;
+                if (!Math.IsBetween(alpha, 0f, 1f))
+                {
+
+                    alpha = Math.Clamp(alpha, 0, 1f);
+                    return true;
+                }
+
+                double xfunc = (p1x * (System.Math.Pow(1 - alpha, 3))) + (3 * p2x * alpha * System.Math.Pow(1 - alpha, 2)) + (3 * p3x * System.Math.Pow(alpha, 2) * (1 - alpha)) + (System.Math.Pow(alpha, 3) * p4x);
+                double yfunc = (p1y * (System.Math.Pow(1 - alpha, 3))) + (3 * p2y * alpha * System.Math.Pow(1 - alpha, 2)) + (3 * p3y * System.Math.Pow(alpha, 2) * (1 - alpha)) + (System.Math.Pow(alpha, 3) * p4y);
+                alpha += 0.01f;
+                double hyp = System.Math.Sqrt(System.Math.Pow(xfunc, 2) + System.Math.Pow(yfunc, 2));
+                double resultant = System.Math.Sqrt(System.Math.Pow(xfunc, 2) + System.Math.Pow(yfunc, 2) + (2 * xfunc * yfunc * (xfunc / hyp)));
+      
+                value = (float)(origin + resultant * destMinOrigin);
 
                 return false;
             }

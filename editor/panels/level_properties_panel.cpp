@@ -7,6 +7,7 @@
 
 #include <Shard3D/scripting/script_engine.h>
 #include <fstream>
+#include <Shard3D/systems/handlers/render_handler.h>
 namespace Shard3D {
 	LevelPropertiesPanel::LevelPropertiesPanel(const sPtr<Level>& levelContext) {
 		setContext(levelContext);
@@ -45,7 +46,7 @@ namespace Shard3D {
 					ImGui::CloseCurrentPopup();
 				}
 				if (!tree.selectedActor.hasComponent<Components::Mesh3DComponent>()) if (ImGui::MenuItem("Mesh")) {
-					tree.selectedActor.addComponent<Components::Mesh3DComponent>(ResourceHandler::coreAssets.m_defaultModel);
+					RenderHandler::addMesh3DComponentToActor(tree.selectedActor, ResourceHandler::coreAssets.m_defaultModel);
 					ImGui::CloseCurrentPopup();
 				}
 				if (!tree.selectedActor.hasComponent<Components::BillboardComponent>()) if (ImGui::MenuItem("Billboard")) {
@@ -245,11 +246,14 @@ namespace Shard3D {
 						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SHARD3D.ASSEXP.SMAT")) {
 							tag = std::string(ENGINE_ASSETS_PATH + std::string("\\") + (char*)payload->Data);
 							actor.getComponent<Components::Mesh3DComponent>().materials[i] = AssetID(actor.getComponent<Components::Mesh3DComponent>().materials[i].getFile());
+							actor.getComponent<Components::Mesh3DComponent>().validate();
 						}
 				}
 				ImGui::TreePop();
 			}
-			if (killComponent) actor.killComponent<Components::Mesh3DComponent>();
+			if (killComponent) {
+				RenderHandler::rmvMesh3DComponentFromActor(actor);
+			}
 		}
 		if (actor.hasComponent<Components::BillboardComponent>()) {
 			bool open = ImGui::TreeNodeEx((void*)typeid(Components::BillboardComponent).hash_code(), nodeFlags, "Billboard");

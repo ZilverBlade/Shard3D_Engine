@@ -5,6 +5,7 @@
 #include <fstream>
 #include <Shard3D/core/asset/assetmgr.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <Shard3D/systems/handlers/render_handler.h>
 namespace Shard3D {
 	MaterialBuilderPanel::MaterialBuilderPanel() : currentAsset(ResourceHandler::coreAssets.s_errorMaterial), currentPPOAsset(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")) {
 		currentItem = ResourceHandler::retrieveSurfaceMaterial(currentAsset);
@@ -16,21 +17,21 @@ namespace Shard3D {
 
 	static std::string blendModeToString(SurfaceMaterialBlendMode_T blendMode) {
 		std::string blendMode_str;
-		if (blendMode & SurfaceMaterialBlendModeTranslucent)
+		if (blendMode & _SurfaceMaterialBlendModeTranslucent)
 			blendMode_str = std::string(blendMode_str + "Translucent");
-		if (blendMode & SurfaceMaterialBlendModeMasked)
+		if (blendMode & _SurfaceMaterialBlendModeMasked)
 			blendMode_str = std::string(blendMode_str + "Masked");
-		if (!(blendMode & SurfaceMaterialBlendModeTranslucent) || !(blendMode & SurfaceMaterialBlendModeMasked))
+		if (!(blendMode & _SurfaceMaterialBlendModeTranslucent) || !(blendMode & _SurfaceMaterialBlendModeMasked))
 			blendMode_str = "Opaque";
 		return blendMode_str;
 	}
 
 	static SurfaceMaterialBlendMode_T stringToBlendMode(const char* blendMode) {
-		SurfaceMaterialBlendMode_T blendMode_flags = SurfaceMaterialBlendModeOpaque;
+		SurfaceMaterialBlendMode_T blendMode_flags = _SurfaceMaterialBlendModeOpaque;
 		if (strstr(blendMode, "Translucent") != nullptr)
-			blendMode_flags |= SurfaceMaterialBlendModeTranslucent;
+			blendMode_flags |= _SurfaceMaterialBlendModeTranslucent;
 		if (strstr(blendMode, "Masked") != nullptr)
-			blendMode_flags |= SurfaceMaterialBlendModeMasked;
+			blendMode_flags |= _SurfaceMaterialBlendModeMasked;
 		return blendMode_flags;
 	}
 
@@ -44,6 +45,8 @@ namespace Shard3D {
 				ResourceHandler::loadSurfaceMaterial(currentAsset);
 				currentItem = ResourceHandler::retrieveSurfaceMaterial(currentAsset);
 			}
+
+		SurfaceMaterialClassOptionsFlags oldSurfaceMaterialFlags = currentItem->getClass();
 
 		const char* items[] = { "Opaque", "Masked", "Translucent", "TranslucentMasked" };
 		const char* current_item = items[currentItem->getBlendMode()];
@@ -110,13 +113,13 @@ namespace Shard3D {
 						surfaceMaterial->shininessTex = AssetID(surfaceMaterial->shininessTex.getFile());
 					}
 			}
-			ImGui::DragFloat(!(surfaceMaterial->getBlendMode() & SurfaceMaterialBlendModeTranslucent) ? "Metallic" : "Clarity", &surfaceMaterial->metallic, 0.01f, 0.f, 1.f);
+			ImGui::DragFloat(!(surfaceMaterial->getClass() & SurfaceMaterialClassOptions_Translucent) ? "Metallic" : "Clarity", &surfaceMaterial->metallic, 0.01f, 0.f, 1.f);
 			{
 				auto& tag = surfaceMaterial->metallicTex.getFileRef();
 				char tagBuffer[256];
 				memset(tagBuffer, 0, 256);
 				strncpy(tagBuffer, tag.c_str(), 256);
-				if (ImGui::InputText(!(surfaceMaterial->getBlendMode() & SurfaceMaterialBlendModeTranslucent) ? "Metallic Map" : "Clarity Map", tagBuffer, 256)) {
+				if (ImGui::InputText(!(surfaceMaterial->getClass() & SurfaceMaterialClassOptions_Translucent) ? "Metallic Map" : "Clarity Map", tagBuffer, 256)) {
 				//	tag = std::string(tagBuffer);
 				}
 				if (ImGui::BeginDragDropTarget())
@@ -139,7 +142,7 @@ namespace Shard3D {
 						surfaceMaterial->normalTex = AssetID(surfaceMaterial->normalTex.getFile());
 					}
 			}
-			if (surfaceMaterial->getBlendMode() & SurfaceMaterialBlendModeMasked)
+			if (surfaceMaterial->getClass() & SurfaceMaterialClassOptions_Masked)
 			{
 				auto& tag = surfaceMaterial->maskedInfo->maskTex.getFileRef();
 				char tagBuffer[256];
@@ -154,7 +157,7 @@ namespace Shard3D {
 						surfaceMaterial->maskedInfo->maskTex = AssetID(surfaceMaterial->maskedInfo->maskTex.getFile());
 					}
 			}
-			if (surfaceMaterial->getBlendMode() & SurfaceMaterialBlendModeTranslucent)
+			if (surfaceMaterial->getClass() & SurfaceMaterialClassOptions_Translucent)
 			{
 				ImGui::DragFloat("Opacity", &surfaceMaterial->translucentInfo->opacity, 0.01f, 0.f, 1.f);
 				{
@@ -172,12 +175,15 @@ namespace Shard3D {
 						}
 				}
 			}
-
-			int cullMode = static_cast<int>(surfaceMaterial->drawData.culling);
+			int cullMode = static_cast<int>(surfaceMaterial->getCullMode());
 			ImGui::Combo("Cull Mode", &cullMode, "VK_CULL_MODE_NONE\0VK_CULL_MODE_FRONT_BIT\0VK_CULL_MODE_BACK_BIT\0");
-			surfaceMaterial->drawData.culling = cullMode;	
+			surfaceMaterial->setCullMode(cullMode);	
 		}
 		
+		if (oldSurfaceMaterialFlags != currentItem->getClass()) {
+			RenderHandler::modifyMaterialType(currentAsset, oldSurfaceMaterialFlags, currentItem->getClass());
+		}
+
 		if (ImGui::Button("Rebuild")) {
 			SHARD3D_INFO("Rebuilding material...");
 			ResourceHandler::rebuildSurfaceMaterial(currentItem);

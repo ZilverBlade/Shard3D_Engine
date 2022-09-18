@@ -29,6 +29,19 @@ namespace Shard3D {
 		static inline bool hasStarting(std::string const& fullString, std::string const& starting) {
 			return (fullString.rfind(starting, 0) == 0);
 		}
+		static std::string removeIllegalPathChars(const std::string & string);
+	};
+
+	class VectorUtils {
+	public:
+		//template <typename uint32_t>
+		static void eraseItemAtIndex(std::vector<uint32_t>& vector, size_t index) {
+			std::vector<uint32_t>::iterator q = vector.begin();
+			for (int i = 0; i < index; i++) {
+				q++;
+			}
+			vector.erase(q);
+		}
 	};
 
 	class IOUtils {
@@ -49,6 +62,8 @@ namespace Shard3D {
 
 #define BIT(x) (1 << x)
 #define SHARD3D_WAITFOR(seconds) Shard3D::WAITUtils::preciseStandby(seconds)
+
+#define TOSTRING(myval) #myval
 
 #define DELETE_COPY(myClass)	myClass(const myClass&) = delete; \
 								myClass& operator=(const myClass&) = delete;

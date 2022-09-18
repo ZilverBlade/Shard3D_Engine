@@ -1,0 +1,80 @@
+Shard3D: 1.2.8.r7-alpha
+Level: \sponzascene.s3dlevel
+LastSavedEditorCameraPos: [-17.945816, -2.12065935, 8.21674442]
+Actors:
+  - Actor: 4498373543628690839
+    TagComponent:
+      Tag: Camera Actor
+    TransformComponent:
+      Translation: [-16.3099995, -3.78200006, 7.1793108]
+      Rotation: [0.197222203, 0, -3.80656314]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      Module: AutoPossessCamera
+      Language: C#
+    CameraComponent:
+      ProjectionType: 1
+      FOV: 91.3000031
+      NearClipPlane: 0.0500000007
+      FarClipPlane: 1024
+      PostProcessing: [[assets/_engine/mat/ppo/hdr_vfx.s3dasset, [3, !!binary "zczMPw=="], [3, !!binary "AAAAAA=="], [3, !!binary "AACAPw=="], [3, !!binary "AACAPw=="]], [assets/_engine/mat/ppo/bloom_vfx.s3dasset, [3, !!binary "AACAPw=="], [3, !!binary "AACAPw=="], [2, !!binary "DAAAAA=="]]]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
+      Materials: [assets/materialdata/None.s3dasset]
+  - Actor: 3684373927316916923
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [25.2801666, -17.7075462, 5.43379545]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 100]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 3692692541069129043
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [0, -17.7653809, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Angle: [0.52359879, 1.04719758]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 12136428348903971710
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [0, -20.2963982, 5.10014296]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 2273399616174721872
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [-0.0750491619, -0.0907571167, 0.0907571167]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      Emission: [1, 1, 1, 1]
+      Specularness: 1
+  - Actor: 14743253100177173582
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, -0.0199999996, 0.00999999978]
+    Mesh3DComponent:
+      MeshAsset: assets/sponzaniouschange/Sponza.fbx.s3dasset
+      Materials: [assets/sponzaniouschange/sponzaleaf1.s3dasset, assets/sponzaniouschange/sponzaMaterial__58.s3dasset, assets/sponzaniouschange/sponzavase_round1.s3dasset, assets/sponzaniouschange/sponzaMaterial__299.s3dasset, assets/sponzaniouschange/sponzabricks1.s3dasset, assets/sponzaniouschange/sponzaarch1.s3dasset, assets/sponzaniouschange/sponzaceiling1.s3dasset, assets/sponzaniouschange/sponzacolumn_a1.s3dasset, assets/sponzaniouschange/sponzafloor1.s3dasset, assets/sponzaniouschange/sponzacolumn_c1.s3dasset, assets/sponzaniouschange/sponzadetails1.s3dasset, assets/sponzaniouschange/sponzacolumn_b1.s3dasset, assets/sponzaniouschange/sponzaMaterial__300.s3dasset, assets/sponzaniouschange/sponzaflagpole1.s3dasset, assets/sponzaniouschange/sponzafabric_e1.s3dasset, assets/sponzaniouschange/sponzafabric_d1.s3dasset, assets/sponzaniouschange/sponzafabric_a1.s3dasset, assets/sponzaniouschange/sponzafabric_g1.s3dasset, assets/sponzaniouschange/sponzafabric_c1.s3dasset, assets/sponzaniouschange/sponzafabric_f1.s3dasset, assets/sponzaniouschange/sponzachain1.s3dasset, assets/sponzaniouschange/sponzavase_hanging1.s3dasset, assets/sponzaniouschange/sponzavase1.s3dasset, assets/sponzaniouschange/sponzaMaterial__301.s3dasset, assets/sponzaniouschange/sponzaroof1.s3dasset]

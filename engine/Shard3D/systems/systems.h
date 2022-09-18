@@ -9,7 +9,7 @@
 #include "rendering/editor/grid_system.h"
 
 #include "buffers/light_system.h"
-#include "buffers/material_system.h"
+#include "handlers/material_handler.h"
 
 #include "computational/particle_system.h"
 #include "computational/physics_system.h"

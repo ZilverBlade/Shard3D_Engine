@@ -1,7 +1,7 @@
 #include "../../s3dpch.h"
 #include "material.h"
 #include "assetmgr.h"
-#include "../../systems/buffers/material_system.h"
+#include "../../systems/handlers/material_handler.h"
 #include "../misc/graphics_settings.h"
 #include <any>
 #include "../../systems/computational/shader_system.h"
@@ -33,41 +33,84 @@ namespace Shard3D {
 	}
 
 	void SurfaceMaterial::free() {
-		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
-		//if (SharedPools::staticMaterialPool)
-			SharedPools::staticMaterialPool->freeDescriptors({ this->materialDescriptorInfo.factors, this->materialDescriptorInfo.textures });
+		SharedPools::staticMaterialPool->freeDescriptors({ this->materialDescriptors.factors, this->materialDescriptors.textures });
 	}
 
 	void SurfaceMaterial::setBlendMode(SurfaceMaterialBlendMode_T mode) {
-		if (mode & SurfaceMaterialBlendModeMasked && !(blendMode & mode))
-			maskedInfo = new _SurfaceMaterial_BlendModeMasked();
-		if (mode & SurfaceMaterialBlendModeTranslucent && !(blendMode & mode))
-			translucentInfo = new _SurfaceMaterial_BlendModeTranslucent();
-		blendMode = mode;
+		bool isNotOpaque = false;
+		if (mode & _SurfaceMaterialBlendModeMasked) {
+			if (!(classFlags & SurfaceMaterialClassOptions_Masked)) maskedInfo = new _SurfaceMaterial_BlendModeMasked();
+			classFlags |= SurfaceMaterialClassOptions_Masked;
+			isNotOpaque = true;
+		} else {
+			classFlags &= ~SurfaceMaterialClassOptions_Masked;
+		}
+		if (mode & _SurfaceMaterialBlendModeTranslucent) {
+			if (!(classFlags & SurfaceMaterialClassOptions_Translucent)) translucentInfo = new _SurfaceMaterial_BlendModeTranslucent();
+			classFlags |= SurfaceMaterialClassOptions_Translucent;
+			isNotOpaque = true;
+		} else {
+			classFlags &= ~SurfaceMaterialClassOptions_Translucent;
+		}
+		if (!isNotOpaque) classFlags |= SurfaceMaterialClassOptions_Opaque;
+		else classFlags &= ~SurfaceMaterialClassOptions_Opaque;
+	}
+
+	SurfaceMaterialBlendMode_T SurfaceMaterial::getBlendMode() {
+		SurfaceMaterialBlendMode_T return_{};
+		if (classFlags & SurfaceMaterialClassOptions_Masked)
+			return_ |= _SurfaceMaterialBlendModeMasked;
+		if (classFlags & SurfaceMaterialClassOptions_Translucent)
+			return_ |= _SurfaceMaterialBlendModeTranslucent;
+		return return_;
+	}
+
+	void SurfaceMaterial::setCullMode(VkCullModeFlags cullmode) {
+		if (cullmode == VK_CULL_MODE_NONE) {
+			classFlags |= SurfaceMaterialClassOptions_NoCulling;
+			classFlags &= ~SurfaceMaterialClassOptions_FrontfaceCulling;
+			return;
+		}
+		if (cullmode == VK_CULL_MODE_FRONT_BIT) {
+			classFlags |= SurfaceMaterialClassOptions_FrontfaceCulling;
+			classFlags &= ~SurfaceMaterialClassOptions_NoCulling;
+			return;
+		}
+		SHARD3D_ERROR("Invalid cull mode specified");
+	}
+
+	VkCullModeFlagBits SurfaceMaterial::getCullMode() {
+		if (classFlags & SurfaceMaterialClassOptions_NoCulling)
+			return VK_CULL_MODE_NONE;
+		if (classFlags & SurfaceMaterialClassOptions_FrontfaceCulling)
+			return VK_CULL_MODE_FRONT_BIT;
+	}
+
+	void SurfaceMaterial::setPolygonMode(VkPolygonMode polygonmode) {
+		SHARD3D_ERROR("Unsupported function");
+	}
+
+	VkPolygonMode SurfaceMaterial::getPolygonMode() {
+		SHARD3D_ERROR("Unsupported function");
+		return VK_POLYGON_MODE_FILL;
 	}
 
 	void SurfaceMaterial::bind(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet) {
 		SHARD3D_ASSERT(built && "Material descriptors and pipelines must be built before surface material can be bound!");
 
-		// TODO: change this to cache certain pipelines to speed up binding
-		// Or, change this that the model.cpp file submits the primitives to some sort of unordered map to render, categorised by the pipelines,
-		// however this wont work when custom material shaders files can be created.
-		// Instead make Uber shaders where all of the materials are stored in 1 shader
-
-		materialPipelineConfig->shaderPipeline->bind(commandBuffer);
+		//MaterialHandler::bindMaterialClass(classFlags, commandBuffer);
 
 		VkDescriptorSet sets[] = {
-			globalSet,
-			materialDescriptorInfo.factors,
-			materialDescriptorInfo.textures
+			materialDescriptors.factors,
+			materialDescriptors.textures
 		};
 
 		vkCmdBindDescriptorSets(
 			commandBuffer,
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			materialPipelineConfig->shaderPipelineLayout,
-			0,
-			3,
+			MaterialHandler::getMaterialClass(classFlags)->getPipelineLayout(),
+			1,
+			2,
 			sets,
 			0,
 			nullptr
@@ -90,10 +133,11 @@ namespace Shard3D {
 	void SurfaceMaterial_Shaded::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
 		if (built) this->free();
 
-		if (blendMode & SurfaceMaterialBlendModeMasked)
-			SHARD3D_ASSERT(this->maskedInfo && "Masked info for surface material not set, while material has Masked as a blend mode set!");
-		if (blendMode & SurfaceMaterialBlendModeTranslucent)
-			SHARD3D_ASSERT(this->translucentInfo && "Translucent info for surface material not set, while material has Translucent as a blend mode set!");
+		SHARD3D_ASSERT(classFlags & SurfaceMaterialClassOptions_Masked ? (this->maskedInfo != nullptr) : true && "Masked info for surface material not set, while material has Masked as a blend mode set!");
+		SHARD3D_ASSERT(classFlags & SurfaceMaterialClassOptions_Translucent ? (this->translucentInfo != nullptr) : true && "Translucent info for surface material not set, while material has Translucent as a blend mode set!");
+		SHARD3D_ASSERT(classFlags & SurfaceMaterialClassOptions_FrontfaceCulling || classFlags & SurfaceMaterialClassOptions_NoCulling && "No cull mode has been specified in this material!");
+
+		MaterialHandler::debugPrintFlags(classFlags);
 
 		{
 			factorsBuffer =
@@ -107,36 +151,18 @@ namespace Shard3D {
 
 			factorsBuffer->map();
 
-			materialDescriptorInfo.factorLayout = EngineDescriptorSetLayout::Builder(device)
-				.addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT)
-				.build();
-
 			VkDescriptorBufferInfo bufferInfo = factorsBuffer->descriptorInfo();
-			EngineDescriptorWriter(*materialDescriptorInfo.factorLayout, *descriptorPool)
+ 				auto& classes = MaterialHandler::getAvailableClasses();
+			EngineDescriptorWriter(*MaterialHandler::getMaterialClass(this->classFlags)->getDescriptorLayouts().factorLayout, *SharedPools::staticMaterialPool)
 				.writeBuffer(1, &bufferInfo)
-				.build(materialDescriptorInfo.factors);
+				.build(materialDescriptors.factors);
 
 			SurfaceMaterial_ShadedOpaque_Factors factors{};
 			factors.diffuse = { this->diffuseColor.x, this->diffuseColor.y, this->diffuseColor.z,
-				(blendMode == SurfaceMaterialBlendModeTranslucent) ? this->translucentInfo->opacity : 1.f };
+				(classFlags & SurfaceMaterialClassOptions_Translucent) ? this->translucentInfo->opacity : 1.f };
 			factors.SSM = { this->specular, this->shininess, this->metallic };
 			factorsBuffer->writeToBuffer(&factors);
 			factorsBuffer->flush();
-		}
-
-		{
-			EngineDescriptorSetLayout::Builder textureLayout_builder = EngineDescriptorSetLayout::Builder(device);
-			textureLayout_builder.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-			textureLayout_builder.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-			textureLayout_builder.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-			textureLayout_builder.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-			textureLayout_builder.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-			if (blendMode == SurfaceMaterialBlendModeMasked)
-				textureLayout_builder.addBinding(6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-			if (blendMode == SurfaceMaterialBlendModeTranslucent)
-				textureLayout_builder.addBinding(7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-
-			materialDescriptorInfo.textureLayout = textureLayout_builder.build();
 		}
 			
 		{
@@ -146,60 +172,32 @@ namespace Shard3D {
 			VkDescriptorImageInfo metallicTex_imageInfo = ResourceHandler::retrieveTexture(this->metallicTex)->getImageInfo();
 			VkDescriptorImageInfo normalTex_imageInfo = ResourceHandler::retrieveTexture(this->normalTex)->getImageInfo();
 
-			EngineDescriptorWriter textureLayout_writer = EngineDescriptorWriter(*materialDescriptorInfo.textureLayout, *descriptorPool);
+			EngineDescriptorWriter textureLayout_writer = EngineDescriptorWriter(*MaterialHandler::getMaterialClass(this->classFlags)->getDescriptorLayouts().textureLayout, *descriptorPool);
 			textureLayout_writer.writeImage(1, &diffuseTex_imageInfo);
 			textureLayout_writer.writeImage(2, &specularTex_imageInfo);
 			textureLayout_writer.writeImage(3, &shininessTex_imageInfo);
 			textureLayout_writer.writeImage(4, &metallicTex_imageInfo);
 			textureLayout_writer.writeImage(5, &normalTex_imageInfo);
 
-			if (blendMode & SurfaceMaterialBlendModeMasked) {
+			if (classFlags & SurfaceMaterialClassOptions_Masked) {
 				VkDescriptorImageInfo maskTex_imageInfo = ResourceHandler::retrieveTexture(this->maskedInfo->maskTex)->getImageInfo();
 				textureLayout_writer.writeImage(6, &maskTex_imageInfo);
 			}
-			if (blendMode & SurfaceMaterialBlendModeTranslucent) {
+			if (classFlags & SurfaceMaterialClassOptions_Translucent) {
 				VkDescriptorImageInfo opacityTex_imageInfo = ResourceHandler::retrieveTexture(this->translucentInfo->opacityTex)->getImageInfo();
 				textureLayout_writer.writeImage(7, &opacityTex_imageInfo);
 			}
 
-			textureLayout_writer.build(materialDescriptorInfo.textures);
+			textureLayout_writer.build(materialDescriptors.textures);
 		}
 
-		materialPipelineConfig = make_uPtr<_MaterialGraphicsPipelineConfigInfo>();
-		MaterialSystem::createSurfacePipelineLayout(
-			&materialPipelineConfig->shaderPipelineLayout,
-			materialDescriptorInfo.factorLayout->getDescriptorSetLayout(),
-			materialDescriptorInfo.textureLayout->getDescriptorSetLayout()
-		);
-		GraphicsPipelineConfigInfo pipelineConfigInfo{};
-		GraphicsPipeline::pipelineConfig(pipelineConfigInfo)
-			.defaultGraphicsPipelineConfigInfo()
-			.setCullMode(drawData.culling)
-			.enableVertexDescriptions();
-
-		
-		if (this->blendMode == SurfaceMaterialBlendModeTranslucent)
-			GraphicsPipeline::pipelineConfig(pipelineConfigInfo).enableAlphaBlending(VK_BLEND_OP_ADD);
-	
-		pipelineConfigInfo.colorBlendInfo.attachmentCount = 4;
-		VkPipelineColorBlendAttachmentState attachments[4]{ pipelineConfigInfo.colorBlendAttachment, pipelineConfigInfo.colorBlendAttachment,pipelineConfigInfo.colorBlendAttachment ,pipelineConfigInfo.colorBlendAttachment };
-		pipelineConfigInfo.colorBlendInfo.pAttachments = attachments;
-
-
-		MaterialSystem::createSurfacePipeline(
-			&materialPipelineConfig->shaderPipeline,
-			materialPipelineConfig->shaderPipelineLayout, 
-			pipelineConfigInfo, 
-			this);
 		built = true;
 	}
 
 	void SurfaceMaterial_Shaded::serialize(YAML::Emitter* out) {
-		if (blendMode & SurfaceMaterialBlendModeMasked)
-			SHARD3D_ASSERT(this->maskedInfo && "Masked info for surface material not set, while material has Masked as a blend mode set!");
-		if (blendMode & SurfaceMaterialBlendModeTranslucent)
-			SHARD3D_ASSERT(this->translucentInfo && "Translucent info for surface material not set, while material has Translucent as a blend mode set!");
-		
+		SHARD3D_ASSERT(classFlags & SurfaceMaterialClassOptions_Masked ? (this->maskedInfo != nullptr) : true && "Masked info for surface material not set, while material has Masked as a blend mode set!");
+		SHARD3D_ASSERT(classFlags & SurfaceMaterialClassOptions_Translucent ? (this->translucentInfo != nullptr) : true && "Translucent info for surface material not set, while material has Translucent as a blend mode set!");
+
 		*out << YAML::BeginMap;
 		*out << YAML::Key << "diffuseColor" << YAML::Value << this->diffuseColor;
 		*out << YAML::Key << "diffuseTex" << YAML::Value << this->diffuseTex.getFile();
@@ -211,9 +209,9 @@ namespace Shard3D {
 		*out << YAML::Key << "metallicTex" << YAML::Value << this->metallicTex.getFile();	
 		*out << YAML::Key << "normalTex" << YAML::Value << this->normalTex.getFile();
 
-		if (blendMode == SurfaceMaterialBlendModeMasked)
+		if (classFlags & SurfaceMaterialClassOptions_Masked)
 			*out << YAML::Key << "maskTex" << YAML::Value << this->maskedInfo->maskTex.getFile();
-		if (blendMode == SurfaceMaterialBlendModeTranslucent) {
+		if (classFlags & SurfaceMaterialClassOptions_Translucent) {
 			*out << YAML::Key << "opacityTex" << YAML::Value << this->translucentInfo->opacityTex.getFile();
 			*out << YAML::Key << "opacity" << YAML::Value << this->translucentInfo->opacity;
 		}
@@ -232,49 +230,30 @@ namespace Shard3D {
 		this->shininessTex = (*data)["Data"]["shininessTex"].as<std::string>();
 		this->metallicTex = (*data)["Data"]["metallicTex"].as<std::string>();
 
-		if (blendMode & SurfaceMaterialBlendModeMasked)
+		if (classFlags & SurfaceMaterialClassOptions_Masked)
 			this->maskedInfo->maskTex = (*data)["Data"]["maskTex"].as<std::string>();
 
-		if (blendMode & SurfaceMaterialBlendModeTranslucent) {
+		if (classFlags & SurfaceMaterialClassOptions_Translucent) {
 			this->translucentInfo->opacity = (*data)["Data"]["opacity"].as<float>();
 			this->translucentInfo->opacityTex = (*data)["Data"]["opacityTex"].as<std::string>();
 		}
 	}
 
 	void SurfaceMaterial_Shaded::loadAllTextures() {
-		if (blendMode & SurfaceMaterialBlendModeMasked)
-			SHARD3D_ASSERT(this->maskedInfo && "Masked info for surface material not set, while material has Masked as a blend mode set!");
-		if (blendMode & SurfaceMaterialBlendModeTranslucent)
-			SHARD3D_ASSERT(this->translucentInfo && "Translucent info for surface material not set, while material has Translucent as a blend mode set!");
-		
+		SHARD3D_ASSERT(classFlags & SurfaceMaterialClassOptions_Masked ? (this->maskedInfo != nullptr) : true && "Masked info for surface material not set, while material has Masked as a blend mode set!");
+		SHARD3D_ASSERT(classFlags & SurfaceMaterialClassOptions_Translucent ? (this->translucentInfo != nullptr) : true && "Translucent info for surface material not set, while material has Translucent as a blend mode set!");
+
 		ResourceHandler::loadTexture(this->normalTex);
 		ResourceHandler::loadTexture(this->diffuseTex);
 		ResourceHandler::loadTexture(this->specularTex);
 		ResourceHandler::loadTexture(this->shininessTex);
 		ResourceHandler::loadTexture(this->metallicTex);
 
-		if (blendMode & SurfaceMaterialBlendModeMasked)
+		if (classFlags & SurfaceMaterialClassOptions_Masked)
 			ResourceHandler::loadTexture(this->maskedInfo->maskTex);
-		if (blendMode & SurfaceMaterialBlendModeTranslucent)
+		if (classFlags & SurfaceMaterialClassOptions_Translucent)
 			ResourceHandler::loadTexture(this->translucentInfo->opacityTex);
 	}
-	// experimental
-	/*
-		void SurfaceMaterial_ShadedMasked::createMaterialShader(EngineDevice& device, uPtr<EngineDescriptorPool>& descriptorPool) {
-			// pseudo code
-
-			std::string foo{};
-			std::string foo2{};
-
-			foo = "shaders/__experimental/blueprints/surface_shaded.frag";
-
-			if (type == shadedopaque)
-			foo2 = "shaders/__experimental/blueprints/surface_opaque.frag";
-
-			built = true;
-		}
-	*/
-
 
 #pragma endregion
 #pragma region SurfaceUnshaded
@@ -298,7 +277,7 @@ namespace Shard3D {
 	}	
 	
 	void PostProcessingMaterial::free() {
-		MaterialSystem::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
+		MaterialHandler::destroyPipelineLayout(materialPipelineConfig->shaderPipelineLayout);
 		//if (SharedPools::staticMaterialPool)
 			SharedPools::staticMaterialPool->freeDescriptors({ this->materialDescriptorInfo.params });
 	}
@@ -343,18 +322,18 @@ namespace Shard3D {
 		myParamsBuffer->flush();
 		
 		materialPipelineConfig = make_uPtr<_MaterialComputePipelineConfigInfo>();
-		MaterialSystem::createPPOPipelineLayout(
+		MaterialHandler::createPPOPipelineLayout(
 			&materialPipelineConfig->shaderPipelineLayout,
 			materialDescriptorInfo.paramsLayout->getDescriptorSetLayout()
 		);
 		
 		if (strUtils::hasEnding(this->shaderPath, ".spv"))
-			MaterialSystem::createPPOPipeline(
+			MaterialHandler::createPPOPipeline(
 				&materialPipelineConfig->shaderPipeline,
 				materialPipelineConfig->shaderPipelineLayout,
 				this->shaderPath);
 		else
-			MaterialSystem::createPPOPipeline(
+			MaterialHandler::createPPOPipeline(
 				&materialPipelineConfig->shaderPipeline,
 				materialPipelineConfig->shaderPipelineLayout,
 				ShaderSystem::compileOnTheFly(this->shaderPath, ShaderType::Compute));

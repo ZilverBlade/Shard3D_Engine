@@ -8,10 +8,11 @@ layout(location = 1) in vec3 fragNormalWorld;
 layout(location = 2) in vec2 fragUV;
 
 layout (location = 0) out vec4 outColor;
+#ifdef S3SDSEXP_ENABLE_FORWARD_GBUFFER
 layout (location = 1) out vec4 outPosition;
 layout (location = 2) out vec4 outNormal;
 layout (location = 3) out vec4 outMaterialData;
-
+#endif
 layout(set = 1, binding = 1) uniform MaterialFactor{
 	vec4 diffuse;
 	float specular;
@@ -195,9 +196,11 @@ const float opacity =
 #endif
 ;
 	outColor = vec4(calculatedLight, opacity); //RGBA
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 	outPosition = vec4(fragPosWorld, 1.0);
-#ifdef S3DSDEF_SHADER_PERMUTATION_SURFACE_SHADED
+#ifdef S3SDSEXP_ENABLE_FORWARD_GBUFFER
 	outNormal = vec4(N, 1.0); 
 	outMaterialData = vec4(material_specular, material_shininess,material_metallic, 1.0); //RGBA
+#endif
 #endif
 }

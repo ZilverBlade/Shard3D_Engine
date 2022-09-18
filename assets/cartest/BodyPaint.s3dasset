@@ -1,4 +1,4 @@
-Shard3D: 1.2.7.r5-alpha
+Shard3D: 1.2.8.r7-alpha
 AssetType: surface_material
 SurfaceMaterial:
   - Material: BodyPaint
@@ -7,7 +7,7 @@ SurfaceMaterial:
       Class: class Shard3D::SurfaceMaterial_Shaded
       BlendMode: 0
     Draw:
-      VkCullModeFlags: 1
+      VkCullModeFlags: 0
       VkPolygonMode: 0
     Data:
       diffuseColor: [1, 0, 0]

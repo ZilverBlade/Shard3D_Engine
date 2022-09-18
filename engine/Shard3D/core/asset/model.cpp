@@ -188,6 +188,7 @@ namespace Shard3D::Resources {
 		VkBuffer _buffers[] = { buffers.vertexBuffer->getBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, _buffers, offsets);
+		
 		if (buffers.hasIndexBuffer) {
 			vkCmdBindIndexBuffer(commandBuffer, buffers.indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		}
@@ -295,7 +296,7 @@ namespace Shard3D::Resources {
 				submeshes[materialSlot].indices.push_back(face.mIndices[j]);
 		}
 
-
+		std::string cleanString = strUtils::removeIllegalPathChars(materialSlot);
 		if (createMaterials) {
 			aiColor4D color{1.f, 1.f, 1.f, 1.f};
 			aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color);
@@ -312,13 +313,13 @@ namespace Shard3D::Resources {
 			grid_material->specular = specular;
 			grid_material->shininess = shininess;
 			grid_material->metallic = metallic;
-			grid_material->drawData.culling = VK_CULL_MODE_FRONT_BIT;
+			grid_material->setCullMode(VK_CULL_MODE_FRONT_BIT);
 
-			AssetManager::createMaterial(workingDir + "/" + materialSlot + ".s3dasset", grid_material);
+			AssetManager::createMaterial(workingDir + "/" + cleanString + ".s3dasset", grid_material);
 		}
 		AssetID m_asset = ResourceHandler::coreAssets.s_errorMaterial;
-		if (IOUtils::doesFileExist(workingDir + "/" + materialSlot + ".s3dasset")) {
-			m_asset = AssetID(workingDir + "/" + materialSlot + ".s3dasset");
+		if (IOUtils::doesFileExist(workingDir + "/" + cleanString + ".s3dasset")) {
+			m_asset = AssetID(workingDir + "/" + cleanString + ".s3dasset");
 		}
 
 		submeshes[materialSlot].materialAsset = m_asset;

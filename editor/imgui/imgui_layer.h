@@ -26,6 +26,7 @@ namespace Shard3D {
 
 		void detach();
 		void render(FrameInfo& frameInfo);
+		void draw(FrameInfo& frameInfo);
 		void attachGUIEditorInfo(sPtr<HUDContainer>& container);
 
 		bool handleWindowResize(FrameInfo& frameInfo);

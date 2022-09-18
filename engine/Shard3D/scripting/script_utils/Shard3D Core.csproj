@@ -50,6 +50,7 @@
     <Compile Include="HUD\HUD.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="InternalCalls.cs" />
+    <Compile Include="Math\Bezier.cs" />
     <Compile Include="Math\Comparison.cs" />
     <Compile Include="Math\Lerp.cs" />
     <Compile Include="Animation\Tween.cs" />

@@ -55,7 +55,7 @@ namespace Shard3D {
 			const AssetID m_defaultModel =			AssetID("assets/_engine/msh/cube.obj.s3dasset");			// Cube Mesh model
 			 
 			const AssetID s_errorMaterial =			AssetID("assets/_engine/mat/world_grid.s3dasset");		// Opaque surface material (world grid)
-			const AssetID s_blankMaterial = AssetID("assets/_engine/mat/world_grid_blank.s3dasset");		// Opaque surface material (world grid)
+			const AssetID s_blankMaterial =			AssetID("assets/_engine/mat/world_grid_blank.s3dasset");		// Opaque surface material (world grid)
 		} static inline coreAssets;
 
 		//Clears textureAssets

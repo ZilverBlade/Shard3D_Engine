@@ -63,9 +63,8 @@ namespace Shard3D {
 	}
 
 	VkCommandBuffer EngineRenderer::beginFrame() {
-#ifndef NDEBUG
 		SHARD3D_ASSERT(!isFrameStarted && "Can't call beginFrame while already in progress");
-#endif
+
 		auto result = engineSwapChain->acquireNextImage(&currentImageIndex);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {

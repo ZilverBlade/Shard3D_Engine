@@ -46,6 +46,8 @@ namespace Shard3D {
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Depth
 			);
+
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 			mainPositionFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
@@ -75,7 +77,7 @@ namespace Shard3D {
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Color
 			);
-
+#endif
 			AttachmentInfo colorAttachmentInfo{};
 			colorAttachmentInfo.frameBufferAttachment = mainColorFramebufferAttachment;
 			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -87,6 +89,7 @@ namespace Shard3D {
 			depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 
 
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 			AttachmentInfo positionAttachmentInfo{};
 			positionAttachmentInfo.frameBufferAttachment = mainPositionFramebufferAttachment;
 			positionAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -103,27 +106,38 @@ namespace Shard3D {
 			materialAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			materialAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
-
+#endif
 			mainRenderpass = new RenderPass(
 				engineDevice, {
 				colorAttachmentInfo,
-				depthAttachmentInfo,
+				depthAttachmentInfo
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
+			,
 				positionAttachmentInfo,
 				normalAttachmentInfo,
 				materialAttachmentInfo
+#endif
 				});
 
-			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment });
+			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
+				, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment
+#endif	
+				});
 		}
 	}
 
 	void Application::destroyRenderPasses() {
 		delete mainFrameBuffer;
 		delete mainRenderpass;
+
 		delete mainColorFramebufferAttachment;
 		delete mainDepthFramebufferAttachment;
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
+		delete mainPositionFramebufferAttachment;
 		delete mainNormalFramebufferAttachment;
 		delete mainMaterialDataFramebufferAttachment;
+#endif
 
 	}
 
@@ -246,10 +260,10 @@ namespace Shard3D {
 				lightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
 				uboBuffers[frameIndex]->flush();
-				
+
 				//	render
 				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
-				forwardRenderSystem.renderForward(frameInfo);
+				forwardRenderSystem.renderForwardOld(frameInfo);
 				billboardRenderSystem.render(frameInfo);
 				mainRenderpass->endRenderPass(frameInfo);
 

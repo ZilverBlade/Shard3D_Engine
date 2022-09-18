@@ -5,6 +5,7 @@
 #include "../../core.h"
 #include "../asset/assetmgr.h"
 #include <fstream>
+#include "../../systems/handlers/render_handler.h"
 namespace Shard3D {
 	namespace ECS {
 		LevelManager::LevelManager(sPtr<Level>& level) : mLevel(level) { 
@@ -187,7 +188,7 @@ namespace Shard3D {
 			strStream << stream.rdbuf();
 
 			YAML::Node data = YAML::Load(strStream.str());
-
+			RenderHandler::clear();
 			try {
 				if (ignoreWarns == false) {
 					if (!data["Level"]) return LevelMgrResults::WrongFileResult;
@@ -217,7 +218,6 @@ namespace Shard3D {
 							loadedActor.getComponent<Components::TransformComponent>().setRotation(actor["TransformComponent"]["Rotation"].as<glm::vec3>());
 							loadedActor.getComponent<Components::TransformComponent>().setScale(actor["TransformComponent"]["Scale"].as<glm::vec3>());
 						}
-
 						
 						// AUDIO
 						if (actor["AudioComponent"]) {
@@ -284,6 +284,7 @@ namespace Shard3D {
 							for (auto& material : loadedActor.getComponent<Components::Mesh3DComponent>().materials) {
 								ResourceHandler::loadSurfaceMaterialRecursive(material);
 							}
+							RenderHandler::addActorToRenderList(loadedActor);
 						}
 						
 						if (actor["PointlightComponent"]) {

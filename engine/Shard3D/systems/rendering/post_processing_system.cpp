@@ -6,7 +6,7 @@
 #include "../../vulkan_abstr.h"
 #include "../../ecs.h"
 #include "../../core/misc/graphics_settings.h"
-#include "../buffers/material_system.h"
+#include "../handlers/material_handler.h"
 
 namespace Shard3D {
 	static void setVkDescriptorImageInfo(VkDescriptorImageInfo* descriptor, FrameBufferAttachment* attachment) {
@@ -17,39 +17,48 @@ namespace Shard3D {
 
 	void PostProcessingSystem::updateDescriptors(PostProcessingGBufferInput imageInput) {
 		setVkDescriptorImageInfo(&ppoDescriptor_BaseRenderedScene, imageInput.baseRenderedScene);
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 		setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
 		setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
 		setVkDescriptorImageInfo(&ppoDescriptor_MaterialSceneInfo, imageInput.materialSceneInfo);
+#endif
 		EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
 			.writeImage(0, &ppoDescriptor_BaseRenderedScene)
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 			.writeImage(1, &ppoDescriptor_PositionSceneInfo)
 			.writeImage(2, &ppoDescriptor_NormalSceneInfo)
 			.writeImage(3, &ppoDescriptor_MaterialSceneInfo)
+#endif
 			.build(ppo_InputDescriptorSet);
 	}
 
 	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass presentingRenderPass, PostProcessingGBufferInput imageInput) : engineDevice(device) {
 		setVkDescriptorImageInfo(&ppoDescriptor_BaseRenderedScene, imageInput.baseRenderedScene);
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 		setVkDescriptorImageInfo(&ppoDescriptor_PositionSceneInfo, imageInput.positionSceneInfo);
 		setVkDescriptorImageInfo(&ppoDescriptor_NormalSceneInfo, imageInput.normalSceneInfo);
 		setVkDescriptorImageInfo(&ppoDescriptor_MaterialSceneInfo, imageInput.materialSceneInfo);
-
+#endif
 		ppo_Layout = EngineDescriptorSetLayout::Builder(engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 			.addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
 			.addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
 			.addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT)
+#endif
 			.build();
 
 		EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
 			.writeImage(0, &ppoDescriptor_BaseRenderedScene)
+#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
 			.writeImage(1, &ppoDescriptor_PositionSceneInfo)
 			.writeImage(2, &ppoDescriptor_NormalSceneInfo)
 			.writeImage(3, &ppoDescriptor_MaterialSceneInfo)
+#endif
 			.build(ppo_InputDescriptorSet);
 
 
-		MaterialSystem::setRenderedSceneImageLayout(ppo_Layout->getDescriptorSetLayout());
+		MaterialHandler::setRenderedSceneImageLayout(ppo_Layout->getDescriptorSetLayout());
 
 		createPipelineLayout();
 		createPipelines(presentingRenderPass);

@@ -195,4 +195,49 @@ namespace Shard3D.Scripts
 		{
 		}
 	}
+
+	public class BezierTest : Actor
+	{
+		private Shard3D.Core.Animation.TweenBezierFloat tweenY;
+
+		protected void BeginEvent()
+		{
+			Math.Bezier curve = new Math.Bezier
+			{
+				curveOrigin = new Vector2(0.0f, 1f),
+				curveDest = new Vector2(1f, 1f)
+			};
+
+			tweenY = new Animation.TweenBezierFloat(2f, 0f, 1f, curve);
+
+			return;
+			tweenY.p2x = 0f;
+			tweenY.p2y = 1.2f;
+			tweenY.p3x = 0.66f;
+			tweenY.p3y = 1.45f;
+
+		}
+
+		protected void TickEvent(float dt)
+		{
+			Vector3 Translation = this.GetComponent<Components.TransformComponent>().Translation;
+			tweenY.Update(dt);
+			Translation.y = tweenY.GetValue();
+			this.GetComponent<Components.TransformComponent>().Translation = Translation;
+			System.Console.WriteLine(tweenY.GetAlpha());
+		}
+
+		protected void EndEvent()
+		{
+		}
+		protected void KillEvent()
+		{
+		}
+
+		protected void SpawnEvent()
+		{
+		}
+	}
+
+
 }

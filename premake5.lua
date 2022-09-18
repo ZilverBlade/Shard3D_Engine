@@ -55,6 +55,7 @@ project "Shard3D"
 	  "engine/Shard3D/systems/systems.h",
 	  "engine/Shard3D/systems/buffers/**.*",
 	  "engine/Shard3D/systems/computational/**.*",
+	  "engine/Shard3D/systems/handlers/**.*",
 	  "engine/Shard3D/systems/rendering/**.*",
 	  "engine/Shard3D/systems/rendering/editor/**.*",
 	 

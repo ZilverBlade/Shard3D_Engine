@@ -16,7 +16,6 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Shard3D</RootNamespace>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -57,7 +56,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>26812;4244;4996;4005;;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26812;4244;4996;4005;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\Vulkan-1.3.211.0\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\yaml\include;..\extern\entt\1include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -80,7 +79,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>26812;4244;4996;4005;;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26812;4244;4996;4005;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\Vulkan-1.3.211.0\Include;..\extern\glfw-3.3.7\include;..\extern\spdlog;..\extern\joltphysics\include;..\extern\yaml\include;..\extern\entt\1include;..\extern\stb\include;..\extern\miniaudio\1include;..\extern\mono\include;..\extern\assimp\include;..\extern\half;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MaxSpeed</Optimization>
@@ -156,10 +155,11 @@
     <ClInclude Include="scripting\script_handler.h" />
     <ClInclude Include="static_definitions.h" />
     <ClInclude Include="systems\buffers\light_system.h" />
-    <ClInclude Include="systems\buffers\material_system.h" />
     <ClInclude Include="systems\computational\particle_system.h" />
     <ClInclude Include="systems\computational\physics_system.h" />
     <ClInclude Include="systems\computational\shader_system.h" />
+    <ClInclude Include="systems\handlers\material_handler.h" />
+    <ClInclude Include="systems\handlers\render_handler.h" />
     <ClInclude Include="systems\rendering\billboard_system.h" />
     <ClInclude Include="systems\rendering\editor\editor_billboard_renderer.h" />
     <ClInclude Include="systems\rendering\editor\grid_system.h" />
@@ -214,10 +214,11 @@
     <ClCompile Include="scripting\script_engine.cpp" />
     <ClCompile Include="scripting\script_engine_linker.cpp" />
     <ClCompile Include="systems\buffers\light_system.cpp" />
-    <ClCompile Include="systems\buffers\material_system.cpp" />
     <ClCompile Include="systems\computational\particle_system.cpp" />
     <ClCompile Include="systems\computational\physics_system.cpp" />
     <ClCompile Include="systems\computational\shader_system.cpp" />
+    <ClCompile Include="systems\handlers\material_handler.cpp" />
+    <ClCompile Include="systems\handlers\render_handler.cpp" />
     <ClCompile Include="systems\rendering\billboard_system.cpp" />
     <ClCompile Include="systems\rendering\editor\editor_billboard_renderer.cpp" />
     <ClCompile Include="systems\rendering\editor\grid_system.cpp" />

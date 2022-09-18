@@ -51,10 +51,10 @@ namespace Shard3D {
 			loadTexture(coreAssets.t_whiteTexture);
 			loadTexture(coreAssets.t_blackTexture);
 			loadTexture(coreAssets.t_normalTexture);
-			loadMesh(coreAssets.m_defaultModel);
-			loadMesh(coreAssets.m_errorMesh);
 			loadSurfaceMaterial(coreAssets.s_errorMaterial);
 			loadSurfaceMaterial(coreAssets.s_blankMaterial);
+			loadMesh(coreAssets.m_defaultModel);
+			loadMesh(coreAssets.m_errorMesh);
 
 			loadPPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
 			loadPPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));

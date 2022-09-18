@@ -7,7 +7,6 @@ namespace Shard3D {
 		particlePool.resize(1000);
 	}
 	ParticleSystem::~ParticleSystem() {
-
 	}
 	void ParticleSystem::update(FrameInfo& frameInfo) {
 

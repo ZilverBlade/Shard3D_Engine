@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <Shard3D/core/asset/assetmgr.h>
 #include <Shard3D/utils/dialogs.h>
+#include <Shard3D/systems/handlers/render_handler.h>
 namespace Shard3D {
 
 	LevelTreePanel::LevelTreePanel(const sPtr<Level>& levelContext) {
@@ -38,7 +39,7 @@ namespace Shard3D {
 				actor.addComponent<Components::CameraComponent>(); 
 				if (!actor.hasComponent<Components::Mesh3DComponent>()) {
 					ResourceHandler::loadMesh(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
-					actor.addComponent<Components::Mesh3DComponent>(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+					RenderHandler::addMesh3DComponentToActor(actor, AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
 					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
 					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));
 				}
@@ -51,7 +52,7 @@ namespace Shard3D {
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {
-			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); actor.addComponent<Components::Mesh3DComponent>(ResourceHandler::coreAssets.m_defaultModel); }
+			if (ImGui::MenuItem("New Static Mesh")) { auto actor = context->createActor("Cube"); RenderHandler::addMesh3DComponentToActor(actor, ResourceHandler::coreAssets.m_defaultModel);}
 			ImGui::EndPopup();
 		}
 		if (ImGui::BeginPopupContextWindow(0, 1, false)) {

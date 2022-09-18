@@ -98,7 +98,7 @@ namespace Shard3D {
     class SharedPools {
     public:
         // (0 = global, 1 = per-material static, 2 = per-material dynamic, 3 = per-draw), 
-        // https://www.reddit.com/r/gamedev/comments/kybh22/vulkan_material_system_descriptor_management_and/
+        // https://www.reddit.com/r/gamedev/comments/kybh22/vulkan_material_handler_descriptor_management_and/
 
         static inline uPtr<EngineDescriptorPool> globalPool{};
         static inline uPtr<EngineDescriptorPool> staticMaterialPool{};

@@ -33,7 +33,7 @@ namespace Shard3D {
 		__h_ctr->monoTypeRegistryAppenderHasComponent.push_back([](ECS::Actor actor) { return actor.hasComponent<Component>(); });
 		__h_ctr->monoTypeRegistryAppenderAddComponent.push_back([](ECS::Actor actor) { actor.addComponent<Component>(); });
 		__h_ctr->monoTypeRegistryAppenderRmvComponent.push_back([](ECS::Actor actor) { actor.killComponent<Component>(); });
-		SHARD3D_LOG("Registered component: '{0}'", corrected_typename);
+		SHARD3D_INFO("Registered component: '{0}'", corrected_typename);
 	}
 
 	void ScriptEngineLinker::registerLinker() {

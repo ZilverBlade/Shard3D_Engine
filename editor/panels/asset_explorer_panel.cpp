@@ -90,8 +90,6 @@ namespace Shard3D {
 		bool refresh_it = false;
 		
 		ImGui::Begin("Asset Explorer");
-		SHARD3D_STAT_RECORD();
-		SHARD3D_STAT_RECORD_END({ "ImGui", "Widgets" });
 		if (ImGui::ImageButtonWithText(refreshIcon, "Refresh", {16.f, 16.f})) {
 			refreshIterator(currentDir);
 			ImGui::End();

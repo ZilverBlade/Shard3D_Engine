@@ -1,0 +1,21 @@
+Shard3D: 1.2.8.r7-alpha
+AssetType: surface_material
+SurfaceMaterial:
+  - Material: sponza:Material__299
+    Physics:
+      MaterialType: SurfaceMaterial
+      Class: class Shard3D::SurfaceMaterial_Shaded
+      BlendMode: 0
+    Draw:
+      VkCullModeFlags: 1
+      VkPolygonMode: 0
+    Data:
+      diffuseColor: [0.800000012, 0.800000012, 0.800000012]
+      diffuseTex: assets/_engine/tex/0xffffff.png.s3dasset
+      specularFactor: 0.5
+      specularTex: assets/_engine/tex/0xffffff.png.s3dasset
+      shininessFactor: 0.346410155
+      shininessTex: assets/_engine/tex/0xffffff.png.s3dasset
+      metallicFactor: 0
+      metallicTex: assets/_engine/tex/0xffffff.png.s3dasset
+      normalTex: assets/_engine/tex/0x807ffe.png.s3dasset

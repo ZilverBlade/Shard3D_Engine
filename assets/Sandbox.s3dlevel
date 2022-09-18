@@ -1,0 +1,90 @@
+Shard3D: 1.2.8.r6-alpha
+Level: \Sandbox.s3dlevel
+LastSavedEditorCameraPos: [5.32554483, 2.93233538, 1.41921532]
+Actors:
+  - Actor: 2945342408738975265
+    TagComponent:
+      Tag: Script Test
+    TransformComponent:
+      Translation: [0, 0, 1.70000005]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      Module: BezierTest
+      Language: C#
+    BillboardComponent:
+      TextureAsset: assets/what.s3dasset
+      BillboardOrientation: 0
+  - Actor: 8840792973453081470
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 0.00999999978]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/_engine/mat/world_grid_blank.s3dasset]
+  - Actor: 13769830534836983219
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [-5, 0, 2.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 14689840036996039687
+    TagComponent:
+      Tag: Pointlight
+    TransformComponent:
+      Translation: [5, 0, 2.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointlightComponent:
+      Emission: [1, 1, 1, 1]
+      Radius: 1
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 9853183963608249096
+    TagComponent:
+      Tag: Camera Actor
+    TransformComponent:
+      Translation: [0, -3.65570068, 1.58396971]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      ProjectionType: 1
+      FOV: 70
+      NearClipPlane: 0.0500000007
+      FarClipPlane: 1024
+      PostProcessing: [[assets/_engine/mat/ppo/hdr_vfx.s3dasset, [3, !!binary "AACAPw=="], [3, !!binary "AAAAAA=="], [3, !!binary "AACAPw=="], [3, !!binary "AACAPw=="]], [assets/_engine/mat/ppo/bloom_vfx.s3dasset, [3, !!binary "AACAPw=="], [3, !!binary "AACAPw=="], [2, !!binary "DAAAAA=="]]]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/camcord.obj.s3dasset
+      Materials: [assets/materialdata/None.s3dasset]
+  - Actor: 12143776608878735676
+    TagComponent:
+      Tag: Spotlight
+    TransformComponent:
+      Translation: [0, -5.15893316, 2.38523579]
+      Rotation: [0, 0.572467983, -0.397935063]
+      Scale: [1, 1.74000001, 1]
+    SpotlightComponent:
+      Emission: [1, 1, 1, 9.93000031]
+      Radius: 1
+      Angle: [1.150172, 1.20253181]
+      Specularness: 1
+      AttenuationCLQ: [0, 0, 1]
+  - Actor: 7874303860760733948
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [-3.79999995, -1.5, 0.5]
+      Rotation: [0, 0, 0]
+      Scale: [0.5, 1, 0.319999993]
+    Mesh3DComponent:
+      MeshAsset: assets/_engine/msh/cube.obj.s3dasset
+      Materials: [assets/Material.s3dasset]
