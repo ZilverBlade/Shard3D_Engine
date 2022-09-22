@@ -31,7 +31,7 @@ namespace Shard3D {
 		void setWindowCallbacks();
 		void createRenderPasses();
 		void destroyRenderPasses();
-		void resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem);
+		void resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* ppoSystem, void* gbuffer);
 		void loadStaticObjects();
 
 		void eventEvent(Events::Event& e);
@@ -41,15 +41,6 @@ namespace Shard3D {
 		EngineDevice engineDevice{ engineWindow };
 		EngineRenderer engineRenderer{ engineWindow, engineDevice };
 		
-		FrameBufferAttachment* mainColorFramebufferAttachment;
-		FrameBufferAttachment* mainDepthFramebufferAttachment;
-		FrameBufferAttachment* mainPositionFramebufferAttachment;
-		FrameBufferAttachment* mainNormalFramebufferAttachment;
-		FrameBufferAttachment* mainMaterialDataFramebufferAttachment;
-
-		FrameBuffer* mainFrameBuffer;
-		RenderPass* mainRenderpass;
-
 		// ECS
 		sPtr<ECS::Level> level;
 	};

@@ -6,37 +6,38 @@
 #include "../../core/ui/hud.h"
 
 namespace Shard3D {
-	class HUDRenderSystem {
-	public:
-		HUDRenderSystem();
-		~HUDRenderSystem();
+	inline namespace Systems {
+		class HUDRenderSystem {
+		public:
+			HUDRenderSystem();
+			~HUDRenderSystem();
 
-		void reset();
+			void reset();
 
-		HUDRenderSystem(const HUDRenderSystem&) = delete;
-		HUDRenderSystem& operator=(const HUDRenderSystem&) = delete;
+			HUDRenderSystem(const HUDRenderSystem&) = delete;
+			HUDRenderSystem& operator=(const HUDRenderSystem&) = delete;
 
-		void create(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass);
-		void destroy();
-		uint64_t getSelectedID();
-		void render(FrameInfo& frameInfo, HUD& gui);
-	private:
-		void createPipelineLayout();
-		void createPipeline(VkRenderPass renderPass);
+			void create(EngineDevice& dvc, EngineWindow& wnd, VkRenderPass renderPass);
+			void destroy();
+			uint64_t getSelectedID();
+			void render(FrameInfo& frameInfo, HUD& gui);
+		private:
+			void createPipelineLayout();
+			void createPipeline(VkRenderPass renderPass);
 
-		uPtr<GraphicsPipeline> graphicsPipeline;
-		uPtr<EngineDescriptorSetLayout> guiSystemLayout;
-		uPtr<EngineDescriptorSetLayout> ssboLayout;
+			uPtr<GraphicsPipeline> graphicsPipeline;
+			uPtr<EngineDescriptorSetLayout> guiSystemLayout;
+			uPtr<EngineDescriptorSetLayout> ssboLayout;
 
-		uPtr<EngineBuffer> pickBuffer;
+			uPtr<EngineBuffer> pickBuffer;
 
-		VkPipelineLayout pipelineLayout;
-		VkDescriptorSet ssboDescriptorSet{};
+			VkPipelineLayout pipelineLayout;
+			VkDescriptorSet ssboDescriptorSet{};
 
-		EngineDevice* device;
-		EngineWindow* window;
+			EngineDevice* device;
+			EngineWindow* window;
 
-		friend class HUDLayer;
-	};
-
+			friend class HUDLayer;
+		};
+	}
 }

@@ -264,6 +264,12 @@
     <ClInclude Include="version.h" />
     <ClInclude Include="vulkan_abstr.h" />
     <ClInclude Include="workarounds.h" />
+    <ClInclude Include="systems\rendering\deferred_render_system.h">
+      <Filter>systems\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\misc\engine_settings.h">
+      <Filter>core\misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shard3D.cpp" />
@@ -406,5 +412,9 @@
     <ClCompile Include="utils\stats_timing.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="systems\rendering\deferred_render_system.cpp">
+      <Filter>systems\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\misc\engine_settings.cpp" />
   </ItemGroup>
 </Project>

@@ -11,6 +11,7 @@ layout(location = 8) out mat4 fragProj;
 
 layout(set = 0, binding = 0) uniform GlobalUbo{
 	mat4 projection;
+	mat4 invProjection;
 	mat4 view;
 	mat4 invView;
 } ubo;
@@ -25,16 +26,15 @@ vec3 gridPlane[6] = vec3[](
 	vec3(1, -1, 0)
 );
 
-vec3 UnprojectPoint(float x, float y, float z, mat4 projection) {
-    mat4 projInv = inverse(projection);
-    vec4 unprojectedPoint =  ubo.invView * projInv * vec4(x, y, z, 1.0);
+vec3 UnprojectPoint(float x, float y, float z) {
+    vec4 unprojectedPoint =  ubo.invView * ubo.invProjection * vec4(x, y, z, 1.0);
     return unprojectedPoint.xyz / unprojectedPoint.w;
 }
 
 void main() {
 	vec3 p = gridPlane[gl_VertexIndex].xyz;
-    nearPoint = UnprojectPoint(p.x, p.y, 0.0, ubo.projection).xyz; // unprojecting on the near plane
-    farPoint = UnprojectPoint(p.x, p.y, 0.5, ubo.projection).xyz; // unprojecting on the far plane
+    nearPoint = UnprojectPoint(p.x, p.y, 0.0).xyz; // unprojecting on the near plane
+    farPoint = UnprojectPoint(p.x, p.y, 0.5).xyz; // unprojecting on the far plane
 		
 	fragView = ubo.view;
 	fragProj = ubo.projection;

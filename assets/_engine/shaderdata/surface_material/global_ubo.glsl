@@ -1,3 +1,5 @@
+#ifndef GLOBAL_UBO_GLSL
+#define GLOBAL_UBO_GLSL
 struct Pointlight {
 	vec4 position;
 	vec4 color;
@@ -23,15 +25,19 @@ struct DirectionalLight {
 
 layout(set = 0, binding = 0) uniform GlobalUbo{
 	mat4 projection;
+	mat4 invProjection;
 	mat4 view;
 	mat4 invView;
 
+	vec2 screenSize;
+
 	vec4 ambientLightColor;			//	sky/ambient
 
-	Pointlight pointlights[128];
-	Spotlight spotlights[128];
-	DirectionalLight directionalLights[6];
+	Pointlight pointlights[256];
+	Spotlight spotlights[256];
+	DirectionalLight directionalLights[16];
 	int numPointlights;
 	int numSpotlights;
 	int numDirectionalLights;
 } ubo;
+#endif

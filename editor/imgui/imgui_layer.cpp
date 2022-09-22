@@ -339,9 +339,10 @@ namespace Shard3D {
 				else if (h_code == typeid(Components::SpotlightComponent).hash_code())
 					frameInfo.activeLevel->createActor("Spotlight").addComponent<Components::SpotlightComponent>();
 				else if (h_code == 32325235)
-					frameInfo.activeLevel->createActor("Cube").addComponent<Components::Mesh3DComponent>(ResourceHandler::coreAssets.m_defaultModel);
+					RenderHandler::addMesh3DComponentToActor(frameInfo.activeLevel->createActor("Cube"), ResourceHandler::coreAssets.m_defaultModel);
 				else if (h_code == typeid(Components::CameraComponent).hash_code()) {
 					Actor actor = frameInfo.activeLevel->createActor("Camera Actor"); RenderHandler::addMesh3DComponentToActor(actor, AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
+					ResourceHandler::loadMesh(AssetID("assets/_engine/msh/camcord.obj" ENGINE_ASSET_SUFFIX));
 					actor.addComponent<Components::CameraComponent>();
 					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/hdr_vfx.s3dasset"));
 					actor.getComponent<Components::CameraComponent>().postProcessMaterials.emplace_back(ResourceHandler::retrievePPOMaterial(AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset")).get(), AssetID("assets/_engine/mat/ppo/bloom_vfx.s3dasset"));

@@ -32,108 +32,9 @@ namespace Shard3D {
 	}
 
 	void Application::createRenderPasses() {
-		{ // Main renderer
-			mainColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				VK_FORMAT_R32G32B32A32_SFLOAT,
-				VK_IMAGE_ASPECT_COLOR_BIT,
-				{ wndWidth, wndHeight, 1 },
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-				VK_IMAGE_LAYOUT_GENERAL,
-				VK_SAMPLE_COUNT_1_BIT
-				}, FrameBufferAttachmentType::Color
-			);
-
-			mainDepthFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				engineRenderer.getSwapchain()->findDepthFormat(),
-				VK_IMAGE_ASPECT_DEPTH_BIT,
-				{ wndWidth, wndHeight, 1 },
-				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-				VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL,
-				VK_SAMPLE_COUNT_1_BIT
-				}, FrameBufferAttachmentType::Depth
-			);
-
-#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
-			mainPositionFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				VK_FORMAT_R32G32B32A32_SFLOAT,
-				VK_IMAGE_ASPECT_COLOR_BIT,
-				{ wndWidth, wndHeight, 1 },
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-				VK_IMAGE_LAYOUT_GENERAL,
-				VK_SAMPLE_COUNT_1_BIT
-				}, FrameBufferAttachmentType::Color
-			);
-
-			mainNormalFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				VK_FORMAT_R32G32B32A32_SFLOAT,
-				VK_IMAGE_ASPECT_COLOR_BIT,
-				{ wndWidth, wndHeight, 1 },
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-				VK_IMAGE_LAYOUT_GENERAL,
-				VK_SAMPLE_COUNT_1_BIT
-				}, FrameBufferAttachmentType::Color
-			);
-
-			mainMaterialDataFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-				VK_FORMAT_R32G32B32A32_SFLOAT,
-				VK_IMAGE_ASPECT_COLOR_BIT,
-				{ wndWidth, wndHeight, 1 },
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
-				VK_IMAGE_LAYOUT_GENERAL,
-				VK_SAMPLE_COUNT_1_BIT
-				}, FrameBufferAttachmentType::Color
-			);
-#endif
-			AttachmentInfo colorAttachmentInfo{};
-			colorAttachmentInfo.frameBufferAttachment = mainColorFramebufferAttachment;
-			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-			colorAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-			AttachmentInfo depthAttachmentInfo{};
-			depthAttachmentInfo.frameBufferAttachment = mainDepthFramebufferAttachment;
-			depthAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-			depthAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-
-
-#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
-			AttachmentInfo positionAttachmentInfo{};
-			positionAttachmentInfo.frameBufferAttachment = mainPositionFramebufferAttachment;
-			positionAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-			positionAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-
-			AttachmentInfo normalAttachmentInfo{};
-			normalAttachmentInfo.frameBufferAttachment = mainNormalFramebufferAttachment;
-			normalAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-			normalAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-			AttachmentInfo materialAttachmentInfo{};
-			materialAttachmentInfo.frameBufferAttachment = mainMaterialDataFramebufferAttachment;
-			materialAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-			materialAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-#endif
-			mainRenderpass = new RenderPass(
-				engineDevice, {
-				colorAttachmentInfo,
-				depthAttachmentInfo
-#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
-			,
-				positionAttachmentInfo,
-				normalAttachmentInfo,
-				materialAttachmentInfo
-#endif
-				});
-
-			mainFrameBuffer = new FrameBuffer(engineDevice, mainRenderpass->getRenderPass(), { mainColorFramebufferAttachment, mainDepthFramebufferAttachment
-#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
-				, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment 
-#endif	
-				});
-		}
 		{ // Post processing
-			ppoColorFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
-			VK_FORMAT_R32G32B32A32_SFLOAT,
+			ppoColorFramebufferAttachment = new Rendering::FrameBufferAttachment(engineDevice, {
+				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				{ wndWidth, wndHeight, 1 },
 				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -157,16 +58,6 @@ namespace Shard3D {
 	}
 
 	void Application::destroyRenderPasses() {
-		delete mainFrameBuffer;
-		delete mainRenderpass;
-		delete mainColorFramebufferAttachment;
-		delete mainDepthFramebufferAttachment;
-
-#ifdef ENEXP_ENABLE_FORWARD_GBUFFER
-		delete mainPositionFramebufferAttachment;
-		delete mainNormalFramebufferAttachment;
-		delete mainMaterialDataFramebufferAttachment;
-#endif
 
 		delete ppoFrameBuffer;
 		delete ppoColorFramebufferAttachment;
@@ -205,12 +96,11 @@ namespace Shard3D {
 	}
 
 
-	void Application::resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem) {
-		mainFrameBuffer->resize(glm::ivec3(newWidth, newHeight, 1), mainRenderpass->getRenderPass());
+	void Application::resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem, void* gbuffer) {
 		ppoFrameBuffer->resize(glm::ivec3(newWidth, newHeight, 1), ppoRenderpass->getRenderPass());
 
 		ImGuiInitializer::setViewportImage(&reinterpret_cast<ImGuiLayer*>(editor)->viewportImage, ppoColorFramebufferAttachment);
-		reinterpret_cast<PostProcessingSystem*>(ppoSystem)->updateDescriptors({mainColorFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment});
+		reinterpret_cast<PostProcessingSystem*>(ppoSystem)->updateDescriptors(reinterpret_cast<GBufferInputData*>(gbuffer));
 	}
 
 	void Application::run() {
@@ -237,14 +127,16 @@ namespace Shard3D {
 		}
 
 		
-		GridSystem gridSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		ForwardRenderSystem forwardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
-		PostProcessingSystem ppoSystem { engineDevice, ppoRenderpass->getRenderPass(), {mainColorFramebufferAttachment, mainPositionFramebufferAttachment, mainNormalFramebufferAttachment, mainMaterialDataFramebufferAttachment}};
+		DeferredRenderSystem deferredRenderSystem{ engineDevice, globalSetLayout->getDescriptorSetLayout() };
+
+		GBufferInputData gbuffer = deferredRenderSystem.getGBufferAttachments();
+		GridSystem gridSystem { engineDevice, deferredRenderSystem.getRenderPass()->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		PostProcessingSystem ppoSystem{ engineDevice, ppoRenderpass->getRenderPass(), &gbuffer };
 		ShadowMappingSystem shadowSystem { engineDevice };
 
-		BillboardRenderSystem billboardRenderSystem { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		BillboardRenderSystem billboardRenderSystem { engineDevice, deferredRenderSystem.getRenderPass()->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
-		_EditorBillboardRenderer editorBillboardRenderer { engineDevice, mainRenderpass->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+		_EditorBillboardRenderer editorBillboardRenderer { engineDevice,  deferredRenderSystem.getRenderPass()->getRenderPass(), globalSetLayout->getDescriptorSetLayout() };
 
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
@@ -372,9 +264,10 @@ beginWhileLoop:
 				//	update
 				GlobalUbo ubo{};
 				ubo.projection = possessedCamera.getProjection();
+				ubo.inverseProjection = possessedCamera.getInverseProjection();
 				ubo.view = possessedCamera.getView();
 				ubo.inverseView = possessedCamera.getInverseView();
-
+				ubo.screenSize = { GraphicsSettings::get().WindowWidth, GraphicsSettings::get().WindowHeight };
 				
 				lightSystem.update(frameInfo, ubo);
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -386,11 +279,11 @@ beginWhileLoop:
 			//	shadowSystem.render(frameInfo);
 			//	SHARD3D_STAT_RECORD_END({ "Rendering", "Shadow Mapping" });
 
-				mainRenderpass->beginRenderPass(frameInfo, mainFrameBuffer);
+				deferredRenderSystem.beginRenderPass(frameInfo);
 
 				SHARD3D_STAT_RECORD();
-				forwardRenderSystem.renderForwardOld(frameInfo);
-				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Lighting" });
+				deferredRenderSystem.renderDeferred(frameInfo);
+				SHARD3D_STAT_RECORD_END({ "Deferred Pass", "Geometry, Lighting" });
 
 				SHARD3D_STAT_RECORD();
 				billboardRenderSystem.render(frameInfo);
@@ -403,7 +296,11 @@ beginWhileLoop:
 				}
 				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Billboards" });
 
-				mainRenderpass->endRenderPass(frameInfo);
+				SHARD3D_STAT_RECORD();
+				deferredRenderSystem.renderForward(frameInfo);
+				SHARD3D_STAT_RECORD_END({ "Forward Pass", "Transparency" });
+
+				deferredRenderSystem.endRenderPass(frameInfo);
 
 				//SHARD3D_STAT_RECORD();
 				ppoSystem.render(frameInfo);
@@ -436,7 +333,9 @@ beginWhileLoop:
 
 				SHARD3D_STAT_RECORD();
 				if (engineWindow.wasWindowResized()) {
-					resizeFrameBuffers(engineWindow.getExtent().width, engineWindow.getExtent().height, &imguiLayer, &ppoSystem);
+					glm::ivec3 newsize = { engineWindow.getExtent().width, engineWindow.getExtent().height , 1};
+					deferredRenderSystem.resize(newsize);
+					resizeFrameBuffers(newsize.x, newsize.y, &imguiLayer, &ppoSystem, &gbuffer);
 					engineWindow.resetWindowResizedFlag();
 				}
 				SHARD3D_STAT_RECORD_END({ "Window", "Resize check & FBuffer" });

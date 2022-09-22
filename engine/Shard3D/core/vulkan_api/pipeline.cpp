@@ -247,4 +247,12 @@ namespace Shard3D {
 		configInfo.depthStencilInfo.depthWriteEnable = VK_FALSE;
 		return _pipeline_cfg(configInfo);
 	}
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::disableDepthWrite() {
+		configInfo.depthStencilInfo.depthWriteEnable = VK_FALSE;
+		return _pipeline_cfg(configInfo);
+	}
+	GraphicsPipeline::_pipeline_cfg GraphicsPipeline::_pipeline_cfg::setSubpass(uint32_t subpassIndex) {
+		configInfo.subpass = subpassIndex;
+		return _pipeline_cfg(configInfo);
+	}
 }

@@ -22,6 +22,7 @@ layout (location = 0) out vec2 fragUV;
 
 layout(set = 0, binding = 0) uniform GlobalUbo{
 	mat4 projection;
+	mat4 invProjection;
 	mat4 view;
 } ubo;
 

@@ -37,7 +37,7 @@ namespace Shard3D {
 		}
 
 	}
-	void RenderHandler::refreshActor(ECS::Actor actor) {
+	void RenderHandler::refreshActor(const ECS::Actor& actor) {
 		UUID uuid = actor.getUUID();
 		for (SurfaceMaterialClassOptionsFlags class_ : getRenderUsingClasses(uuid)) {
 			materialRendering[class_][uuid].mesh = &actor.getComponent<Components::Mesh3DComponent>();
@@ -80,9 +80,8 @@ namespace Shard3D {
 		return std::vector<SurfaceMaterialClassOptionsFlags>(vector.begin(), vector.end());
 	}
 	void RenderHandler::clear() {
-		for (auto& [flags, data] : materialRendering) 
-			for (auto& [actor, data2] : data)
-				data.erase(actor);
+		for (auto& [flags, data] : materialRendering)
+			data.clear();
 	}
 	void RenderHandler::addMesh3DComponentToActor(ECS::Actor actor, AssetID mesh) {
 		actor.addComponent<Components::Mesh3DComponent>(mesh);

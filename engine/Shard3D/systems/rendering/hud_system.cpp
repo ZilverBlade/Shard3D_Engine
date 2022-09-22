@@ -7,7 +7,7 @@
 #include "../../core/asset/assetmgr.h"
 #include "../../core/misc/graphics_settings.h"
 
-namespace Shard3D {
+namespace Shard3D::Systems {
 	struct HUDPushConstants {
 		glm::vec4 PZR;
 		glm::vec2 scale;

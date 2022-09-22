@@ -13,8 +13,10 @@ highp float random(vec2 coords) {
 void main()	{
     vec2 coordinates = gl_FragCoord.xy / vec2(imageSize(postProcessImage));
 
-    vec3 pixelColor = imageLoad(postProcessImage, ivec2(gl_FragCoord.xy)).rgb;
-
+	ivec2 thisCoord = ivec2(gl_FragCoord.x, imageSize(postProcessImage).y - gl_FragCoord.y);
+	
+    vec3 pixelColor = imageLoad(postProcessImage, thisCoord).rgb;
+    
     float fragmentColor_r = pixelColor.x;
     float fragmentColor_g = pixelColor.y;
     float fragmentColor_b = pixelColor.z;

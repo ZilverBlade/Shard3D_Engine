@@ -188,6 +188,7 @@ namespace Shard3D {
 			strStream << stream.rdbuf();
 
 			YAML::Node data = YAML::Load(strStream.str());
+			
 			RenderHandler::clear();
 			try {
 				if (ignoreWarns == false) {

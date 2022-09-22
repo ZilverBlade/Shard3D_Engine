@@ -7,7 +7,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-namespace Shard3D {
+namespace Shard3D::Systems {
 	struct ShadowPushConstants {
 		glm::mat4 projection;
 		glm::mat4 model;

@@ -26,11 +26,7 @@ namespace Shard3D {
 		bool is10BitColor = false;
 		glm::vec4 localScreen{1280,720, 0, 0}; // posX, posY, width, height, 
 
-		glm::uvec3 PostProcessingInvocationIDCounts{1920 / 16, 1080 / 16, 1};
-	};
-
-	struct NonModifyableStaticInfo {
-		std::string gameName = "My Shard3D Game";
+		glm::uvec3 PostProcessingInvocationIDCounts{ 1280 / 16, 720 / 16, 1};
 	};
 
 	struct Settings {
@@ -103,10 +99,6 @@ namespace Shard3D {
 			//@param Can be: Low, Medium, High
 			//@return (live usage)
 		GraphicsEnum ReflectionQuality = Medium;
-
-		glm::vec3 GlobalMaterialSettings = { 1.f, 0.5f, 0.f };
-
-		float exposure = 1.f;
 	};
 
 	struct EditorPreviewSettings {
@@ -125,7 +117,6 @@ namespace Shard3D {
 	private:
 		static inline Settings graphics{};
 		static inline RuntimeInfo r_info{};
-		static inline NonModifyableStaticInfo constInfo{};
 		static inline CSimpleIniA ini;
 		static inline EngineWindow* engineWindow;
 	public:
@@ -138,8 +129,7 @@ namespace Shard3D {
 	// as this getter passes the value by reference, you may modify its contents
 		static Settings& get();
 
-		static NonModifyableStaticInfo getStaticApplicationInfo() { return constInfo; }
-
+		
 		static void set(Settings sets);
 		 
 		static void setWindowMode(WindowType winType);

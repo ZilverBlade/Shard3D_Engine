@@ -36,6 +36,8 @@ namespace Shard3D {
 			_pipeline_cfg discardRasterizer();
 			_pipeline_cfg forceSampleCount(VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
 			_pipeline_cfg disableDepthTest();
+			_pipeline_cfg disableDepthWrite();
+			_pipeline_cfg setSubpass(uint32_t subpassIndex);
 		private:
 			GraphicsPipelineConfigInfo& configInfo;
 		};

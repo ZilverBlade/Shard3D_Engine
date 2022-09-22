@@ -4,105 +4,83 @@
 #include <glm/glm.hpp>
 
 namespace Shard3D {
+	inline namespace Rendering {
+		struct FrameBufferAttachmentDescription {
+			VkFormat frameBufferFormat;
+			VkImageAspectFlags imageAspect;
+			glm::ivec3 dimensions;
+			VkImageUsageFlags usage;
+			VkImageLayout finalLayout;
+			VkSampleCountFlagBits samples;
+		};
 
-	struct FrameBufferAttachmentDescription {
-		VkFormat frameBufferFormat;
-		VkImageAspectFlags imageAspect;
-		glm::ivec3 dimensions;
-		VkImageUsageFlags usage;
-		VkImageLayout finalLayout;
-		VkSampleCountFlagBits samples;
-	};
+		enum class FrameBufferAttachmentType {
+			Color,
+			Depth,
+			Resolve,
+			Storage
+		};
 
-	enum class FrameBufferAttachmentType {
-		Color,
-		Depth,
-		Resolve,
-		Storage
-	};
+		class FrameBufferAttachment {
+		public:
+			FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
+			~FrameBufferAttachment();
 
-	class FrameBufferAttachment {
-	public:
-		FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
-		~FrameBufferAttachment();
+			DELETE_COPY(FrameBufferAttachment)
+			DELETE_MOVE(FrameBufferAttachment)
 
-		DELETE_COPY(FrameBufferAttachment);
-		DELETE_MOVE(FrameBufferAttachment);
+			inline VkImage getImage() { return image; }
+			inline VkImageView getImageView() { return imageView; }
+			inline VkSampler getSampler() { SHARD3D_ASSERT(sampler && "Sampler was never created or is of type for a subpass!"); return sampler; }
+			inline VkImageLayout getImageLayout() { return finalLayout; }
+			inline VkDeviceMemory getDeviceMemory() { return imageMemory; }
+			inline glm::ivec3 getDimensions() { return dimensions; }
+			inline FrameBufferAttachmentDescription& getDescription() { return description; }
+			inline FrameBufferAttachmentType getType() { return _attachmentType; }
+			inline VkDescriptorImageInfo getDescriptor() { return descriptor; }
 
-		inline VkImage getImage() { return image; }
-		inline VkImageView getImageView() { return imageView; }
-		inline VkSampler getSampler() { SHARD3D_SILENT_ASSERT(sampler && "Sampler was never created or is of type for a subpass!"); return sampler; }
-		inline VkImageLayout getImageLayout() { return finalLayout; }
-		inline VkDeviceMemory getDeviceMemory() { return imageMemory; }
-		inline glm::ivec3 getDimensions() { return dimensions; }
-		inline FrameBufferAttachmentDescription& getDescription() { return description; }
-		inline FrameBufferAttachmentType getType() { return _attachmentType; }
-		inline VkDescriptorImageInfo getDescriptor() { return descriptor; }
-		
-		void resize(glm::ivec3 newDimensions);
-	private:
-		void destroy();
-		void create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
+			void resize(glm::ivec3 newDimensions);
+		private:
+			void destroy();
+			void create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
 
-		VkImage image{};
-		VkImageView imageView{};
-		VkSampler sampler{};
-		VkImageLayout finalLayout{};
-		VkDeviceMemory imageMemory{};
-		VkDescriptorImageInfo descriptor{};
+			VkImage image{};
+			VkImageView imageView{};
+			VkSampler sampler{};
+			VkImageLayout finalLayout{};
+			VkDeviceMemory imageMemory{};
+			VkDescriptorImageInfo descriptor{};
 
-		EngineDevice& engineDevice;
-		FrameBufferAttachmentDescription description;
-		FrameBufferAttachmentType _attachmentType;
+			EngineDevice& engineDevice;
+			FrameBufferAttachmentDescription description;
+			FrameBufferAttachmentType _attachmentType;
 
-		glm::ivec3 dimensions{};
-	};
+			glm::ivec3 dimensions{};
+		};
 
-	class FrameBuffer {
-	public:
-		FrameBuffer(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& attachments);
-		~FrameBuffer();
+		class FrameBuffer {
+		public:
+			FrameBuffer(EngineDevice& device, VkRenderPass renderPass, const std::vector<Rendering::FrameBufferAttachment*>& attachments);
+			~FrameBuffer();
 
-		
-		DELETE_COPY(FrameBuffer);
-		DELETE_MOVE(FrameBuffer);
+			DELETE_COPY(FrameBuffer);
+			DELETE_MOVE(FrameBuffer);
 
-		inline glm::ivec3 getDimensions() { return {width, height, depth}; }
-		inline VkFramebuffer getFrameBuffer() { return frameBuffer; }
-		void resize(glm::ivec3 newDimensions, VkRenderPass renderpass);
-	private:
-		void create(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& _attachments);
-		void destroy();
-		
-		uint32_t width{};
-		uint32_t height{};
-		uint32_t depth{};
+			inline glm::ivec3 getDimensions() { return { width, height, depth }; }
+			inline VkFramebuffer getFrameBuffer() { return frameBuffer; }
+			void resize(glm::ivec3 newDimensions, VkRenderPass renderpass);
+		private:
+			void create(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& _attachments);
+			void destroy();
 
-		VkFramebuffer frameBuffer{};
+			uint32_t width{};
+			uint32_t height{};
+			uint32_t depth{};
 
-		std::vector<FrameBufferAttachment*> attachments;
-		EngineDevice& engineDevice;
-	};
+			VkFramebuffer frameBuffer{};
 
-	class FrameBufferAdvanced {
-	public:
-		FrameBufferAdvanced(EngineDevice& device, VkRenderPass renderPass, const std::vector<FrameBufferAttachment*>& attachments);
-		~FrameBufferAdvanced();
-
-		DELETE_COPY(FrameBufferAdvanced);
-		DELETE_MOVE(FrameBufferAdvanced);
-
-		inline glm::ivec3 getDimensions() { return { width, height, depth }; }
-		inline VkFramebuffer getFrameBuffer() { return frameBuffer; }
-		void resize(glm::ivec3 newDimensions);
-	private:
-		uint32_t width{};
-		uint32_t height{};
-		uint32_t depth{};
-
-		VkFramebuffer frameBuffer{};
-		EngineDevice& engineDevice;
-	};
-
-
+			std::vector<FrameBufferAttachment*> attachments;
+			EngineDevice& engineDevice;
+		};
+	}
 }

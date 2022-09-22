@@ -35,7 +35,8 @@ namespace Shard3D {
         GraphicsPipelineConfigInfo pipelineConfig{};
         GraphicsPipeline::pipelineConfig(pipelineConfig)
             .defaultGraphicsPipelineConfigInfo()
-            .enableAlphaBlending(VK_BLEND_OP_ADD);
+            .enableAlphaBlending(VK_BLEND_OP_ADD)
+            .setSubpass(1);
 
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;

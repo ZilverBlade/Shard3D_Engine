@@ -1,4 +1,4 @@
-#include "../../s3dpch.h" 
+#pragma deprecated
 
 #include <glm/gtc/constants.hpp>
 
@@ -9,8 +9,9 @@
 #include "../../core/asset/assetmgr.h"
 #include "../../core/asset/cubemap.h"
 #include "../../ecs.h"
-namespace Shard3D {
 
+namespace Shard3D::Systems {
+#if 0
 	struct MeshPushConstantData {
 		glm::mat4 modelMatrix{ 1.f };
 		glm::mat4 normalMatrix{ 1.f };
@@ -180,7 +181,7 @@ namespace Shard3D {
 			nullptr
 		);
 
-		MaterialHandler::bindMaterialClass(flags, commandBuffer);
+		MaterialHandler::bindMaterialClassForward(flags, commandBuffer);
 		for (auto& [asset, object] : RenderHandler::getSurfaceMaterialRenderingList()[flags]) {
 			SHARD3D_ASSERT(object.mesh && object.transform && "Cannot render a non existant mesh!");
 
@@ -207,5 +208,5 @@ namespace Shard3D {
 			}
 		}
 	}
-
+#endif
 }

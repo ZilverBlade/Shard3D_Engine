@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rendering/forward_render_system.h"
+#include "rendering/deferred_render_system.h"
 #include "rendering/billboard_system.h"
 #include "rendering/hud_system.h"
 #include "rendering/post_processing_system.h"

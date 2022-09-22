@@ -12,6 +12,8 @@ namespace Shard3D {
 		projectionMatrix[3][0] = -(right + left) / (right - left);
 		projectionMatrix[3][1] = -(bottom + top) / (bottom - top);
 		projectionMatrix[3][2] = -zNear / (zFar - zNear);
+
+		inverseProjectionMatrix = glm::inverse(projectionMatrix);
 	}
 
 	void EngineCamera::setPerspectiveProjection(float fovy, float aspect, float zNear /*Near clipping plane*/, float zFar /*Far clipping plane*/) {
@@ -23,6 +25,8 @@ namespace Shard3D {
 		projectionMatrix[2][2] = zFar / (zFar - zNear);
 		projectionMatrix[2][3] = 1.f;
 		projectionMatrix[3][2] = -(zFar * zNear) / (zFar - zNear);
+
+		inverseProjectionMatrix = glm::inverse(projectionMatrix);
 	}
 	/* *
 * Set camera view based on the camera's position and direction

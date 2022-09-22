@@ -6,8 +6,9 @@
 
 namespace Shard3D {
 	class ImGuiLayer;
-	class FrameBufferAttachment;
-
+	inline namespace Rendering {
+		class FrameBufferAttachment;
+	}
 	class ImGuiInitializer {
 		static inline VkDescriptorPool imGuiDescriptorPool;
 		static inline ImGui_ImplVulkan_InitInfo imgui_init_info{};

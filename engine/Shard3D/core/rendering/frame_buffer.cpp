@@ -1,8 +1,9 @@
 #include "../../s3dpch.h"
 #include "frame_buffer.h"
 #include <Shlwapi.h>
-namespace Shard3D {
-	FrameBufferAttachment::FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler) : engineDevice(device), description(attachmentDescription), _attachmentType(attachmentType) {
+namespace Shard3D::Rendering {
+	FrameBufferAttachment::FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler) 
+		: engineDevice(device), description(attachmentDescription), _attachmentType(attachmentType) {
 		create(engineDevice, attachmentDescription, this->_attachmentType, hasSampler);
 	}
 	void FrameBufferAttachment::destroy() {
@@ -86,12 +87,11 @@ namespace Shard3D {
 			if (vkCreateSampler(device.device(), &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
 				SHARD3D_ERROR("Failed to create sampler");
 			}
-
-			// Fill a descriptor for later use in a descriptor set
-			descriptor.imageLayout = attachmentDescription.finalLayout;
-			descriptor.imageView = imageView;
 			descriptor.sampler = sampler;
 		}
+		// Fill a descriptor for later use in a descriptor set
+		descriptor.imageLayout = attachmentDescription.finalLayout;
+		descriptor.imageView = imageView;
 		dimensions = { attachmentDescription.dimensions.x, attachmentDescription.dimensions.y, attachmentDescription.dimensions.z };
 	}
 

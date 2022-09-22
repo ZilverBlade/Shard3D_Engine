@@ -5,46 +5,45 @@
 #include "../../core/vulkan_api/pipeline_compute.h"
 
 namespace Shard3D {
-	class RenderPass;
-	class FrameBuffer;
-	class FrameBufferAttachment;
-	struct PostProcessingGBufferInput {
-		FrameBufferAttachment* baseRenderedScene;
-		FrameBufferAttachment* positionSceneInfo;
-		FrameBufferAttachment* normalSceneInfo;
-		FrameBufferAttachment* materialSceneInfo;
-	};
-	class PostProcessingSystem {
-	public:
-		PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainpresentingRenderPassRenderPass, PostProcessingGBufferInput imageInput);
-		~PostProcessingSystem();
+	inline namespace Rendering {
+		class RenderPass;
+		class FrameBuffer;
+		class FrameBufferAttachment;
+	}
+	inline namespace Systems {
+		struct GBufferInputData;
+		class PostProcessingSystem {
+		public:
+			PostProcessingSystem(EngineDevice& device, VkRenderPass swapchainpresentingRenderPassRenderPass, GBufferInputData* imageInput);
+			~PostProcessingSystem();
 
-		PostProcessingSystem(const PostProcessingSystem&) = delete;
-		PostProcessingSystem& operator=(const PostProcessingSystem&) = delete;
+			PostProcessingSystem(const PostProcessingSystem&) = delete;
+			PostProcessingSystem& operator=(const PostProcessingSystem&) = delete;
 
-		void render(FrameInfo& frameInfo);
-		void renderGammaCorrection(FrameInfo& frameInfo);
-		void renderImageFlipForPresenting(FrameInfo& frameInfo);
-		void updateDescriptors(PostProcessingGBufferInput imageInput);
-	private:
-		void createPipelineLayout();
-		void createPipelines(VkRenderPass renderPass);
-		
-		EngineDevice& engineDevice;
+			void render(FrameInfo& frameInfo);
+			void renderGammaCorrection(FrameInfo& frameInfo);
+			void renderImageFlipForPresenting(FrameInfo& frameInfo);
+			void updateDescriptors(GBufferInputData* imageInput);
+		private:
+			void createPipelineLayout();
+			void createPipelines(VkRenderPass renderPass);
 
-		uPtr<GraphicsPipeline> debanderShaderPipeline;
-		uPtr<ComputePipeline> gammaCorrectionShaderPipeline;
+			EngineDevice& engineDevice;
 
-		VkDescriptorSet ppo_InputDescriptorSet{};
-		
-		VkDescriptorImageInfo ppoDescriptor_BaseRenderedScene;
-		VkDescriptorImageInfo ppoDescriptor_PositionSceneInfo;
-		VkDescriptorImageInfo ppoDescriptor_NormalSceneInfo;
-		VkDescriptorImageInfo ppoDescriptor_MaterialSceneInfo;
+			uPtr<GraphicsPipeline> debanderShaderPipeline;
+			uPtr<ComputePipeline> gammaCorrectionShaderPipeline;
 
-		uPtr<EngineDescriptorSetLayout> ppo_Layout{};
+			VkDescriptorSet ppo_InputDescriptorSet{};
 
-		VkPipelineLayout pipelineLayout{};
-	};
+			VkDescriptorImageInfo ppoDescriptor_BaseRenderedScene;
+			VkDescriptorImageInfo ppoDescriptor_PositionSceneInfo;
+			VkDescriptorImageInfo ppoDescriptor_NormalSceneInfo;
+			VkDescriptorImageInfo ppoDescriptor_MaterialDiffuseSceneInfo;
+			VkDescriptorImageInfo ppoDescriptor_MaterialParamSceneInfo;
 
+			uPtr<EngineDescriptorSetLayout> ppo_Layout{};
+
+			VkPipelineLayout pipelineLayout{};
+		};
+	}
 }

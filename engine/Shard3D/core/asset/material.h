@@ -155,7 +155,7 @@ namespace Shard3D {
 		virtual void deserialize(YAML::Node* data) = 0;
 		virtual void loadAllTextures() = 0;
 
-		void bind(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet);
+		void bind(VkCommandBuffer commandBuffer);
 		inline bool isBuilt() { return built; }
 	protected:
 		_DrawData drawData{};

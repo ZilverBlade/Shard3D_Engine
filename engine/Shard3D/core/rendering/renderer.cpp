@@ -4,7 +4,7 @@
 #include "../../core.h"
 #include "../misc/graphics_settings.h"
 
-namespace Shard3D {
+namespace Shard3D::Rendering {
 	EngineRenderer::EngineRenderer(EngineWindow &window, EngineDevice &device) 
 		: engineWindow{window}, engineDevice{device} {
 		recreateSwapchain();

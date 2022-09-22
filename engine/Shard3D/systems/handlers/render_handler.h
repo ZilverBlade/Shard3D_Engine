@@ -12,7 +12,7 @@ namespace Shard3D {
 	class RenderHandler {
 	public:
 		static void addActorToRenderList(ECS::Actor actor);
-		static void refreshActor(ECS::Actor actor);
+		static void refreshActor(const ECS::Actor& actor);
 		static SurfaceMaterialRenderInfo buildRenderInfoFromActor(ECS::Actor actor, SurfaceMaterialClassOptionsFlags flags);
 		static std::vector<SurfaceMaterialClassOptionsFlags> getRenderUsingClasses(UUID actorID);
 		static void clear();

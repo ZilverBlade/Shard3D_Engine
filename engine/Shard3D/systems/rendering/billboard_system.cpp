@@ -4,7 +4,7 @@
 #include "billboard_system.h"
 #include "../../core/ecs/components.h"
 #include "../../core/asset/assetmgr.h"
-namespace Shard3D {
+namespace Shard3D::Systems {
 
 	struct BillboardPushConstants {
 		glm::vec4 translation;
@@ -54,7 +54,8 @@ namespace Shard3D {
 		GraphicsPipeline::pipelineConfig(pipelineConfig)
 			.defaultGraphicsPipelineConfigInfo()
 			//.enableAlphaBlending(VK_BLEND_OP_ADD)
-			.setCullMode(VK_CULL_MODE_FRONT_BIT);
+			.setCullMode(VK_CULL_MODE_BACK_BIT)
+			.setSubpass(1);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout; // support only view plane aligned atm

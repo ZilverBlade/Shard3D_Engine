@@ -86,8 +86,10 @@ namespace Shard3D {
 
 			shallowCopy(newLvl, other);
 
-			for (auto& actor : enttMap) {
-				RenderHandler::refreshActor(Actor(actor.second, newLvl.get()));
+			RenderHandler::clear();
+			for (auto& [uuid, handle] : enttMap) {
+				Actor actor = Actor(handle, newLvl.get());
+				if (actor.hasComponent<Components::Mesh3DComponent>()) RenderHandler::addActorToRenderList(actor);
 			}
 
 			return newLvl;

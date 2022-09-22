@@ -36,22 +36,12 @@ namespace Shard3D {
 		void windowResizeEvent(Events::WindowResizeEvent& e);
 		void eventEvent(Events::Event& e);
 
-		void resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem);
+		void resizeFrameBuffers(uint32_t newWidth, uint32_t newHeight, void* editor, void* ppoSystem, void* gbuffer);
 
 		// Engine components
 		EngineWindow engineWindow{ wndWidth, wndHeight, "Shard3D Engine" };
 		EngineDevice engineDevice{ engineWindow };
 		EngineRenderer engineRenderer{ engineWindow, engineDevice };
-		
-		FrameBufferAttachment* mainColorFramebufferAttachment;
-		FrameBufferAttachment* mainDepthFramebufferAttachment;
-		FrameBufferAttachment* mainPositionFramebufferAttachment;
-		FrameBufferAttachment* mainNormalFramebufferAttachment;
-		FrameBufferAttachment* mainMaterialDataFramebufferAttachment;
-
-
-		FrameBuffer* mainFrameBuffer;
-		RenderPass* mainRenderpass;
 
 		FrameBufferAttachment* ppoColorFramebufferAttachment;
 		FrameBuffer* ppoFrameBuffer;

@@ -7,6 +7,9 @@
 #include <vector>
 
 namespace Shard3D {
+	inline namespace Systems {
+		class HUDRenderSystem;
+	}
 	struct HUDElement {
 		glm::vec2 position;
 		glm::vec2 scale = { 0.2f, 0.2f };

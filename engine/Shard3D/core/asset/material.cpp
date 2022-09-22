@@ -95,7 +95,7 @@ namespace Shard3D {
 		return VK_POLYGON_MODE_FILL;
 	}
 
-	void SurfaceMaterial::bind(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet) {
+	void SurfaceMaterial::bind(VkCommandBuffer commandBuffer) {
 		SHARD3D_ASSERT(built && "Material descriptors and pipelines must be built before surface material can be bound!");
 
 		//MaterialHandler::bindMaterialClass(classFlags, commandBuffer);
@@ -109,7 +109,7 @@ namespace Shard3D {
 			commandBuffer,
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
 			MaterialHandler::getMaterialClass(classFlags)->getPipelineLayout(),
-			1,
+			(classFlags & SurfaceMaterialClassOptions_Translucent) ? 2 : 1,
 			2,
 			sets,
 			0,
@@ -332,12 +332,12 @@ namespace Shard3D {
 				&materialPipelineConfig->shaderPipeline,
 				materialPipelineConfig->shaderPipelineLayout,
 				this->shaderPath);
-		else
+		else {
 			MaterialHandler::createPPOPipeline(
 				&materialPipelineConfig->shaderPipeline,
 				materialPipelineConfig->shaderPipelineLayout,
 				ShaderSystem::compileOnTheFly(this->shaderPath, ShaderType::Compute));
-
+		}
 		built = true;
 	}
 

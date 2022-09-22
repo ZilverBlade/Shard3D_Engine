@@ -3,7 +3,7 @@
 #include "../vulkan_api/device.h"
 #include "../misc/graphics_settings.h"
 
-namespace Shard3D {
+namespace Shard3D::Rendering {
 
 EngineSwapChain::EngineSwapChain(EngineDevice &deviceRef, VkExtent2D extent)
     : device{deviceRef}, windowExtent{extent} {

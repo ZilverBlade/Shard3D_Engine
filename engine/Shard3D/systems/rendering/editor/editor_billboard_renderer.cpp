@@ -52,7 +52,8 @@ namespace Shard3D {
 		GraphicsPipelineConfigInfo pipelineConfig{};
 		GraphicsPipeline::pipelineConfig(pipelineConfig)
 			.defaultGraphicsPipelineConfigInfo()
-			.setCullMode(VK_CULL_MODE_FRONT_BIT);
+			.setCullMode(VK_CULL_MODE_BACK_BIT)
+			.setSubpass(1);
 
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;

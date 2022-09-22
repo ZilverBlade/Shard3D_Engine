@@ -5,26 +5,27 @@
 #include "../../core/ecs/level.h"
 
 namespace Shard3D {
-	class BillboardRenderSystem {
-	public:
-		BillboardRenderSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-		~BillboardRenderSystem();
+	inline namespace Systems {
+		class BillboardRenderSystem {
+		public:
+			BillboardRenderSystem(EngineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+			~BillboardRenderSystem();
 
-		BillboardRenderSystem(const BillboardRenderSystem&) = delete;
-		BillboardRenderSystem& operator=(const BillboardRenderSystem&) = delete;
+			BillboardRenderSystem(const BillboardRenderSystem&) = delete;
+			BillboardRenderSystem& operator=(const BillboardRenderSystem&) = delete;
 
-		void render(FrameInfo& frameInfo);
+			void render(FrameInfo& frameInfo);
 
-	private:
+		private:
 
-		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-		void createPipeline(VkRenderPass renderPass);
+			void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+			void createPipeline(VkRenderPass renderPass);
 
-		EngineDevice& engineDevice;
+			EngineDevice& engineDevice;
 
-		uPtr<GraphicsPipeline> graphicsPipeline;
-		VkPipelineLayout pipelineLayout;
-		uPtr<EngineDescriptorSetLayout> billboardSystemLayout;
-	};
-
+			uPtr<GraphicsPipeline> graphicsPipeline;
+			VkPipelineLayout pipelineLayout;
+			uPtr<EngineDescriptorSetLayout> billboardSystemLayout;
+		};
+	}
 }

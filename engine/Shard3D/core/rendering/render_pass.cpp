@@ -3,8 +3,16 @@
 
 // Basic RenderPass abstraction (single subpass)
 
-namespace Shard3D {
+namespace Shard3D::Rendering {
 	RenderPass::RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments) : engineDevice(device) {
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+		float noEditBgColor[3]{};
+		noEditBgColor[0] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorR"));
+		noEditBgColor[1] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorG"));
+		noEditBgColor[2] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorB"));
+
 		std::vector<VkAttachmentDescription> attachmentDescriptions;
 		attachmentDescriptions.resize(attachments.size());
 
@@ -90,7 +98,7 @@ namespace Shard3D {
 		for (int i = 0; i < attachments.size(); i++) {
 			switch (attachments[i].frameBufferAttachment->getType()) {
 			case (FrameBufferAttachmentType::Color):
-				clearValues[i].color = { 0.01f, 0.01f, 0.01f, 1.0f };
+				clearValues[i].color = { noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.0f };
 				break;
 			case (FrameBufferAttachmentType::Depth):
 				clearValues[i].depthStencil = { 1.0f, 0 };
@@ -118,13 +126,13 @@ namespace Shard3D {
 	
 		VkViewport viewport = {};
 		viewport.x = 0.0f;
-		viewport.y = static_cast<float>(frameBuffer->getDimensions().y);
+		viewport.y = 0.0f;
 		viewport.width = static_cast<float>(frameBuffer->getDimensions().x);
-		viewport.height = -static_cast<float>(frameBuffer->getDimensions().y);
+		viewport.height = static_cast<float>(frameBuffer->getDimensions().y);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 		vkCmdSetViewport(frameInfo.commandBuffer, 0, 1, &viewport);
-	
+
 		VkRect2D scissor = {};
 		scissor.extent.width = frameBuffer->getDimensions().x;
 		scissor.extent.height = frameBuffer->getDimensions().y;
@@ -139,6 +147,13 @@ namespace Shard3D {
 
 
 	RenderPassAdvanced::RenderPassAdvanced(EngineDevice& device, const std::vector<AttachmentInfo>& attachments, std::vector<SubpassInfo> subpassInfos) : engineDevice(device) {
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		ini.LoadFile(ENGINE_SETTINGS_PATH);
+		float noEditBgColor[3]{};
+		noEditBgColor[0] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorR"));
+		noEditBgColor[1] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorG"));
+		noEditBgColor[2] = static_cast<float>(ini.GetDoubleValue("RENDERING", "DefaultBGColorB"));
 
 		std::vector<VkAttachmentDescription> attachmentDescriptions;
 		attachmentDescriptions.resize(attachments.size());
@@ -146,7 +161,7 @@ namespace Shard3D {
 		for (uint32_t i = 0; i < attachments.size(); i++) {
 			auto& attachmentDescription = attachmentDescriptions[i];
 			SHARD3D_ASSERT(attachments[i].frameBufferAttachment->getType() != FrameBufferAttachmentType::Resolve && "RenderPassAdvanced does not support resolve attachments! Consider using RenderPass instead if you require to use resolve attachments!");
-			SHARD3D_ASSERT(attachments[i].frameBufferAttachment->getDescription().samples == VK_SAMPLE_COUNT_1_BIT && "RenderPassAdvanced does not support MSAA! Consider using RenderPass instead if you require to MSAA!");
+			SHARD3D_ASSERT(attachments[i].frameBufferAttachment->getDescription().samples == VK_SAMPLE_COUNT_1_BIT && "RenderPassAdvanced does not support MSAA! Consider using RenderPass instead if you require MSAA usage!");
 			attachmentDescription.format = attachments[i].frameBufferAttachment->getDescription().frameBufferFormat;
 			attachmentDescription.samples = attachments[i].frameBufferAttachment->getDescription().samples;
 			attachmentDescription.loadOp = attachments[i].loadOp;
@@ -156,6 +171,7 @@ namespace Shard3D {
 			attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			attachmentDescription.finalLayout = attachments[i].frameBufferAttachment->getDescription().finalLayout;
 		}
+
 
 		// Subpasses
 		std::vector<SubpassDescription> subpassDescriptions{};
@@ -204,7 +220,7 @@ namespace Shard3D {
 				else {
 					VkAttachmentReference inputReference{};
 					inputReference.attachment = renderTarget;
-					inputReference.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+					inputReference.layout = attachments[renderTarget].frameBufferAttachment->getDescription().finalLayout;
 					subpassDescriptionMy.inputReferences.push_back(inputReference);
 
 					hasInput = true;
@@ -302,8 +318,8 @@ namespace Shard3D {
 		for (uint32_t i = 0; i < attachments.size(); i++) {
 			if (attachments[i].frameBufferAttachment->getType() == FrameBufferAttachmentType::Depth) 
 				clearValues[i].depthStencil = { 1.0f, 0 };		
-			else 
-				clearValues[i].color = { 0.01f, 0.01f, 0.01f, 1.0f };
+			else
+				clearValues[i].color = { noEditBgColor[0], noEditBgColor[1], noEditBgColor[2], 1.0f };
 			
 		}
 	}

@@ -6,73 +6,74 @@
 #include "../../s3dstd.h"
 
 namespace Shard3D {
-	struct AttachmentInfo {
-		FrameBufferAttachment* frameBufferAttachment;
-		VkAttachmentLoadOp loadOp;
-		VkAttachmentStoreOp storeOp;
-	};
-	
-	class RenderPass {
-	public:
-		RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments);
-		~RenderPass();
+	inline namespace Rendering {
+		struct AttachmentInfo {
+			FrameBufferAttachment* frameBufferAttachment;
+			VkAttachmentLoadOp loadOp;
+			VkAttachmentStoreOp storeOp;
+		};
 
-		DELETE_COPY(RenderPass);
-		DELETE_MOVE(RenderPass);
+		class RenderPass {
+		public:
+			RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments);
+			~RenderPass();
 
-		void beginRenderPass(FrameInfo& frameInfo, FrameBuffer* frameBuffer);
-		void endRenderPass(FrameInfo& frameInfo);
+			DELETE_COPY(RenderPass)
+			DELETE_MOVE(RenderPass)
 
-		inline void setViewportSize(uint32_t _width, uint32_t _height) { width = _width; height = _height; }
+			void beginRenderPass(FrameInfo& frameInfo, FrameBuffer* frameBuffer);
+			void endRenderPass(FrameInfo& frameInfo);
 
-		inline VkRenderPass getRenderPass() { return renderpass; }
-	private:
-		uint32_t width{};
-		uint32_t height{};
+			inline void setViewportSize(uint32_t _width, uint32_t _height) { width = _width; height = _height; }
 
-		EngineDevice& engineDevice;
+			inline VkRenderPass getRenderPass() { return renderpass; }
+		private:
+			uint32_t width{};
+			uint32_t height{};
 
-		std::vector<VkClearValue> clearValues{};
-		VkRenderPass renderpass{};
-	};
+			EngineDevice& engineDevice;
 
-	struct SubpassInfo {
-		std::vector<uint32_t> renderTargets;
-		std::vector<uint32_t> subpassInputs;
-	};
+			std::vector<VkClearValue> clearValues{};
+			VkRenderPass renderpass{};
+		};
 
-	struct SubpassDescription {
-		VkAttachmentReference depthReference{};
-		std::vector<VkAttachmentReference> colorReferences{};
-		std::vector<VkAttachmentReference> inputReferences{};
-		VkSubpassDescription subpassDescription;
-	};
+		struct SubpassInfo {
+			std::vector<uint32_t> renderTargets;
+			std::vector<uint32_t> subpassInputs;
+		};
 
-	class RenderPassAdvanced {
-	public:
-		RenderPassAdvanced(EngineDevice& device, const std::vector<AttachmentInfo>& attachments, std::vector<SubpassInfo> subpassInfos);
-		~RenderPassAdvanced();
+		struct SubpassDescription {
+			VkAttachmentReference depthReference{};
+			std::vector<VkAttachmentReference> colorReferences{};
+			std::vector<VkAttachmentReference> inputReferences{};
+			VkSubpassDescription subpassDescription;
+		};
 
-		RenderPassAdvanced(const RenderPass&) = delete;
-		RenderPassAdvanced& operator=(const RenderPass&) = delete;
-		RenderPassAdvanced(RenderPass&&) = delete;
-		RenderPassAdvanced& operator=(RenderPass&&) = delete;
+		class RenderPassAdvanced {
+		public:
+			RenderPassAdvanced(EngineDevice& device, const std::vector<AttachmentInfo>& attachments, std::vector<SubpassInfo> subpassInfos);
+			~RenderPassAdvanced();
 
-		void beginRenderPass(VkCommandBuffer commandBuffer, FrameBuffer* frameBuffer);
-		void endRenderPass(VkCommandBuffer commandBuffer);
-		void nextSubpass(VkCommandBuffer commandBuffer);
+			RenderPassAdvanced(const RenderPass&) = delete;
+			RenderPassAdvanced& operator=(const RenderPass&) = delete;
+			RenderPassAdvanced(RenderPass&&) = delete;
+			RenderPassAdvanced& operator=(RenderPass&&) = delete;
 
-		inline void setViewportSize(uint32_t _width, uint32_t _height) { width = _width; height = _height; }
+			void beginRenderPass(VkCommandBuffer commandBuffer, FrameBuffer* frameBuffer);
+			void endRenderPass(VkCommandBuffer commandBuffer);
+			void nextSubpass(VkCommandBuffer commandBuffer);
 
-		inline VkRenderPass getRenderPass() { return renderpass; }
-	private:
-		uint32_t width{};
-		uint32_t height{};
+			inline void setViewportSize(uint32_t _width, uint32_t _height) { width = _width; height = _height; }
 
-		EngineDevice& engineDevice;
+			inline VkRenderPass getRenderPass() { return renderpass; }
+		private:
+			uint32_t width{};
+			uint32_t height{};
 
-		std::vector<VkClearValue> clearValues{};
-		VkRenderPass renderpass{};
-	};
+			EngineDevice& engineDevice;
 
+			std::vector<VkClearValue> clearValues{};
+			VkRenderPass renderpass{};
+		};
+	}
 }

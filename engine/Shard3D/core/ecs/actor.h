@@ -30,7 +30,7 @@ namespace Shard3D {
 			}
 
 			template<typename T>
-			T& getComponent() {
+			T& getComponent() const {
 #ifndef ENSET_UNSAFE_COMPONENTS
 				if (!hasComponent<T>()) { // is error since it will very likely cause a crash
 					SHARD3D_ERROR("Actor {0} does not have component '{1}'!", this->getUUID(), typeid(T).name());
@@ -41,12 +41,12 @@ namespace Shard3D {
 			}
 
 			template<typename T>
-			bool hasComponent() {
+			bool hasComponent() const {
 				return level->registry.all_of<T>(actorHandle);
 			}
 
 			template<typename T>
-			void killComponent() { // is warn since it has the chance of not causing a crash or undefined behaviour
+			void killComponent() const { // is warn since it has the chance of not causing a crash or undefined behaviour
 				if (!hasComponent<T>()) { // no #if !ENSET_UNSAFE_COMPONENTS because this error is negligible;
 					SHARD3D_WARN("Actor {0} does not have component '{1}'!", this->getUUID(), typeid(T).name());
 					return;
@@ -54,20 +54,20 @@ namespace Shard3D {
 				level->registry.remove<T>(actorHandle);
 			}
 
-			inline bool hasRelationship() {
+			inline bool hasRelationship() const {
 				return hasComponent<Components::RelationshipComponent>();
 			}
 
-			bool isInvalid() {
+			bool isInvalid() const {
 				return actorHandle == entt::null 
 					|| (getUUID() == 0 || getUUID() == 1 || getUUID() == UINT64_MAX)
 					|| !hasComponent<Components::TagComponent>()
 					|| !hasComponent<Components::UUIDComponent>();
 			}
-			inline UUID getUUID() { return getComponent<Components::UUIDComponent>().getID(); }
-			inline std::string getTag() { return getComponent<Components::TagComponent>().tag; }
-			inline void setTag(std::string tag) { getComponent<Components::TagComponent>().tag = tag; };
-			inline Components::TransformComponent& getTransform() { return getComponent<Components::TransformComponent>(); }
+			inline UUID getUUID() const { return getComponent<Components::UUIDComponent>().getID(); }
+			inline std::string getTag() const { return getComponent<Components::TagComponent>().tag; }
+			inline void setTag(std::string tag) const { getComponent<Components::TagComponent>().tag = tag; };
+			inline Components::TransformComponent& getTransform() const { return getComponent<Components::TransformComponent>(); }
 
 			operator bool() const { return actorHandle != entt::null; }
 			operator entt::entity() const { return actorHandle; };

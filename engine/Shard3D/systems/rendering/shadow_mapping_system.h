@@ -5,33 +5,35 @@
 #include "../../core/rendering/render_pass.h"
 
 namespace Shard3D {
-	class ShadowMappingSystem {
-	public:
-		ShadowMappingSystem(EngineDevice& device);
-		~ShadowMappingSystem();
+	inline namespace Systems {
+		class ShadowMappingSystem {
+		public:
+			ShadowMappingSystem(EngineDevice& device);
+			~ShadowMappingSystem();
 
-		ShadowMappingSystem(const ShadowMappingSystem&) = delete;
-		ShadowMappingSystem& operator=(const ShadowMappingSystem&) = delete;
+			ShadowMappingSystem(const ShadowMappingSystem&) = delete;
+			ShadowMappingSystem& operator=(const ShadowMappingSystem&) = delete;
 
-		void render(FrameInfo& frameInfo);
-		FrameBufferAttachment* getFrameBufferAttachment() {
-			return shadowDepthFramebufferAttachment;
-		}
-	private:
-		void createRenderPass();
-		void createPipelineLayout();
-		void createPipeline();
-		
-		EngineCamera lightCamera{};
-		glm::mat4 lightProjection;
-		EngineDevice& engineDevice;
+			void render(FrameInfo& frameInfo);
+			FrameBufferAttachment* getFrameBufferAttachment() {
+				return shadowDepthFramebufferAttachment;
+			}
+		private:
+			void createRenderPass();
+			void createPipelineLayout();
+			void createPipeline();
 
-		FrameBufferAttachment* shadowDepthFramebufferAttachment;
-		FrameBuffer* shadowFrameBuffer;
-		RenderPass* shadowRenderpass;
+			EngineCamera lightCamera{};
+			glm::mat4 lightProjection;
+			EngineDevice& engineDevice;
 
-		uPtr<GraphicsPipeline> graphicsPipeline;
-		VkPipelineLayout pipelineLayout;
-		uPtr<EngineDescriptorSetLayout> billboardSystemLayout;
-	};
+			FrameBufferAttachment* shadowDepthFramebufferAttachment;
+			FrameBuffer* shadowFrameBuffer;
+			RenderPass* shadowRenderpass;
+
+			uPtr<GraphicsPipeline> graphicsPipeline;
+			VkPipelineLayout pipelineLayout;
+			uPtr<EngineDescriptorSetLayout> billboardSystemLayout;
+		};
+	}
 }

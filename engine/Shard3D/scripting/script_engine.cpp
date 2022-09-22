@@ -16,6 +16,7 @@
 #include "../core/ecs/components.h"
 #include "../core/ui/hud.h"
 #include "../core/misc/graphics_settings.h"
+#include "../core/misc/engine_settings.h"
 namespace Shard3D {
 
 	struct GlobalScriptEngineData {
@@ -261,7 +262,7 @@ namespace Shard3D {
 	}
 
 	inline void ScriptEngine::_reloadAssembly(ScriptEngineData* scriptEngine, ScriptLanguage lang) {
-		std::string path = std::string("assets/scriptdata/script/") + GraphicsSettings::getStaticApplicationInfo().gameName + std::string((lang == ScriptLanguage_CSharp) ? "-cs.dll" : "-vb.dll");
+		std::string path = std::string("assets/scriptdata/script/") + EngineSettings::getStaticApplicationInfo().gameName + std::string((lang == ScriptLanguage_CSharp) ? "-cs.dll" : "-vb.dll");
 		scriptEngine->appAssembly = MonoUtils::loadAssembly(path);
 		scriptEngine->appAssemblyImage = mono_assembly_get_image(scriptEngine->appAssembly);
 		MonoUtils::printAssemblyTypes(scriptEngine, scriptEngine->appAssembly, (int)lang);

@@ -117,6 +117,7 @@
     <ClInclude Include="core\ecs\level.h" />
     <ClInclude Include="core\ecs\levelmgr.h" />
     <ClInclude Include="core\ecs\sactor.h" />
+    <ClInclude Include="core\misc\engine_settings.h" />
     <ClInclude Include="core\misc\UUID.h" />
     <ClInclude Include="core\misc\cheat_codes.h" />
     <ClInclude Include="core\misc\frame_info.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="systems\handlers\material_handler.h" />
     <ClInclude Include="systems\handlers\render_handler.h" />
     <ClInclude Include="systems\rendering\billboard_system.h" />
+    <ClInclude Include="systems\rendering\deferred_render_system.h" />
     <ClInclude Include="systems\rendering\editor\editor_billboard_renderer.h" />
     <ClInclude Include="systems\rendering\editor\grid_system.h" />
     <ClInclude Include="systems\rendering\forward_render_system.h" />
@@ -181,6 +183,7 @@
     <ClInclude Include="workarounds.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="core\misc\engine_settings.cpp" />
     <ClCompile Include="Shard3D.cpp" />
     <ClCompile Include="core\asset\assetid.cpp" />
     <ClCompile Include="core\asset\assetmgr.cpp" />
@@ -220,6 +223,7 @@
     <ClCompile Include="systems\handlers\material_handler.cpp" />
     <ClCompile Include="systems\handlers\render_handler.cpp" />
     <ClCompile Include="systems\rendering\billboard_system.cpp" />
+    <ClCompile Include="systems\rendering\deferred_render_system.cpp" />
     <ClCompile Include="systems\rendering\editor\editor_billboard_renderer.cpp" />
     <ClCompile Include="systems\rendering\editor\grid_system.cpp" />
     <ClCompile Include="systems\rendering\forward_render_system.cpp" />

@@ -20,7 +20,7 @@ namespace Shard3D {
 		void eventEvent(Events::Event& e);
 		bool mouseButtonDownEvent(Events::MouseButtonDownEvent& e);
 		bool contextRefresh;
-		HUDRenderSystem hudRenderSystem;
+		Systems::HUDRenderSystem hudRenderSystem;
 		HUD hud;
 		friend class Application;
 	};

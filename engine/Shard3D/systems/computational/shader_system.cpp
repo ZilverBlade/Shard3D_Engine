@@ -11,7 +11,9 @@ namespace Shard3D {
 			msg += std::to_string(type);
 			msg += static_cast<char>(include_depth);
 
-			const std::string name = std::string(requested_source);
+			char tmp[256];
+			getcwd(tmp, 256);
+			const std::string name = std::string(tmp + std::string("/assets/_engine/shaderdata/surface_material/") + requested_source);
 			const std::string contents = IOUtils::readText(name, true);
 
 			auto container = new std::array<std::string, 2>;
@@ -109,10 +111,12 @@ namespace Shard3D {
 
 		if (pre_result.GetNumErrors() > 0) {
 			SHARD3D_ERROR(pre_result.GetErrorMessage());
+			return std::vector<char>();
 		}
 		
 		if (result.GetNumErrors() > 0) {
 			SHARD3D_ERROR(result.GetErrorMessage());
+			return std::vector<char>();
 		}
 
 		std::vector<uint32_t> sresult = std::vector<uint32_t>(result.cbegin(), result.cend());

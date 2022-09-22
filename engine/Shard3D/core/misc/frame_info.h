@@ -7,7 +7,6 @@
 #include "../ecs/level.h"
 
 namespace Shard3D {
-	// fix this shit up eventually, only temporary solution
 	struct Pointlight {
 		glm::vec4 position{};
 		glm::vec4 color{}; 
@@ -39,8 +38,12 @@ namespace Shard3D {
 		*/
 
 		glm::mat4 projection{ 1.f };
+		glm::mat4 inverseProjection{ 1.f };
 		glm::mat4 view{ 1.f };
 		glm::mat4 inverseView{ 1.f };
+
+		glm::vec2 screenSize = { 1280, 720 };
+		glm::vec2 alignmentbullshit;
 
 		//reyleigh scattering fakery and/or indirect light
 		glm::vec4 ambientColor = { 1.0f, 1.0f, 1.0f, 0.01f };
@@ -51,12 +54,6 @@ namespace Shard3D {
 		int numPointlights;
 		int numSpotlights;
 		int numDirectionalLights;
-		
-		alignas(16)glm::vec4 cameraSettings = {1.f, 0.5f, 0.f, 1.f};
-	};
-
-	struct ComputeUbo {
-		VkSampler inputImage;
 	};
 
 	struct FrameInfo {

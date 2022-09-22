@@ -16,8 +16,6 @@ namespace Shard3D {
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
 
-		constInfo.gameName = ini.GetValue("GAME", "gameName");
-
 		ini.LoadFile(GAME_SETTINGS_PATH);
 		read();
 	}

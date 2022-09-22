@@ -4,11 +4,14 @@
 #include "../../vulkan_abstr.h"
 #include "../../core/vulkan_api/pipeline_compute.h"
 namespace Shard3D {
+	inline namespace Systems {
+		class DeferredRenderSystem;
+	}
 	namespace Components {
 		struct TransformComponent;
 		struct Mesh3DComponent;
 	}
-
+	
 	/*
 		**current system:**
 			GOOD | bind mesh once
@@ -66,15 +69,41 @@ namespace Shard3D {
 		DELETE_COPY(SurfaceMaterialClass)
 
 		SurfaceMaterialClass(EngineDevice& device, SurfaceMaterialClassOptionsFlags flags);
-		void bind(VkCommandBuffer commandBuffer);
+		~SurfaceMaterialClass();
 		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig.shaderPipelineLayout; }
 		SurfaceMaterialClassOptionsFlags getClass() { return options_flags; }
 		_SurfaceMaterialShaderDescriptorLayoutsInfo& getDescriptorLayouts() { return materialDescriptorLayoutInfo; }
-	private:
-		_MaterialGraphicsPipelineConfigInfo materialPipelineConfig{};
+	protected:
+		_MaterialGraphicsPipelineConfigInfo materialPipelineConfig{};	
 		_SurfaceMaterialShaderDescriptorLayoutsInfo materialDescriptorLayoutInfo{};
 		SurfaceMaterialClassOptionsFlags options_flags;
 		EngineDevice& engineDevice;
+	};
+	
+	class SurfaceMaterialClassForward : public SurfaceMaterialClass {
+	public:
+		SurfaceMaterialClassForward(EngineDevice& device, SurfaceMaterialClassOptionsFlags flags);
+		void bindForward(VkCommandBuffer commandBuffer);
+	};
+	class SurfaceMaterialClassDeferred : public SurfaceMaterialClass {
+	public:
+		SurfaceMaterialClassDeferred(EngineDevice& device, SurfaceMaterialClassOptionsFlags flags);
+		void bindDeferred(VkCommandBuffer commandBuffer);
+	};
+
+
+	class SurfaceMaterialClassDeferredLighting {
+	public:
+		DELETE_COPY(SurfaceMaterialClassDeferredLighting)
+		SurfaceMaterialClassDeferredLighting(EngineDevice& device);
+		~SurfaceMaterialClassDeferredLighting();
+		VkPipelineLayout getPipelineLayout() { return materialPipelineConfig.shaderPipelineLayout; }
+		void bindDeferredLighting(VkCommandBuffer commandBuffer);
+	protected:
+		_MaterialGraphicsPipelineConfigInfo materialPipelineConfig{};
+		_SurfaceMaterialShaderDescriptorLayoutsInfo materialDescriptorLayoutInfo{};
+		EngineDevice& engineDevice;
+		friend class MaterialHandler;
 	};
 
 	struct SurfaceMaterialRenderInfo {
@@ -90,6 +119,8 @@ namespace Shard3D {
 		static void setRenderPassContext(VkRenderPass renderPass) { mRenderPass = renderPass; }
 		static void setGlobalSetLayout(VkDescriptorSetLayout globalSetLayout) { mGlobalSetLayout = globalSetLayout; }
 		static void setRenderedSceneImageLayout(VkDescriptorSetLayout renderedSceneLayout) { mPPOSceneSetLayout = renderedSceneLayout; }
+		static void setDeferredRenderingSystem(DeferredRenderSystem* system) { deferredRenderingSystem = system; }
+
 		static void setAllAvailableMaterialShaderPermutations(std::vector<SurfaceMaterialClassOptionsFlags>&& shaders);
 		static void destroy();
 
@@ -97,19 +128,23 @@ namespace Shard3D {
 		static void recompilePPO();
 
 		static void createSurfacePipelineLayout(
-			VkPipelineLayout* pipelineLayout,
-			VkDescriptorSetLayout factorLayout,
-			VkDescriptorSetLayout textureLayout
+			VkPipelineLayout* pipelineLayout, 
+			std::vector<VkDescriptorSetLayout> layouts,
+			VkPushConstantRange* pushConstantRange = nullptr
 		);
 
 		static void createSurfacePipeline(
 			uPtr<GraphicsPipeline>* pipeline,
 			VkPipelineLayout pipelineLayout,
 			GraphicsPipelineConfigInfo& pipelineConfig,
-			const std::string& fragment_shader
+			const std::string& fragment_shader,
+			const std::string& vertex_shader = "assets/shaderdata/mesh_shader.vert.spv"
 		);
 
-		static void createSurfacePipeline(uPtr<GraphicsPipeline>* pipeline, VkPipelineLayout pipelineLayout, GraphicsPipelineConfigInfo& pipelineConfig, SurfaceMaterialClass* self);
+		static void createSurfacePipeline(uPtr<GraphicsPipeline>* pipeline, 
+			VkPipelineLayout pipelineLayout, 
+			GraphicsPipelineConfigInfo& pipelineConfig, 
+			SurfaceMaterialClass* self, uint8_t subpassIndex);
 		
 		static void createPPOPipelineLayout(
 			VkPipelineLayout* pipelineLayout,
@@ -127,18 +162,34 @@ namespace Shard3D {
 		static void destroyPipelineLayout(VkPipelineLayout pipelineLayout);
 
 		// RENDERING LIST
-		static void bindMaterialClass(SurfaceMaterialClassOptionsFlags flags, VkCommandBuffer commandBuffer);
 		static SurfaceMaterialClass* getMaterialClass(SurfaceMaterialClassOptionsFlags flags);
-		static auto& getAvailableClasses() { return materialClassesOptions; }
+		static void bindMaterialClassDeferred(SurfaceMaterialClassOptionsFlags flags, VkCommandBuffer commandBuffer);
+		static void bindMaterialClassDeferredLighting(VkCommandBuffer commandBuffer, VkDescriptorSet globalSet);
+		static void bindMaterialClassForward(SurfaceMaterialClassOptionsFlags flags, VkCommandBuffer commandBuffer);
+
+		static auto& getAvailableClasses() { return materialClassesOptionsGlobal; }
+
+		static auto& getDeferrableClasses() { return materialClassesOptionsDeferred; }
+		static auto& getForwardOnlyClasses() { return materialClassesOptionsForward; }
 		static void debugPrintFlags(SurfaceMaterialClassOptionsFlags flags);
+		static DeferredRenderSystem* getDeferredRenderer() { return deferredRenderingSystem; }
 	private:
 		static inline EngineDevice* mDevice;
 		static inline VkRenderPass mRenderPass{};
+		static inline DeferredRenderSystem* deferredRenderingSystem;
 		static inline VkDescriptorSetLayout mGlobalSetLayout{};
 		static inline VkDescriptorSetLayout mPPOSceneSetLayout{};
 		static inline std::vector<std::string> compiledShaders{};
+		friend class SurfaceMaterialClassDeferredLighting;
 																	// unordered map instead of vector to speed up removing/adding elements if necessary on the fly
-		static inline std::vector<SurfaceMaterialClassOptionsFlags> materialClassesOptions;
-		static inline hashMap<SurfaceMaterialClassOptionsFlags, SurfaceMaterialClass*> materialClasses;
+		static inline std::vector<SurfaceMaterialClassOptionsFlags> materialClassesOptionsGlobal;
+
+		static inline std::vector<SurfaceMaterialClassOptionsFlags> materialClassesOptionsDeferred;
+		static inline std::vector<SurfaceMaterialClassOptionsFlags> materialClassesOptionsForward;
+
+		static inline hashMap<SurfaceMaterialClassOptionsFlags, SurfaceMaterialClass*> materialClassesGlobal;
+		static inline hashMap<SurfaceMaterialClassOptionsFlags, SurfaceMaterialClassDeferred*> materialClassesDeferred;
+		static inline hashMap<SurfaceMaterialClassOptionsFlags, SurfaceMaterialClassForward*> materialClassesForward;
+		static inline SurfaceMaterialClassDeferredLighting* materialClassDeferredLighting;
 	};
 }
