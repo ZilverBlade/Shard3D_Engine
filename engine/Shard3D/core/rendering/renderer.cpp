@@ -130,9 +130,9 @@ namespace Shard3D::Rendering {
 
 		VkViewport viewport{};
 		viewport.x = 0.0f;
-		viewport.y = static_cast<float>(engineSwapChain->getSwapChainExtent().height);
+		viewport.y = 0.0f;
 		viewport.width = static_cast<float>(engineSwapChain->getSwapChainExtent().width);
-		viewport.height = -static_cast<float>(engineSwapChain->getSwapChainExtent().height);
+		viewport.height = static_cast<float>(engineSwapChain->getSwapChainExtent().height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
 		VkRect2D scissor{ {0, 0}, engineSwapChain->getSwapChainExtent() };

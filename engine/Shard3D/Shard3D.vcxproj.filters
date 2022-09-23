@@ -270,6 +270,9 @@
     <ClInclude Include="core\misc\engine_settings.h">
       <Filter>core\misc</Filter>
     </ClInclude>
+    <ClInclude Include="core\vulkan_api\sync.h">
+      <Filter>core\vulkan_api</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shard3D.cpp" />
@@ -416,5 +419,8 @@
       <Filter>systems\rendering</Filter>
     </ClCompile>
     <ClCompile Include="core\misc\engine_settings.cpp" />
+    <ClCompile Include="core\vulkan_api\sync.cpp">
+      <Filter>core\vulkan_api</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

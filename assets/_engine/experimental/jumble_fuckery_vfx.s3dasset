@@ -1,0 +1,7 @@
+Shard3D: 1.2.9.r1-alpha
+AssetType: postprocessing_material
+PPOMaterial:
+  - Material: GBufferVisualizer
+    Data:
+      Shader: assets/_engine/experimental/gbuffer_Test.comp
+      MyParams: [[2, GBufferIndex, !!binary "AAAAAA=="]]

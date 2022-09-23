@@ -83,47 +83,47 @@ namespace Shard3D::Systems {
 			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT,
 			VK_IMAGE_LAYOUT_GENERAL,
 			VK_SAMPLE_COUNT_1_BIT
-			}, FrameBufferAttachmentType::Color, false
+			}, FrameBufferAttachmentType::Color
 		);
 
 		depthFramebufferAttachment = new Rendering::FrameBufferAttachment(engineDevice, {
 			depthFormat,
 			VK_IMAGE_ASPECT_DEPTH_BIT,
 			windowSize,
-			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
-			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+			VK_IMAGE_LAYOUT_GENERAL,
 			VK_SAMPLE_COUNT_1_BIT
-			}, FrameBufferAttachmentType::Depth, false
+			}, FrameBufferAttachmentType::Depth
 		);
 
 		normalFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 			framebufferFormat,
 			VK_IMAGE_ASPECT_COLOR_BIT,
 			windowSize,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
 			VK_IMAGE_LAYOUT_GENERAL,
 			VK_SAMPLE_COUNT_1_BIT
-			}, FrameBufferAttachmentType::Color, false
+			}, FrameBufferAttachmentType::Color
 		);
 
 		materialDiffuseFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 			framebufferFormat,
 			VK_IMAGE_ASPECT_COLOR_BIT,
 			windowSize,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
 			VK_IMAGE_LAYOUT_GENERAL,
 			VK_SAMPLE_COUNT_1_BIT
-			}, FrameBufferAttachmentType::Color, false
+			}, FrameBufferAttachmentType::Color
 		);
 
 		materialParamFramebufferAttachment = new FrameBufferAttachment(engineDevice, {
 			framebufferFormat,
 			VK_IMAGE_ASPECT_COLOR_BIT,
 			windowSize,
-			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
 			VK_IMAGE_LAYOUT_GENERAL,
 			VK_SAMPLE_COUNT_1_BIT
-			}, FrameBufferAttachmentType::Color, false
+			}, FrameBufferAttachmentType::Color
 		);
 
 		deferredRenderpass = new RenderPassAdvanced(

@@ -136,6 +136,7 @@
     <ClInclude Include="core\vulkan_api\device.h" />
     <ClInclude Include="core\vulkan_api\pipeline.h" />
     <ClInclude Include="core\vulkan_api\pipeline_compute.h" />
+    <ClInclude Include="core\vulkan_api\sync.h" />
     <ClInclude Include="dynamic_definitions.h" />
     <ClInclude Include="ecs.h" />
     <ClInclude Include="events\event.h" />
@@ -184,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\misc\engine_settings.cpp" />
+    <ClCompile Include="core\vulkan_api\sync.cpp" />
     <ClCompile Include="Shard3D.cpp" />
     <ClCompile Include="core\asset\assetid.cpp" />
     <ClCompile Include="core\asset\assetmgr.cpp" />

@@ -15,7 +15,7 @@ namespace Shard3D {
 
 		class RenderPass {
 		public:
-			RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments);
+			RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments, bool fromCompute = false);
 			~RenderPass();
 
 			DELETE_COPY(RenderPass)

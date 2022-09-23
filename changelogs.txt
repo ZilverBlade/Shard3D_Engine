@@ -211,6 +211,10 @@ ALPHA:
 		- Implemented deferred rendering
 		- Improved transparency rendering (however improvements could be made)
 		- Increased maximum lights limit from 128 to 256 (for spotlights and pointlights) and from 6 to 16 (for directional lights)
+		- Fixed several synchronization issues
+		- Potentially fixed depth buffer not working on AMD graphics cards
+		- Added synchronization abstraction
+		- Fixed several validation errors
 
 		:: TODO, proper events sytem, fix issue with resources not being unloaded, add editor layouts, use premake
 		:: Fix: dont use 64 bit integers for shaders (e.g. HUD system)

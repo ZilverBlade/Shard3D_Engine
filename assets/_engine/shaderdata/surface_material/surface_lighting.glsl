@@ -64,7 +64,7 @@ vec3 calculateLight(ShadedPixelInfo pixel) {
 		float attenuation = 1.0 / (dist * dist);
 		
 		float strength = light.color.w * attenuation;
-		if (strength < 0.01) continue;	// light culling
+		if (strength < 0.001) continue;	// light culling
 		vec3 radiance = strength * light.color.xyz;
 
 		lightOutput +=
@@ -79,7 +79,7 @@ vec3 calculateLight(ShadedPixelInfo pixel) {
 		float attenuation = 1.0 / (dist * dist);
 		
 		float strength = light.color.w * attenuation;
-		if (strength < 0.01) continue;	// light culling
+		if (strength < 0.001) continue;	// light culling
 		vec3 radiance = strength * light.color.xyz;
 
 		vec3 L = normalize(light.position.xyz - pixel.positionWorld);

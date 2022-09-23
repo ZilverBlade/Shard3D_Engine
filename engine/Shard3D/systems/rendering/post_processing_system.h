@@ -43,6 +43,9 @@ namespace Shard3D {
 
 			uPtr<EngineDescriptorSetLayout> ppo_Layout{};
 
+			Synchronization syncComputePPO{ SynchronizationType::GraphicsToCompute, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+			Synchronization syncComputeDepth{ SynchronizationType::GraphicsToCompute, VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT };
+			
 			VkPipelineLayout pipelineLayout{};
 		};
 	}

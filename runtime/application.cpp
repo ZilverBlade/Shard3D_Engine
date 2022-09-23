@@ -100,6 +100,13 @@ namespace Shard3D {
 
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
+		Synchronization syncDebander{ SynchronizationType::ComputeToGraphics, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT };
+		syncDebander.addImageBarrier(
+			SynchronizationAttachment::None,
+			gbuffer.baseRenderedScene->getImage(),
+			gbuffer.baseRenderedScene->getImageSubresourceRange(),
+			VK_IMAGE_LAYOUT_GENERAL
+		);
 
 		ResourceHandler::init(engineDevice);
 		level = make_sPtr<ECS::Level>();
@@ -159,10 +166,12 @@ namespace Shard3D {
 				deferredRenderSystem.beginRenderPass(frameInfo);
 				deferredRenderSystem.renderDeferred(frameInfo);
 				billboardRenderSystem.render(frameInfo);
+				deferredRenderSystem.renderForward(frameInfo);
 				deferredRenderSystem.endRenderPass(frameInfo);
 
 				ppoSystem.render(frameInfo);
 				ppoSystem.renderGammaCorrection(frameInfo);
+				syncDebander.syncBarrier(frameInfo.commandBuffer); 
 				engineRenderer.beginSwapChainRenderPass(commandBuffer);
 				ppoSystem.renderImageFlipForPresenting(frameInfo);
 				engineRenderer.endSwapChainRenderPass(commandBuffer);
@@ -171,6 +180,8 @@ namespace Shard3D {
 				if (engineWindow.wasWindowResized()) {
 					glm::ivec3 newsize = { engineWindow.getExtent().width, engineWindow.getExtent().height , 1 };
 					deferredRenderSystem.resize(newsize);
+					syncDebander.clearBarriers();
+					syncDebander.addImageBarrier(SynchronizationAttachment::None, gbuffer.baseRenderedScene->getImage(), gbuffer.baseRenderedScene->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL);
 					resizeFrameBuffers(newsize.x, newsize.y, &ppoSystem, &gbuffer);
 					engineWindow.resetWindowResizedFlag();
 				}

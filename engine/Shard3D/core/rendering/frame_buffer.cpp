@@ -2,9 +2,9 @@
 #include "frame_buffer.h"
 #include <Shlwapi.h>
 namespace Shard3D::Rendering {
-	FrameBufferAttachment::FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler) 
+	FrameBufferAttachment::FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType) 
 		: engineDevice(device), description(attachmentDescription), _attachmentType(attachmentType) {
-		create(engineDevice, attachmentDescription, this->_attachmentType, hasSampler);
+		create(engineDevice, attachmentDescription, this->_attachmentType);
 	}
 	void FrameBufferAttachment::destroy() {
 		vkDestroyImageView(engineDevice.device(), imageView, nullptr);
@@ -19,10 +19,10 @@ namespace Shard3D::Rendering {
 	void FrameBufferAttachment::resize(glm::ivec3 newDimensions) {
 		destroy();
 		description.dimensions = newDimensions;
-		create(engineDevice, description, this->_attachmentType, this->sampler);
+		create(engineDevice, description, this->_attachmentType);
 	}	
 
-	void FrameBufferAttachment::create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler) {
+	void FrameBufferAttachment::create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType) {
 		VkImageCreateInfo imageCreateInfo{};
 		imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -35,7 +35,7 @@ namespace Shard3D::Rendering {
 		imageCreateInfo.samples = attachmentDescription.samples;
 		imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		// We will sample directly from the color attachment
-		imageCreateInfo.usage = attachmentDescription.usage | (VK_IMAGE_USAGE_SAMPLED_BIT * hasSampler);
+		imageCreateInfo.usage = attachmentDescription.usage;
 		VkMemoryAllocateInfo memAlloc = {};
 		memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		VkMemoryRequirements memReqs;
@@ -57,19 +57,19 @@ namespace Shard3D::Rendering {
 		imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		imageViewCreateInfo.format = description.frameBufferFormat;
-		imageViewCreateInfo.subresourceRange = {};
-		imageViewCreateInfo.subresourceRange.aspectMask = description.imageAspect;
-		imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-		imageViewCreateInfo.subresourceRange.levelCount = 1;
-		imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-		imageViewCreateInfo.subresourceRange.layerCount = 1;
+		subresourceRange.aspectMask = description.imageAspect;
+		subresourceRange.baseMipLevel = 0;
+		subresourceRange.levelCount = 1;
+		subresourceRange.baseArrayLayer = 0;
+		subresourceRange.layerCount = 1;
+		imageViewCreateInfo.subresourceRange = subresourceRange;
 		imageViewCreateInfo.image = image;
 
 		if (vkCreateImageView(device.device(), &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS) {
 			SHARD3D_ERROR("Failed to create image view!");
 		}
 
-		if (hasSampler) {
+		if (attachmentDescription.usage & VK_IMAGE_USAGE_SAMPLED_BIT) {
 			// Create sampler to sample from the attachment in the fragment shader
 			VkSamplerCreateInfo samplerInfo = {};
 			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;

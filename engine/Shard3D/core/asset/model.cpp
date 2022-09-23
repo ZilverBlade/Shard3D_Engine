@@ -267,7 +267,6 @@ namespace Shard3D::Resources {
 
 			SHARD3D_LOG("Creating primitive data for slot {0} with index {1}", materialSlot, slotPtrs.size() - 1);
 		}
-		hashMap<Vertex, uint32_t> uniqueVertices{};
 		for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
 			Vertex vertex{};
 			vertex.position = {
@@ -290,9 +289,9 @@ namespace Shard3D::Resources {
 			submeshes[materialSlot].vertices.push_back(vertex);
 		}
 
-		for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+		for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
 			aiFace face = mesh->mFaces[i];
-			for (unsigned int j = 0; j < face.mNumIndices; j++)
+			for (uint32_t j = 0; j < face.mNumIndices; j++)
 				submeshes[materialSlot].indices.push_back(face.mIndices[j]);
 		}
 

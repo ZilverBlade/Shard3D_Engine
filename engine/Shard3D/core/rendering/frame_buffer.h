@@ -23,13 +23,14 @@ namespace Shard3D {
 
 		class FrameBufferAttachment {
 		public:
-			FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
+			FrameBufferAttachment(EngineDevice& device, FrameBufferAttachmentDescription&& attachmentDescription, FrameBufferAttachmentType attachmentType);
 			~FrameBufferAttachment();
 
 			DELETE_COPY(FrameBufferAttachment)
 			DELETE_MOVE(FrameBufferAttachment)
 
 			inline VkImage getImage() { return image; }
+			inline VkImageSubresourceRange getImageSubresourceRange() { return subresourceRange; }
 			inline VkImageView getImageView() { return imageView; }
 			inline VkSampler getSampler() { SHARD3D_ASSERT(sampler && "Sampler was never created or is of type for a subpass!"); return sampler; }
 			inline VkImageLayout getImageLayout() { return finalLayout; }
@@ -42,9 +43,10 @@ namespace Shard3D {
 			void resize(glm::ivec3 newDimensions);
 		private:
 			void destroy();
-			void create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType, bool hasSampler = true);
+			void create(EngineDevice& device, const FrameBufferAttachmentDescription& attachmentDescription, FrameBufferAttachmentType attachmentType);
 
 			VkImage image{};
+			VkImageSubresourceRange subresourceRange{};
 			VkImageView imageView{};
 			VkSampler sampler{};
 			VkImageLayout finalLayout{};

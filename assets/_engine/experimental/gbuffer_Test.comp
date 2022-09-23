@@ -1,0 +1,39 @@
+
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;
+layout (set = 0, binding = 0, rgba32f) uniform image2D postProcessImage;
+layout (set = 0, binding = 1) uniform sampler2D depthImage;
+layout (set = 0, binding = 2) uniform sampler2D normalImage;
+layout (set = 0, binding = 3) uniform sampler2D mDiffuseImage;
+layout (set = 0, binding = 4) uniform sampler2D mParamImage;
+layout (set = 1, binding = 0) readonly buffer myParams {
+	int mode;
+} gbufferVisualizer;
+
+
+vec2 texCoordFromPixelCoord(vec2 myCoord, vec2 myArea) {
+    return myCoord / myArea;
+}
+
+void main()	{
+    vec3 pixelColor = imageLoad(postProcessImage, ivec2(gl_GlobalInvocationID.xy)).rgb;
+    vec2 samplerCoord = texCoordFromPixelCoord(gl_GlobalInvocationID.xy, imageSize(postProcessImage));
+    float fragDepth = texture(depthImage, samplerCoord).x;
+	vec3 fragNormal = texture(normalImage, samplerCoord).xyz;
+	vec3 fragMatDiffuse = texture(mDiffuseImage, samplerCoord).xyz;
+	vec4 fragMatParam = texture(mParamImage, samplerCoord).xyzw;
+
+	vec3 outColor = vec3(0.0);
+
+ 	if (gbufferVisualizer.mode == 0) outColor = pixelColor;
+ 	if (gbufferVisualizer.mode == 1) outColor = vec3(fragDepth);
+ 	if (gbufferVisualizer.mode == 2) outColor = fragNormal;
+ 	if (gbufferVisualizer.mode == 3) outColor = fragMatDiffuse;
+ 	if (gbufferVisualizer.mode == 4) outColor = vec3(fragMatParam.x);
+ 	if (gbufferVisualizer.mode == 5) outColor = vec3(fragMatParam.y);
+ 	if (gbufferVisualizer.mode == 6) outColor = vec3(fragMatParam.z);
+ 	if (gbufferVisualizer.mode == 7) outColor = vec3(fragMatParam.w);
+
+    imageStore(postProcessImage, ivec2(gl_GlobalInvocationID.xy), vec4(outColor, 1.0));
+}

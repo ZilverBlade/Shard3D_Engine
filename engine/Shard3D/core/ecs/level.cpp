@@ -209,7 +209,7 @@ namespace Shard3D {
 			}
 			{
 				for (HUD* hud : TEMPORARY::hudList) for (auto& element : hud->elements)
-						ScriptEngine::hudScript().begin(element.second.get());
+					ScriptEngine::hudScript().begin(element.second.get());
 			}
 		//	physicsSystemPtr->begin(this);
 			SHARD3D_INFO("Beginning simulation");
@@ -288,7 +288,8 @@ namespace Shard3D {
 
 			if (actor.hasComponent<Components::RelationshipComponent>()) {
 				if (actor.getComponent<Components::RelationshipComponent>().parentActor != entt::null) {
-					std::vector<entt::entity>& childVector = Actor(actor.getComponent<Components::RelationshipComponent>().parentActor, this).getComponent<Components::RelationshipComponent>().childActors;
+					std::vector<entt::entity>& childVector = Actor(actor.getComponent<Components::RelationshipComponent>().parentActor, this)
+						.getComponent<Components::RelationshipComponent>().childActors;
 					std::vector<entt::entity>::iterator q = childVector.begin();	
 					for (int i = 0; i < childVector.size(); i++) {
 						if (childVector.at(i) == actor) break;

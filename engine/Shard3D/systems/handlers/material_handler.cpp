@@ -428,7 +428,6 @@ namespace Shard3D {
 		pipelineConfigInfo.colorBlendInfo.attachmentCount = 3;
 		VkPipelineColorBlendAttachmentState attachments[3]{ pipelineConfigInfo.colorBlendAttachment,pipelineConfigInfo.colorBlendAttachment ,pipelineConfigInfo.colorBlendAttachment };
 		pipelineConfigInfo.colorBlendInfo.pAttachments = attachments;
-
 		MaterialHandler::createSurfacePipeline(
 			&materialPipelineConfig.shaderPipeline,
 			materialPipelineConfig.shaderPipelineLayout,
@@ -452,7 +451,7 @@ namespace Shard3D {
 			.disableDepthTest()
 			.setCullMode(VK_CULL_MODE_BACK_BIT)
 			.setSubpass(1);
-
+		
 		std::stringstream stream;
 		std::stringstream cacheDir;
 

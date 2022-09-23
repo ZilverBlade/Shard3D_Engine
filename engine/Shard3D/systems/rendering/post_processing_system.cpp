@@ -20,11 +20,19 @@ namespace Shard3D::Systems {
 
 		EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
 			.writeImage(0, &baseimageinfo)
-		//	.writeImage(1, &dbufferimageInfo)
+			.writeImage(1, &dbufferimageInfo)
 			.writeImage(2, &normrimageInfo)
 			.writeImage(3, &mdiffuseimageInfo)
 			.writeImage(4, &mparamimageInfo)
 			.build(ppo_InputDescriptorSet);
+
+		syncComputePPO.clearBarriers();
+		syncComputeDepth.clearBarriers();
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->baseRenderedScene->getImage(), imageInput->baseRenderedScene->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL);
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->normalSceneInfo->getImage(), imageInput->normalSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL);
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->materialDiffuseSceneInfo->getImage(), imageInput->materialDiffuseSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL);
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->materialParamSceneInfo->getImage(), imageInput->materialParamSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL);
+		syncComputeDepth.addImageBarrier(SynchronizationAttachment::Depth, imageInput->depthSceneInfo->getImage(), imageInput->depthSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL);
 	}
 
 	PostProcessingSystem::PostProcessingSystem(EngineDevice& device, VkRenderPass presentingRenderPass, GBufferInputData* imageInput) : engineDevice(device) {
@@ -36,15 +44,15 @@ namespace Shard3D::Systems {
 
 		ppo_Layout = EngineDescriptorSetLayout::Builder(engineDevice)
 			.addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
-		//	.addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
-			.addBinding(4, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+			.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+			.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+			.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+			.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
 			.build();
 
 		EngineDescriptorWriter(*ppo_Layout, *SharedPools::staticMaterialPool)
 			.writeImage(0, &baseimageinfo)
-		//	.writeImage(1, &dbufferimageInfo)
+			.writeImage(1, &dbufferimageInfo)
 			.writeImage(2, &normrimageInfo)
 			.writeImage(3, &mdiffuseimageInfo)
 			.writeImage(4, &mparamimageInfo)
@@ -54,6 +62,12 @@ namespace Shard3D::Systems {
 
 		createPipelineLayout();
 		createPipelines(presentingRenderPass);
+
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->baseRenderedScene->getImage(), imageInput->baseRenderedScene->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL); 
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->normalSceneInfo->getImage(), imageInput->normalSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->materialDiffuseSceneInfo->getImage(), imageInput->materialDiffuseSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		syncComputePPO.addImageBarrier(SynchronizationAttachment::Color, imageInput->materialParamSceneInfo->getImage(), imageInput->materialParamSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		syncComputeDepth.addImageBarrier(SynchronizationAttachment::Depth, imageInput->depthSceneInfo->getImage(), imageInput->depthSceneInfo->getImageSubresourceRange(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
 	}
 
 	PostProcessingSystem::~PostProcessingSystem() {
@@ -102,6 +116,8 @@ namespace Shard3D::Systems {
 	}
 
 	void PostProcessingSystem::render(FrameInfo& frameInfo) {
+		syncComputePPO.syncBarrier(frameInfo.commandBuffer);
+		syncComputeDepth.syncBarrier(frameInfo.commandBuffer);
 		for (auto& material : frameInfo.activeLevel->getPossessedCameraActor().getComponent<Components::CameraComponent>().postProcessMaterials) {
 			material.dispatch(frameInfo.commandBuffer, ppo_InputDescriptorSet);
 		}

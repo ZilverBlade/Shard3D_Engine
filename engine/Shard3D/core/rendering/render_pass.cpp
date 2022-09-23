@@ -4,7 +4,7 @@
 // Basic RenderPass abstraction (single subpass)
 
 namespace Shard3D::Rendering {
-	RenderPass::RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments) : engineDevice(device) {
+	RenderPass::RenderPass(EngineDevice& device, const std::vector<AttachmentInfo>& attachments, bool fromCompute) : engineDevice(device) {
 		CSimpleIniA ini;
 		ini.SetUnicode();
 		ini.LoadFile(ENGINE_SETTINGS_PATH);
@@ -38,7 +38,7 @@ namespace Shard3D::Rendering {
 		subpassDescription.pColorAttachments = nullptr;
 		subpassDescription.pDepthStencilAttachment = nullptr;
 		subpassDescription.pResolveAttachments = nullptr;
-
+		
 		for (uint32_t i = 0; i < attachments.size(); i++) {
 			switch (attachments[i].frameBufferAttachment->getType()) {
 			case (FrameBufferAttachmentType::Color): {
@@ -66,9 +66,10 @@ namespace Shard3D::Rendering {
 
 		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
 		dependencies[0].dstSubpass = 0;
-		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		dependencies[0].srcStageMask = fromCompute ? VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT : VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+			| VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT | (fromCompute * VK_ACCESS_SHADER_WRITE_BIT);
 		dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
@@ -213,18 +214,19 @@ namespace Shard3D::Rendering {
 				uint32_t renderTarget = subpassInfos[i].subpassInputs[j];
 				if (attachments[renderTarget].frameBufferAttachment->getType() == FrameBufferAttachmentType::Depth) {
 					subpassDescriptionMy.depthReference.attachment = renderTarget;
-					subpassDescriptionMy.depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+					subpassDescriptionMy.depthReference.layout = attachments[renderTarget].frameBufferAttachment->getDescription().finalLayout;
 
 					hasDepth = true;
 				}
 				else {
-					VkAttachmentReference inputReference{};
-					inputReference.attachment = renderTarget;
-					inputReference.layout = attachments[renderTarget].frameBufferAttachment->getDescription().finalLayout;
-					subpassDescriptionMy.inputReferences.push_back(inputReference);
-
 					hasInput = true;
 				}
+				VkAttachmentReference inputReference{};
+				inputReference.attachment = renderTarget;
+				inputReference.layout = attachments[renderTarget].frameBufferAttachment->getDescription().finalLayout;
+				subpassDescriptionMy.inputReferences.push_back(inputReference);
+
+
 			}
 
 			if (hasDepth) {
@@ -253,9 +255,11 @@ namespace Shard3D::Rendering {
 			firstDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 			firstDependency.dstSubpass = 0;
 			firstDependency.srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-			firstDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			firstDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT 
+				| VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 			firstDependency.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-			firstDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			firstDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT 
+				| VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 			firstDependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
 			for (size_t i = 1; i < (dependencies.size() - 1); i++) {

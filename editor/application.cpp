@@ -37,20 +37,15 @@ namespace Shard3D {
 				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				{ wndWidth, wndHeight, 1 },
-				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 				VK_SAMPLE_COUNT_1_BIT
 				}, FrameBufferAttachmentType::Color);
 
-			AttachmentInfo colorAttachmentInfo{};
-			colorAttachmentInfo.frameBufferAttachment = ppoColorFramebufferAttachment;
-			colorAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-			colorAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
 			ppoRenderpass = new RenderPass(
 				engineDevice, {
-				colorAttachmentInfo
-				});
+					{.frameBufferAttachment = ppoColorFramebufferAttachment, .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR, .storeOp = VK_ATTACHMENT_STORE_OP_STORE }
+				}, true);
 
 			ppoFrameBuffer = new FrameBuffer(engineDevice, ppoRenderpass->getRenderPass(), { ppoColorFramebufferAttachment });
 		}
@@ -125,7 +120,6 @@ namespace Shard3D {
 				.writeBuffer(0, &bufferInfo)
 				.build(globalDescriptorSets[i]);
 		}
-
 		
 		DeferredRenderSystem deferredRenderSystem{ engineDevice, globalSetLayout->getDescriptorSetLayout() };
 
@@ -140,6 +134,13 @@ namespace Shard3D {
 
 		PhysicsSystem physicsSystem{};
 		LightSystem lightSystem{};
+		Synchronization syncDebander{ SynchronizationType::ComputeToGraphics, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT };
+		syncDebander.addImageBarrier(
+			SynchronizationAttachment::None,
+			gbuffer.baseRenderedScene->getImage(),
+			gbuffer.baseRenderedScene->getImageSubresourceRange(),
+			VK_IMAGE_LAYOUT_GENERAL
+		);
 
 		ResourceHandler::init(engineDevice);
 		// level must be created after resource handler has been initialised due to the fact that the editor camera is created with post processing materials
@@ -307,8 +308,8 @@ beginWhileLoop:
 				//SHARD3D_STAT_RECORD_END({ "Post Processing", "Main" });
 
 				SHARD3D_STAT_RECORD();
+				syncDebander.syncBarrier(frameInfo.commandBuffer);
 				ppoRenderpass->beginRenderPass(frameInfo, ppoFrameBuffer);
-
 				ppoSystem.renderImageFlipForPresenting(frameInfo);
 
 				hudLayer0.render(frameInfo);
@@ -335,6 +336,8 @@ beginWhileLoop:
 				if (engineWindow.wasWindowResized()) {
 					glm::ivec3 newsize = { engineWindow.getExtent().width, engineWindow.getExtent().height , 1};
 					deferredRenderSystem.resize(newsize);
+					syncDebander.clearBarriers();
+					syncDebander.addImageBarrier(SynchronizationAttachment::None, gbuffer.baseRenderedScene->getImage(), gbuffer.baseRenderedScene->getImageSubresourceRange(), VK_IMAGE_LAYOUT_GENERAL);
 					resizeFrameBuffers(newsize.x, newsize.y, &imguiLayer, &ppoSystem, &gbuffer);
 					engineWindow.resetWindowResizedFlag();
 				}
