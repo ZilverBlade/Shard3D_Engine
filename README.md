@@ -1,3 +1,7 @@
+# IMPORTANT NOTICE
+### Shard3D has moved over to GitLabs! This is due to storage issues and bandwith from the libraries included (especially .lib), and github not wanting to accept my student benefits request for whatever reason
+## [You can find my repository here now!](https://gitlab.com/ZilverBlade/Shard3D_Engine)
+
 
 ![](https://cdn.discordapp.com/attachments/763044823342776340/1002705748121354302/unknown.png)  
 
